@@ -426,7 +426,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'basic' | 'details' | 'stats' | 'media' | 'builds' | 'recommendations' | 'talents' | 'constellations')}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   activeTab === tab.id
                     ? 'bg-purple-600 text-white shadow-lg'
@@ -859,6 +859,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                   <div className="mb-4">
                     <h5 className="text-sm font-medium text-gray-400 mb-2">Рекомендуемое оружие:</h5>
                     <div className="flex flex-wrap gap-2">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {recommendations[0].weapons.map((weaponItem: any, index: number) => {
                         // Обрабатываем случай, когда оружие может быть объектом или строкой
                         const weaponId = typeof weaponItem === 'string' ? weaponItem : weaponItem.id;

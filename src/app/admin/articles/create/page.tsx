@@ -424,12 +424,14 @@ console.log(&quot;Hello World&quot;);
       {/* Инструкции по работе с изображениями */}
       <div className="mt-8 p-6 bg-neutral-800 rounded-lg">
         <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <Image className="w-5 h-5" />
           Работа с изображениями в редакторе
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-neutral-300">
           <div>
             <h4 className="font-medium text-white mb-3 flex items-center gap-2">
+              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image className="w-4 h-4" />
               Одиночные изображения
             </h4>

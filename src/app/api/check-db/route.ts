@@ -34,7 +34,8 @@ export async function GET() {
         count,
         samples: samples.map((doc: Record<string, unknown>) => {
           // Убираем _id из примера для читаемости
-          const { _id: _unused, ...rest } = doc;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { _id, ...rest } = doc;
           return rest;
         })
       };
