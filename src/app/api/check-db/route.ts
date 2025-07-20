@@ -34,7 +34,7 @@ export async function GET() {
         count,
         samples: samples.map((doc: Record<string, unknown>) => {
           // Убираем _id из примера для читаемости
-          const { _id, ...rest } = doc;
+          const { _id: _unused, ...rest } = doc;
           return rest;
         })
       };

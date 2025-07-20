@@ -22,6 +22,8 @@ interface EditCharacterPageProps {
   params: Promise<{ id: string }>;
 }
 
+
+
 export default function EditCharacterPage({ params }: EditCharacterPageProps) {
   const router = useRouter();
   const [character, setCharacter] = useState<Character | null>(null);
@@ -39,12 +41,16 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'stats' | 'media' | 'builds' | 'recommendations' | 'talents' | 'constellations'>('basic');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [builds, setBuilds] = useState<any[]>([]);
   const [buildModalOpen, setBuildModalOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [editingBuild, setEditingBuild] = useState<any>(null);
   const [weaponsList, setWeaponsList] = useState<Weapon[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [recommendationModalOpen, setRecommendationModalOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [editingRecommendation, setEditingRecommendation] = useState<any>(null);
   const [isEditingGameplayDescription, setIsEditingGameplayDescription] = useState(false);
   const [gameplayDescriptionDraft, setGameplayDescriptionDraft] = useState('');
@@ -169,6 +175,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
     setBuildModalOpen(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditBuild = (build: any) => {
     setEditingBuild(build);
     setBuildModalOpen(true);
@@ -190,6 +197,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSaveBuild = async (build: any) => {
     try {
       if (editingBuild) {
@@ -221,6 +229,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
     setRecommendationModalOpen(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditRecommendation = (recommendation: any) => {
     setEditingRecommendation(recommendation);
     setRecommendationModalOpen(true);
@@ -237,6 +246,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSaveRecommendation = async (recommendation: any) => {
     try {
       const { id } = await params;
@@ -852,6 +862,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                       {recommendations[0].weapons.map((weaponItem: any, index: number) => {
                         // Обрабатываем случай, когда оружие может быть объектом или строкой
                         const weaponId = typeof weaponItem === 'string' ? weaponItem : weaponItem.id;
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const weapon = weaponsList.find((w: any) => w.id === weaponId);
                         
                         if (weapon) {
@@ -883,6 +894,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                   <div className="mb-4">
                     <h5 className="text-sm font-medium text-gray-400 mb-2">Рекомендуемые артефакты:</h5>
                     <div className="flex flex-wrap gap-2">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {recommendations[0].artifacts.map((artifact: any, artifactIndex: number) => {
                         if ('id' in artifact) {
                           return (
