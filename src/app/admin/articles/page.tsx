@@ -9,7 +9,7 @@ import { AddButton } from '@/components/ui/add-button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import OptimizedImage from '@/components/ui/optimized-image';
-import { Plus, Edit, Trash2, Eye, Calendar, User, Star } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Calendar, User, Star, Globe } from 'lucide-react';
 
 export default function ArticlesAdminPage() {
   const [articles, setArticles] = useState<Article[]>([]);

@@ -2,15 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Character, Artifact, ArtifactOrCombination } from '@/types';
+import { Character } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import OptimizedImage from '@/components/ui/optimized-image';
-import { Save, Upload, Star, Users, Sword, Shield, Globe, FileText, Settings, ArrowLeft } from 'lucide-react';
+import { Save, Upload, Star, Users, Shield, FileText, Settings, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { WeaponSelectModal } from '@/components/builds/WeaponSelectModal';
-import { ArtifactSelectModal } from '@/components/builds/ArtifactSelectModal';
 import BuildForm from '@/components/builds/BuildForm';
 import RecommendationForm from '@/components/builds/RecommendationForm';
 import TextFormattingToolbar from '@/components/admin/TextFormattingToolbar';
@@ -18,7 +16,7 @@ import SuggestionHelper from '@/components/admin/SuggestionHelper';
 import TalentManager from '@/components/admin/TalentManager';
 import ConstellationManager from '@/components/admin/ConstellationManager';
 import { Weapon } from '@/types';
-import { getSafeImageUrl, getImageWithFallback } from '@/lib/utils/imageUtils';
+import { getImageWithFallback } from '@/lib/utils/imageUtils';
 
 interface EditCharacterPageProps {
   params: Promise<{ id: string }>;

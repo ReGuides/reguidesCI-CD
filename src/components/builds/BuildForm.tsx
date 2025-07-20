@@ -321,7 +321,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
           </div>
           {mainStats.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
-              {mainStats.map((stat, index) => (
+              {mainStats.map((stat) => (
                 <div key={stat} className="flex items-center gap-1 bg-purple-600/20 border border-purple-500 rounded px-2 py-1">
                   <span className="text-sm text-purple-300">{STAT_LABELS[stat]}</span>
                   <button
@@ -358,7 +358,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
           </div>
           {subStats.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
-              {subStats.map((stat, index) => (
+              {subStats.map((stat) => (
                 <div key={stat} className="flex items-center gap-1 bg-green-600/20 border border-green-500 rounded px-2 py-1">
                   <span className="text-sm text-green-300">{STAT_LABELS[stat]}</span>
                   <button

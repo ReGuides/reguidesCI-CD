@@ -43,15 +43,6 @@ export default function ArtifactsAdminPage() {
     return matchesSearch && matchesRarity;
   });
 
-  const getRarityColor = (rarity: number) => {
-    switch (rarity) {
-      case 5: return 'text-yellow-400';
-      case 4: return 'text-purple-400';
-      case 3: return 'text-blue-400';
-      default: return 'text-gray-400';
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">

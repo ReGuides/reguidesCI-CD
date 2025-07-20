@@ -29,7 +29,7 @@ export function WeaponGrid() {
       } else {
         setError(data.error || 'Failed to fetch weapons');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch weapons');
     } finally {
       setLoading(false);

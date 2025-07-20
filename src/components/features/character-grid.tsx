@@ -29,7 +29,7 @@ export function CharacterGrid() {
       } else {
         setError(data.error || 'Failed to fetch characters');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch characters');
     } finally {
       setLoading(false);

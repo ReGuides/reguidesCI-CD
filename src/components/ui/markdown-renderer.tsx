@@ -13,37 +13,6 @@ interface MarkdownRendererProps {
 }
 
 export default function MarkdownRenderer({ content, className = '' }: MarkdownRendererProps) {
-  // Функция для обработки кастомных div элементов
-  const processCustomElements = (content: string) => {
-    let carouselIndex = 0;
-    
-    // Обрабатываем карусели изображений
-    const processedContent = content.replace(/<div class="image-carousel">([\s\S]*?)<\/div>/g, (match, innerContent) => {
-      const images: Array<{ src: string; alt: string }> = [];
-      
-      // Извлекаем изображения из markdown
-      const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-      let imageMatch;
-      
-      while ((imageMatch = imageRegex.exec(innerContent)) !== null) {
-        images.push({
-          alt: imageMatch[1] || 'Изображение',
-          src: imageMatch[2]
-        });
-      }
-      
-      if (images.length > 0) {
-        return `<div class="carousel-placeholder" data-carousel-index="${carouselIndex++}" data-images='${JSON.stringify(images)}'></div>`;
-      }
-
-      return match;
-    });
-
-    return processedContent;
-  };
-
-  const processedContent = processCustomElements(content);
-
   return (
     <div className={`prose prose-invert max-w-none ${className}`}>
       <ReactMarkdown

@@ -125,15 +125,6 @@ export default function CreateArticlePage() {
     }
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'easy': return 'text-green-400 bg-green-900/20';
-      case 'medium': return 'text-yellow-400 bg-yellow-900/20';
-      case 'hard': return 'text-red-400 bg-red-900/20';
-      default: return 'text-gray-400 bg-gray-900/20';
-    }
-  };
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="mb-6">
@@ -398,7 +389,7 @@ export default function CreateArticlePage() {
 
 \`\`\`javascript
 // Пример кода
-console.log('Hello World');
+console.log(&quot;Hello World&quot;);
 \`\`\`
 
 ### Работа с изображениями
@@ -444,7 +435,7 @@ console.log('Hello World');
             </h4>
             <ul className="space-y-2">
               <li>• Нажмите кнопку изображения в панели инструментов</li>
-              <li>• Выберите "Одиночное изображение"</li>
+              <li>• Выберите &quot;Одиночное изображение&quot;</li>
               <li>• Введите URL изображения и альтернативный текст</li>
               <li>• Настройте выравнивание (лево, центр, право)</li>
               <li>• Установите ширину изображения (100-800px)</li>
@@ -459,7 +450,7 @@ console.log('Hello World');
             </h4>
             <ul className="space-y-2">
               <li>• Нажмите кнопку изображения в панели инструментов</li>
-              <li>• Выберите "Карусель изображений"</li>
+              <li>• Выберите &quot;Карусель изображений&quot;</li>
               <li>• Добавьте несколько изображений по одному</li>
               <li>• Настройте альтернативный текст для каждого</li>
               <li>• Карусель будет отображаться с навигацией</li>

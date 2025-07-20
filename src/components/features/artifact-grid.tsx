@@ -29,7 +29,7 @@ export function ArtifactGrid() {
       } else {
         setError(data.error || 'Failed to fetch artifacts');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch artifacts');
     } finally {
       setLoading(false);
