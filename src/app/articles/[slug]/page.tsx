@@ -144,8 +144,8 @@ export default function ArticleDetailPage({ params }: ArticleDetailPageProps) {
           
           <h1 className="text-4xl font-bold text-white mb-4">{article.title}</h1>
           
-          {article.description && (
-            <p className="text-xl text-neutral-300 mb-6">{article.description}</p>
+          {article.excerpt && (
+            <p className="text-xl text-neutral-300 mb-6">{article.excerpt}</p>
           )}
 
           {/* Метаинформация */}
