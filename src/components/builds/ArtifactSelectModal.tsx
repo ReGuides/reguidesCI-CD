@@ -328,7 +328,7 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
                   
                   {twoStatCombinations.length === 0 ? (
                     <div className="text-center py-8 text-gray-400">
-                      Нажмите "Добавить комбинацию" чтобы создать первую комбинацию 2+стат
+                      Нажмите &quot;Добавить комбинацию&quot; чтобы создать первую комбинацию 2+стат
                     </div>
                   ) : (
                     <div className="space-y-4">

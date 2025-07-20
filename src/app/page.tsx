@@ -71,7 +71,7 @@ export default function HomePage() {
       .sort((a, b) => b.views - a.views)
       .slice(0, 4)
       .map(v => v._id);
-  }, [allStats, newest3Characters]);
+  }, [allStats, newest3Characters, characters]);
 
   // Баннер: 3 новых + 4 самых просматриваемых
   const bannerCharacters = useMemo(() => {

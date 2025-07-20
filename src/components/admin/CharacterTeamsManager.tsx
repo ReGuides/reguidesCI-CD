@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Users, Shield, Zap, Heart } from 'lucide-react';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
@@ -185,15 +183,7 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
     setShowCharacterSelect({ open: true, teamIndex, position });
   };
 
-  const handleCharacterSelect = (selected: string[]) => {
-    if (showCharacterSelect.position && showCharacterSelect.teamIndex >= 0) {
-      const { teamIndex, position } = showCharacterSelect;
-      const updatedTeams = [...recommendedTeams];
-      updatedTeams[teamIndex].positions[position].characters = selected;
-      setRecommendedTeams(updatedTeams);
-    }
-    setShowCharacterSelect({ open: false, teamIndex: -1, position: null });
-  };
+
 
   const renderTeamForm = (team: RecommendedTeam, index: number) => (
     <div key={index} className="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
@@ -344,7 +334,7 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
           <div className="text-center py-8 text-gray-400">
             <Users className="w-12 h-12 mx-auto mb-4 text-gray-600" />
             <p>Нет рекомендуемых команд</p>
-            <p className="text-sm">Нажмите "Добавить команду" чтобы создать первую команду</p>
+            <p className="text-sm">Нажмите &quot;Добавить команду&quot; чтобы создать первую команду</p>
           </div>
         ) : (
           <div className="space-y-4">
