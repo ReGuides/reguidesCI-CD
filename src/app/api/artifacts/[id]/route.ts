@@ -1,0 +1,38 @@
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import { ArtifactModel } from '@/models/Artifact';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB();
+    
+    const artifact = await ArtifactModel.findOne({ id: params.id });
+    
+    if (!artifact) {
+      return NextResponse.json(
+        { error: 'Artifact not found' },
+        { status: 404 }
+      );
+    }
+    
+    return NextResponse.json({
+      id: artifact.id,
+      name: artifact.name,
+      rarity: artifact.rarity,
+      bonus1: artifact.bonus1,
+      bonus2: artifact.bonus2,
+      bonus4: artifact.bonus4,
+      pieces: artifact.pieces,
+      image: artifact.image
+    });
+  } catch (error) {
+    console.error('Error fetching artifact:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch artifact' },
+      { status: 500 }
+    );
+  }
+} 

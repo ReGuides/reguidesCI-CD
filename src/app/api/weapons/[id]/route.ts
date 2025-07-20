@@ -1,0 +1,40 @@
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import { WeaponModel } from '@/models/Weapon';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB();
+    
+    const weapon = await WeaponModel.findOne({ id: params.id });
+    
+    if (!weapon) {
+      return NextResponse.json(
+        { error: 'Weapon not found' },
+        { status: 404 }
+      );
+    }
+    
+    return NextResponse.json({
+      id: weapon.id,
+      name: weapon.name,
+      type: weapon.type,
+      rarity: weapon.rarity,
+      baseAttack: weapon.baseAttack,
+      subStatName: weapon.subStatName,
+      subStatValue: weapon.subStatValue,
+      passiveName: weapon.passiveName,
+      passiveEffect: weapon.passiveEffect,
+      image: weapon.image
+    });
+  } catch (error) {
+    console.error('Error fetching weapon:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch weapon' },
+      { status: 500 }
+    );
+  }
+} 

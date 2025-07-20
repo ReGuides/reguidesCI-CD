@@ -1,0 +1,32 @@
+# Унифицируем окончания строк
+* text=auto
+
+# JavaScript/TypeScript файлы
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+
+# Конфигурационные файлы
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# CSS/SCSS файлы
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+
+# HTML файлы
+*.html text eol=lf
+
+# Бинарные файлы
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.svg text eol=lf 

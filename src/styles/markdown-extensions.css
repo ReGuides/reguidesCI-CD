@@ -1,0 +1,74 @@
+/* Стили для обтекания изображений */
+.image-container {
+  clear: both;
+}
+
+.image-container.float-left {
+  float: left;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+.image-container.float-right {
+  float: right;
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.image-container.mx-auto {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1rem;
+}
+
+/* Очистка float после контейнеров изображений */
+.image-container::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Стили для карусели изображений */
+.image-carousel {
+  margin: 2rem 0;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .image-container.float-left,
+  .image-container.float-right {
+    float: none;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100% !important;
+  }
+}
+
+/* Стили для текста вокруг изображений */
+.prose p {
+  text-align: justify;
+}
+
+/* Улучшенные стили для изображений в Markdown */
+.prose img {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease-in-out;
+}
+
+.prose img:hover {
+  transform: scale(1.02);
+}
+
+/* Стили для контейнеров с изображениями */
+.prose .image-container img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Стили для карусели в Markdown */
+.prose .carousel-placeholder {
+  margin: 2rem 0;
+} 
