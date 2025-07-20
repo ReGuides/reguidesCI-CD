@@ -156,7 +156,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -226,7 +226,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
     setRecommendationModalOpen(true);
   };
 
-  const handleDeleteRecommendation = async (recommendationId: string) => {
+  const handleDeleteRecommendation = async () => {
     if (!confirm("Удалить рекомендации?")) return;
     try {
       const { id } = await params;
@@ -751,7 +751,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
               <div className="text-center py-8 text-gray-400">
                 <Settings className="w-12 h-12 mx-auto mb-4 text-gray-600" />
                 <p>Билды не найдены</p>
-                <p className="text-sm">Нажмите "Добавить билд" чтобы создать первый билд</p>
+                <p className="text-sm">Нажмите &quot;Добавить билд&quot; чтобы создать первый билд</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -817,7 +817,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
               <div className="text-center py-8 text-gray-400">
                 <Star className="w-12 h-12 mx-auto mb-4 text-gray-600" />
                 <p>Рекомендации не найдены</p>
-                <p className="text-sm">Нажмите "Добавить рекомендации" чтобы создать рекомендации для персонажа</p>
+                <p className="text-sm">Нажмите &quot;Добавить рекомендации&quot; чтобы создать рекомендации для персонажа</p>
               </div>
             ) : (
               <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
@@ -834,7 +834,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                     </Button>
                     <Button
                       type="button"
-                      onClick={() => handleDeleteRecommendation('current')}
+                      onClick={() => handleDeleteRecommendation()}
                       variant="outline"
                       size="sm"
                       className="text-red-400 hover:text-red-300"
