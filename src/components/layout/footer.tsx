@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Footer() {
   return (
@@ -9,9 +10,11 @@ export function Footer() {
           <Link href="/" className="flex items-center space-x-2 lg:space-x-3 group">
             {/* Логотип Genshin Impact */}
             <div className="w-6 h-6 lg:w-8 lg:h-8 flex-shrink-0">
-              <img 
+              <Image 
                 src="/images/logos/logo.png" 
                 alt="Genshin Impact Logo" 
+                width={32}
+                height={32}
                 className="w-full h-full object-contain"
               />
             </div>

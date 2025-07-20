@@ -3,6 +3,7 @@
 import { Character } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Функция для определения цвета фона в зависимости от элемента
 const getElementColor = (element?: string) => {
@@ -29,9 +30,11 @@ export function CharacterCard({ character, className = '' }: CharacterCardProps)
   return (
     <Link href={`/characters/${character.id}`}>
       <div className={`relative bg-card rounded-lg shadow-lg overflow-hidden flex flex-col w-full aspect-[5/7] group ${className}`}>
-        <img
+        <Image
           src={getImageWithFallback(imageUrl, character.name, 'character')}
           alt={character.name}
+          width={300}
+          height={420}
           className="absolute inset-0 w-full h-full object-cover z-10"
           onError={e => { 
             const target = e.target as HTMLImageElement;

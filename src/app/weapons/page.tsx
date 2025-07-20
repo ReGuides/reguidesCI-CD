@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { WeaponCard } from '@/components/weapon-card';
 import { WeaponFilters } from '@/components/features/weapon-filters';
-import { WeaponModal } from '@/components/weapon-modal';
 import { Weapon } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
@@ -11,8 +10,6 @@ export default function WeaponsPage() {
   const [weapons, setWeapons] = useState<Weapon[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     type: 'all',
     rarity: 'all',
@@ -21,16 +18,6 @@ export default function WeaponsPage() {
 
   const handleFiltersChange = useCallback((newFilters: typeof filters) => {
     setFilters(newFilters);
-  }, []);
-
-  const handleWeaponClick = useCallback((weapon: Weapon) => {
-    setSelectedWeapon(weapon);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setSelectedWeapon(null);
   }, []);
 
   useEffect(() => {

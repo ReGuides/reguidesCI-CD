@@ -58,7 +58,7 @@ export function getFallbackImage(type: 'character' | 'weapon' | 'artifact' | 'av
 }
 
 // Функция для оптимизации изображений
-export function optimizeImageUrl(url: string, width: number = 400, height: number = 400): string {
+export function optimizeImageUrl(url: string): string {
   // В будущем можно добавить CDN или сервис оптимизации изображений
   return url;
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import OptimizedImage from '@/components/ui/optimized-image';
-import { Artifact, ArtifactOrCombination } from '@/types';
+import { Artifact, ArtifactOrCombination, Weapon } from '@/types';
 import { WeaponSelectModal } from './WeaponSelectModal';
 import { ArtifactSelectModal } from './ArtifactSelectModal';
 import TextFormattingToolbar from '@/components/admin/TextFormattingToolbar';
@@ -41,9 +41,29 @@ const TALENT_OPTIONS = [
 ];
 
 interface BuildFormProps {
-  initial?: any;
+  initial?: {
+    title?: string;
+    role?: string;
+    description?: string;
+    weapons?: string[];
+    artifacts?: ArtifactOrCombination[];
+    mainStats?: string[];
+    subStats?: string[];
+    talentPriorities?: string[];
+    isFeatured?: boolean;
+  };
   onCancel: () => void;
-  onSave: (build: any) => void;
+  onSave: (build: {
+    title: string;
+    role: string;
+    description: string;
+    weapons: string[];
+    artifacts: ArtifactOrCombination[];
+    mainStats: string[];
+    subStats: string[];
+    talentPriorities: string[];
+    isFeatured: boolean;
+  }) => void;
   characterWeaponType?: string;
   characterId?: string;
 }
@@ -58,7 +78,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
   const [subStats, setSubStats] = useState<string[]>(initial?.subStats || []);
   const [talentPriorities, setTalentPriorities] = useState<string[]>(initial?.talentPriorities || []);
   const [isFeatured, setIsFeatured] = useState(initial?.isFeatured || false);
-  const [weaponsList, setWeaponsList] = useState<any[]>([]);
+  const [weaponsList, setWeaponsList] = useState<Weapon[]>([]);
   const [artifactsList, setArtifactsList] = useState<Artifact[]>([]);
   const [showWeaponModal, setShowWeaponModal] = useState(false);
   const [showArtifactModal, setShowArtifactModal] = useState(false);
@@ -221,7 +241,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
                     type="button"
                     onClick={() => setWeapons(prev => prev.filter(id => id !== weaponId))}
                     className="text-red-400 hover:text-red-300 ml-1"
-                  >×</button>
+                  >x</button>
                 </div>
               ) : null;
             })}
@@ -238,21 +258,25 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
             {artifacts.map((artifact, index) => {
               if ('id' in artifact) {
                 // Одиночный артефакт
+                const artifactData = artifactsList.find(a => a.id === artifact.id);
+                if (!artifactData) return null;
                 return (
-                                  <div key={artifact.id} className="flex items-center gap-2 bg-neutral-800 border border-neutral-700 rounded px-3 py-2">
-                  <OptimizedImage
-                    src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
-                    alt={artifact.name}
-                    className="w-8 h-8 rounded"
-                    type="artifact"
-                  />
-                  <span className="text-sm font-medium text-white">{artifact.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => setArtifacts(prev => prev.filter((_, i) => i !== index))}
-                    className="text-red-400 hover:text-red-300 ml-1"
-                  >×</button>
-                </div>
+                  <div key={artifact.id} className="flex items-center gap-2 bg-neutral-800 border border-neutral-700 rounded px-3 py-2">
+                    <OptimizedImage
+                      src={getImageWithFallback(artifactData.image, artifactData.name, 'artifact')}
+                      alt={artifactData.name}
+                      className="w-8 h-8 rounded"
+                      type="artifact"
+                    />
+                    <span className="text-sm font-medium text-white">{artifactData.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setArtifacts(prev => prev.filter((_, i) => i !== index))}
+                      className="text-red-400 hover:text-red-300 ml-1"
+                    >
+                      X
+                    </button>
+                  </div>
                 );
               } else {
                 // Комбинация артефактов
@@ -263,7 +287,9 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
                       type="button"
                       onClick={() => setArtifacts(prev => prev.filter((_, i) => i !== index))}
                       className="text-red-400 hover:text-red-300 ml-1"
-                    >×</button>
+                    >
+                      X
+                    </button>
                   </div>
                 );
               }
@@ -303,7 +329,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
                     onClick={() => handleStatToggle('mainStats', stat)}
                     className="text-red-400 hover:text-red-300 text-xs"
                   >
-                    ×
+                    X
                   </button>
                 </div>
               ))}
@@ -340,7 +366,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
                     onClick={() => handleStatToggle('subStats', stat)}
                     className="text-red-400 hover:text-red-300 text-xs"
                   >
-                    ×
+                    X
                   </button>
                 </div>
               ))}
@@ -397,7 +423,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
                         onClick={() => handleRemoveTalent(index)}
                         className="text-red-400 hover:text-red-300 text-xs"
                       >
-                        ×
+                        X
                       </button>
                     </div>
                   </div>

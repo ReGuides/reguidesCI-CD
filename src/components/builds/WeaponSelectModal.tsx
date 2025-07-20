@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { Weapon } from '@/types';
-import { getImageWithFallback, getSafeImageUrl } from '@/lib/utils/imageUtils';
+import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import { selectedItemStyles } from '@/lib/utils/selectionStyles';
 
 interface WeaponSelectModalProps {
@@ -13,7 +13,6 @@ interface WeaponSelectModalProps {
   selectedWeapons: string[];
   weapons: Weapon[];
   weaponType?: string; // новый проп
-  character?: any; // добавлено для отладки
 }
 
 export const WeaponSelectModal: React.FC<WeaponSelectModalProps> = ({
@@ -23,7 +22,6 @@ export const WeaponSelectModal: React.FC<WeaponSelectModalProps> = ({
   selectedWeapons,
   weapons,
   weaponType,
-  character,
 }) => {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<string[]>(selectedWeapons);

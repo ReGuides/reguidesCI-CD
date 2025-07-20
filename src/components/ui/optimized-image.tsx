@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 
 interface OptimizedImageProps {
   src?: string;
@@ -54,9 +55,11 @@ export default function OptimizedImage({
         </div>
       )}
       
-      <img
+      <Image
         src={finalSrc}
         alt={alt}
+        width={400}
+        height={400}
         className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200`}
         onLoad={handleImageLoad}
         onError={handleImageError}

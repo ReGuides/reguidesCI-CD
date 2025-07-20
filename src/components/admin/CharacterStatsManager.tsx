@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Edit, Save, X } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 interface CharacterStat {
   stat: string;
@@ -59,11 +58,7 @@ const CharacterStatsManager: React.FC<CharacterStatsManagerProps> = ({ character
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    fetchStats();
-  }, [characterId]);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/characters/${characterId}/stats`);
@@ -82,7 +77,11 @@ const CharacterStatsManager: React.FC<CharacterStatsManagerProps> = ({ character
     } finally {
       setLoading(false);
     }
-  };
+  }, [characterId]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [characterId, fetchStats]);
 
   const handleSaveStats = async () => {
     setSaving(true);
@@ -122,7 +121,7 @@ const CharacterStatsManager: React.FC<CharacterStatsManagerProps> = ({ character
     setMainStats([...mainStats, { stat: '', targetValue: '', unit: '', description: '', artifactType: 'general' }]);
   };
 
-  const updateMainStat = (index: number, field: keyof CharacterStat, value: any) => {
+  const updateMainStat = (index: number, field: keyof CharacterStat, value: string | number) => {
     const updated = [...mainStats];
     updated[index] = { ...updated[index], [field]: value };
     setMainStats(updated);
@@ -162,7 +161,7 @@ const CharacterStatsManager: React.FC<CharacterStatsManagerProps> = ({ character
     ]);
   };
 
-  const updateTalentPriority = (index: number, field: keyof TalentPriority, value: any) => {
+  const updateTalentPriority = (index: number, field: keyof TalentPriority, value: string | number) => {
     const updated = [...talentPriorities];
     updated[index] = { ...updated[index], [field]: value };
     setTalentPriorities(updated);

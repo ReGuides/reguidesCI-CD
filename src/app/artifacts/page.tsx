@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ArtifactCard } from '@/components/artifact-card';
 import { ArtifactFilters } from '@/components/features/artifact-filters';
-import { ArtifactModal } from '@/components/artifact-modal';
 import { Artifact } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
@@ -11,8 +10,6 @@ export default function ArtifactsPage() {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     type: 'all',
     rarity: 'all',
@@ -21,16 +18,6 @@ export default function ArtifactsPage() {
 
   const handleFiltersChange = useCallback((newFilters: typeof filters) => {
     setFilters(newFilters);
-  }, []);
-
-  const handleArtifactClick = useCallback((artifact: Artifact) => {
-    setSelectedArtifact(artifact);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setSelectedArtifact(null);
   }, []);
 
   useEffect(() => {

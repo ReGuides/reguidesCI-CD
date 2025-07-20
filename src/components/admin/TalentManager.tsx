@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -44,11 +44,7 @@ const TalentManager: React.FC<TalentManagerProps> = ({ characterId, onSave }) =>
     { value: 'passive', label: 'Пассивный талант', icon: '⭐' }
   ];
 
-  useEffect(() => {
-    fetchTalents();
-  }, [characterId]);
-
-  const fetchTalents = async () => {
+  const fetchTalents = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/characters/${characterId}/talents`);
@@ -63,7 +59,11 @@ const TalentManager: React.FC<TalentManagerProps> = ({ characterId, onSave }) =>
     } finally {
       setLoading(false);
     }
-  };
+  }, [characterId]);
+
+  useEffect(() => {
+    fetchTalents();
+  }, [fetchTalents]);
 
   const handleSaveTalents = async () => {
     setSaving(true);

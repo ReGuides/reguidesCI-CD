@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Users, Shield, Zap, Heart } from 'lucide-react';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
+import { Character } from '@/types';
 
 interface TeamPosition {
   characters: string[];
@@ -51,19 +52,14 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
   const [notes, setNotes] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [charactersList, setCharactersList] = useState<any[]>([]);
+  const [charactersList, setCharactersList] = useState<Character[]>([]);
   const [showCharacterSelect, setShowCharacterSelect] = useState<{
     open: boolean;
     teamIndex: number;
     position: keyof RecommendedTeam['positions'] | null;
   }>({ open: false, teamIndex: -1, position: null });
 
-  useEffect(() => {
-    fetchTeams();
-    fetchCharacters();
-  }, [characterId]);
-
-  const fetchTeams = async () => {
+  const fetchTeams = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/characters/${characterId}/teams`);
@@ -78,9 +74,9 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
     } finally {
       setLoading(false);
     }
-  };
+  }, [characterId]);
 
-  const fetchCharacters = async () => {
+  const fetchCharacters = useCallback(async () => {
     try {
       const response = await fetch('/api/characters');
       if (response.ok) {
@@ -91,7 +87,12 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
     } catch (error) {
       console.error('Error fetching characters:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchTeams();
+    fetchCharacters();
+  }, [characterId, fetchTeams, fetchCharacters]);
 
   const handleSaveTeams = async () => {
     setSaving(true);

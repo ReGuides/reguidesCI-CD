@@ -1,5 +1,6 @@
 import { Artifact } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
+import Image from 'next/image';
 
 interface ArtifactCardProps {
   artifact: Artifact;
@@ -44,11 +45,9 @@ export function ArtifactCard({ artifact, onSelect, isSelected }: ArtifactCardPro
     }
   };
 
-  // Получаем цвета для минимальной и максимальной редкости
+  // Получаем цвета для минимальной редкости
   const minRarity = Math.min(...artifact.rarity);
-  const maxRarity = Math.max(...artifact.rarity);
   const minColors = getRarityColors(minRarity);
-  const maxColors = getRarityColors(maxRarity);
 
   return (
     <div 
@@ -60,9 +59,11 @@ export function ArtifactCard({ artifact, onSelect, isSelected }: ArtifactCardPro
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500/0 via-purple-500/50 to-purple-500/0 group-hover:from-purple-400/0 group-hover:via-purple-400/70 group-hover:to-purple-400/0 transition-all duration-500" />
       <div className="relative">
         <div className="relative">
-          <img 
+          <Image 
             src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
             alt={artifact.name} 
+            width={160}
+            height={128}
             className="w-full h-32 object-contain mb-1.5 filter drop-shadow-[0_0_8px_rgba(147,51,234,0.3)] group-hover:drop-shadow-[0_0_15px_rgba(147,51,234,0.5)] transition-all duration-500"
             onError={(e) => {
               console.error('Image load error:', artifact.image);

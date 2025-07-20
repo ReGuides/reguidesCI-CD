@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { WeaponModel } from '@/models/Weapon';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectDB();
     
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     await connectDB();
     

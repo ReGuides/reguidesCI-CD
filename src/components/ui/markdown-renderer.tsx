@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import ImageCarousel from './image-carousel';
+import Image from 'next/image';
 
 interface MarkdownRendererProps {
   content: string;
@@ -14,24 +15,23 @@ interface MarkdownRendererProps {
 export default function MarkdownRenderer({ content, className = '' }: MarkdownRendererProps) {
   // Функция для обработки кастомных div элементов
   const processCustomElements = (content: string) => {
-    // Обработка карусели изображений
-    const carouselRegex = /<div class="image-carousel">([\s\S]*?)<\/div>/g;
-    let processedContent = content;
     let carouselIndex = 0;
-
-    processedContent = processedContent.replace(carouselRegex, (match, innerContent) => {
-      // Извлекаем изображения из карусели
-      const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+    
+    // Обрабатываем карусели изображений
+    const processedContent = content.replace(/<div class="image-carousel">([\s\S]*?)<\/div>/g, (match, innerContent) => {
       const images: Array<{ src: string; alt: string }> = [];
+      
+      // Извлекаем изображения из markdown
+      const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
       let imageMatch;
-
+      
       while ((imageMatch = imageRegex.exec(innerContent)) !== null) {
         images.push({
-          alt: imageMatch[1] || `Изображение ${images.length + 1}`,
+          alt: imageMatch[1] || 'Изображение',
           src: imageMatch[2]
         });
       }
-
+      
       if (images.length > 0) {
         return `<div class="carousel-placeholder" data-carousel-index="${carouselIndex++}" data-images='${JSON.stringify(images)}'></div>`;
       }
@@ -166,9 +166,11 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
           ),
           // Кастомные стили для изображений
           img: ({ src, alt }) => (
-            <img 
-              src={src} 
+            <Image 
+              src={src || ''} 
               alt={alt || ''} 
+              width={800}
+              height={600}
               className="max-w-full h-auto rounded-lg my-4"
               onError={(e) => {
                 e.currentTarget.src = '/images/placeholder.png';
@@ -198,7 +200,7 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
             // Обработка карусели изображений
             if (className?.includes('carousel-placeholder')) {
               try {
-                const imagesData = (props as any)['data-images'];
+                const imagesData = (props as Record<string, unknown>)['data-images'];
                 if (imagesData) {
                   const images = JSON.parse(imagesData as string);
                   return <ImageCarousel images={images} className="my-6" />;

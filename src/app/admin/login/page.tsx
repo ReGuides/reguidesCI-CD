@@ -35,7 +35,7 @@ export default function AdminLoginPage() {
         const errorData = await response.json();
         setError(errorData.error || 'Ошибка входа');
       }
-    } catch (err) {
+    } catch {
       setError('Ошибка соединения');
     } finally {
       setLoading(false);

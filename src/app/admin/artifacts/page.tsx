@@ -2,14 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { Artifact } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { AdminButton } from '@/components/ui/admin-button';
 import { IconActionButton } from '@/components/ui/icon-action-button';
 import { AddButton } from '@/components/ui/add-button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { Eye, Pencil, Trash, Plus } from 'lucide-react';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';

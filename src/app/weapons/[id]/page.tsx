@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
 import { Weapon } from '@/types';
-import { getImageWithFallback, getSafeImageUrl } from '@/lib/utils/imageUtils';
+import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
 export default function WeaponDetailPage({ params }: { params: Promise<{ id: string }> }) {

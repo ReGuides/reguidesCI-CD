@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { IArticle } from '@/lib/db/models/Article';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -180,7 +180,7 @@ export default function ArticlesPage() {
           </select>
           <select
             value={filters.sortBy || 'newest'}
-            onChange={(e) => handleFilterChange({ sortBy: e.target.value as any })}
+            onChange={(e) => handleFilterChange({ sortBy: e.target.value as 'newest' | 'oldest' | 'popular' | 'rating' })}
             className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-accent"
           >
             <option value="newest">Сначала новые</option>
@@ -251,7 +251,7 @@ export default function ArticlesPage() {
                 </span>
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">{article.title}</h3>
-              <p className="text-gray-300 text-sm mb-4 line-clamp-3">{article.description}</p>
+              <p className="text-gray-300 text-sm mb-4 line-clamp-3">{article.excerpt}</p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {article.author.avatar && (

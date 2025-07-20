@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, Gift, Star } from 'lucide-react';
+import { Gift, Star } from 'lucide-react';
+import Image from 'next/image';
 
 interface BirthdayCharacter {
   id: string;
@@ -34,7 +35,7 @@ export default function BirthdayBanner() {
         const currentMonth = today.getMonth() + 1; // getMonth() возвращает 0-11
         const currentDay = today.getDate();
 
-        const todayBirthdays = characters.filter((char: any) => {
+        const todayBirthdays = characters.filter((char: { birthday?: string }) => {
           if (!char.birthday) return false;
           
           // Парсим день рождения (формат может быть разным)
@@ -86,9 +87,11 @@ export default function BirthdayBanner() {
               {birthdayCharacters.map((character, index) => (
                 <div key={character.id} className="flex items-center gap-2">
                   {index > 0 && <span className="text-white">и</span>}
-                  <img 
+                  <Image 
                     src={character.image} 
                     alt={character.name}
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded-full border-2 border-white object-cover"
                     onError={(e) => {
                       // Fallback если изображение не загрузилось

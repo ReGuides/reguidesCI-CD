@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import OptimizedImage from '@/components/ui/optimized-image';
-import { Artifact, ArtifactOrCombination } from '@/types';
+import { Artifact, ArtifactOrCombination, Weapon } from '@/types';
 import { WeaponSelectModal } from './WeaponSelectModal';
 import { ArtifactSelectModal } from './ArtifactSelectModal';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
@@ -10,17 +9,23 @@ import CharacterStatsManager from '@/components/admin/CharacterStatsManager';
 import CharacterTeamsManager from '@/components/admin/CharacterTeamsManager';
 
 interface RecommendationFormProps {
-  initial?: any;
+  initial?: {
+    weapons?: (string | Weapon)[];
+    artifacts?: ArtifactOrCombination[];
+  };
   onCancel: () => void;
-  onSave: (recommendation: any) => void;
+  onSave: (recommendation: {
+    weapons: (string | Weapon)[];
+    artifacts: ArtifactOrCombination[];
+  }) => void;
   characterWeaponType?: string;
   characterId?: string;
 }
 
 export default function RecommendationForm({ initial, onCancel, onSave, characterWeaponType, characterId }: RecommendationFormProps) {
-  const [weapons, setWeapons] = useState<(string | any)[]>(initial?.weapons || []);
+  const [weapons, setWeapons] = useState<(string | Weapon)[]>(initial?.weapons || []);
   const [artifacts, setArtifacts] = useState<ArtifactOrCombination[]>(initial?.artifacts || []);
-  const [weaponsList, setWeaponsList] = useState<any[]>([]);
+  const [weaponsList, setWeaponsList] = useState<Weapon[]>([]);
   const [artifactsList, setArtifactsList] = useState<Artifact[]>([]);
   const [showWeaponModal, setShowWeaponModal] = useState(false);
   const [showArtifactModal, setShowArtifactModal] = useState(false);
@@ -101,7 +106,7 @@ export default function RecommendationForm({ initial, onCancel, onSave, characte
             <button
               key={tab.id}
               type="button"
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as 'weapons' | 'artifacts' | 'stats' | 'teams')}
               className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
                 activeTab === tab.id
                   ? 'bg-purple-600 text-white shadow-lg'

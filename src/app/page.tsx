@@ -1,17 +1,15 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CharacterCard } from '@/components/character-card';
-import { Character, Weapon, Artifact } from '@/types';
-import { Eye, Star, Calendar, User } from 'lucide-react';
+import { Character } from '@/types';
 import BirthdayBanner from '@/components/birthday-banner';
 import MobileSidebar from '@/components/mobile-sidebar';
 import NewsSection from '@/components/news-section';
 import FriendsSection from '@/components/friends-section';
 import CharacterCarousel from '@/components/character-carousel';
-import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
 
@@ -38,12 +36,6 @@ export default function HomePage() {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [allStats, setAllStats] = useState<{ _id: string; views: number }[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Получить просмотры по id
-  const getViews = (id: string) => {
-    const found = allStats.find(v => v._id === id);
-    return found ? found.views : 0;
-  };
 
   // Для баннера — 3 самых новых
   const newest3Characters = useMemo(() => {
@@ -149,7 +141,7 @@ export default function HomePage() {
           const viewsResponse = await fetch('/api/character-views/public-stats');
           if (viewsResponse.ok) {
             const viewsData = await viewsResponse.json();
-            const formattedData = viewsData.map((item: any) => ({
+            const formattedData = viewsData.map((item: { characterId: string; totalViews?: number }) => ({
               _id: item.characterId,
               views: item.totalViews || 0
             }));

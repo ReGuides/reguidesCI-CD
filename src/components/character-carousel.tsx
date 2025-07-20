@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Character } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
 interface CharacterCarouselProps {
   characters: Character[];
@@ -21,9 +22,7 @@ export default function CharacterCarousel({
 }: CharacterCarouselProps) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const progressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Удаляем прогресс-логику и анимацию
 
@@ -139,9 +138,11 @@ export default function CharacterCarousel({
                 {isActive && (
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/20 to-blue-500/20 blur-xl scale-100" />
                 )}
-                <img
+                <Image
                   src={getImageWithFallback(character.image, character.name, 'character')}
                   alt={character.name}
+                  width={320}
+                  height={400}
                   className="absolute inset-0 w-full h-full object-cover object-center rounded-2xl"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;

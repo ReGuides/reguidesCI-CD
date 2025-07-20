@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, User, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
 interface News {

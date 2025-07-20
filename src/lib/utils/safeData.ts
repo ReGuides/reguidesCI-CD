@@ -10,7 +10,7 @@ export function sanitizeData<T>(data: T): T {
       return data.map(sanitizeData) as T;
     }
 
-    const sanitized: any = {};
+    const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data)) {
       if (value instanceof Error) {
         sanitized[key] = value.message;
@@ -26,7 +26,7 @@ export function sanitizeData<T>(data: T): T {
   return data;
 }
 
-export function safeStringify(obj: any): string {
+export function safeStringify(obj: unknown): string {
   try {
     return JSON.stringify(sanitizeData(obj));
   } catch {

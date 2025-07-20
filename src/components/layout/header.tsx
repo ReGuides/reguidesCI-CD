@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, X, Search, User } from 'lucide-react';
+import { Menu, X, Search } from 'lucide-react';
 import { useState } from 'react';
+import Image from 'next/image';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,9 +21,11 @@ export function Header() {
             <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
               {/* Логотип Genshin Impact */}
               <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
-                <img 
+                <Image 
                   src="/images/logos/logo.png" 
                   alt="Genshin Impact Logo" 
+                  width={40}
+                  height={40}
                   className="w-full h-full object-contain"
                 />
               </div>

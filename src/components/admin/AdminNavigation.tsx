@@ -2,9 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { AdminButton } from '@/components/ui/admin-button';
-import { IconActionButton } from '@/components/ui/icon-action-button';
-import { AddButton } from '@/components/ui/add-button';
 import { 
   Users, 
   Sword, 
@@ -12,21 +9,14 @@ import {
   FileText, 
   Settings, 
   BarChart3,
-  Home,
-  ChevronRight,
-  Plus,
-  Search,
-  Bell,
-  User,
-  LogOut
+  Home
 } from 'lucide-react';
 
 interface AdminNavigationProps {
   className?: string;
-  children?: React.ReactNode;
 }
 
-export default function AdminNavigation({ className = '', children }: AdminNavigationProps) {
+export default function AdminNavigation({ className = '' }: AdminNavigationProps) {
   const pathname = usePathname();
 
   const navigationItems = [

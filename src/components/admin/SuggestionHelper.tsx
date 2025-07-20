@@ -49,7 +49,7 @@ interface Constellation {
   description: string;
 }
 
-const SuggestionHelper: React.FC<SuggestionHelperProps> = ({ onInsert, onClose, characterId }) => {
+const SuggestionHelper: React.FC<SuggestionHelperProps> = ({ onInsert, characterId }) => {
   const [selectedType, setSelectedType] = useState<SuggestionType | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);

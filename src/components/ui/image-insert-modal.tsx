@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Upload, Image as ImageIcon, AlignLeft, AlignRight, AlignCenter, Grid3X3 } from 'lucide-react';
 import { useRef } from 'react';
+import Image from 'next/image';
 
 interface ImageInsertModalProps {
   isOpen: boolean;
@@ -56,7 +57,7 @@ export default function ImageInsertModal({ isOpen, onClose, onInsert, initialMod
       } else {
         setUploadError(data.error || 'Ошибка загрузки');
       }
-    } catch (e) {
+    } catch {
       setUploadError('Ошибка загрузки');
     } finally {
       setUploading(false);
@@ -188,7 +189,7 @@ export default function ImageInsertModal({ isOpen, onClose, onInsert, initialMod
                     {uploading && <span className="text-xs text-accent">Загрузка...</span>}
                     {uploadError && <span className="text-xs text-red-400">{uploadError}</span>}
                     {imageUrl && imageUrl.startsWith('/uploads/') && (
-                      <img src={imageUrl} alt="preview" className="max-h-32 rounded mt-2" />
+                      <Image src={imageUrl} alt="preview" width={128} height={128} className="max-h-32 rounded mt-2" />
                     )}
                   </div>
                 </div>
@@ -315,18 +316,11 @@ export default function ImageInsertModal({ isOpen, onClose, onInsert, initialMod
                     Изображения в карусели ({carouselImages.length})
                   </label>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {carouselImages.map((img, index) => (
+                    {carouselImages.map((image, index) => (
                       <div key={index} className="flex items-center gap-2 p-2 bg-neutral-700 rounded">
-                        <img 
-                          src={img.url} 
-                          alt={img.alt}
-                          className="w-8 h-8 object-cover rounded"
-                          onError={(e) => {
-                            e.currentTarget.src = '/images/placeholder.png';
-                          }}
-                        />
+                        <Image src={image.url} alt={image.alt || `Изображение ${index + 1}`} width={64} height={64} className="w-16 h-16 object-cover rounded" />
                         <span className="flex-1 text-sm text-neutral-300 truncate">
-                          {img.alt || `Изображение ${index + 1}`}
+                          {image.alt || `Изображение ${index + 1}`}
                         </span>
                         <button
                           onClick={() => removeCarouselImage(index)}

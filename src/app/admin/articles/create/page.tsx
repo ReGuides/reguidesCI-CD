@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import MarkdownEditor from '@/components/ui/markdown-editor';
-import { ArrowLeft, Save, Eye, Image, Grid3X3, Type, Clock, Search, Zap, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Save, Image, Grid3X3, Type, Clock, Search, Zap, RefreshCw } from 'lucide-react';
 
 export default function CreateArticlePage() {
   const router = useRouter();
@@ -113,7 +113,6 @@ export default function CreateArticlePage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
         router.push('/admin/articles');
       } else {
         throw new Error('Ошибка создания статьи');

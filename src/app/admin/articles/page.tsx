@@ -3,17 +3,13 @@
 import { useState, useEffect } from 'react';
 import { Article } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { AdminButton } from '@/components/ui/admin-button';
-import { ActionButton } from '@/components/ui/action-button';
 import { IconActionButton } from '@/components/ui/icon-action-button';
-import { IconButton } from '@/components/ui/icon-button';
 import { AddButton } from '@/components/ui/add-button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import OptimizedImage from '@/components/ui/optimized-image';
-import { Plus, Edit, Trash2, Eye, FileText, Calendar, User, Star, Globe } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Calendar, User, Star } from 'lucide-react';
 
 export default function ArticlesAdminPage() {
   const [articles, setArticles] = useState<Article[]>([]);

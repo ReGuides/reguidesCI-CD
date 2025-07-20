@@ -1,8 +1,9 @@
 'use client';
 
 import { Weapon } from '@/types';
-import { getImageWithFallback, getSafeImageUrl } from '@/lib/utils/imageUtils';
+import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import { Modal } from '@/components/ui/modal';
+import Image from 'next/image';
 
 const rarityColors = {
   5: {
@@ -54,9 +55,11 @@ export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
       <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
         <div className="relative w-24 h-24 flex-shrink-0">
           <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${colors.gradient} opacity-60`} />
-          <img
+          <Image
             src={getImageSrc()}
             alt={weapon.name}
+            width={96}
+            height={96}
             className={`w-full h-full object-contain rounded-xl border-2 border-neutral-700 bg-neutral-800 ${colors.shadow}`}
             onError={e => {
               const target = e.target as HTMLImageElement;

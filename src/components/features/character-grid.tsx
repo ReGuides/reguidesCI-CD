@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Star, Eye, User } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Character } from '@/types';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';

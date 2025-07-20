@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { IAbout, Feature, TeamMember } from '@/lib/db/models/About';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
@@ -52,9 +53,11 @@ export default function AboutPage() {
     <div key={member.name} className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl hover:bg-neutral-750 transition-colors">
       <div className="text-center">
         {member.avatar && (
-          <img 
+          <Image 
             src={member.avatar.startsWith('http') ? member.avatar : `/images/avatars/${member.avatar}`}
             alt={member.name} 
+            width={80}
+            height={80}
             className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
@@ -139,7 +142,7 @@ export default function AboutPage() {
         <div className="text-center">
           <div className="text-6xl mb-4">📄</div>
           <h1 className="text-2xl font-bold text-white mb-2">Страница не найдена</h1>
-          <p className="text-neutral-400">Страница "О проекте" пока не создана</p>
+          <p className="text-neutral-400">Страница &quot;О проекте&quot; пока не создана</p>
         </div>
       </div>
     );

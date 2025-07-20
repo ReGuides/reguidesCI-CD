@@ -4,17 +4,12 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import AdminNavigation from '@/components/admin/AdminNavigation';
 import { 
   Settings, 
   Save, 
   Globe, 
   Shield, 
-  Database,
-  Bell,
-  Palette,
   Users
 } from 'lucide-react';
 
@@ -90,11 +85,11 @@ export default function SettingsPage() {
     }
   };
 
-  const handleInputChange = (section: string, field: string, value: any) => {
+  const handleInputChange = (section: keyof SiteSettings, field: string, value: string | boolean) => {
     setSettings(prev => ({
       ...prev,
       [section]: {
-        ...prev[section as keyof SiteSettings],
+        ...(prev[section] as Record<string, unknown>),
         [field]: value
       }
     }));

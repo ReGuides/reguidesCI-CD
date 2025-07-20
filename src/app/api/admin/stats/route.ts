@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
 import { Character } from '@/lib/db/models/Character';
 import { Weapon } from '@/lib/db/models/Weapon';
 import { Artifact } from '@/lib/db/models/Artifact';
 import { Article } from '@/lib/db/models/Article';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectToDatabase();
     

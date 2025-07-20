@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     await fs.writeFile(filePath, buffer);
     const url = `/uploads/${fileName}`;
     return NextResponse.json({ url });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 } 

@@ -3,6 +3,7 @@
 import { Artifact } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import { Modal } from '@/components/ui/modal';
+import Image from 'next/image';
 
 const rarityColors = {
   1: { gradient: 'from-gray-400 to-gray-500', shadow: 'shadow-gray-500/20', badge: 'bg-gray-500/20 text-gray-400' },
@@ -25,9 +26,11 @@ export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps)
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
         <div className="relative w-24 h-24 flex-shrink-0">
-          <img
+          <Image
             src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
             alt={artifact.name}
+            width={96}
+            height={96}
             className={`w-full h-full object-contain rounded-xl border-2 border-neutral-700 bg-neutral-800 ${rarityColors[artifact.rarity[0] as keyof typeof rarityColors]?.shadow || rarityColors[1].shadow}`}
             onError={e => {
               const target = e.target as HTMLImageElement;

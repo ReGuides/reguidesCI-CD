@@ -3,10 +3,25 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Database, Users, CheckCircle, XCircle } from 'lucide-react';
+import { Database, CheckCircle, XCircle } from 'lucide-react';
 
 export default function TestPage() {
-  const [testResult, setTestResult] = useState<any>(null);
+  const [testResult, setTestResult] = useState<{
+    success?: boolean;
+    error?: string;
+    details?: string;
+    message?: string;
+    data?: {
+      database?: string;
+      characterCount?: number;
+      sampleCharacters?: Array<{
+        name: string;
+        element: string;
+        weapon: string;
+        rarity: number;
+      }>;
+    };
+  } | null>(null);
   const [loading, setLoading] = useState(false);
 
   const testDatabase = async () => {
@@ -96,7 +111,7 @@ export default function TestPage() {
                       <div>
                         <strong>Примеры персонажей:</strong>
                         <ul className="list-disc list-inside mt-2 ml-4">
-                          {testResult.data.sampleCharacters.map((char: any, index: number) => (
+                          {testResult.data.sampleCharacters.map((char: { name: string; element: string; weapon: string; rarity: number }, index: number) => (
                             <li key={index}>
                               {char.name} ({char.element}, {char.weapon}, {char.rarity}★)
                             </li>

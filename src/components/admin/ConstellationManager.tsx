@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -28,11 +28,7 @@ const ConstellationManager: React.FC<ConstellationManagerProps> = ({ characterId
     description: ''
   });
 
-  useEffect(() => {
-    fetchConstellations();
-  }, [characterId]);
-
-  const fetchConstellations = async () => {
+  const fetchConstellations = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/characters/${characterId}/constellations`);
@@ -47,7 +43,11 @@ const ConstellationManager: React.FC<ConstellationManagerProps> = ({ characterId
     } finally {
       setLoading(false);
     }
-  };
+  }, [characterId]);
+
+  useEffect(() => {
+    fetchConstellations();
+  }, [fetchConstellations]);
 
   const handleSaveConstellations = async () => {
     setSaving(true);

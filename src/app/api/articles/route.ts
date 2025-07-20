@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const limit = searchParams.get('limit');
     
-    let query: any = {}; // Временно убираем фильтр по статусу
+    const query: Record<string, unknown> = {}; // Временно убираем фильтр по статусу
     
     if (status && status !== 'all') {
       query.status = status;

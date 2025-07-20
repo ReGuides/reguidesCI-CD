@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import MarkdownRenderer from './markdown-renderer';
-import MarkdownHelp from './markdown-help';
 import ImageInsertModal from './image-insert-modal';
 import { 
   Bold, 
@@ -153,7 +152,7 @@ console.log('Hello World');
     disabled = false,
     shortcut
   }: { 
-    icon: any; 
+    icon: React.ComponentType<{ className?: string }>; 
     onClick: () => void; 
     title: string; 
     disabled?: boolean;

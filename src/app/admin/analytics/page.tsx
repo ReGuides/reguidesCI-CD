@@ -11,7 +11,6 @@ import {
   Eye, 
   TrendingUp, 
   Calendar,
-  BarChart3,
   Activity
 } from 'lucide-react';
 
@@ -72,7 +71,7 @@ export default function AnalyticsPage() {
       const articlesData = await articlesRes.json();
 
       // Подсчитываем общие просмотры
-      const totalViews = (articlesData.data?.articles || []).reduce((sum: number, article: any) => sum + (article.views || 0), 0);
+      const totalViews = (articlesData.data?.articles || []).reduce((sum: number, article: { views?: number }) => sum + (article.views || 0), 0);
 
       setAnalytics({
         totalCharacters: charactersData.data?.characters?.length || 0,
@@ -84,9 +83,9 @@ export default function AnalyticsPage() {
         weeklyViews: Math.floor(totalViews * 0.1),
         dailyViews: Math.floor(totalViews * 0.02),
         topArticles: (articlesData.data?.articles || [])
-          .sort((a: any, b: any) => (b.views || 0) - (a.views || 0))
+          .sort((a: { views?: number }, b: { views?: number }) => (b.views || 0) - (a.views || 0))
           .slice(0, 5)
-          .map((article: any) => ({
+          .map((article: { title: string; views?: number }) => ({
             title: article.title,
             views: article.views || 0
           })),

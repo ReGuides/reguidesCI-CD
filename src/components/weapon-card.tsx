@@ -1,5 +1,6 @@
 import { Weapon } from '@/types';
-import { getImageWithFallback, getSafeImageUrl } from '@/lib/utils/imageUtils';
+import { getSafeImageUrl } from '@/lib/utils/imageUtils';
+import Image from 'next/image';
 
 interface WeaponCardProps {
   weapon: Weapon;
@@ -91,9 +92,11 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
       <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${colors.glow} transition-all duration-500`} />
       <div className="relative">
         <div className="relative">
-          <img 
+          <Image 
             src={getImageSrc()}
             alt={weapon.name} 
+            width={160}
+            height={128}
             className={`w-full h-32 object-contain mb-1.5 filter drop-shadow-[0_0_8px_${colors.shadow}] group-hover:drop-shadow-[0_0_15px_${colors.shadowHover}] transition-all duration-500`}
             onError={(e) => {
               console.error('Image load error:', weapon.image);

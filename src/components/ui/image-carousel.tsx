@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X, Play, Pause } from 'lucide-react';
+import Image from 'next/image';
 
 interface ImageCarouselProps {
   images: Array<{ src: string; alt: string }>;
@@ -82,9 +83,11 @@ export default function ImageCarousel({
       >
         {/* Основное изображение */}
         <div className="relative overflow-hidden rounded-lg">
-          <img
+          <Image
             src={currentImage.src}
             alt={currentImage.alt}
+            width={400}
+            height={256}
             className="w-full h-64 object-cover cursor-pointer transition-transform hover:scale-105"
             onClick={openFullscreen}
             onError={(e) => {
@@ -203,9 +206,11 @@ export default function ImageCarousel({
                   }`}
                 >
                   <div className="w-16 h-16 rounded-lg overflow-hidden">
-                    <img
+                    <Image
                       src={image.src}
                       alt={image.alt}
+                      width={64}
+                      height={64}
                       className="w-full h-full object-cover transition-transform group-hover/thumb:scale-110"
                       onError={(e) => {
                         e.currentTarget.src = '/images/placeholder.png';
@@ -234,9 +239,11 @@ export default function ImageCarousel({
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Основное изображение */}
-            <img
+            <Image
               src={currentImage.src}
               alt={currentImage.alt}
+              width={800}
+              height={600}
               className="max-w-full max-h-full object-contain"
               onError={(e) => {
                 e.currentTarget.src = '/images/placeholder.png';

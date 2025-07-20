@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Star, Eye, Sword } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Weapon } from '@/types';
 import OptimizedImage from '@/components/ui/optimized-image';
-import { getImageWithFallback, getSafeImageUrl } from '@/lib/utils/imageUtils';
+import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 
 export function WeaponGrid() {
   const [weapons, setWeapons] = useState<Weapon[]>([]);

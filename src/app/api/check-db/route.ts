@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { getDatabaseURI } from '@/lib/config';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Подключаемся к базе данных
     if (mongoose.connection.readyState !== 1) {
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     // Получаем список всех коллекций
     const collections = await mongoose.connection.db.listCollections().toArray();
     
-    const results: any = {};
+    const results: Record<string, { count: number; samples: Record<string, unknown>[] }> = {};
     
     // Проверяем каждую коллекцию
     for (const collection of collections) {
@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
       
       results[collectionName] = {
         count,
-        samples: samples.map((doc: any) => {
+        samples: samples.map((doc: Record<string, unknown>) => {
           // Убираем _id из примера для читаемости
-          const { _id, ...rest } = doc;
+          const { _id: _, ...rest } = doc;
           return rest;
         })
       };

@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const limit = searchParams.get('limit');
     
-    let query: any = {};
+    const query: Record<string, unknown> = {};
     
     if (element && element !== 'all') {
       query.element = element;

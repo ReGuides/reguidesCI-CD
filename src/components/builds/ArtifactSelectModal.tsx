@@ -88,7 +88,7 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
   };
 
   const handleApply = () => {
-    let result: ArtifactOrCombination[] = [...selected];
+    const result: ArtifactOrCombination[] = [...selected];
 
     if (mode === 'combination') {
       if (combinationType === '2+2' && selected22Sets.length >= 2) {
@@ -234,7 +234,9 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
                       type="artifact"
                       fallbackSrc="/images/artifacts/default.png"
                     />
-                    <span className="text-sm text-center font-medium text-white">{artifact.name}</span>
+                    <span className="text-sm text-center font-medium text-white">
+                      {artifact.name}
+                    </span>
                     {isSelected && (
                       <span className="absolute top-2 left-2 bg-purple-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold border-2 border-white shadow">
                         {selected.findIndex(item => 'id' in item && item.id === artifact.id) + 1}

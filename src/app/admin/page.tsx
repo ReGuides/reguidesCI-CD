@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { 
   Users, 
@@ -12,8 +11,6 @@ import {
   FileText, 
   Eye, 
   TrendingUp, 
-  Calendar,
-  BarChart3,
   Activity,
   Plus,
   Settings,
@@ -81,7 +78,7 @@ export default function AdminDashboard() {
       const articlesData = await articlesRes.json();
 
       // Подсчитываем общие просмотры
-      const totalViews = (articlesData.data?.articles || []).reduce((sum: number, article: any) => sum + (article.views || 0), 0);
+      const totalViews = (articlesData.data?.articles || []).reduce((sum: number, article: { views?: number }) => sum + (article.views || 0), 0);
 
       setStats({
         totalCharacters: charactersData.data?.characters?.length || 0,

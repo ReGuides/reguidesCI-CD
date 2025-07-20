@@ -2,17 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { Weapon } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { AdminButton } from '@/components/ui/admin-button';
 import { IconActionButton } from '@/components/ui/icon-action-button';
 import { AddButton } from '@/components/ui/add-button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { Eye, Pencil, Trash, Plus } from 'lucide-react';
-import { getImageWithFallback, getSafeImageUrl } from '@/lib/utils/imageUtils';
+import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 
 export default function WeaponsAdminPage() {
   const [weapons, setWeapons] = useState<Weapon[]>([]);
@@ -47,15 +44,6 @@ export default function WeaponsAdminPage() {
     const matchesType = filterType === 'all' || weapon.type === filterType;
     return matchesSearch && matchesRarity && matchesType;
   });
-
-  const getRarityColor = (rarity: number) => {
-    switch (rarity) {
-      case 5: return 'text-yellow-400';
-      case 4: return 'text-purple-400';
-      case 3: return 'text-blue-400';
-      default: return 'text-gray-400';
-    }
-  };
 
   if (loading) {
     return (
