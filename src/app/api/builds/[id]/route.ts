@@ -3,10 +3,11 @@ import connectDB from "@/lib/mongodb";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json();
+    const { id } = await params;
     const mongoose = await connectDB();
     const db = mongoose.connection.db;
     if (!db) {
@@ -19,7 +20,7 @@ export async function PUT(
     };
     
     const result = await db.collection("builds").updateOne(
-      { id: params.id },
+      { id },
       { $set: updatedBuild }
     );
     
@@ -36,16 +37,17 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const mongoose = await connectDB();
     const db = mongoose.connection.db;
     if (!db) {
       throw new Error("Database connection failed");
     }
     
-    const result = await db.collection("builds").deleteOne({ id: params.id });
+    const result = await db.collection("builds").deleteOne({ id });
     
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Build not found" }, { status: 404 });

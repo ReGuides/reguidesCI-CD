@@ -4,12 +4,14 @@ import { ArtifactModel } from '@/models/Artifact';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const artifact = await ArtifactModel.findOne({ id: params.id });
+    const { id } = await params;
+    
+    const artifact = await ArtifactModel.findOne({ id });
     
     if (!artifact) {
       return NextResponse.json(

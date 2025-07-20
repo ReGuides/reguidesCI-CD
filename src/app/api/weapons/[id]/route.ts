@@ -4,12 +4,14 @@ import { WeaponModel } from '@/models/Weapon';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const weapon = await WeaponModel.findOne({ id: params.id });
+    const { id } = await params;
+    
+    const weapon = await WeaponModel.findOne({ id });
     
     if (!weapon) {
       return NextResponse.json(

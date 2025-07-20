@@ -4,12 +4,12 @@ import { CharacterStatsModel } from '@/models/CharacterStats';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const characterId = params.id;
+    const { id: characterId } = await params;
     const stats = await CharacterStatsModel.findOne({ characterId });
     
     if (!stats) {
@@ -37,12 +37,12 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const characterId = params.id;
+    const { id: characterId } = await params;
     const body = await request.json();
     
     const statsData = {

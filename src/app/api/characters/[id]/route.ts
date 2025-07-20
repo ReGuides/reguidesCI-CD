@@ -4,13 +4,15 @@ import { CharacterModel } from '@/models/Character';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
+    const { id } = await params;
+    
     // Ищем персонажа только по id
-    const character = await CharacterModel.findOne({ id: params.id });
+    const character = await CharacterModel.findOne({ id });
     
     if (!character) {
       return NextResponse.json(
@@ -52,13 +54,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
     const body = await request.json();
-    const characterId = params.id;
+    const { id: characterId } = await params;
     
     const updatedCharacter = await CharacterModel.findOneAndUpdate(
       { id: characterId },
@@ -91,12 +93,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const characterId = params.id;
+    const { id: characterId } = await params;
     
     const deletedCharacter = await CharacterModel.findOneAndDelete({ id: characterId });
     
