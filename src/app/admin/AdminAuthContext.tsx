@@ -2,6 +2,18 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 
+export interface AdminJwtPayload {
+  id: string;
+  name?: string;
+  email?: string;
+  role: string;
+  avatar?: string;
+  username?: string;
+  login?: string;
+  exp?: number;
+  iat?: number;
+}
+
 export interface AdminUser {
   id: string;
   name?: string;
@@ -43,7 +55,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     try {
-      const decoded: any = jwtDecode(token);
+      const decoded = jwtDecode<AdminJwtPayload>(token);
       if (!decoded || !decoded.id) {
         setUser(null);
         return;
@@ -69,7 +81,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('adminToken', token);
     }
     try {
-      const decoded: any = jwtDecode(token);
+      const decoded = jwtDecode<AdminJwtPayload>(token);
       setUser({
         id: decoded.id,
         name: decoded.name,

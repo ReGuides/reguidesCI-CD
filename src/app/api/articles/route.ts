@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { ArticleModel } from '@/models/Article';
 import jwt from 'jsonwebtoken';
+import { AdminJwtPayload } from '@/app/admin/AdminAuthContext';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -14,11 +15,11 @@ function getTokenFromRequest(request: NextRequest): string | null {
   );
 }
 
-function verifyToken(request: NextRequest): { id: string; role: string; email: string; name: string } | null {
+function verifyToken(request: NextRequest): AdminJwtPayload | null {
   const token = getTokenFromRequest(request);
   if (!token) return null;
   try {
-    return jwt.verify(token, JWT_SECRET) as any;
+    return jwt.verify(token, JWT_SECRET) as AdminJwtPayload;
   } catch {
     return null;
   }

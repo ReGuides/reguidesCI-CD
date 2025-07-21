@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { AdminJwtPayload } from './AdminAuthContext';
 
 export interface AdminUser {
   id: string;
@@ -21,7 +22,7 @@ export function useAdminUser(): AdminUser | null {
     }
     if (!token) return null;
     try {
-      const decoded: any = jwtDecode(token);
+      const decoded = jwtDecode<AdminJwtPayload>(token);
       if (!decoded || !decoded.id) return null;
       return {
         id: decoded.id,

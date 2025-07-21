@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
+import { AdminJwtPayload } from './AdminAuthContext';
 
 export function useAdminAuthGuard() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export function useAdminAuthGuard() {
       return;
     }
     try {
-      const decoded: any = jwtDecode(token);
+      const decoded = jwtDecode<AdminJwtPayload>(token);
       if (!decoded || decoded.role !== 'admin' || (decoded.exp && Date.now() / 1000 > decoded.exp)) {
         router.replace('/admin/login');
       }

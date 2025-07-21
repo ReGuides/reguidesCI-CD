@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { AdminJwtPayload } from '@/app/admin/AdminAuthContext';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -16,9 +17,9 @@ export function verifyRequestAuth(request: NextRequest, allowedRoles: string[] =
   if (!token) {
     throw new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
-  let user: any;
+  let user: AdminJwtPayload;
   try {
-    user = jwt.verify(token, JWT_SECRET);
+    user = jwt.verify(token, JWT_SECRET) as AdminJwtPayload;
   } catch {
     throw new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401 });
   }
