@@ -84,12 +84,6 @@ export function Header() {
             <Link href="/about" className="text-text hover:text-highlight transition-colors">
               О проекте
             </Link>
-            <Link href="/admin" className="text-accent hover:text-accent-dark transition-colors font-medium">
-              Админ
-            </Link>
-            <Link href="/test" className="text-accent hover:text-accent-dark transition-colors font-medium">
-              Тест
-            </Link>
           </div>
         </nav>
 
@@ -144,20 +138,6 @@ export function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 О проекте
-              </Link>
-              <Link 
-                href="/admin" 
-                className="block px-4 py-3 text-accent hover:text-accent-dark hover:bg-neutral-700 rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Админ
-              </Link>
-              <Link 
-                href="/test" 
-                className="block px-4 py-3 text-accent hover:text-accent-dark hover:bg-neutral-700 rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Тест
               </Link>
             </div>
           </div>

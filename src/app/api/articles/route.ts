@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { ArticleModel } from '@/models/Article';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+
+function getTokenFromRequest(request: NextRequest): string | null {
+  // Сначала пробуем cookie (SSR/middleware), потом заголовок
+  return (
+    request.cookies.get('adminToken')?.value ||
+    request.headers.get('authorization')?.replace('Bearer ', '') ||
+    null
+  );
+}
+
+function verifyToken(request: NextRequest): { id: string; role: string; email: string; name: string } | null {
+  const token = getTokenFromRequest(request);
+  if (!token) return null;
+  try {
+    return jwt.verify(token, JWT_SECRET) as any;
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,90 +65,45 @@ export async function GET(request: NextRequest) {
     const categories = await ArticleModel.distinct('category');
     
     return NextResponse.json({
-      success: true,
-      articles: articles.map(article => ({
-        _id: article._id,
-        title: article.title,
-        slug: article.slug,
-        content: article.content,
-        excerpt: article.excerpt,
-        type: article.type,
-        author: article.author,
-        category: article.category,
-        tags: article.tags,
-        featuredImage: article.featuredImage,
-        status: article.status,
-        publishedAt: article.publishedAt,
-        seoTitle: article.seoTitle,
-        seoDescription: article.seoDescription,
-        difficulty: article.difficulty,
-        estimatedTime: article.estimatedTime,
-        prerequisites: article.prerequisites,
-        relatedArticles: article.relatedArticles,
-        views: article.views,
-        rating: article.rating,
-        createdAt: article.createdAt,
-        updatedAt: article.updatedAt
-      })),
+      articles,
       filters: {
-        statuses: statuses.filter(Boolean).sort(),
-        categories: categories.filter(Boolean).sort()
-      }
+        statuses,
+        categories,
+      },
     });
   } catch (error) {
     console.error('Error fetching articles:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch articles' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
 
 export async function POST(request: NextRequest) {
+  // --- Защита: только для авторизованных пользователей с ролью admin/editor ---
+  const user = verifyToken(request);
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (user.role !== 'admin' && user.role !== 'editor') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   try {
     await connectDB();
-    
-    const body = await request.json();
-    
-    const newArticle = new ArticleModel({
-      title: body.title,
-      slug: body.slug,
-      content: body.content,
-      excerpt: body.excerpt,
-      type: body.category === 'guides' ? 'guide' : 
-            body.category === 'characters' ? 'article' :
-            body.category === 'weapons' ? 'article' :
-            body.category === 'artifacts' ? 'article' :
-            body.category === 'news' ? 'article' :
-            body.category === 'review' ? 'article' :
-            body.category === 'analysis' ? 'article' : 'article',
-      author: body.author,
-      category: body.category,
-      tags: body.tags || [],
-      featuredImage: body.featuredImage,
-      status: body.status || 'draft',
-      seoTitle: body.seoTitle,
-      seoDescription: body.seoDescription,
-      difficulty: body.difficulty || 'easy',
-      estimatedTime: body.estimatedTime || 0,
-      prerequisites: body.prerequisites || [],
-      relatedArticles: body.relatedArticles || [],
-      views: 0,
-      rating: 0,
-      createdAt: new Date(),
-      updatedAt: new Date()
+    const data = await request.json();
+    // Подставляем автора по id из токена
+    const article = new ArticleModel({
+      ...data,
+      author: user.id,
     });
-    
-    const savedArticle = await newArticle.save();
-    
-    return NextResponse.json({
-      success: true,
-      article: savedArticle
-    });
+    await article.save();
+    return NextResponse.json({ success: true, article });
   } catch (error) {
     console.error('Error creating article:', error);
     return NextResponse.json(
-      { error: 'Failed to create article' },
+      { error: 'Ошибка создания статьи', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

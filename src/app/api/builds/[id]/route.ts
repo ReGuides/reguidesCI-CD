@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
+import { verifyRequestAuth } from '@/lib/utils/auth';
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  verifyRequestAuth(request, ['admin']);
   try {
     const body = await request.json();
     const { id } = await params;
@@ -39,6 +41,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  verifyRequestAuth(request, ['admin']);
   try {
     const { id } = await params;
     const mongoose = await connectDB();

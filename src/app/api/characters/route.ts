@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { CharacterModel } from '@/models/Character';
+import { verifyRequestAuth } from '@/lib/utils/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -90,6 +91,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  verifyRequestAuth(request, ['admin']);
   try {
     await connectDB();
     

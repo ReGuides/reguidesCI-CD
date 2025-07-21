@@ -4,7 +4,7 @@ module.exports = {
       name: 'reguides-nextjs',
       script: 'npm',
       args: 'start',
-      cwd: './reguides-nextjs',
+      cwd: '/var/www/reguides',
       instances: 1,
       autorestart: true,
       watch: false,
@@ -17,10 +17,39 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3000
       },
-      error_file: './logs/err.log',
-      out_file: './logs/out.log',
-      log_file: './logs/combined.log',
-      time: true
+      error_file: '/var/log/pm2/reguides-error.log',
+      out_file: '/var/log/pm2/reguides-out.log',
+      log_file: '/var/log/pm2/reguides-combined.log',
+      time: true,
+      // Автоматический перезапуск при сбоях
+      max_restarts: 10,
+      min_uptime: '10s',
+      // Мониторинг
+      pmx: true,
+      // Переменные окружения для MongoDB
+      env_file: '.env',
+      // Дополнительные настройки для монолитного приложения
+      node_args: '--max-old-space-size=1024',
+      // Логирование в JSON формате
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      // Автоматическое сохранение процесса
+      pmx: true,
+      // Настройки для кластера (если понадобится)
+      exec_mode: 'fork'
     }
-  ]
+  ],
+
+  deploy: {
+    production: {
+      user: 'root',
+      host: '95.215.56.7',
+      ref: 'origin/master',
+      repo: 'https://github.com/ReGuides/reguidesCI-CD.git',
+      path: '/var/www/reguides',
+      'pre-deploy-local': 'echo "Начинаем деплой..."',
+      'post-deploy': 'npm ci --only=production && pm2 reload ecosystem.config.js --env production && echo "Деплой завершен"',
+      'pre-setup': 'echo "Настройка сервера..."',
+      'post-setup': 'echo "Сервер настроен"'
+    }
+  }
 }; 

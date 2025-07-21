@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { CharacterModel } from '@/models/Character';
+import { verifyRequestAuth } from '@/lib/utils/auth';
 
 export async function GET(
   request: NextRequest,
@@ -56,6 +57,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  verifyRequestAuth(request, ['admin']);
   try {
     await connectDB();
     
@@ -95,6 +97,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  verifyRequestAuth(request, ['admin']);
   try {
     await connectDB();
     

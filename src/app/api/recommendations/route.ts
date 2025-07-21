@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
 import mongoose from 'mongoose';
+import { verifyRequestAuth } from '@/lib/utils/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,6 +35,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  verifyRequestAuth(request, ['admin']);
   try {
     const body = await request.json();
     const { characterId, weapons, artifacts } = body;
@@ -76,6 +78,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  verifyRequestAuth(request, ['admin']);
   try {
     const body = await request.json();
     const { characterId, weapons, artifacts } = body;
@@ -113,6 +116,7 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  verifyRequestAuth(request, ['admin']);
   try {
     const { searchParams } = new URL(request.url);
     const characterId = searchParams.get('characterId');

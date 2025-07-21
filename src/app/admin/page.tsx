@@ -18,6 +18,7 @@ import {
   Clock,
   Star
 } from 'lucide-react';
+import { useAdminAuthGuard } from './useAdminAuthGuard';
 
 interface DashboardStats {
   totalCharacters: number;
@@ -42,6 +43,7 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
+  useAdminAuthGuard();
   const [stats, setStats] = useState<DashboardStats>({
     totalCharacters: 0,
     totalWeapons: 0,

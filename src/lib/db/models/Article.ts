@@ -83,7 +83,6 @@ const ArticleSchema = new Schema<IArticle>({
 
 // Индексы для поиска
 ArticleSchema.index({ title: 'text', excerpt: 'text', content: 'text' }); // Изменено с description на excerpt
-ArticleSchema.index({ slug: 1 });
 ArticleSchema.index({ status: 1 }); // Добавлен индекс для status
 ArticleSchema.index({ isPublished: 1 });
 ArticleSchema.index({ type: 1 });
