@@ -94,10 +94,15 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
     const data = await request.json();
-    // Подставляем автора по id из токена
+    // Подставляем автора как объект
     const article = new ArticleModel({
       ...data,
-      author: user.id,
+      author: {
+        _id: user.id,
+        name: user.name,
+        username: user.username,
+        avatar: user.avatar,
+      },
     });
     await article.save();
     return NextResponse.json({ success: true, article });
