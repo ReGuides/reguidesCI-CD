@@ -134,18 +134,29 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
             </td>
           ),
           // Кастомные стили для изображений
-          img: ({ src, alt }) => (
-            <Image 
-              src={src || ''} 
-              alt={alt || ''} 
-              width={800}
-              height={600}
-              className="max-w-full h-auto rounded-lg my-4"
-              onError={(e) => {
-                e.currentTarget.src = '/images/placeholder.png';
-              }}
-            />
-          ),
+          img: ({ src, alt }) => {
+            // Если src начинается с http://localhost:3000, обрезаем до относительного
+            let safeSrc = src || '';
+            if (safeSrc.startsWith('http://localhost:3000')) {
+              safeSrc = safeSrc.replace('http://localhost:3000', '');
+            }
+            // Если src не начинается с /, добавить /images/articles/
+            if (safeSrc && !safeSrc.startsWith('/')) {
+              safeSrc = `/images/articles/${safeSrc}`;
+            }
+            return (
+              <Image 
+                src={safeSrc}
+                alt={alt || ''}
+                width={800}
+                height={600}
+                className="max-w-full h-auto rounded-lg my-4"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/placeholder.png';
+                }}
+              />
+            );
+          },
           // Кастомные компоненты для div элементов
           div: ({ className, children, ...props }) => {
             // Обработка контейнеров изображений с обтеканием
