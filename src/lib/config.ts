@@ -21,9 +21,7 @@ export const config = {
 
 // Функции для получения конфигурации
 export const getDatabaseURI = () => {
-  // Автоматически определяем окружение
-  const isProduction = process.env.NODE_ENV === 'production';
-  return isProduction ? config.database.production : config.database.development;
+  return process.env.MONGODB_URI || (process.env.NODE_ENV === 'production' ? config.database.production : config.database.development);
 };
 
 export const getAppURL = () => {
