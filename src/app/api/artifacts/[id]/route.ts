@@ -23,7 +23,9 @@ export async function GET(
     return NextResponse.json({
       id: artifact.id,
       name: artifact.name,
-      rarity: Array.isArray(artifact.rarity) ? artifact.rarity : (typeof artifact.rarity === 'number' ? [artifact.rarity] : []),
+      rarity: Array.isArray(artifact.rarity) && artifact.rarity.length > 0
+        ? artifact.rarity
+        : [5],
       bonus1: artifact.bonus1,
       bonus2: artifact.bonus2,
       bonus4: artifact.bonus4,

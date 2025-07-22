@@ -13,7 +13,9 @@ export async function GET() {
     // Гарантируем, что rarity всегда массив
     const safeArtifacts = artifacts.map(a => ({
       ...a.toObject(),
-      rarity: Array.isArray(a.rarity) ? a.rarity : (typeof a.rarity === 'number' ? [a.rarity] : [])
+      rarity: Array.isArray(a.rarity) && a.rarity.length > 0
+        ? a.rarity
+        : [5]
     }));
 
     return NextResponse.json({ data: safeArtifacts });

@@ -45,12 +45,10 @@ export function ArtifactCard({ artifact, onSelect, isSelected }: ArtifactCardPro
     }
   };
 
-  // Гарантируем, что rarity всегда массив
-  const rarityArray = Array.isArray(artifact.rarity)
+  // Гарантируем, что rarity всегда массив с числами
+  const rarityArray = Array.isArray(artifact.rarity) && artifact.rarity.length > 0
     ? artifact.rarity
-    : typeof artifact.rarity === 'number'
-      ? [artifact.rarity]
-      : [];
+    : [5];
 
   // Получаем цвета для минимальной редкости
   const minRarity = rarityArray.length > 0 ? Math.min(...rarityArray) : 1;
