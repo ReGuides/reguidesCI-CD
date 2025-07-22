@@ -45,8 +45,15 @@ export function ArtifactCard({ artifact, onSelect, isSelected }: ArtifactCardPro
     }
   };
 
+  // Гарантируем, что rarity всегда массив
+  const rarityArray = Array.isArray(artifact.rarity)
+    ? artifact.rarity
+    : typeof artifact.rarity === 'number'
+      ? [artifact.rarity]
+      : [];
+
   // Получаем цвета для минимальной редкости
-  const minRarity = Math.min(...artifact.rarity);
+  const minRarity = rarityArray.length > 0 ? Math.min(...rarityArray) : 1;
   const minColors = getRarityColors(minRarity);
 
   return (
@@ -74,7 +81,7 @@ export function ArtifactCard({ artifact, onSelect, isSelected }: ArtifactCardPro
           <div className="absolute bottom-2 right-2">
             <div className={`px-2 py-1 rounded bg-gradient-to-r ${minColors.gradient} ${minColors.shadow}`}>
               <div className="flex gap-1">
-                {Array.isArray(artifact.rarity) ? artifact.rarity.map((rarity, i) => {
+                {rarityArray.length > 0 ? rarityArray.map((rarity, i) => {
                   const colors = getRarityColors(rarity);
                   return (
                     <span key={i} className={`${colors.text} font-bold text-base`}>
@@ -83,7 +90,7 @@ export function ArtifactCard({ artifact, onSelect, isSelected }: ArtifactCardPro
                   );
                 }) : (
                   <span className={`${minColors.text} font-bold text-base`}>
-                    {artifact.rarity}★
+                    1★
                   </span>
                 )}
               </div>
