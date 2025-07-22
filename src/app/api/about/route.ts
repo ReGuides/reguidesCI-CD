@@ -25,8 +25,10 @@ export async function GET() {
     // Podtyagivaem avatarki dlya uchastnikov komandy po imeni
     if (about.team && Array.isArray(about.team) && about.team.length > 0) {
       const userNames = about.team.map((t) => t.name);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const users = await User.find({ name: { $in: userNames } }).lean() as any[];
       about.team = about.team.map((member) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const user = users.find((u: any) => u.name === member.name);
         return {
           ...member,
