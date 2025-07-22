@@ -13,12 +13,6 @@ interface AboutData {
   [key: string]: unknown;
 }
 
-interface UserData {
-  name: string;
-  avatar?: string;
-  [key: string]: unknown;
-}
-
 export async function GET() {
   try {
     await connectToDatabase();
@@ -33,7 +27,7 @@ export async function GET() {
       const userNames = about.team.map((t) => t.name);
       const users = await User.find({ name: { $in: userNames } }).lean();
       about.team = about.team.map((member) => {
-        const user = users.find((u: any) => u.name === member.name);
+        const user = users.find((u: { name: string; avatar?: string }) => u.name === member.name);
         return {
           ...member,
           avatar: user?.avatar || member.avatar || null // Prioritize user avatar, then existing member avatar
