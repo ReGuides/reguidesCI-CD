@@ -14,21 +14,13 @@ interface ArtifactFiltersProps {
 }
 
 export function ArtifactFilters({ filters, onFiltersChange }: ArtifactFiltersProps) {
-  const [filterOptions, setFilterOptions] = useState({
-    types: [] as string[],
-    rarities: [] as number[]
-  });
-
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
         const response = await fetch('/api/artifacts');
         if (response.ok) {
           const data = await response.json();
-          setFilterOptions({
-            types: data.filters?.types || [],
-            rarities: data.filters?.rarities || []
-          });
+          // Удаляю неиспользуемые переменные и функции
         }
       } catch (error) {
         console.error('Error fetching filter options:', error);
@@ -37,18 +29,6 @@ export function ArtifactFilters({ filters, onFiltersChange }: ArtifactFiltersPro
 
     fetchFilterOptions();
   }, []);
-
-  const handleTypeChange = useCallback((value: string) => {
-    onFiltersChange({ ...filters, type: value });
-  }, [filters, onFiltersChange]);
-
-  const handleRarityChange = useCallback((value: string) => {
-    onFiltersChange({ ...filters, rarity: value });
-  }, [filters, onFiltersChange]);
-
-  const handleSearchChange = useCallback((value: string) => {
-    onFiltersChange({ ...filters, search: value });
-  }, [filters, onFiltersChange]);
 
   return (
     <div className="mb-8 bg-card rounded-lg shadow-md p-6 border border-neutral-700">
