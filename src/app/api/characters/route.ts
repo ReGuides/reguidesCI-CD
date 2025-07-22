@@ -15,6 +15,18 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const limit = searchParams.get('limit');
     
+    // Маппинг синонимов типов оружия
+    const weaponSynonyms: { [key: string]: string[] } = {
+      'Меч': ['Меч', 'Одноручный меч'],
+      'Двуручный меч': ['Двуручный меч'],
+      'Копье': ['Копье', 'Копьё'],
+      'Лук': ['Лук', 'Стрелковое'],
+      'Катализатор': ['Катализатор']
+    };
+
+    // Получаем weapon из query
+    const weapon = searchParams.get('weapon');
+    
     const query: Record<string, unknown> = {};
     
     if (element && element !== 'all') {
@@ -23,6 +35,12 @@ export async function GET(request: NextRequest) {
     
     if (weaponType && weaponType !== 'all') {
       query.weaponType = weaponType;
+    }
+
+    if (weapon && weapon !== 'all') {
+      // Если выбрано что-то из фильтра, ищем по всем синонимам
+      const synonyms = weaponSynonyms[weapon as keyof typeof weaponSynonyms] || [weapon];
+      query.weapon = { $in: synonyms };
     }
     
     if (rarity && rarity !== 'all') {
@@ -50,11 +68,19 @@ export async function GET(request: NextRequest) {
     
     // Генерируем фильтры на основе данных
     const allCharacters = await CharacterModel.find({}).sort({ name: 1 });
+    // Формируем фильтры с учётом синонимов
+    const allWeaponsRaw = allCharacters.map(char => char.weapon).filter(Boolean);
+    const weaponGroups = Object.entries(weaponSynonyms).reduce<string[]>((acc, [group, synonyms]) => {
+      if (allWeaponsRaw.some(w => synonyms.includes(w))) {
+        acc.push(group);
+      }
+      return acc;
+    }, []);
     const filters = {
       elements: [...new Set(allCharacters.map(char => char.element).filter(Boolean))],
-      weapons: [...new Set(allCharacters.map(char => char.weaponType).filter(Boolean))],
+      weapons: weaponGroups,
       rarities: [...new Set(allCharacters.map(char => char.rarity).filter(Boolean))],
-      regions: [...new Set(allCharacters.map(char => char.region).filter(Boolean))]
+      regions: Array.from(new Set([...allCharacters.map(char => char.region).filter(Boolean), 'Нод-Край']))
     };
     
     return NextResponse.json({

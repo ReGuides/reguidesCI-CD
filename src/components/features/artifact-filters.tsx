@@ -53,43 +53,7 @@ export function ArtifactFilters({ filters, onFiltersChange }: ArtifactFiltersPro
   return (
     <div className="mb-8 bg-card rounded-lg shadow-md p-6 border border-neutral-700">
       <div className="flex flex-col gap-4">
-        {/* Type Filter */}
-        <div>
-          <label className="block text-sm font-medium text-text mb-2">
-            Набор артефактов
-          </label>
-          <select
-            value={filters.type}
-            onChange={(e) => handleTypeChange(e.target.value)}
-            className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-text focus:outline-none focus:ring-2 focus:ring-accent"
-          >
-            <option value="all">Все наборы</option>
-            {(filterOptions.types || []).map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </div>
-        {/* Rarity Filter */}
-        <div>
-          <label className="block text-sm font-medium text-text mb-2">
-            Редкость
-          </label>
-          <select
-            value={filters.rarity}
-            onChange={(e) => handleRarityChange(e.target.value)}
-            className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-text focus:outline-none focus:ring-2 focus:ring-accent"
-          >
-            <option value="all">Все редкости</option>
-            {(filterOptions.rarities || []).map((rarity) => (
-              <option key={rarity} value={rarity}>
-                {rarity}★
-              </option>
-            ))}
-          </select>
-        </div>
-        {/* Search */}
+        {/* Search Only */}
         <div>
           <label className="block text-sm font-medium text-text mb-2">
             Поиск
@@ -97,7 +61,7 @@ export function ArtifactFilters({ filters, onFiltersChange }: ArtifactFiltersPro
           <input
             type="text"
             value={filters.search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
             placeholder="Поиск артефактов..."
             className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-text placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent"
           />
