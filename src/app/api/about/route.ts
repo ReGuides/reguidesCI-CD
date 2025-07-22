@@ -25,9 +25,9 @@ export async function GET() {
     // Podtyagivaem avatarki dlya uchastnikov komandy po imeni
     if (about.team && Array.isArray(about.team) && about.team.length > 0) {
       const userNames = about.team.map((t) => t.name);
-      const users = await User.find({ name: { $in: userNames } }).lean();
+      const users = await User.find({ name: { $in: userNames } }).lean() as any[];
       about.team = about.team.map((member) => {
-        const user = users.find((u: { name: string; avatar?: string }) => u.name === member.name);
+        const user = users.find((u: any) => u.name === member.name);
         return {
           ...member,
           avatar: user?.avatar || member.avatar || null // Prioritize user avatar, then existing member avatar
