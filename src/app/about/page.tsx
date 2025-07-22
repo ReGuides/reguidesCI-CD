@@ -68,8 +68,12 @@ export default function AboutPage() {
     <div key={member.name} className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl hover:bg-neutral-750 transition-colors">
       <div className="text-center">
         {member.avatar ? (
-          <Image
-            src={member.avatar.startsWith('http') ? member.avatar : `/images/avatars/${member.avatar}`}
+          <img
+            src={
+              member.avatar.startsWith('http') || member.avatar.startsWith('/images/avatars/')
+                ? member.avatar
+                : `/images/avatars/${member.avatar}`
+            }
             alt={member.name}
             width={80}
             height={80}
