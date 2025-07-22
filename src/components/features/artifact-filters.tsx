@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 
 interface Filters {
   type: string;
@@ -19,7 +19,7 @@ export function ArtifactFilters({ filters, onFiltersChange }: ArtifactFiltersPro
       try {
         const response = await fetch('/api/artifacts');
         if (response.ok) {
-          const data = await response.json();
+          await response.json();
           // Удаляю неиспользуемые переменные и функции
         }
       } catch (error) {

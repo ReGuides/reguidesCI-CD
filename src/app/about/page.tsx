@@ -5,8 +5,16 @@ import Image from 'next/image';
 import { IAbout, Feature, TeamMember } from '@/lib/db/models/About';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
+interface Stats {
+  characters: number;
+  weapons: number;
+  artifacts: number;
+  builds?: number;
+}
+
 export default function AboutPage() {
   const [about, setAbout] = useState<IAbout | null>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,11 +23,7 @@ export default function AboutPage() {
       try {
         setLoading(true);
         const response = await fetch('/api/about');
-        
-        if (!response.ok) {
-          throw new Error('Failed to load about page');
-        }
-        
+        if (!response.ok) throw new Error('Failed to load about page');
         const data = await response.json();
         setAbout(data);
       } catch (error) {
@@ -29,8 +33,19 @@ export default function AboutPage() {
         setLoading(false);
       }
     };
-
     loadAbout();
+  }, []);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const response = await fetch('/api/stats');
+        if (!response.ok) return;
+        const data = await response.json();
+        setStats(data);
+      } catch {}
+    };
+    loadStats();
   }, []);
 
   const renderFeature = (feature: Feature) => (
@@ -52,17 +67,22 @@ export default function AboutPage() {
   const renderTeamMember = (member: TeamMember) => (
     <div key={member.name} className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl hover:bg-neutral-750 transition-colors">
       <div className="text-center">
-        {member.avatar && (
-          <Image 
+        {member.avatar ? (
+          <Image
             src={member.avatar.startsWith('http') ? member.avatar : `/images/avatars/${member.avatar}`}
-            alt={member.name} 
+            alt={member.name}
             width={80}
             height={80}
-            className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
+            className="w-20 h-20 rounded-full mx-auto mb-4 object-cover bg-neutral-700"
             onError={(e) => {
-              e.currentTarget.style.display = 'none';
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = '/images/avatars/default.png';
             }}
           />
+        ) : (
+          <div className="w-20 h-20 rounded-full mx-auto mb-4 bg-neutral-700 flex items-center justify-center text-3xl text-neutral-400">
+            <span>👤</span>
+          </div>
         )}
         <h3 className="text-xl font-semibold text-white mb-1">{member.name}</h3>
         <p className="text-blue-400 font-medium mb-2">{member.role}</p>
@@ -71,44 +91,16 @@ export default function AboutPage() {
         )}
         <div className="flex justify-center gap-3">
           {member.social?.github && (
-            <a 
-              href={member.social.github} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-neutral-400 hover:text-white transition-colors"
-            >
-              GitHub
-            </a>
+            <a href={member.social.github} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">GitHub</a>
           )}
           {member.social?.telegram && (
-            <a 
-              href={member.social.telegram} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-neutral-400 hover:text-white transition-colors"
-            >
-              Telegram
-            </a>
+            <a href={member.social.telegram} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">Telegram</a>
           )}
           {member.social?.discord && (
-            <a 
-              href={member.social.discord} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-neutral-400 hover:text-white transition-colors"
-            >
-              Discord
-            </a>
+            <a href={member.social.discord} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">Discord</a>
           )}
           {member.social?.website && (
-            <a 
-              href={member.social.website} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-neutral-400 hover:text-white transition-colors"
-            >
-              Website
-            </a>
+            <a href={member.social.website} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">Website</a>
           )}
         </div>
       </div>
@@ -163,22 +155,22 @@ export default function AboutPage() {
         </div>
 
         {/* Statistics */}
-        {about.statistics && (
+        {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
             <div className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-blue-400 mb-2">{about.statistics.characters}</div>
+              <div className="text-3xl font-bold text-blue-400 mb-2">{stats.characters}</div>
               <div className="text-neutral-400">Персонажей</div>
             </div>
             <div className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-purple-400 mb-2">{about.statistics.weapons}</div>
+              <div className="text-3xl font-bold text-purple-400 mb-2">{stats.weapons}</div>
               <div className="text-neutral-400">Оружий</div>
             </div>
             <div className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-green-400 mb-2">{about.statistics.artifacts}</div>
+              <div className="text-3xl font-bold text-green-400 mb-2">{stats.artifacts}</div>
               <div className="text-neutral-400">Артефактов</div>
             </div>
             <div className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-yellow-400 mb-2">{about.statistics.builds}</div>
+              <div className="text-3xl font-bold text-yellow-400 mb-2">{stats.builds ?? '-'}</div>
               <div className="text-neutral-400">Сборок</div>
             </div>
           </div>
@@ -263,10 +255,18 @@ export default function AboutPage() {
         {about.supportProject && (
           <div className="mt-12 p-8 bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/20 rounded-xl">
             <h2 className="text-2xl font-bold text-white mb-4 text-center">Поддержать проект</h2>
-            <div 
-              className="text-neutral-300 text-center"
-              dangerouslySetInnerHTML={{ __html: about.supportProject }}
-            />
+            {about.supportProject.startsWith('http') ? (
+              <div className="flex justify-center">
+                <button
+                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow transition-colors text-lg"
+                  onClick={() => window.open(about.supportProject, '_blank', 'noopener,noreferrer')}
+                >
+                  Поддержать
+                </button>
+              </div>
+            ) : (
+              <div className="text-neutral-300 text-center" dangerouslySetInnerHTML={{ __html: about.supportProject }} />
+            )}
           </div>
         )}
       </div>
