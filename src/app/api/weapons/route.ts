@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { WeaponModel } from '@/models/Weapon';
+import { NextRequest } from 'next/server';
 
-export async function GET(request) {
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
     // Получаем параметры фильтрации
     const { searchParams } = new URL(request.url);
-    const filter = {};
+    const filter: Record<string, unknown> = {};
     const type = searchParams.get('type');
     const rarity = searchParams.get('rarity');
     const search = searchParams.get('search');
