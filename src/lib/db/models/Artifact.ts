@@ -5,7 +5,7 @@ export interface IArtifact {
   id?: string; // Для совместимости со старой базой данных
   name: string;
   set: string;
-  rarity: 3 | 4 | 5;
+  rarity: number[];
   piece: 'Flower of Life' | 'Plume of Death' | 'Sands of Eon' | 'Goblet of Eonothem' | 'Circlet of Logos';
   mainStat: string;
   subStats?: string[];
@@ -27,10 +27,15 @@ const ArtifactSchema = new Schema<IArtifact>({
   id: { type: String, unique: true, sparse: true }, // Для совместимости со старой базой данных
   name: { type: String, required: true },
   set: { type: String, required: true },
-  rarity: { 
-    type: Number, 
+  rarity: {
+    type: [Number],
     required: true,
-    enum: [3, 4, 5]
+    validate: {
+      validator: function(rarity) {
+        return Array.isArray(rarity) && rarity.every(r => r >= 1 && r <= 5);
+      },
+      message: 'Редкость должна быть от 1 до 5'
+    }
   },
   piece: { 
     type: String, 
