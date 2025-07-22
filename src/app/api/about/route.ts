@@ -6,7 +6,7 @@ import { User } from '@/lib/db/models/User';
 interface AboutData {
   team?: Array<{
     name: string;
-    avatar?: string;
+    avatar?: string | null;
     role?: string;
     description?: string;
   }>;
@@ -31,9 +31,9 @@ export async function GET() {
     // Podtyagivaem avatarki dlya uchastnikov komandy po imeni
     if (about.team && Array.isArray(about.team) && about.team.length > 0) {
       const userNames = about.team.map((t) => t.name);
-      const users = await User.find({ name: { $in: userNames } }).lean() as UserData[];
+      const users = await User.find({ name: { $in: userNames } }).lean();
       about.team = about.team.map((member) => {
-        const user = users.find((u: UserData) => u.name === member.name);
+        const user = users.find((u: any) => u.name === member.name);
         return {
           ...member,
           avatar: user?.avatar || member.avatar || null // Prioritize user avatar, then existing member avatar
