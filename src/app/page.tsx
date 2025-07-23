@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CharacterCard } from '@/components/character-card';
 import { Character } from '@/types';
@@ -27,11 +26,6 @@ function sortByPatchNumber(a: Character, b: Character): number {
 
 export default function HomePage() {
   const router = useRouter();
-  const [stats, setStats] = useState({
-    characters: 0,
-    weapons: 0,
-    artifacts: 0
-  });
   const [characters, setCharacters] = useState<Character[]>([]);
   const [allStats, setAllStats] = useState<{ _id: string; views: number }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,12 +115,7 @@ export default function HomePage() {
       try {
         setLoading(true);
         
-        // Получаем статистику
-        const statsResponse = await fetch('/api/stats');
-        if (statsResponse.ok) {
-          const statsData = await statsResponse.json();
-          setStats(statsData);
-        }
+
 
         // Получаем персонажей
         const charactersResponse = await fetch('/api/characters');
