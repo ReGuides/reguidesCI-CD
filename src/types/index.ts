@@ -19,6 +19,52 @@ export interface Character {
   role?: string; // добавлено для админки
 }
 
+// News types
+export interface News {
+  _id: string;
+  title: string;
+  content: string;
+  summary: string;
+  preview?: string;
+  date?: string;
+  author?: string;
+  type?: 'genshin' | 'general';
+  image?: string;
+  featured?: boolean;
+  publishedAt?: string;
+  isPublished?: boolean;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Advertisement types
+export interface Advertisement {
+  _id: string;
+  title: string;
+  description: string;
+  url: string;
+  backgroundImage?: string;
+  cta: string;
+  type: string;
+  erid?: string;
+  isActive: boolean;
+  order: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// About types
+export interface About {
+  _id: string;
+  title: string;
+  content: string;
+  supportProject?: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Character Stats types
 export interface CharacterStat {
   stat: string;

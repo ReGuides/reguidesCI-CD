@@ -13,7 +13,6 @@ import CharacterCarousel from '@/components/character-carousel';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
 
-
 function parsePatchNumber(patch?: string): number {
   if (!patch) return 0;
   const [major, minor] = patch.split('.').map(Number);
@@ -174,38 +173,10 @@ export default function HomePage() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center min-h-[400px]">
+    <div className="w-full min-h-[400px]">
       {/* Баннер дней рождения */}
       <div className="w-full max-w-7xl mx-auto px-4">
         <BirthdayBanner />
-      </div>
-
-      {/* Hero Section */}
-      <div className="w-full max-w-7xl mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            ReGuides
-          </h1>
-          <p className="text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">
-            Полное руководство по Genshin Impact. Изучите персонажей, оружия и артефакты с подробными характеристиками и рекомендациями.
-          </p>
-          
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-neutral-800 rounded-lg p-6 border border-neutral-700">
-              <div className="text-3xl font-bold text-accent mb-2">{stats.characters}</div>
-              <div className="text-neutral-400">Персонажей</div>
-            </div>
-            <div className="bg-neutral-800 rounded-lg p-6 border border-neutral-700">
-              <div className="text-3xl font-bold text-accent mb-2">{stats.weapons}</div>
-              <div className="text-neutral-400">Оружий</div>
-            </div>
-            <div className="bg-neutral-800 rounded-lg p-6 border border-neutral-700">
-              <div className="text-3xl font-bold text-accent mb-2">{stats.artifacts}</div>
-              <div className="text-neutral-400">Артефактов</div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Character Carousel */}
@@ -219,87 +190,61 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Новые персонажи */}
-      <div className="w-full max-w-7xl mx-auto mt-12 sm:mt-16 px-4">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Новые персонажи</h2>
-        <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {newest6Characters.map(character => (
-            <div key={`new-${character.id}`} onClick={() => router.push(`/characters/${character.id}`)} className="cursor-pointer">
-              <CharacterCard character={character} />
+      {/* Основной контент */}
+      <div className="w-full max-w-7xl mx-auto px-4">
+        <div className="flex-1 min-w-0">
+            {/* Новые персонажи */}
+            <div className="mt-12 sm:mt-16">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Новые персонажи</h2>
+              <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                {newest6Characters.map(character => (
+                  <div key={`new-${character.id}`} onClick={() => router.push(`/characters/${character.id}`)} className="cursor-pointer">
+                    <CharacterCard character={character} />
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 text-center">
+                <button 
+                  className="px-6 py-2 bg-accent hover:bg-accent/80 text-white rounded-lg font-semibold transition" 
+                  onClick={() => router.push('/characters')}
+                >
+                  Все персонажи
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="mt-4 text-center">
-          <button 
-            className="px-6 py-2 bg-accent hover:bg-accent/80 text-white rounded-lg font-semibold transition" 
-            onClick={() => router.push('/characters')}
-          >
-            Все персонажи
-          </button>
-        </div>
-      </div>
 
-      {/* Случайные персонажи */}
-      <div className="w-full max-w-7xl mx-auto mt-12 sm:mt-16 px-4">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Случайные персонажи</h2>
-        <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {randomBlockCharacters.map(character => (
-            <div key={`random-${character.id}`} onClick={() => router.push(`/characters/${character.id}`)} className="cursor-pointer">
-              <CharacterCard character={character} />
+            {/* Мобильная версия сайдбара */}
+            <div className="w-full my-4 lg:hidden">
+              <MobileSidebar />
             </div>
-          ))}
-        </div>
-        <div className="mt-4 text-center">
-          <button 
-            className="px-6 py-2 bg-accent hover:bg-accent/80 text-white rounded-lg font-semibold transition" 
-            onClick={() => router.push('/characters')}
-          >
-            Все персонажи
-          </button>
-        </div>
-      </div>
 
-      {/* Quick Links */}
-      <div className="w-full max-w-7xl mx-auto mt-12 sm:mt-16 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-neutral-800 rounded-lg p-6 border border-neutral-700">
-            <h3 className="text-xl font-bold text-white mb-4">Оружия</h3>
-            <p className="text-neutral-300 mb-4">
-              Изучите все оружия Genshin Impact с подробными характеристиками и пассивными способностями.
-            </p>
-            <Link 
-              href="/weapons" 
-              className="inline-block bg-accent text-white px-4 py-2 rounded-md hover:bg-accent/90 transition-colors"
-            >
-              Перейти к оружиям
-            </Link>
-          </div>
-          
-          <div className="bg-neutral-800 rounded-lg p-6 border border-neutral-700">
-            <h3 className="text-xl font-bold text-white mb-4">Артефакты</h3>
-            <p className="text-neutral-300 mb-4">
-              Изучите все артефакты Genshin Impact с подробными характеристиками и бонусами комплектов.
-            </p>
-            <Link 
-              href="/artifacts" 
-              className="inline-block bg-accent text-white px-4 py-2 rounded-md hover:bg-accent/90 transition-colors"
-            >
-              Перейти к артефактам
-            </Link>
-          </div>
+            {/* Блок новостей */}
+            <NewsSection />
+
+            {/* Случайные персонажи */}
+            <div className="mt-12 sm:mt-16">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Случайные персонажи</h2>
+              <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                {randomBlockCharacters.map(character => (
+                  <div key={`random-${character.id}`} onClick={() => router.push(`/characters/${character.id}`)} className="cursor-pointer">
+                    <CharacterCard character={character} />
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 text-center">
+                <button 
+                  className="px-6 py-2 bg-accent hover:bg-accent/80 text-white rounded-lg font-semibold transition" 
+                  onClick={() => router.push('/characters')}
+                >
+                  Все персонажи
+                </button>
+              </div>
+            </div>
+
+            {/* Блок друзей проекта */}
+            <FriendsSection />
         </div>
       </div>
-
-      {/* Мобильная версия сайдбара */}
-      <div className="w-full my-4">
-        <MobileSidebar />
-      </div>
-
-      {/* Блок новостей */}
-      <NewsSection />
-
-      {/* Блок друзей проекта */}
-      <FriendsSection />
     </div>
   );
 }

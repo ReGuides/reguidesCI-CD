@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import Sidebar from '@/components/sidebar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,6 +29,11 @@ export default function RootLayout({
           </main>
           
           <Footer />
+        </div>
+        
+        {/* Сайдбар на всех страницах */}
+        <div className="hidden lg:block fixed right-4 top-1/2 transform -translate-y-1/2 w-72 z-10">
+          <Sidebar />
         </div>
       </body>
     </html>
