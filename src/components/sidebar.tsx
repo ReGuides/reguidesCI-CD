@@ -6,11 +6,7 @@ import { Character, News, Advertisement, About } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import Image from 'next/image';
 
-interface SidebarProps {
-  className?: string;
-}
-
-export default function Sidebar({ className = '' }: SidebarProps) {
+export default function Sidebar() {
   const router = useRouter();
   const [selectedNews, setSelectedNews] = useState<News | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
