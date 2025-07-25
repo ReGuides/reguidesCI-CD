@@ -6,8 +6,8 @@ export const config = {
   database: {
     // Для разработки
     development: 'mongodb://localhost:27017/reguides',
-    // Для продакшена - измените на ваш хост
-    production: 'mongodb://reguides.ru:27017/reguides',
+    // Для продакшена - MongoDB на том же сервере
+    production: 'mongodb://localhost:27017/reguides',
   },
   
   // Приложение (Next.js монолит)
