@@ -6,6 +6,7 @@ import { Plus, Trash2, Users, Shield, Zap, Heart } from 'lucide-react';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import { Character } from '@/types';
+import CharacterSelectModal from './CharacterSelectModal';
 
 interface TeamPosition {
   characters: string[];
@@ -51,11 +52,16 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [charactersList, setCharactersList] = useState<Character[]>([]);
-  const [showCharacterSelect, setShowCharacterSelect] = useState<{
+  const [showTeamCharacterSelect, setShowTeamCharacterSelect] = useState<{
     open: boolean;
     teamIndex: number;
     position: keyof RecommendedTeam['positions'] | null;
   }>({ open: false, teamIndex: -1, position: null });
+  
+  const [showCompatibleCharacterSelect, setShowCompatibleCharacterSelect] = useState<{
+    open: boolean;
+    index: number;
+  }>({ open: false, index: -1 });
 
   const fetchTeams = useCallback(async () => {
     setLoading(true);
@@ -179,8 +185,12 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
     setCompatibleCharacters(updated);
   };
 
-  const openCharacterSelect = (teamIndex: number, position: keyof RecommendedTeam['positions']) => {
-    setShowCharacterSelect({ open: true, teamIndex, position });
+  const openTeamCharacterSelect = (teamIndex: number, position: keyof RecommendedTeam['positions']) => {
+    setShowTeamCharacterSelect({ open: true, teamIndex, position });
+  };
+
+  const openCompatibleCharacterSelect = (index: number) => {
+    setShowCompatibleCharacterSelect({ open: true, index });
   };
 
 
@@ -215,7 +225,7 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
                 </div>
                 <Button
                   type="button"
-                  onClick={() => openCharacterSelect(index, position)}
+                  onClick={() => openTeamCharacterSelect(index, position)}
                   size="sm"
                   variant="outline"
                   className="text-xs"
@@ -272,31 +282,47 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
     </div>
   );
 
-  const renderCompatibleCharacterForm = (compatible: CompatibleCharacter, index: number) => (
-    <div key={index} className="flex items-center gap-2">
-              <select
-          value={compatible.characterId}
-          onChange={(e) => updateCompatibleCharacter(index, e.target.value)}
-          className="flex-1 px-3 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white"
+  const renderCompatibleCharacterForm = (compatible: CompatibleCharacter, index: number) => {
+    const characterData = charactersList.find(c => c.id === compatible.characterId);
+    
+    return (
+      <div key={index} className="flex items-center gap-2">
+        <div className="flex-1 flex items-center gap-2 bg-neutral-700 border border-neutral-600 rounded-lg px-3 py-2">
+          {characterData ? (
+            <>
+              <OptimizedImage
+                src={getImageWithFallback(characterData.image, characterData.name, 'character')}
+                alt={characterData.name}
+                className="w-6 h-6 rounded"
+                type="character"
+              />
+              <span className="text-white">{characterData.name}</span>
+            </>
+          ) : (
+            <span className="text-gray-400">Персонаж не выбран</span>
+          )}
+        </div>
+        <Button
+          type="button"
+          onClick={() => openCompatibleCharacterSelect(index)}
+          size="sm"
+          variant="outline"
+          className="text-blue-400 hover:text-blue-300"
         >
-          <option value="">Выберите персонажа</option>
-          {charactersList.map(character => (
-            <option key={character.id} value={character.id}>
-              {character.name} ({character.element})
-            </option>
-          ))}
-        </select>
-                        <Button
-                    type="button"
-                    onClick={() => removeCompatibleCharacter(index)}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-    </div>
-  );
+          Выбрать
+        </Button>
+        <Button
+          type="button"
+          onClick={() => removeCompatibleCharacter(index)}
+          size="sm"
+          variant="outline"
+          className="text-red-400 hover:text-red-300"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+    );
+  };
 
   if (loading) {
     return <div className="text-center py-4 text-gray-400">Загрузка команд...</div>;
@@ -378,60 +404,51 @@ const CharacterTeamsManager: React.FC<CharacterTeamsManagerProps> = ({ character
         />
       </div>
 
-      {/* Модальное окно выбора персонажей */}
-      {showCharacterSelect.open && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-neutral-900 rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-bold mb-4 text-white">Выберите персонажей</h2>
-            <div className="grid gap-2 grid-cols-2 sm:grid-cols-3">
-              {charactersList.map(character => {
-                const isSelected = showCharacterSelect.position && 
-                  showCharacterSelect.teamIndex >= 0 &&
-                  recommendedTeams[showCharacterSelect.teamIndex]?.positions[showCharacterSelect.position]?.characters.includes(character.id);
-                
-                return (
-                  <button
-                    key={character.id}
-                    type="button"
-                    onClick={() => {
-                      if (showCharacterSelect.position && showCharacterSelect.teamIndex >= 0) {
-                        updateTeamPosition(
-                          showCharacterSelect.teamIndex,
-                          showCharacterSelect.position!,
-                          character.id,
-                          !isSelected
-                        );
-                      }
-                    }}
-                    className={`flex items-center gap-2 p-2 rounded border transition-colors ${
-                      isSelected
-                        ? 'bg-blue-600 border-blue-400 text-white' 
-                        : 'bg-neutral-800 border-neutral-700 text-gray-200'
-                    }`}
-                  >
-                    <OptimizedImage
-                      src={getImageWithFallback(character.image, character.name, 'character')}
-                      alt={character.name}
-                      className="w-8 h-8 rounded object-cover"
-                      type="character"
-                    />
-                    <span className="text-sm">{character.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-            <div className="flex gap-4 mt-6">
-                          <Button
-              type="button"
-              onClick={() => setShowCharacterSelect({ open: false, teamIndex: -1, position: null })}
-              className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-            >
-              Готово
-            </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Модальные окна выбора персонажей */}
+      <CharacterSelectModal
+        isOpen={showTeamCharacterSelect.open}
+        onClose={() => setShowTeamCharacterSelect({ open: false, teamIndex: -1, position: null })}
+        onSelect={(characterIds) => {
+          if (showTeamCharacterSelect.position && showTeamCharacterSelect.teamIndex >= 0) {
+            // Очищаем текущих персонажей и добавляем новых
+            const currentCharacters = recommendedTeams[showTeamCharacterSelect.teamIndex]?.positions[showTeamCharacterSelect.position]?.characters || [];
+            
+            // Удаляем всех текущих персонажей
+            currentCharacters.forEach(characterId => {
+              updateTeamPosition(showTeamCharacterSelect.teamIndex, showTeamCharacterSelect.position!, characterId, false);
+            });
+            
+            // Добавляем новых персонажей
+            characterIds.forEach(characterId => {
+              updateTeamPosition(showTeamCharacterSelect.teamIndex, showTeamCharacterSelect.position!, characterId, true);
+            });
+          }
+        }}
+        selectedCharacters={
+          showTeamCharacterSelect.position && showTeamCharacterSelect.teamIndex >= 0
+            ? recommendedTeams[showTeamCharacterSelect.teamIndex]?.positions[showTeamCharacterSelect.position]?.characters || []
+            : []
+        }
+        title="Выбор персонажей для команды"
+        multiple={true}
+      />
+
+      <CharacterSelectModal
+        isOpen={showCompatibleCharacterSelect.open}
+        onClose={() => setShowCompatibleCharacterSelect({ open: false, index: -1 })}
+        onSelect={(characterIds) => {
+          if (showCompatibleCharacterSelect.index >= 0 && characterIds.length > 0) {
+            updateCompatibleCharacter(showCompatibleCharacterSelect.index, characterIds[0]);
+          }
+        }}
+        selectedCharacters={
+          showCompatibleCharacterSelect.index >= 0
+            ? [compatibleCharacters[showCompatibleCharacterSelect.index]?.characterId || '']
+            : []
+        }
+        title="Выбор совместимого персонажа"
+        multiple={false}
+      />
     </div>
   );
 };
