@@ -162,7 +162,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="w-full min-h-[400px]">
+            <div className="w-full min-h-[400px]">
       {/* Баннер дней рождения */}
       <div className="w-full max-w-7xl mx-auto px-4">
         <BirthdayBanner />

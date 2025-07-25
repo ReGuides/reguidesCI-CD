@@ -6,9 +6,12 @@ import { Character, News, Advertisement, About } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import Image from 'next/image';
 
-export default function Sidebar() {
+interface SidebarProps {
+  onNewsSelect: (news: News | null) => void;
+}
+
+export default function Sidebar({ onNewsSelect }: SidebarProps) {
   const router = useRouter();
-  const [selectedNews, setSelectedNews] = useState<News | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
   const [news, setNews] = useState<News[]>([]);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
@@ -165,11 +168,11 @@ export default function Sidebar() {
         {latestNews.length > 0 ? (
           <div className="space-y-3">
             {latestNews.map((item, index) => (
-              <div
-                key={item._id || index}
-                className="cursor-pointer hover:bg-neutral-700 rounded-lg p-3 transition-colors"
-                onClick={() => setSelectedNews(item)}
-              >
+                              <div
+                  key={item._id || index}
+                  className="cursor-pointer hover:bg-neutral-700 rounded-lg p-3 transition-colors"
+                  onClick={() => onNewsSelect(item)}
+                >
                 <div className="flex items-start gap-3">
                   <div className={`w-1 h-8 rounded ${item.type === 'genshin' ? 'bg-blue-400' : 'bg-yellow-400'}`} />
                   <div className="flex-1 min-w-0">
@@ -247,27 +250,7 @@ export default function Sidebar() {
         </div>
       )}
 
-      {/* Модальное окно для новостей */}
-      {selectedNews && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-neutral-800 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <h2 className="text-xl font-bold text-white">{selectedNews.title}</h2>
-                <button
-                  onClick={() => setSelectedNews(null)}
-                  className="text-gray-400 hover:text-white text-2xl"
-                >
-                  ×
-                </button>
-              </div>
-              <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-                {selectedNews.content}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 } 
