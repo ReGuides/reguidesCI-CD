@@ -83,6 +83,8 @@ const CharacterStatsManager: React.FC<CharacterStatsManagerProps> = ({ character
     fetchStats();
   }, [characterId, fetchStats]);
 
+
+
   const handleSaveStats = async () => {
     setSaving(true);
     try {
@@ -212,13 +214,16 @@ const CharacterStatsManager: React.FC<CharacterStatsManagerProps> = ({ character
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">Статы персонажа</h3>
-        <Button 
-          onClick={handleSaveStats} 
-          disabled={saving}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          {saving ? 'Сохранение...' : 'Сохранить статы'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-yellow-400">⚠️ Не забудьте сохранить статы перед сохранением рекомендаций</span>
+          <Button 
+            onClick={handleSaveStats} 
+            disabled={saving}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            {saving ? 'Сохранение...' : 'Сохранить статы'}
+          </Button>
+        </div>
       </div>
 
       {/* Основные статы */}
