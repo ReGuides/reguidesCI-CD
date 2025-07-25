@@ -34,10 +34,8 @@ export default function AddCharacterPage() {
     patchNumber: '',
     role: '',
     gameplayDescription: '',
-    isFeatured: false,
-    isActive: true
+    isFeatured: false
   });
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'stats' | 'media' | 'builds' | 'recommendations' | 'talents' | 'constellations'>('basic');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
