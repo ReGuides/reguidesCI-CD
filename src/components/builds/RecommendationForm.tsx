@@ -259,7 +259,7 @@ export default function RecommendationForm({ initial, onCancel, onSave, characte
         <div className="flex gap-2 justify-end mt-2">
           <div className="flex items-center gap-2 mr-auto">
             {activeTab === 'stats' && (
-              <span className="text-xs text-yellow-400">⚠️ Сначала сохраните статы кнопкой "Сохранить статы"</span>
+              <span className="text-xs text-yellow-400">⚠️ Сначала сохраните статы кнопкой &quot;Сохранить статы&quot;</span>
             )}
           </div>
           <Button 
