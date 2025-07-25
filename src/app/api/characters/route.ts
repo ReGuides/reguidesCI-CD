@@ -117,13 +117,39 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  verifyRequestAuth(request, ['admin']);
   try {
+    console.log('POST /api/characters - Starting request');
+    
+    // Проверяем аутентификацию
+    const user = verifyRequestAuth(request, ['admin']);
+    console.log('POST /api/characters - Auth successful for user:', user);
+    
     await connectDB();
+    console.log('POST /api/characters - Database connected');
     
     const body = await request.json();
+    console.log('POST /api/characters - Request body:', body);
     
-    const newCharacter = new CharacterModel({
+    // Проверяем обязательные поля
+    if (!body.id || !body.name) {
+      console.error('POST /api/characters - Missing required fields');
+      return NextResponse.json(
+        { error: 'Missing required fields: id and name' },
+        { status: 400 }
+      );
+    }
+    
+    // Проверяем, не существует ли уже персонаж с таким ID
+    const existingCharacter = await CharacterModel.findOne({ id: body.id });
+    if (existingCharacter) {
+      console.error('POST /api/characters - Character with this ID already exists:', body.id);
+      return NextResponse.json(
+        { error: 'Character with this ID already exists' },
+        { status: 409 }
+      );
+    }
+    
+    const characterData = {
       id: body.id,
       name: body.name,
       element: body.element,
@@ -132,24 +158,42 @@ export async function POST(request: NextRequest) {
       region: body.region,
       description: body.description,
       image: body.image,
+      gender: body.gender,
+      birthday: body.birthday,
+      patchNumber: body.patchNumber,
+      gameplayDescription: body.gameplayDescription || '',
+      role: body.role,
       isActive: body.isActive !== undefined ? body.isActive : true,
       isFeatured: body.isFeatured || false,
-      role: body.role,
       weapon: body.weapon,
       createdAt: new Date(),
       updatedAt: new Date()
-    });
+    };
     
+    console.log('POST /api/characters - Creating character with data:', characterData);
+    
+    const newCharacter = new CharacterModel(characterData);
     const savedCharacter = await newCharacter.save();
+    
+    console.log('POST /api/characters - Character saved successfully:', savedCharacter._id);
     
     return NextResponse.json({
       success: true,
       character: savedCharacter
     });
   } catch (error) {
-    console.error('Error creating character:', error);
+    console.error('POST /api/characters - Error creating character:', error);
+    
+    // Более подробная информация об ошибке
+    if (error instanceof Error) {
+      console.error('POST /api/characters - Error details:', {
+        message: error.message,
+        stack: error.stack
+      });
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to create character' },
+      { error: 'Failed to create character', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
