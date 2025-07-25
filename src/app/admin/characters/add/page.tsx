@@ -71,23 +71,41 @@ export default function AddCharacterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Валидация обязательных полей
+    if (!formData.name || !formData.id) {
+      alert('Пожалуйста, заполните обязательные поля: Имя и ID персонажа');
+      return;
+    }
+    
     setSaving(true);
     
     try {
+      console.log('Отправляем данные персонажа:', formData);
       const response = await fetch('/api/characters', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
       
+      console.log('Ответ сервера:', response.status, response.statusText);
+      
       if (response.ok) {
         const result = await response.json();
-        router.push(`/admin/characters/${result.id}/edit`);
+        if (result.success && result.character) {
+          router.push(`/admin/characters/${result.character.id}/edit`);
+        } else {
+          console.error('Error creating character: Invalid response format');
+          alert('Ошибка при создании персонажа: неверный формат ответа');
+        }
       } else {
-        console.error('Error creating character');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error creating character:', response.status, errorData);
+        alert(`Ошибка при создании персонажа: ${errorData.error || response.statusText}`);
       }
     } catch (error) {
       console.error('Error saving character:', error);
+      alert('Ошибка при создании персонажа: ' + (error instanceof Error ? error.message : 'Неизвестная ошибка'));
     } finally {
       setSaving(false);
     }
