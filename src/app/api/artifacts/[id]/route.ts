@@ -20,8 +20,9 @@ export async function GET(
       );
     }
     
-    return NextResponse.json({
-      id: artifact.id,
+    // Убеждаемся, что id поле присутствует
+    const artifactData = {
+      id: artifact.id || artifact._id?.toString(),
       name: artifact.name,
       rarity: Array.isArray(artifact.rarity) && artifact.rarity.length > 0
         ? artifact.rarity
@@ -31,7 +32,9 @@ export async function GET(
       bonus4: artifact.bonus4,
       pieces: artifact.pieces,
       image: artifact.image
-    });
+    };
+    
+    return NextResponse.json(artifactData);
   } catch (error) {
     console.error('Error fetching artifact:', error);
     return NextResponse.json(

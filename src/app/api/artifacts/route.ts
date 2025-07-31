@@ -14,6 +14,10 @@ export async function GET() {
     const safeArtifacts = artifacts.map(a => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, __v, createdAt, updatedAt, ...cleanArtifact } = a;
+      // Убеждаемся, что id поле присутствует
+      if (!cleanArtifact.id && _id) {
+        cleanArtifact.id = _id.toString();
+      }
       return {
         ...cleanArtifact,
         rarity: Array.isArray(cleanArtifact.rarity) && cleanArtifact.rarity.length > 0

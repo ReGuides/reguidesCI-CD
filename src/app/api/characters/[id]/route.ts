@@ -22,9 +22,10 @@ export async function GET(
       );
     }
     
-    return NextResponse.json({
+    // Убеждаемся, что id поле присутствует
+    const characterData = {
       _id: character._id,
-      id: character.id,
+      id: character.id || character._id?.toString(),
       name: character.name,
       image: character.image,
       element: character.element,
@@ -43,7 +44,9 @@ export async function GET(
       views: character.views,
       createdAt: character.createdAt,
       updatedAt: character.updatedAt
-    });
+    };
+    
+    return NextResponse.json(characterData);
   } catch (error) {
     console.error('Error fetching character:', error);
     return NextResponse.json(

@@ -31,6 +31,10 @@ export async function GET(request: NextRequest) {
     const cleanWeapons = weapons.map(weapon => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, __v, createdAt, updatedAt, ...cleanWeapon } = weapon;
+      // Убеждаемся, что id поле присутствует
+      if (!cleanWeapon.id && _id) {
+        cleanWeapon.id = _id.toString();
+      }
       return cleanWeapon;
     });
 

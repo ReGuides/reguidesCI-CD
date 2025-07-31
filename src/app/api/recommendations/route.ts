@@ -22,11 +22,28 @@ export async function GET(request: NextRequest) {
         return NextResponse.json([]);
       }
 
-      return NextResponse.json([recommendation]);
+      // Очищаем данные от служебных полей MongoDB
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, __v, ...cleanRecommendation } = recommendation;
+      return NextResponse.json([{
+        ...cleanRecommendation,
+        id: recommendation.id || _id?.toString()
+      }]);
     } else {
       // Получить все рекомендации
       const recommendations = await mongoose.connection.db.collection('recommendations').find({}).toArray();
-      return NextResponse.json(recommendations);
+      
+      // Очищаем данные от служебных полей MongoDB
+      const cleanRecommendations = recommendations.map(rec => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _id, __v, ...cleanRec } = rec;
+        return {
+          ...cleanRec,
+          id: rec.id || _id?.toString()
+        };
+      });
+      
+      return NextResponse.json(cleanRecommendations);
     }
   } catch (error) {
     console.error('Error fetching recommendations:', error);

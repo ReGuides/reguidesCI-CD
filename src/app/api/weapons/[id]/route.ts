@@ -20,8 +20,9 @@ export async function GET(
       );
     }
     
-    return NextResponse.json({
-      id: weapon.id,
+    // Убеждаемся, что id поле присутствует
+    const weaponData = {
+      id: weapon.id || weapon._id?.toString(),
       name: weapon.name,
       type: weapon.type,
       rarity: weapon.rarity,
@@ -31,7 +32,9 @@ export async function GET(
       passiveName: weapon.passiveName,
       passiveEffect: weapon.passiveEffect,
       image: weapon.image
-    });
+    };
+    
+    return NextResponse.json(weaponData);
   } catch (error) {
     console.error('Error fetching weapon:', error);
     return NextResponse.json(
