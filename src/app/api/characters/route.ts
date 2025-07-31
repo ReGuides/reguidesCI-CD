@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: characters.map(character => {
-        const { _id, __v, createdAt, updatedAt, ...cleanCharacter } = character;
+        const { _id: _, __v: __, createdAt: ___, updatedAt: ____, ...cleanCharacter } = character;
         return cleanCharacter;
       }),
       filters
