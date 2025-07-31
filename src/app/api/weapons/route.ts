@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
 
     // Очищаем данные от служебных полей MongoDB
     const cleanWeapons = weapons.map(weapon => {
-      const { _id: _unused1, __v: _unused2, createdAt: _unused3, updatedAt: _unused4, ...cleanWeapon } = weapon;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, __v, createdAt, updatedAt, ...cleanWeapon } = weapon;
       return cleanWeapon;
     });
 
