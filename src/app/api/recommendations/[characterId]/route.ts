@@ -28,11 +28,6 @@ interface ArtifactSet {
   image?: string;
 }
 
-interface ArtifactCombination {
-  setType: 'combination';
-  sets: ArtifactSet[];
-}
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ characterId: string }> }
