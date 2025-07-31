@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { CharacterRecommendationModel } from '@/models/CharacterRecommendation';
+import { CharacterRecommendationModel, ICharacterRecommendation } from '@/models/CharacterRecommendation';
 
 export async function GET(
   request: NextRequest,
@@ -14,7 +14,7 @@ export async function GET(
     const recommendations = await CharacterRecommendationModel.find({ characterId: id });
     
     return NextResponse.json({
-      recommendations: recommendations.map((rec: any) => ({
+      recommendations: recommendations.map((rec: ICharacterRecommendation) => ({
         weapons: rec.weapons || [],
         artifacts: rec.artifacts || [],
         mainStats: {

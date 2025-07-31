@@ -4,6 +4,34 @@ import mongoose from 'mongoose';
 import { CharacterModel } from '@/models/Character';
 import { WeaponModel } from '@/models/Weapon';
 import { ArtifactModel } from '@/models/Artifact';
+import { Weapon, Artifact, ArtifactOrCombination } from '@/types';
+
+interface RecommendationDocument {
+  characterId: string;
+  weapons: string[];
+  artifacts: (string | ArtifactOrCombination)[];
+  notes?: string;
+}
+
+interface CharacterStatsDocument {
+  characterId: string;
+  mainStatSands?: string[];
+  mainStatGoblet?: string[];
+  mainStatCirclet?: string[];
+  subStats?: string[];
+  notes?: string;
+}
+
+interface ArtifactSet {
+  id: string;
+  name: string;
+  image?: string;
+}
+
+interface ArtifactCombination {
+  setType: 'combination';
+  sets: ArtifactSet[];
+}
 
 export async function GET(
   request: NextRequest,
@@ -36,11 +64,11 @@ export async function GET(
       );
     }
     const recommendationsCollection = mongoose.connection.db.collection('recommendations');
-    const recommendation = await recommendationsCollection.findOne({ characterId: character.id });
+    const recommendation = await recommendationsCollection.findOne({ characterId: character.id }) as RecommendationDocument | null;
 
     // Получаем статы из коллекции characterstats
     const characterStatsCollection = mongoose.connection.db.collection('characterstats');
-    const characterStats = await characterStatsCollection.findOne({ characterId: character.id });
+    const characterStats = await characterStatsCollection.findOne({ characterId: character.id }) as CharacterStatsDocument | null;
 
     if (!recommendation && !characterStats) {
       return NextResponse.json(
@@ -51,33 +79,27 @@ export async function GET(
 
     // Получаем полные данные оружий
     const weaponsWithFullData = recommendation ? await Promise.all(
-      (recommendation.weapons || []).map(async (weapon: any) => {
-        if (typeof weapon === 'string') {
-          // Если это ID оружия
-          const fullWeaponData = await WeaponModel.findOne({ id: weapon });
-          return fullWeaponData || { id: weapon, name: weapon };
-        } else {
-          // Если это уже объект оружия
-          return weapon;
-        }
+      (recommendation.weapons || []).map(async (weapon: string) => {
+        const fullWeaponData = await WeaponModel.findOne({ id: weapon });
+        return fullWeaponData || { id: weapon, name: weapon } as Weapon;
       })
     ) : [];
 
     // Получаем полные данные артефактов
     const artifactsWithFullData = recommendation ? await Promise.all(
-      (recommendation.artifacts || []).map(async (artifact: any) => {
+      (recommendation.artifacts || []).map(async (artifact: string | ArtifactOrCombination) => {
         if (typeof artifact === 'string') {
           // Если это ID артефакта
           const fullArtifactData = await ArtifactModel.findOne({ id: artifact });
-          return fullArtifactData || { id: artifact, name: artifact };
+          return fullArtifactData || { id: artifact, name: artifact } as Artifact;
         } else if (artifact.setType === 'single') {
           // Если это одиночный артефакт
           const fullArtifactData = await ArtifactModel.findOne({ id: artifact.id });
           return fullArtifactData || artifact;
-        } else if (artifact.setType === 'combination') {
+        } else if (artifact.setType === 'combination' && 'sets' in artifact) {
           // Если это комбинация артефактов
           const setsWithFullData = await Promise.all(
-            (artifact.sets || []).map(async (set: any) => {
+            (artifact.sets || []).map(async (set: ArtifactSet) => {
               const fullSetData = await ArtifactModel.findOne({ id: set.id });
               return fullSetData || set;
             })

@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Weapon, Artifact } from '@/types';
+import { Weapon, ArtifactOrCombination } from '@/types';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
-import { Star, Zap, Shield, Heart, Users } from 'lucide-react';
+import { Zap, Shield, Heart } from 'lucide-react';
 
 interface CharacterWeaponsSectionProps {
   characterId: string;
@@ -12,7 +12,7 @@ interface CharacterWeaponsSectionProps {
 
 interface Recommendation {
   weapons: Weapon[];
-  artifacts: any[]; // Используем any для гибкости с разными типами артефактов
+  artifacts: ArtifactOrCombination[]; // Используем правильный тип для артефактов
   mainStats?: {
     sands: string;
     goblet: string;
@@ -168,7 +168,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     return (
                       <div key={`combination-${index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                         <div className="grid grid-cols-2 gap-1 mb-3 w-16 h-16">
-                          {artifact.sets.map((set: any, setIndex: number) => (
+                          {artifact.sets.map((set: { id: string; name: string; image?: string }, setIndex: number) => (
                             <OptimizedImage
                               key={setIndex}
                               src={getImageWithFallback(set.image, set.name, 'artifact')}
