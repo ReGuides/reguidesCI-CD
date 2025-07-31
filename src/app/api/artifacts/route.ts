@@ -7,15 +7,19 @@ export async function GET() {
     await connectDB();
     
     const artifacts = await ArtifactModel.find({})
-      .sort({ name: 1 });
+      .sort({ name: 1 })
+      .lean();
 
-    // Гарантируем, что rarity всегда массив
-    const safeArtifacts = artifacts.map(a => ({
-      ...a.toObject(),
-      rarity: Array.isArray(a.rarity) && a.rarity.length > 0
-        ? a.rarity
-        : [5]
-    }));
+    // Гарантируем, что rarity всегда массив и очищаем от служебных полей
+    const safeArtifacts = artifacts.map(a => {
+      const { _id, __v, createdAt, updatedAt, ...cleanArtifact } = a;
+      return {
+        ...cleanArtifact,
+        rarity: Array.isArray(cleanArtifact.rarity) && cleanArtifact.rarity.length > 0
+          ? cleanArtifact.rarity
+          : [5]
+      };
+    });
 
     // ВРЕМЕННЫЙ ЛОГ ДЛЯ ДИАГНОСТИКИ
     console.log('ArtifactModel.modelName:', ArtifactModel?.modelName);

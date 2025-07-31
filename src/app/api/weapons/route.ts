@@ -19,15 +19,22 @@ export async function GET(request: NextRequest) {
     if (search) filter.name = { $regex: search, $options: 'i' };
 
     const weapons = await WeaponModel.find(filter)
-      .sort({ name: 1 });
+      .sort({ name: 1 })
+      .lean();
 
     // Собираем уникальные типы и редкости для фильтров
-    const allWeapons = await WeaponModel.find({}).select('type rarity');
+    const allWeapons = await WeaponModel.find({}).select('type rarity').lean();
     const types = Array.from(new Set(allWeapons.map(w => w.type))).filter(Boolean);
     const rarities = Array.from(new Set(allWeapons.map(w => w.rarity))).filter(Boolean).sort((a, b) => b - a);
 
+    // Очищаем данные от служебных полей MongoDB
+    const cleanWeapons = weapons.map(weapon => {
+      const { _id, __v, createdAt, updatedAt, ...cleanWeapon } = weapon;
+      return cleanWeapon;
+    });
+
     return NextResponse.json({
-      data: weapons,
+      data: cleanWeapons,
       filters: {
         types,
         rarities

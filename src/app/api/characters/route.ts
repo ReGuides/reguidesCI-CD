@@ -64,10 +64,10 @@ export async function GET(request: NextRequest) {
       charactersQuery = charactersQuery.limit(parseInt(limit));
     }
     
-    const characters = await charactersQuery;
+    const characters = await charactersQuery.lean();
     
     // Генерируем фильтры на основе данных
-    const allCharacters = await CharacterModel.find({}).sort({ name: 1 });
+    const allCharacters = await CharacterModel.find({}).sort({ name: 1 }).lean();
     // Формируем фильтры с учётом синонимов
     const allWeaponsRaw = allCharacters.map(char => char.weapon).filter(Boolean);
     const weaponGroups = Object.entries(weaponSynonyms).reduce<string[]>((acc, [group, synonyms]) => {
@@ -85,26 +85,10 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      data: characters.map(character => ({
-        _id: character._id,
-        id: character.id,
-        name: character.name,
-        element: character.element,
-        weaponType: character.weaponType,
-        rarity: character.rarity,
-        region: character.region,
-        description: character.description,
-        image: character.image,
-        isActive: character.isActive,
-        isFeatured: character.isFeatured,
-        role: character.role,
-        weapon: character.weapon,
-        patchNumber: character.patchNumber,
-        birthday: character.birthday,
-        views: character.views,
-        createdAt: character.createdAt,
-        updatedAt: character.updatedAt
-      })),
+      data: characters.map(character => {
+        const { _id, __v, createdAt, updatedAt, ...cleanCharacter } = character;
+        return cleanCharacter;
+      }),
       filters
     });
   } catch (error) {
