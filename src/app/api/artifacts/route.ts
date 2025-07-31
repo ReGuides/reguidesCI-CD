@@ -7,7 +7,6 @@ export async function GET() {
     await connectDB();
     
     const artifacts = await ArtifactModel.find({})
-      .select('id name rarity image')
       .sort({ name: 1 });
 
     // Гарантируем, что rarity всегда массив

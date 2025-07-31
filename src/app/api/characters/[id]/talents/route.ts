@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { TalentModel } from '@/models/Talent';
+import { CharacterTalentsModel } from '@/models/CharacterTalents';
 
 export async function GET(
   request: NextRequest,
@@ -10,21 +10,28 @@ export async function GET(
     await connectDB();
     
     const { id } = await params;
-    console.log('API: Fetching talents for character:', id);
     
-    const talentData = await TalentModel.findOne({ characterId: id });
-
-    if (!talentData) {
-      console.log('API: No talent data found for character:', id);
-      return NextResponse.json({ talents: [] });
+    const talentsData = await CharacterTalentsModel.findOne({ characterId: id });
+    
+    if (!talentsData) {
+      return NextResponse.json({
+        talents: [],
+        priorities: [],
+        notes: ''
+      });
     }
     
-    console.log('API: Found talent data with', talentData.talents?.length || 0, 'talents');
-
-    return NextResponse.json({ talents: talentData.talents || [] });
+    return NextResponse.json({
+      talents: talentsData.talents || [],
+      priorities: talentsData.priorities || [],
+      notes: talentsData.notes || ''
+    });
   } catch (error) {
-    console.error('API: Error fetching talents:', error);
-    return NextResponse.json({ error: 'Failed to fetch talents' }, { status: 500 });
+    console.error('Error fetching talents:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch talents' },
+      { status: 500 }
+    );
   }
 }
 

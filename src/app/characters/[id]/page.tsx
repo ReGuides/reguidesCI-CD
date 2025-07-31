@@ -6,6 +6,11 @@ import Link from 'next/link';
 import { Character } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import CharacterWeaponsSection from '@/components/character/CharacterWeaponsSection';
+import CharacterTeamsSection from '@/components/character/CharacterTeamsSection';
+import CharacterTalentsSection from '@/components/character/CharacterTalentsSection';
+import CharacterConstellationsSection from '@/components/character/CharacterConstellationsSection';
+import { Zap, Users, Sword, Star, BookOpen } from 'lucide-react';
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations';
 
@@ -27,6 +32,13 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
         
         const data = await response.json();
         setCharacter(data);
+        
+        // Увеличиваем счетчик просмотров
+        try {
+          await fetch(`/api/characters/${id}/views`, { method: 'POST' });
+        } catch (error) {
+          console.error('Error incrementing views:', error);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -104,8 +116,15 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
             }}
           />
           
-          <div className="absolute bottom-0 left-0 w-full bg-black/60 py-2 px-4 text-lg font-bold text-white text-center">
-            {character.name}
+          <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent py-4 px-4">
+            <div className="text-center">
+              <h1 className="text-xl font-bold text-white mb-1">{character.name}</h1>
+              {character.views && character.views > 0 && (
+                <p className="text-xs text-gray-300">
+                  {character.views.toLocaleString()} просмотров
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -117,142 +136,204 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
             style={{ background: elementColor }}
           />
           
-          <div className="mb-4 text-sm text-gray-300">{character.description}</div>
+          {/* Описание */}
+          {character.description && (
+            <div className="mb-6">
+              <p className="text-sm text-gray-300 leading-relaxed">{character.description}</p>
+            </div>
+          )}
           
-          <ul className="text-sm text-gray-400 space-y-1">
-            <li><span className="font-semibold text-text">Элемент:</span> {character.element}</li>
-            <li><span className="font-semibold text-text">Оружие:</span> {character.weapon}</li>
-            <li><span className="font-semibold text-text">Регион:</span> {character.region}</li>
-            <li><span className="font-semibold text-text">Редкость:</span> {character.rarity}★</li>
-            <li><span className="font-semibold text-text">Пол:</span> {character.gender}</li>
-            <li><span className="font-semibold text-text">День рождения:</span> {character.birthday}</li>
-            <li><span className="font-semibold text-text">Патч:</span> {character.patchNumber}</li>
-          </ul>
+          {/* Основная информация */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-neutral-800/50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div 
+                    className="w-4 h-4 rounded-full"
+                    style={{ background: elementColor }}
+                  />
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">Элемент</span>
+                </div>
+                <p className="text-white font-medium">{character.element}</p>
+              </div>
+              
+              <div className="bg-neutral-800/50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">Оружие</span>
+                </div>
+                <p className="text-white font-medium">{character.weapon}</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-neutral-800/50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">Регион</span>
+                </div>
+                <p className="text-white font-medium">{character.region}</p>
+              </div>
+              
+              <div className="bg-neutral-800/50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">Редкость</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: character.rarity || 0 }, (_, i) => (
+                    <span key={i} className="text-yellow-400">★</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-neutral-800/50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">Пол</span>
+                </div>
+                <p className="text-white font-medium">{character.gender}</p>
+              </div>
+              
+              <div className="bg-neutral-800/50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">Патч</span>
+                </div>
+                <p className="text-white font-medium">{character.patchNumber}</p>
+              </div>
+            </div>
+            
+            {character.birthday && (
+              <div className="bg-neutral-800/50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">День рождения</span>
+                </div>
+                <p className="text-white font-medium">{character.birthday}</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Правая колонка: контент */}
       <div className="flex-1 flex flex-col min-h-full">
-        <div className="flex gap-4 mb-6 mt-2 md:mt-4 flex-wrap px-4">
+        <div className="flex gap-2 mb-6 mt-2 md:mt-4 flex-wrap px-4">
           <button
-            className={`px-4 py-2 rounded font-semibold transition ${
+            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'weapons'
-                ? 'bg-accent text-white'
-                : 'bg-card text-gray-400 hover:bg-accent/20'
+                ? 'bg-accent text-white shadow-lg shadow-accent/25'
+                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
             }`}
             onClick={() => setActiveTab('weapons')}
           >
+            <Zap className="w-4 h-4" />
             Оружия и Артефакты
           </button>
           <button
-            className={`px-4 py-2 rounded font-semibold transition ${
+            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'teams'
-                ? 'bg-accent text-white'
-                : 'bg-card text-gray-400 hover:bg-accent/20'
+                ? 'bg-accent text-white shadow-lg shadow-accent/25'
+                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
             }`}
             onClick={() => setActiveTab('teams')}
           >
+            <Users className="w-4 h-4" />
             Команды
           </button>
           <button
-            className={`px-4 py-2 rounded font-semibold transition ${
+            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'builds'
-                ? 'bg-accent text-white'
-                : 'bg-card text-gray-400 hover:bg-accent/20'
+                ? 'bg-accent text-white shadow-lg shadow-accent/25'
+                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
             }`}
             onClick={() => setActiveTab('builds')}
           >
+            <BookOpen className="w-4 h-4" />
             Сборки
           </button>
           <button
-            className={`px-4 py-2 rounded font-semibold transition ${
+            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'talents'
-                ? 'bg-accent text-white'
-                : 'bg-card text-gray-400 hover:bg-accent/20'
+                ? 'bg-accent text-white shadow-lg shadow-accent/25'
+                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
             }`}
             onClick={() => setActiveTab('talents')}
           >
+            <Sword className="w-4 h-4" />
             Таланты
           </button>
           <button
-            className={`px-4 py-2 rounded font-semibold transition ${
+            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'constellations'
-                ? 'bg-accent text-white'
-                : 'bg-card text-gray-400 hover:bg-accent/20'
+                ? 'bg-accent text-white shadow-lg shadow-accent/25'
+                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
             }`}
             onClick={() => setActiveTab('constellations')}
           >
+            <Star className="w-4 h-4" />
             Созвездия
           </button>
         </div>
 
-        <div className="flex-1 px-4">
+        <div className="flex-1 px-4 animate-in fade-in duration-300">
           {activeTab === 'weapons' && (
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Левая колонка: Оружия и Артефакты */}
-                <div>
-                  {/* Оружия */}
-                  <div>
-                    <h2 className="block text-lg sm:text-2xl font-bold mb-4 sm:mb-6 text-text">
-                      Рекомендуемое оружие
-                    </h2>
-                    <div className="text-center text-gray-400 py-8">
-                      Рекомендации по оружию пока не настроены
-                    </div>
-                  </div>
-
-                  {/* Артефакты */}
-                  <div>
-                    <h2 className="block text-lg sm:text-2xl font-bold mb-4 sm:mb-6 text-text">
-                      Рекомендуемые артефакты
-                    </h2>
-                    <div className="text-center text-gray-400 py-8">
-                      Рекомендации по артефактам пока не настроены
-                    </div>
-                  </div>
-                </div>
-
-                {/* Правая колонка: Статы */}
-                <div>
-                  <div className="bg-card border border-neutral-700 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold mb-4 text-white">Рекомендуемые статы</h3>
-                    <p className="text-gray-400 text-sm">Статы для этого персонажа пока не настроены</p>
-                  </div>
-                </div>
+            <div>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Оружия и Артефакты</h2>
+                <p className="text-gray-400">Рекомендуемое оружие, артефакты и статы для {character.name}</p>
               </div>
+              <CharacterWeaponsSection characterId={character.id} />
             </div>
           )}
 
           {activeTab === 'teams' && (
-            <div className="text-center text-gray-400 py-8">
-              Информация о командах пока не настроена
+            <div>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Команды</h2>
+                <p className="text-gray-400">Рекомендуемые команды и совместимые персонажи для {character.name}</p>
+              </div>
+              <CharacterTeamsSection characterId={character.id} />
             </div>
           )}
 
           {activeTab === 'builds' && (
             <div>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Сборки</h2>
+                <p className="text-gray-400">Готовые сборки и стратегии для {character.name}</p>
+              </div>
               {character.gameplayDescription && (
-                <div className="bg-card border border-neutral-700 rounded-lg p-4 mb-6 text-base text-neutral-200 whitespace-pre-line">
-                  <h3 className="text-lg font-semibold mb-2 text-white">Общее описание геймплея</h3>
-                  <p>{character.gameplayDescription}</p>
+                <div className="bg-card border border-neutral-700 rounded-lg p-6 mb-6">
+                  <h3 className="text-lg font-semibold mb-3 text-white flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-blue-400" />
+                    Общее описание геймплея
+                  </h3>
+                  <p className="text-gray-300 leading-relaxed whitespace-pre-line">{character.gameplayDescription}</p>
                 </div>
               )}
-              <div className="text-center text-gray-400 py-8">
-                Сборки для этого персонажа пока не настроены
+              <div className="text-center text-gray-400 py-12">
+                <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+                <h3 className="text-lg font-semibold mb-2">Сборки пока не настроены</h3>
+                <p>Детальные сборки для этого персонажа будут добавлены позже</p>
               </div>
             </div>
           )}
 
           {activeTab === 'talents' && (
-            <div className="text-center text-gray-400 py-8">
-              Информация о талантах пока не настроена
+            <div>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Таланты</h2>
+                <p className="text-gray-400">Таланты и приоритеты прокачки для {character.name}</p>
+              </div>
+              <CharacterTalentsSection characterId={character.id} />
             </div>
           )}
 
           {activeTab === 'constellations' && (
-            <div className="text-center text-gray-400 py-8">
-              Информация о созвездиях пока не настроена
+            <div>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Созвездия</h2>
+                <p className="text-gray-400">Созвездия и приоритеты для {character.name}</p>
+              </div>
+              <CharacterConstellationsSection characterId={character.id} />
             </div>
           )}
         </div>

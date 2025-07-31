@@ -9,23 +9,27 @@ export async function GET(
   try {
     await connectDB();
     
-    const { id: characterId } = await params;
-    const teams = await CharacterTeamsModel.findOne({ characterId });
+    const { id } = await params;
     
-    if (!teams) {
+    const teamsData = await CharacterTeamsModel.findOne({ characterId: id });
+    
+    if (!teamsData) {
       return NextResponse.json({
-        characterId,
         recommendedTeams: [],
         compatibleCharacters: [],
         notes: ''
       });
     }
     
-    return NextResponse.json(teams);
+    return NextResponse.json({
+      recommendedTeams: teamsData.recommendedTeams || [],
+      compatibleCharacters: teamsData.compatibleCharacters || [],
+      notes: teamsData.notes || ''
+    });
   } catch (error) {
-    console.error('Error fetching character teams:', error);
+    console.error('Error fetching teams:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch character teams' },
+      { error: 'Failed to fetch teams' },
       { status: 500 }
     );
   }

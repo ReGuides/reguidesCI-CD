@@ -1,6 +1,8 @@
 import { Artifact } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import Image from 'next/image';
+import { useState } from 'react';
+import { ArtifactModal } from './artifact-modal';
 
 interface ArtifactCardProps {
   artifact: Artifact;
@@ -9,6 +11,16 @@ interface ArtifactCardProps {
 }
 
 export function ArtifactCard({ artifact, onSelect, isSelected }: ArtifactCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCardClick = () => {
+    if (onSelect) {
+      onSelect();
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
   // Функция для определения цветов в зависимости от редкости
   const getRarityColors = (rarity: number) => {
     switch (rarity) {
@@ -55,10 +67,11 @@ export function ArtifactCard({ artifact, onSelect, isSelected }: ArtifactCardPro
   const minColors = getRarityColors(minRarity);
 
   return (
-    <div 
-      className={`group relative bg-neutral-900 rounded p-2 w-40 hover:scale-105 transition-all duration-500 ${isSelected ? 'ring-2 ring-accent' : ''} ${onSelect ? 'cursor-pointer' : ''}`}
-      onClick={onSelect}
-    >
+    <>
+      <div 
+        className={`group relative bg-neutral-900 rounded p-2 w-40 hover:scale-105 transition-all duration-500 ${isSelected ? 'ring-2 ring-accent' : ''} cursor-pointer`}
+        onClick={handleCardClick}
+      >
       <div className="absolute inset-0 rounded bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <div className="absolute inset-0 rounded border-t-2 border-purple-500/50 group-hover:border-purple-400/70 transition-colors duration-500" />
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500/0 via-purple-500/50 to-purple-500/0 group-hover:from-purple-400/0 group-hover:via-purple-400/70 group-hover:to-purple-400/0 transition-all duration-500" />
@@ -100,5 +113,11 @@ export function ArtifactCard({ artifact, onSelect, isSelected }: ArtifactCardPro
         </div>
       </div>
     </div>
+      <ArtifactModal 
+        artifact={artifact}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 } 

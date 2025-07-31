@@ -1,6 +1,8 @@
 import { Weapon } from '@/types';
 import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import Image from 'next/image';
+import { useState } from 'react';
+import { WeaponModal } from './weapon-modal';
 
 interface WeaponCardProps {
   weapon: Weapon;
@@ -9,6 +11,16 @@ interface WeaponCardProps {
 }
 
 export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCardClick = () => {
+    if (onSelect) {
+      onSelect();
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
   // Функция для определения цветов в зависимости от редкости
   const getRarityColors = (rarity: number) => {
     switch (rarity) {
@@ -83,10 +95,11 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
   };
 
   return (
-    <div 
-      className={`group relative bg-neutral-900 rounded p-2 w-40 shadow-lg hover:scale-105 transition-all duration-500 ${isSelected ? 'ring-2 ring-accent' : ''} ${onSelect ? 'cursor-pointer' : ''}`}
-      onClick={onSelect}
-    >
+    <>
+      <div 
+        className={`group relative bg-neutral-900 rounded p-2 w-40 shadow-lg hover:scale-105 transition-all duration-500 ${isSelected ? 'ring-2 ring-accent' : ''} cursor-pointer`}
+        onClick={handleCardClick}
+      >
       <div className={`absolute inset-0 rounded bg-gradient-to-br ${colors.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
       <div className={`absolute inset-0 rounded border-t-2 ${colors.border} transition-colors duration-500`} />
       <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${colors.glow} transition-all duration-500`} />
@@ -121,5 +134,11 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
         </div>
       </div>
     </div>
+      <WeaponModal 
+        weapon={weapon}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 } 

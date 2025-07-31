@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { ConstellationModel } from '@/models/Constellation';
+import { CharacterConstellationsModel } from '@/models/CharacterConstellations';
 
 export async function GET(
   request: NextRequest,
@@ -10,21 +10,28 @@ export async function GET(
     await connectDB();
     
     const { id } = await params;
-    console.log('API: Fetching constellations for character:', id);
     
-    const constellationData = await ConstellationModel.findOne({ characterId: id });
-
-    if (!constellationData) {
-      console.log('API: No constellation data found for character:', id);
-      return NextResponse.json({ constellations: [] });
+    const constellationsData = await CharacterConstellationsModel.findOne({ characterId: id });
+    
+    if (!constellationsData) {
+      return NextResponse.json({
+        constellations: [],
+        priorities: [],
+        notes: ''
+      });
     }
     
-    console.log('API: Found constellation data with', constellationData.constellations?.length || 0, 'constellations');
-
-    return NextResponse.json({ constellations: constellationData.constellations || [] });
+    return NextResponse.json({
+      constellations: constellationsData.constellations || [],
+      priorities: constellationsData.priorities || [],
+      notes: constellationsData.notes || ''
+    });
   } catch (error) {
-    console.error('API: Error fetching constellations:', error);
-    return NextResponse.json({ error: 'Failed to fetch constellations' }, { status: 500 });
+    console.error('Error fetching constellations:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch constellations' },
+      { status: 500 }
+    );
   }
 }
 
@@ -44,7 +51,7 @@ export async function POST(
     }
     
     // Проверяем, существует ли уже запись для этого персонажа
-    const existingConstellation = await ConstellationModel.findOne({ characterId: id });
+    const existingConstellation = await CharacterConstellationsModel.findOne({ characterId: id });
     
     if (existingConstellation) {
       // Обновляем существующую запись
@@ -53,7 +60,7 @@ export async function POST(
       await existingConstellation.save();
     } else {
       // Создаем новую запись
-      await ConstellationModel.create({
+      await CharacterConstellationsModel.create({
         characterId: id,
         constellations: constellations,
         updatedAt: new Date()

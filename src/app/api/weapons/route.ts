@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
     if (search) filter.name = { $regex: search, $options: 'i' };
 
     const weapons = await WeaponModel.find(filter)
-      .select('id name type rarity image')
       .sort({ name: 1 });
 
     // Собираем уникальные типы и редкости для фильтров
