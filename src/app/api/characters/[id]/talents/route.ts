@@ -51,7 +51,7 @@ export async function POST(
     }
     
     // Проверяем, существует ли уже запись для этого персонажа
-    const existingTalent = await TalentModel.findOne({ characterId: id });
+    const existingTalent = await CharacterTalentsModel.findOne({ characterId: id });
     
     if (existingTalent) {
       // Обновляем существующую запись
@@ -60,7 +60,7 @@ export async function POST(
       await existingTalent.save();
     } else {
       // Создаем новую запись
-      await TalentModel.create({
+      await CharacterTalentsModel.create({
         characterId: id,
         talents: talents,
         updatedAt: new Date()
