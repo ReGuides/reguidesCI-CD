@@ -12,7 +12,7 @@ export async function GET() {
 
     // Гарантируем, что rarity всегда массив и очищаем от служебных полей
     const safeArtifacts = artifacts.map(a => {
-      const { _id: _, __v: __, createdAt: ___, updatedAt: ____, ...cleanArtifact } = a;
+      const { _id: _unused1, __v: _unused2, createdAt: _unused3, updatedAt: _unused4, ...cleanArtifact } = a;
       return {
         ...cleanArtifact,
         rarity: Array.isArray(cleanArtifact.rarity) && cleanArtifact.rarity.length > 0

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     // Очищаем данные от служебных полей MongoDB
     const cleanWeapons = weapons.map(weapon => {
-      const { _id: _, __v: __, createdAt: ___, updatedAt: ____, ...cleanWeapon } = weapon;
+      const { _id: _unused1, __v: _unused2, createdAt: _unused3, updatedAt: _unused4, ...cleanWeapon } = weapon;
       return cleanWeapon;
     });
 
