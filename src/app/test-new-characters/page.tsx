@@ -61,7 +61,7 @@ export default function TestNewCharacters() {
             <p>Weapon: {
               typeof character.weapon === 'string' 
                 ? character.weapon 
-                : character.weapon?.name || 'Не указано'
+                : (character.weapon?.name?.toString() || 'Не указано')
             }</p>
             {character.image && (
               <img 

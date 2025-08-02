@@ -136,18 +136,18 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     <div key={weapon.id} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                       <OptimizedImage
                         src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
-                        alt={weapon.name}
+                        alt={weapon.name?.toString() || 'Оружие'}
                         className="w-16 h-16 rounded mb-3"
                         type="weapon"
                       />
                       <div className="text-center w-full">
                         <div className="flex items-center justify-center gap-1 mb-2">
-                          <span className="text-yellow-400 text-sm">★{weapon.rarity}</span>
+                          <span className="text-yellow-400 text-sm">★{Number(weapon.rarity)}</span>
                         </div>
                         <p className="text-white text-xs font-medium leading-tight mb-1 min-h-[2.5rem] flex items-center justify-center">
-                          {weapon.name}
+                          {weapon.name?.toString() || 'Не указано'}
                         </p>
-                        <p className="text-gray-400 text-xs">{weapon.type}</p>
+                        <p className="text-gray-400 text-xs">{weapon.type?.toString() || 'Не указано'}</p>
                       </div>
                     </div>
                   );
@@ -175,15 +175,23 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     return (
                       <div key={`combination-${index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                         <div className="grid grid-cols-2 gap-1 mb-3 w-16 h-16">
-                          {artifact.sets.map((set: { id: string; name: string; image?: string }, setIndex: number) => (
-                            <OptimizedImage
-                              key={setIndex}
-                              src={getImageWithFallback(set.image, set.name, 'artifact')}
-                              alt={set.name}
-                              className="w-full h-full rounded"
-                              type="artifact"
-                            />
-                          ))}
+                          {artifact.sets.map((set: { id: string; name: string; image?: string }, setIndex: number) => {
+                            // Убеждаемся, что все поля являются примитивами
+                            const cleanSet = {
+                              id: set.id?.toString() || '',
+                              name: set.name?.toString() || '',
+                              image: set.image?.toString() || ''
+                            };
+                            return (
+                              <OptimizedImage
+                                key={setIndex}
+                                src={getImageWithFallback(cleanSet.image, cleanSet.name, 'artifact')}
+                                alt={cleanSet.name}
+                                className="w-full h-full rounded"
+                                type="artifact"
+                              />
+                            );
+                          })}
                         </div>
                         <div className="text-center w-full">
                           <p className="text-white text-xs font-medium leading-tight mb-2 min-h-[2.5rem] flex items-center justify-center">
@@ -199,13 +207,13 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                       <div key={`single-${artifact.name || index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                         <OptimizedImage
                           src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
-                          alt={artifact.name}
+                          alt={artifact.name?.toString() || 'Артефакт'}
                           className="w-16 h-16 rounded mb-3"
                           type="artifact"
                         />
                         <div className="text-center w-full">
                           <p className="text-white text-xs font-medium leading-tight mb-2 min-h-[2.5rem] flex items-center justify-center">
-                            {artifact.name}
+                            {artifact.name?.toString() || 'Не указано'}
                           </p>
                         </div>
                       </div>
@@ -216,13 +224,13 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                       <div key={`regular-${artifact.id || artifact.name || index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                         <OptimizedImage
                           src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
-                          alt={artifact.name}
+                          alt={artifact.name?.toString() || 'Артефакт'}
                           className="w-16 h-16 rounded mb-3"
                           type="artifact"
                         />
                         <div className="text-center w-full">
                           <p className="text-white text-xs font-medium leading-tight mb-2 min-h-[2.5rem] flex items-center justify-center">
-                            {artifact.name}
+                            {artifact.name?.toString() || 'Не указано'}
                           </p>
                         </div>
                       </div>

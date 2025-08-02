@@ -164,7 +164,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
                 <p className="text-white font-medium">{
                   typeof character.weapon === 'string'
                     ? character.weapon
-                    : character.weapon?.name || 'Не указано'
+                    : (character.weapon?.name?.toString() || 'Не указано')
                 }</p>
               </div>
             </div>
@@ -182,7 +182,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
                   <span className="text-xs text-gray-400 uppercase tracking-wide">Редкость</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: character.rarity || 0 }, (_, i) => (
+                  {Array.from({ length: Number(character.rarity) || 0 }, (_, i) => (
                     <span key={i} className="text-yellow-400">★</span>
                   ))}
                 </div>

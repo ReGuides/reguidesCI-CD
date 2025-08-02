@@ -21,9 +21,37 @@ export async function GET(request: NextRequest) {
     const cleanBuilds = builds.map(build => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, __v, ...cleanBuild } = build;
+      // Убеждаемся, что все поля являются примитивами
       return {
         ...cleanBuild,
-        id: build.id || _id?.toString()
+        id: (build.id || _id?.toString()) || '',
+        title: cleanBuild.title?.toString() || '',
+        characterId: cleanBuild.characterId?.toString() || '',
+        description: cleanBuild.description?.toString() || '',
+        artifacts: Array.isArray(cleanBuild.artifacts) ? cleanBuild.artifacts.map(artifact => ({
+          ...artifact,
+          id: artifact.id?.toString() || '',
+          name: artifact.name?.toString() || '',
+          type: artifact.type?.toString() || '',
+          rarity: Number(artifact.rarity) || 1,
+          description: artifact.description?.toString() || '',
+          image: artifact.image?.toString() || ''
+        })) : [],
+        weapons: Array.isArray(cleanBuild.weapons) ? cleanBuild.weapons.map(weapon => ({
+          ...weapon,
+          id: weapon.id?.toString() || '',
+          name: weapon.name?.toString() || '',
+          type: weapon.type?.toString() || '',
+          rarity: Number(weapon.rarity) || 1,
+          baseAttack: weapon.baseAttack?.toString() || '',
+          subStatName: weapon.subStatName?.toString() || '',
+          subStatValue: weapon.subStatValue?.toString() || '',
+          passiveName: weapon.passiveName?.toString() || '',
+          passiveEffect: weapon.passiveEffect?.toString() || '',
+          image: weapon.image?.toString() || ''
+        })) : [],
+        createdAt: cleanBuild.createdAt?.toString() || '',
+        updatedAt: cleanBuild.updatedAt?.toString() || ''
       };
     });
     

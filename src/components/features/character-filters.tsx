@@ -96,11 +96,15 @@ export function CharacterFilters({ filters, onFiltersChange }: CharacterFiltersP
             className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-text focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <option value="all">Все оружия</option>
-            {(filterOptions.weapons || []).map((weapon) => (
-              <option key={weapon} value={weapon}>
-                {weapon}
-              </option>
-            ))}
+            {(filterOptions.weapons || []).map((weapon) => {
+              // Убеждаемся, что weapon - это строка
+              const weaponValue = typeof weapon === 'string' ? weapon : (weapon as any)?.name || (weapon as any)?.id || 'Unknown';
+              return (
+                <option key={weaponValue} value={weaponValue}>
+                  {weaponValue}
+                </option>
+              );
+            })}
           </select>
         </div>
         {/* Rarity Filter */}
@@ -116,7 +120,7 @@ export function CharacterFilters({ filters, onFiltersChange }: CharacterFiltersP
             <option value="all">Все редкости</option>
             {(filterOptions.rarities || []).map((rarity) => (
               <option key={rarity} value={rarity}>
-                {rarity}★
+                {Number(rarity)}★
               </option>
             ))}
           </select>

@@ -32,7 +32,7 @@ export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
                   {weapon.type || 'Не указано'}
                 </span>
                 <div className="flex gap-1">
-                  {getRarityStars(weapon.rarity)}
+                  {getRarityStars(Number(weapon.rarity))}
                 </div>
               </div>
             </div>

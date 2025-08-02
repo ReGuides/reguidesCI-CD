@@ -87,7 +87,7 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
     }
   };
 
-  const colors = getRarityColors(weapon.rarity);
+  const colors = getRarityColors(Number(weapon.rarity));
 
   const getImageSrc = () => {
     if (!weapon.image) return '/images/weapons/default.png';
@@ -122,7 +122,7 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
           {weapon.name}
         </div>
         <div className="flex gap-0.5 mb-1">
-          {Array.from({ length: weapon.rarity }).map((_, i) => (
+          {Array.from({ length: Number(weapon.rarity) }).map((_, i) => (
             <span key={i} className="text-yellow-300 text-base drop-shadow-[0_0_8px_rgba(234,179,8,0.5)] group-hover:drop-shadow-[0_0_12px_rgba(234,179,8,0.7)] transition-all duration-500">★</span>
           ))}
         </div>

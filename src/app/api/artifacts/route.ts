@@ -14,15 +14,21 @@ export async function GET() {
     const safeArtifacts = artifacts.map(a => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, __v, createdAt, updatedAt, ...cleanArtifact } = a;
-      // Убеждаемся, что id поле присутствует
+      // Убеждаемся, что id поле присутствует и является строкой
       if (!cleanArtifact.id && _id) {
         cleanArtifact.id = _id.toString();
       }
+      // Убеждаемся, что все поля являются примитивами
       return {
         ...cleanArtifact,
+        id: cleanArtifact.id?.toString() || '',
+        name: cleanArtifact.name?.toString() || '',
+        type: cleanArtifact.type?.toString() || '',
         rarity: Array.isArray(cleanArtifact.rarity) && cleanArtifact.rarity.length > 0
-          ? cleanArtifact.rarity
-          : [5]
+          ? cleanArtifact.rarity.map(r => Number(r))
+          : [5],
+        description: cleanArtifact.description?.toString() || '',
+        image: cleanArtifact.image?.toString() || ''
       };
     });
 

@@ -88,7 +88,26 @@ export async function GET(request: NextRequest) {
       data: characters.map(character => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { _id, __v, createdAt, updatedAt, ...cleanCharacter } = character;
-        return cleanCharacter;
+        // Убеждаемся, что все поля являются примитивами
+        return {
+          ...cleanCharacter,
+          id: cleanCharacter.id?.toString() || '',
+          name: cleanCharacter.name?.toString() || '',
+          element: cleanCharacter.element?.toString() || '',
+          weaponType: cleanCharacter.weaponType?.toString() || '',
+          rarity: Number(cleanCharacter.rarity) || 1,
+          region: cleanCharacter.region?.toString() || '',
+          description: cleanCharacter.description?.toString() || '',
+          image: cleanCharacter.image?.toString() || '',
+          gender: cleanCharacter.gender?.toString() || '',
+          birthday: cleanCharacter.birthday?.toString() || '',
+          patchNumber: cleanCharacter.patchNumber?.toString() || '',
+          gameplayDescription: cleanCharacter.gameplayDescription?.toString() || '',
+          role: cleanCharacter.role?.toString() || '',
+          isActive: Boolean(cleanCharacter.isActive),
+          isFeatured: Boolean(cleanCharacter.isFeatured),
+          weapon: cleanCharacter.weapon?.toString() || ''
+        };
       }),
       filters
     });

@@ -185,7 +185,7 @@ export default function CharactersAdminPage() {
                   <div className="text-white text-lg font-semibold leading-tight line-clamp-1">{character.name}</div>
                   <div className="flex items-center space-x-2 mt-1">
                     <span className={`text-base ${getElementColor(character.element)}`}>{character.element || '-'}</span>
-                    <span className={`text-base ${getRarityColor(character.rarity)}`}>{character.rarity || '-'}★</span>
+                    <span className={`text-base ${getRarityColor(character.rarity)}`}>{Number(character.rarity) || '-'}★</span>
                   </div>
                 </div>
               </div>
@@ -201,7 +201,7 @@ export default function CharactersAdminPage() {
                       character.weaponType || 
                       (typeof character.weapon === 'string' 
                         ? character.weapon 
-                        : character.weapon?.name) || 
+                        : (character.weapon?.name?.toString() || '')) || 
                       '-'
                     }</span>
                   </div>

@@ -87,7 +87,7 @@ export function CharacterGrid() {
                 {character.rarity && (
                   <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/60 text-yellow-300 px-2 py-1 rounded shadow">
                     <Star className="h-3 w-3 fill-current" />
-                    <span className="text-xs font-bold">{character.rarity}</span>
+                    <span className="text-xs font-bold">{Number(character.rarity)}</span>
                   </div>
                 )}
               </div>
@@ -100,7 +100,7 @@ export function CharacterGrid() {
                   {character.weapon && <><span>•</span><span>{
                     typeof character.weapon === 'string' 
                       ? character.weapon 
-                      : character.weapon?.name || 'Не указано'
+                      : (character.weapon?.name?.toString() || 'Не указано')
                   }</span></>}
                 </div>
                 {character.description && (
