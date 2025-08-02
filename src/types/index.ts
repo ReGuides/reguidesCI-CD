@@ -5,7 +5,7 @@ export interface Character {
   name: string;
   image?: string;
   element?: string;
-  weapon?: string;
+  weapon?: string | Weapon;
   weaponType?: string; // добавлено для админки
   region?: string;
   rarity?: number;

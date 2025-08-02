@@ -161,7 +161,11 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs text-gray-400 uppercase tracking-wide">Оружие</span>
                 </div>
-                <p className="text-white font-medium">{character.weapon}</p>
+                <p className="text-white font-medium">{
+                  typeof character.weapon === 'string'
+                    ? character.weapon
+                    : character.weapon?.name || 'Не указано'
+                }</p>
               </div>
             </div>
             
