@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       // Убеждаемся, что все поля являются примитивами
       return {
         ...cleanBuild,
-        id: (build.id || _id?.toString()) || '',
+                 id: typeof build.id === 'object' ? build.id?.toString() || '' : ((build.id || _id?.toString()) || ''),
         title: cleanBuild.title?.toString() || '',
         characterId: cleanBuild.characterId?.toString() || '',
         description: cleanBuild.description?.toString() || '',

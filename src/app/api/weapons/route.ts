@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       // Убеждаемся, что все поля являются примитивами
       return {
         ...cleanWeapon,
-        id: cleanWeapon.id?.toString() || '',
+                     id: typeof cleanWeapon.id === 'object' ? cleanWeapon.id?.toString() || '' : (cleanWeapon.id?.toString() || ''),
         name: cleanWeapon.name?.toString() || '',
         type: cleanWeapon.type?.toString() || '',
         rarity: Number(cleanWeapon.rarity) || 1,

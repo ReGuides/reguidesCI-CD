@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
         // Убеждаемся, что все поля являются примитивами
         return {
           ...cleanCharacter,
-          id: cleanCharacter.id?.toString() || '',
+          id: typeof cleanCharacter.id === 'object' ? cleanCharacter.id?.toString() || '' : (cleanCharacter.id?.toString() || ''),
           name: cleanCharacter.name?.toString() || '',
           element: cleanCharacter.element?.toString() || '',
           weaponType: cleanCharacter.weaponType?.toString() || '',

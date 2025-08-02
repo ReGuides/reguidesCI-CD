@@ -34,13 +34,25 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
         if (response.ok) {
           const data = await response.json();
           setRecommendation(data);
-        } else if (response.status === 404) {
-          // Рекомендации не найдены - это нормально
-          setRecommendation(null);
+        } else {
+          // Если произошла ошибка, устанавливаем пустой объект
+          setRecommendation({
+            weapons: [],
+            artifacts: [],
+            mainStats: undefined,
+            subStats: [],
+            notes: undefined
+          } as Recommendation);
         }
       } catch (error) {
         console.error('Error fetching recommendation:', error);
-        setRecommendation(null);
+        setRecommendation({
+          weapons: [],
+          artifacts: [],
+          mainStats: undefined,
+          subStats: [],
+          notes: undefined
+        } as Recommendation);
       } finally {
         setLoading(false);
       }
@@ -70,7 +82,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
     );
   }
 
-  if (!recommendation) {
+  if (!recommendation || (!recommendation.weapons.length && !recommendation.artifacts.length && !recommendation.mainStats && !recommendation.subStats?.length)) {
     return (
       <div className="space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -126,14 +138,23 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
             </h2>
             {recommendation.weapons.length > 0 ? (
               <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 px-2">
-                {recommendation.weapons.map((weapon, idx) => {
-                  if (!weapon || typeof weapon !== 'object' || !('name' in weapon) || !('id' in weapon)) {
-                    return (
-                      <div key={idx} className="text-red-400">Ошибка данных оружия</div>
-                    );
-                  }
-                  return (
-                    <div key={weapon.id} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
+                                 {recommendation.weapons.map((weapon, idx) => {
+                   if (!weapon || typeof weapon !== 'object' || !('name' in weapon) || !('id' in weapon)) {
+                     return (
+                       <div key={idx} className="text-red-400">Ошибка данных оружия</div>
+                     );
+                   }
+                                     // Убеждаемся, что у нас есть уникальный строковый ключ
+                   let weaponKey;
+                   if (typeof weapon.id === 'object' && weapon.id !== null) {
+                     // Если id является объектом MongoDB, используем индекс
+                     weaponKey = `weapon-obj-${idx}`;
+                   } else {
+                     // Если id является примитивом, используем его строковое представление
+                     weaponKey = `weapon-${weapon.id?.toString() || idx}`;
+                   }
+                   return (
+                     <div key={weaponKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                       <OptimizedImage
                         src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
                         alt={weapon.name?.toString() || 'Оружие'}
@@ -182,15 +203,24 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                               name: set.name?.toString() || '',
                               image: set.image?.toString() || ''
                             };
-                            return (
-                              <OptimizedImage
-                                key={setIndex}
-                                src={getImageWithFallback(cleanSet.image, cleanSet.name, 'artifact')}
-                                alt={cleanSet.name}
-                                className="w-full h-full rounded"
-                                type="artifact"
-                              />
-                            );
+                                                         // Убеждаемся, что у нас есть уникальный строковый ключ
+                             let setKey;
+                             if (typeof cleanSet.id === 'object' && cleanSet.id !== null) {
+                               // Если id является объектом MongoDB, используем индекс
+                               setKey = `set-obj-${setIndex}`;
+                             } else {
+                               // Если id является примитивом, используем его строковое представление
+                               setKey = `set-${cleanSet.id}-${setIndex}`;
+                             }
+                             return (
+                               <OptimizedImage
+                                 key={setKey}
+                                 src={getImageWithFallback(cleanSet.image, cleanSet.name, 'artifact')}
+                                 alt={cleanSet.name}
+                                 className="w-full h-full rounded"
+                                 type="artifact"
+                               />
+                             );
                           })}
                         </div>
                         <div className="text-center w-full">
@@ -203,8 +233,17 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     );
                   } else if (artifact.setType === 'single') {
                     // Одиночный сет
-                    return (
-                      <div key={`single-${artifact.name || index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
+                                         // Убеждаемся, что у нас есть уникальный строковый ключ
+                     let artifactKey;
+                     if (typeof artifact.id === 'object' && artifact.id !== null) {
+                       // Если id является объектом MongoDB, используем индекс
+                       artifactKey = `single-obj-${index}`;
+                     } else {
+                       // Если id является примитивом, используем его строковое представление
+                       artifactKey = `single-${artifact.id?.toString() || artifact.name?.toString() || index}`;
+                     }
+                     return (
+                       <div key={artifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                         <OptimizedImage
                           src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
                           alt={artifact.name?.toString() || 'Артефакт'}
@@ -220,8 +259,17 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     );
                   } else if ('id' in artifact && 'name' in artifact && !artifact.setType) {
                     // Обычный артефакт (для обратной совместимости) - без setType
-                    return (
-                      <div key={`regular-${artifact.id || artifact.name || index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
+                                         // Убеждаемся, что у нас есть уникальный строковый ключ
+                     let regularArtifactKey;
+                     if (typeof artifact.id === 'object' && artifact.id !== null) {
+                       // Если id является объектом MongoDB, используем индекс
+                       regularArtifactKey = `regular-obj-${index}`;
+                     } else {
+                       // Если id является примитивом, используем его строковое представление
+                       regularArtifactKey = `regular-${artifact.id?.toString() || artifact.name?.toString() || index}`;
+                     }
+                     return (
+                       <div key={regularArtifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                         <OptimizedImage
                           src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
                           alt={artifact.name?.toString() || 'Артефакт'}
@@ -287,8 +335,8 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                   <div>
                     <h5 className="text-sm font-medium text-gray-300 mb-2">Дополнительные статы</h5>
                     <div className="flex flex-wrap gap-1">
-                      {recommendation.subStats.map((stat, statIndex) => (
-                        <span key={statIndex} className="px-2 py-1 bg-neutral-700 rounded text-xs text-white">
+                                             {recommendation.subStats.map((stat, statIndex) => (
+                         <span key={`stat-${statIndex}-${stat?.toString() || ''}`} className="px-2 py-1 bg-neutral-700 rounded text-xs text-white">
                           {stat}
                         </span>
                       ))}

@@ -21,7 +21,7 @@ export async function GET() {
       // Убеждаемся, что все поля являются примитивами
       return {
         ...cleanArtifact,
-        id: cleanArtifact.id?.toString() || '',
+                      id: typeof cleanArtifact.id === 'object' ? cleanArtifact.id?.toString() || '' : (cleanArtifact.id?.toString() || ''),
         name: cleanArtifact.name?.toString() || '',
         type: cleanArtifact.type?.toString() || '',
         rarity: Array.isArray(cleanArtifact.rarity) && cleanArtifact.rarity.length > 0
