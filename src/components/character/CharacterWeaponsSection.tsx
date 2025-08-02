@@ -126,25 +126,32 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
             </h2>
             {recommendation.weapons.length > 0 ? (
               <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 px-2">
-                {recommendation.weapons.map((weapon) => (
-                  <div key={weapon.id} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
-                    <OptimizedImage
-                      src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
-                      alt={weapon.name}
-                      className="w-16 h-16 rounded mb-3"
-                      type="weapon"
-                    />
-                    <div className="text-center w-full">
-                      <div className="flex items-center justify-center gap-1 mb-2">
-                        <span className="text-yellow-400 text-sm">★{weapon.rarity}</span>
+                {recommendation.weapons.map((weapon, idx) => {
+                  if (!weapon || typeof weapon !== 'object' || !('name' in weapon) || !('id' in weapon)) {
+                    return (
+                      <div key={idx} className="text-red-400">Ошибка данных оружия</div>
+                    );
+                  }
+                  return (
+                    <div key={weapon.id} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
+                      <OptimizedImage
+                        src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
+                        alt={weapon.name}
+                        className="w-16 h-16 rounded mb-3"
+                        type="weapon"
+                      />
+                      <div className="text-center w-full">
+                        <div className="flex items-center justify-center gap-1 mb-2">
+                          <span className="text-yellow-400 text-sm">★{weapon.rarity}</span>
+                        </div>
+                        <p className="text-white text-xs font-medium leading-tight mb-1 min-h-[2.5rem] flex items-center justify-center">
+                          {weapon.name}
+                        </p>
+                        <p className="text-gray-400 text-xs">{weapon.type}</p>
                       </div>
-                      <p className="text-white text-xs font-medium leading-tight mb-1 min-h-[2.5rem] flex items-center justify-center">
-                        {weapon.name}
-                      </p>
-                      <p className="text-gray-400 text-xs">{weapon.type}</p>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center text-gray-400 py-8">
