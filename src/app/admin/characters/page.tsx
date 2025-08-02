@@ -197,7 +197,13 @@ export default function CharactersAdminPage() {
                   </div>
                   <div className="flex justify-between text-neutral-400">
                     <span>Оружие:</span>
-                    <span className="text-white">{character.weaponType || character.weapon || '-'}</span>
+                    <span className="text-white">{
+                      character.weaponType || 
+                      (typeof character.weapon === 'string' 
+                        ? character.weapon 
+                        : character.weapon?.name) || 
+                      '-'
+                    }</span>
                   </div>
                   <div className="flex justify-between text-neutral-400">
                     <span>Регион:</span>
