@@ -97,7 +97,11 @@ export function CharacterGrid() {
                 <CardTitle className="text-base font-semibold mb-1 line-clamp-1 text-white group-hover:text-purple-400 transition-colors">{character.name}</CardTitle>
                 <div className="flex items-center gap-2 text-xs text-neutral-400 mb-1">
                   {character.element && <span>{character.element}</span>}
-                  {character.weapon && <><span>•</span><span>{character.weapon}</span></>}
+                  {character.weapon && <><span>•</span><span>{
+                    typeof character.weapon === 'string' 
+                      ? character.weapon 
+                      : character.weapon?.name || 'Не указано'
+                  }</span></>}
                 </div>
                 {character.description && (
                   <p className="text-xs text-neutral-400 line-clamp-2 min-h-[32px]">{character.description}</p>
