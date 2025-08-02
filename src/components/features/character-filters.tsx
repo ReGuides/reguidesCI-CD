@@ -98,7 +98,7 @@ export function CharacterFilters({ filters, onFiltersChange }: CharacterFiltersP
             <option value="all">Все оружия</option>
             {(filterOptions.weapons || []).map((weapon) => {
               // Убеждаемся, что weapon - это строка
-              const weaponValue = typeof weapon === 'string' ? weapon : (weapon as any)?.name || (weapon as any)?.id || 'Unknown';
+              const weaponValue = typeof weapon === 'string' ? weapon : String(weapon || 'Unknown');
               return (
                 <option key={weaponValue} value={weaponValue}>
                   {weaponValue}
