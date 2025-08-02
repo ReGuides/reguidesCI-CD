@@ -58,7 +58,11 @@ export default function TestNewCharacters() {
             <h3 className="font-bold">{character.name}</h3>
             <p>Patch: {character.patchNumber}</p>
             <p>Element: {character.element}</p>
-            <p>Weapon: {character.weapon}</p>
+            <p>Weapon: {
+              typeof character.weapon === 'string' 
+                ? character.weapon 
+                : character.weapon?.name || 'Не указано'
+            }</p>
             {character.image && (
               <img 
                 src={character.image} 
