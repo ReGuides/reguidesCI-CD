@@ -28,18 +28,7 @@ interface WeaponDocument {
   image: unknown;
 }
 
-interface ArtifactDocument {
-  _id?: unknown;
-  __v?: unknown;
-  createdAt?: unknown;
-  updatedAt?: unknown;
-  id: unknown;
-  name: unknown;
-  type: unknown;
-  rarity: unknown;
-  description: unknown;
-  image: unknown;
-}
+
 
 interface CharacterStatsDocument {
   characterId: string;
@@ -139,10 +128,11 @@ export async function GET(
        if (typeof artifact === 'string') {
          // Если это ID артефакта - пока возвращаем базовый объект
          return { id: artifact, name: artifact } as Artifact;
-       } else if (typeof artifact === 'object' && artifact !== null) {
-         const artifactObj = artifact as Record<string, unknown>;
-         // Обрабатываем как объект с полными данными
-         const { _id, __v, createdAt, updatedAt, ...cleanArtifact } = artifactObj;
+               } else if (typeof artifact === 'object' && artifact !== null) {
+          const artifactObj = artifact as Record<string, unknown>;
+          // Обрабатываем как объект с полными данными
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { _id, __v, createdAt, updatedAt, ...cleanArtifact } = artifactObj;
          return {
            ...cleanArtifact,
            id: typeof cleanArtifact.id === 'object' ? cleanArtifact.id?.toString() || '' : (cleanArtifact.id?.toString() || ''),
