@@ -13,13 +13,7 @@ export async function GET(
     
     console.log('Searching for artifact with ID:', id);
     
-    let artifact = await ArtifactModel.findOne({ id });
-    
-    // Если не найден по id, попробуем найти по _id
-    if (!artifact) {
-      console.log('Artifact not found by id, trying _id');
-      artifact = await ArtifactModel.findById(id);
-    }
+    const artifact = await ArtifactModel.findOne({ id }).lean();
     
     if (!artifact) {
       console.log('Artifact not found for ID:', id);
@@ -30,57 +24,25 @@ export async function GET(
     }
     
     console.log('Found artifact:', artifact);
-    console.log('Artifact fields from DB:', {
-      id: artifact.id,
-      _id: artifact._id,
-      name: artifact.name,
-      rarity: artifact.rarity,
-      bonus1: artifact.bonus1,
-      bonus2: artifact.bonus2,
-      bonus4: artifact.bonus4,
-      pieces: artifact.pieces,
-      image: artifact.image
-    });
-    
-    // Проверяем, какие поля существуют
-    console.log('Artifact hasOwnProperty checks:', {
-      hasId: artifact.hasOwnProperty('id'),
-      hasName: artifact.hasOwnProperty('name'),
-      hasRarity: artifact.hasOwnProperty('rarity'),
-      hasBonus1: artifact.hasOwnProperty('bonus1'),
-      hasBonus2: artifact.hasOwnProperty('bonus2'),
-      hasBonus4: artifact.hasOwnProperty('bonus4'),
-      hasPieces: artifact.hasOwnProperty('pieces'),
-      hasImage: artifact.hasOwnProperty('image')
-    });
+    console.log('All artifact object keys:', Object.keys(artifact));
     
     // Убеждаемся, что id поле присутствует
-    const artifactData = {
-      id: artifact.id || artifact._id?.toString(),
-      name: artifact.name,
-      rarity: Array.isArray(artifact.rarity) && artifact.rarity.length > 0
-        ? artifact.rarity
+    const result = {
+      id: (artifact as any).id || (artifact as any)._id?.toString(),
+      name: (artifact as any).name?.toString() || '',
+      rarity: Array.isArray((artifact as any).rarity) && (artifact as any).rarity.length > 0
+        ? (artifact as any).rarity.map((r: any) => Number(r))
         : [5],
-      bonus1: artifact.bonus1,
-      bonus2: artifact.bonus2,
-      bonus4: artifact.bonus4,
-      pieces: artifact.pieces,
-      image: artifact.image
+      bonus1: (artifact as any).bonus1?.toString() || undefined,
+      bonus2: (artifact as any).bonus2?.toString() || undefined,
+      bonus4: (artifact as any).bonus4?.toString() || undefined,
+      pieces: (artifact as any).pieces || 5,
+      image: (artifact as any).image?.toString() || ''
     };
     
-    console.log('Returning artifact data:', artifactData);
-    console.log('Artifact data fields:', {
-      id: artifactData.id,
-      name: artifactData.name,
-      rarity: artifactData.rarity,
-      bonus1: artifactData.bonus1,
-      bonus2: artifactData.bonus2,
-      bonus4: artifactData.bonus4,
-      pieces: artifactData.pieces,
-      image: artifactData.image
-    });
+    console.log('Returning artifact data:', result);
     
-    return NextResponse.json(artifactData);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching artifact:', error);
     return NextResponse.json(
