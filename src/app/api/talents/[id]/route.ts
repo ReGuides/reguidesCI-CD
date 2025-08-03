@@ -21,40 +21,49 @@ export async function GET(
     await connectDB();
     const { id } = await params;
 
-    // Ищем документ с талантами персонажа
-    let talentDoc = await Talent.findOne({ characterId: id });
+    // Сначала ищем талант по типу в любом документе
+    let talentDoc = await Talent.findOne({
+      'talents.type': id
+    });
     
-    if (!talentDoc) {
-      // Если не найден по characterId, попробуем найти талант по типу в любом документе
-      talentDoc = await Talent.findOne({
-        'talents.type': id
-      });
-      
-      if (talentDoc) {
-        // Находим конкретный талант в массиве
-        const talent = talentDoc.talents.find((t: TalentItem) => t.type === id);
-        if (talent) {
-          return NextResponse.json(talent);
-        }
+    if (talentDoc) {
+      // Находим конкретный талант в массиве
+      const talent = talentDoc.talents.find((t: TalentItem) => t.type === id);
+      if (talent) {
+        return NextResponse.json(talent);
       }
-      
-      return NextResponse.json(
-        { error: 'Talent not found' },
-        { status: 404 }
-      );
     }
 
-    // Если найден документ по characterId, ищем талант по типу
-    const talent = talentDoc.talents.find((t: TalentItem) => t.type === id || t.name === id);
+    // Если не найден по типу, попробуем найти по типу в полных ID
+    talentDoc = await Talent.findOne({
+      'talents._id': { $regex: `^${id}_` }
+    });
     
-    if (!talent) {
-      return NextResponse.json(
-        { error: 'Talent not found' },
-        { status: 404 }
+    if (talentDoc) {
+      // Находим талант, который начинается с нужного типа
+      const talent = talentDoc.talents.find((t: TalentItem) => 
+        t._id?.toString().startsWith(`${id}_`)
       );
+      if (talent) {
+        return NextResponse.json(talent);
+      }
     }
 
-    return NextResponse.json(talent);
+    // Если не найден по типу, попробуем найти по characterId
+    talentDoc = await Talent.findOne({ characterId: id });
+    
+    if (talentDoc) {
+      // Ищем талант по типу или имени в найденном документе
+      const talent = talentDoc.talents.find((t: TalentItem) => t.type === id || t.name === id);
+      if (talent) {
+        return NextResponse.json(talent);
+      }
+    }
+    
+    return NextResponse.json(
+      { error: 'Talent not found' },
+      { status: 404 }
+    );
   } catch (error) {
     console.error('Error fetching talent:', error);
     return NextResponse.json(

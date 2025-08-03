@@ -67,11 +67,21 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className 
       if (/^(weapon|artifact|character|talent|constellation):/.test(href)) {
         // Спец-ссылка
         const [type, id] = href.split(':');
+        
+        // Для талантов извлекаем тип из полного ID
+        let processedId = id;
+        if (type === 'talent') {
+          // Если ID содержит подчеркивание, извлекаем тип (например, passive_6862fa05411509dc6fa5172b -> passive)
+          if (id.includes('_')) {
+            processedId = id.split('_')[0];
+          }
+        }
+        
         result.push(
           <button
             key={href + match.index}
             className="underline text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
-            onClick={() => onItemClick?.(type, id)}
+            onClick={() => onItemClick?.(type, processedId)}
           >
             {text}
           </button>

@@ -69,6 +69,14 @@ export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps)
               <div className="bg-neutral-800 rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-white mb-3">Бонусы сета</h3>
                 <div className="space-y-4 text-sm">
+                  {artifact.bonus1 && (
+                    <div className="bg-neutral-900 rounded p-3 border border-neutral-600">
+                      <div className="text-green-300 text-xs mb-2">1 предмет</div>
+                      <p className="text-white leading-relaxed">
+                        {artifact.bonus1}
+                      </p>
+                    </div>
+                  )}
                   {artifact.bonus2 && (
                     <div className="bg-neutral-900 rounded p-3 border border-neutral-600">
                       <div className="text-blue-300 text-xs mb-2">2 предмета</div>
@@ -82,6 +90,14 @@ export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps)
                       <div className="text-purple-300 text-xs mb-2">4 предмета</div>
                       <p className="text-white leading-relaxed">
                         {artifact.bonus4}
+                      </p>
+                    </div>
+                  )}
+                  {!artifact.bonus1 && !artifact.bonus2 && !artifact.bonus4 && (
+                    <div className="bg-neutral-900 rounded p-3 border border-neutral-600">
+                      <div className="text-gray-400 text-xs mb-2">Информация о бонусах</div>
+                      <p className="text-gray-300 leading-relaxed">
+                        Бонусы сета не указаны
                       </p>
                     </div>
                   )}
