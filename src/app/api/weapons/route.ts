@@ -22,7 +22,7 @@ export async function GET() {
       image: 1
     }).toArray();
 
-    return NextResponse.json(weapons);
+    return NextResponse.json({ data: weapons });
   } catch (error) {
     console.error('Error fetching weapons:', error);
     return NextResponse.json(

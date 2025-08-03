@@ -5,14 +5,16 @@ import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 
 interface WeaponModalProps {
   weapon: Weapon | null;
   isOpen: boolean;
   onClose: () => void;
+  isLoading?: boolean;
 }
 
-export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
+export function WeaponModal({ weapon, isOpen, onClose, isLoading = false }: WeaponModalProps) {
   useEffect(() => {
     if (weapon) {
       console.log('WeaponModal weapon changed:', weapon);
@@ -20,6 +22,20 @@ export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
   }, [weapon]);
 
   if (!isOpen || !weapon) return null;
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="bg-neutral-900 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-neutral-700">
+          <div className="p-6">
+            <div className="flex justify-center items-center h-64">
+              <LoadingSpinner size="lg" className="text-accent" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const getRarityStars = (rarity: number) => {
     return Array.from({ length: rarity }, (_, i) => (

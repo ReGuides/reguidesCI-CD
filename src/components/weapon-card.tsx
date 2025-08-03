@@ -12,12 +12,38 @@ interface WeaponCardProps {
 
 export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [fullWeapon, setFullWeapon] = useState<Weapon | null>(null);
+  const [loadingWeapon, setLoadingWeapon] = useState(false);
 
-  const handleCardClick = () => {
+  const handleCardClick = async () => {
     if (onSelect) {
       onSelect();
     } else {
       setIsModalOpen(true);
+      await loadFullWeapon();
+    }
+  };
+
+  const loadFullWeapon = async () => {
+    if (fullWeapon) return; // Уже загружено
+    
+    try {
+      setLoadingWeapon(true);
+      const response = await fetch(`/api/weapons/${weapon.id}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const weaponData = await response.json();
+      console.log('Full weapon data loaded:', weaponData);
+      setFullWeapon(weaponData);
+    } catch (err) {
+      console.error('Error loading full weapon data:', err);
+      // Используем базовые данные если загрузка не удалась
+      setFullWeapon(weapon);
+    } finally {
+      setLoadingWeapon(false);
     }
   };
 
@@ -135,9 +161,10 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
       </div>
     </div>
       <WeaponModal 
-        weapon={weapon}
+        weapon={fullWeapon || weapon}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        isLoading={loadingWeapon}
       />
     </>
   );

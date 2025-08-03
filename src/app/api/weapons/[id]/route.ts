@@ -19,7 +19,17 @@ export async function GET(
     const { id } = await params;
     
     const weaponsCollection = mongoose.connection.db.collection('weapons');
-    const weapon = await weaponsCollection.findOne({ id });
+    let weapon = await weaponsCollection.findOne({ id });
+    
+    // Если не найдено по id, попробуем найти по _id
+    if (!weapon) {
+      try {
+        const objectId = new mongoose.Types.ObjectId(id);
+        weapon = await weaponsCollection.findOne({ _id: objectId });
+      } catch (error) {
+        // Если id не является валидным ObjectId, игнорируем ошибку
+      }
+    }
     
     if (!weapon) {
       return NextResponse.json(
@@ -34,13 +44,16 @@ export async function GET(
       name: weapon.name,
       type: weapon.type,
       rarity: weapon.rarity,
-      baseAttack: weapon.baseAttack,
-      subStatName: weapon.subStatName,
-      subStatValue: weapon.subStatValue,
-      passiveName: weapon.passiveName,
-      passiveEffect: weapon.passiveEffect,
+      baseAttack: weapon.baseAttack || weapon.base_attack || weapon.attack,
+      subStatName: weapon.subStatName || weapon.sub_stat_name || weapon.subStat,
+      subStatValue: weapon.subStatValue || weapon.sub_stat_value || weapon.subStatValue,
+      passiveName: weapon.passiveName || weapon.passive_name || weapon.passive,
+      passiveEffect: weapon.passiveEffect || weapon.passive_effect || weapon.passiveDescription,
       image: weapon.image
     };
+    
+    console.log('Original weapon data:', weapon);
+    console.log('Processed weapon data:', weaponData);
     
     return NextResponse.json(weaponData);
   } catch (error) {

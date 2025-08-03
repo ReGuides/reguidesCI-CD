@@ -32,19 +32,6 @@ export async function GET() {
       };
     });
 
-    // ВРЕМЕННЫЙ ЛОГ ДЛЯ ДИАГНОСТИКИ
-    console.log('ArtifactModel.modelName:', ArtifactModel?.modelName);
-    console.log('ArtifactModel.schema.obj.rarity:', ArtifactModel?.schema?.obj?.rarity);
-    if (artifacts.length > 0) {
-      console.log('Пример artifact:', {
-        id: artifacts[0].id,
-        rarity: artifacts[0].rarity,
-        name: artifacts[0].name
-      });
-    } else {
-      console.log('Нет артефактов в базе!');
-    }
-
     return NextResponse.json({ data: safeArtifacts });
   } catch (error) {
     console.error('Error fetching artifacts:', error);

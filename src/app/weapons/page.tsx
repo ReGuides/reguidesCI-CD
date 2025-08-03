@@ -21,10 +21,13 @@ export default function WeaponsPage() {
   }, []);
 
   useEffect(() => {
+    console.log('State changed:', { loading, error, weaponsLength: weapons.length });
+  }, [loading, error, weapons.length]);
+
+  useEffect(() => {
     const fetchWeapons = async () => {
       try {
         setLoading(true);
-        console.log('Fetching weapons with filters:', filters);
         
         const params = new URLSearchParams();
         if (filters.type !== 'all') params.append('type', filters.type);
@@ -32,14 +35,17 @@ export default function WeaponsPage() {
         if (filters.search) params.append('search', filters.search);
 
         const response = await fetch(`/api/weapons?${params.toString()}`);
-        console.log('Response status:', response.status);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Weapons data:', data);
+        
+        console.log('Weapons data received:', data);
+        console.log('Weapons array:', data.data);
+        console.log('Weapons length:', data.data?.length);
+        console.log('First weapon:', data.data?.[0]);
         
         setWeapons(data.data || []);
       } catch (err) {

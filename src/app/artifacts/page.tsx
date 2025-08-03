@@ -24,7 +24,6 @@ export default function ArtifactsPage() {
     const fetchArtifacts = async () => {
       try {
         setLoading(true);
-        console.log('Fetching artifacts with filters:', filters);
         
         const params = new URLSearchParams();
         if (filters.type !== 'all') params.append('type', filters.type);
@@ -32,14 +31,12 @@ export default function ArtifactsPage() {
         if (filters.search) params.append('search', filters.search);
 
         const response = await fetch(`/api/artifacts?${params.toString()}`);
-        console.log('Response status:', response.status);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Artifacts data:', data);
         
         setArtifacts(data.data || []);
       } catch (err) {
