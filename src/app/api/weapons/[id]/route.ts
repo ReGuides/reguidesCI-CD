@@ -18,21 +18,15 @@ export async function GET(
     
     const { id } = await params;
     
-    console.log('Searching for weapon with ID:', id);
-    
     const weaponsCollection = mongoose.connection.db.collection('weapons');
     const weapon = await weaponsCollection.findOne({ id });
     
     if (!weapon) {
-      console.log('Weapon not found for ID:', id);
       return NextResponse.json(
         { error: 'Weapon not found' },
         { status: 404 }
       );
     }
-    
-    console.log('Found weapon:', weapon);
-    console.log('All weapon object keys:', Object.keys(weapon));
     
     // Убеждаемся, что id поле присутствует
     const weaponData = {
@@ -47,8 +41,6 @@ export async function GET(
       passiveEffect: weapon.passiveEffect,
       image: weapon.image
     };
-    
-    console.log('Returning weapon data:', weaponData);
     
     return NextResponse.json(weaponData);
   } catch (error) {

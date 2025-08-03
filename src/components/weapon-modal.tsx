@@ -21,19 +21,6 @@ export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
 
   if (!isOpen || !weapon) return null;
 
-  console.log('WeaponModal received weapon:', weapon);
-  console.log('Weapon fields:', {
-    name: weapon.name,
-    type: weapon.type,
-    rarity: weapon.rarity,
-    baseAttack: weapon.baseAttack,
-    subStatName: weapon.subStatName,
-    subStatValue: weapon.subStatValue,
-    passiveName: weapon.passiveName,
-    passiveEffect: weapon.passiveEffect,
-    image: weapon.image
-  });
-
   const getRarityStars = (rarity: number) => {
     return Array.from({ length: rarity }, (_, i) => (
       <span key={i} className="text-yellow-400">★</span>
