@@ -96,28 +96,45 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
   const elementColor = getElementColor(character.element || '');
 
   const handleItemClick = async (type: string, id: string) => {
+    console.log('handleItemClick called with:', { type, id });
     try {
       if (type === 'weapon') {
+        console.log('Fetching weapon:', id);
         const response = await fetch(`/api/weapons/${id}`);
         if (response.ok) {
           const weapon = await response.json();
+          console.log('Weapon data received:', weapon);
           setSelectedWeapon(weapon);
           setIsWeaponModalOpen(true);
+        } else {
+          console.error('Failed to fetch weapon:', response.status, response.statusText);
         }
       } else if (type === 'artifact') {
+        console.log('Fetching artifact:', id);
         const response = await fetch(`/api/artifacts/${id}`);
         if (response.ok) {
           const artifact = await response.json();
+          console.log('Artifact data received:', artifact);
           setSelectedArtifact(artifact);
           setIsArtifactModalOpen(true);
+        } else {
+          console.error('Failed to fetch artifact:', response.status, response.statusText);
         }
       } else if (type === 'talent') {
+        console.log('Fetching talent:', id);
         const response = await fetch(`/api/talents/${id}`);
         if (response.ok) {
           const talent = await response.json();
+          console.log('Talent data received:', talent);
           setSelectedTalent(talent);
           setIsTalentModalOpen(true);
+        } else {
+          console.error('Failed to fetch talent:', response.status, response.statusText);
         }
+      } else if (type === 'character') {
+        console.log('Redirecting to character:', id);
+        // Для персонажей перенаправляем на страницу персонажа
+        window.location.href = `/characters/${id}`;
       }
     } catch (error) {
       console.error('Error fetching item data:', error);

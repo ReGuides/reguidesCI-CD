@@ -11,14 +11,25 @@ export async function GET(
     
     const { id } = await params;
     
-    const artifact = await ArtifactModel.findOne({ id });
+    console.log('Searching for artifact with ID:', id);
+    
+    let artifact = await ArtifactModel.findOne({ id });
+    
+    // Если не найден по id, попробуем найти по _id
+    if (!artifact) {
+      console.log('Artifact not found by id, trying _id');
+      artifact = await ArtifactModel.findById(id);
+    }
     
     if (!artifact) {
+      console.log('Artifact not found for ID:', id);
       return NextResponse.json(
         { error: 'Artifact not found' },
         { status: 404 }
       );
     }
+    
+    console.log('Found artifact:', artifact);
     
     // Убеждаемся, что id поле присутствует
     const artifactData = {
@@ -33,6 +44,8 @@ export async function GET(
       pieces: artifact.pieces,
       image: artifact.image
     };
+    
+    console.log('Returning artifact data:', artifactData);
     
     return NextResponse.json(artifactData);
   } catch (error) {

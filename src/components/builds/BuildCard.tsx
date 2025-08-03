@@ -66,31 +66,48 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
   }, [build.weapons]);
 
   const handleItemClick = async (type: string, id: string) => {
+    console.log('BuildCard handleItemClick called with:', { type, id });
     try {
       if (type === 'weapon') {
+        console.log('BuildCard fetching weapon:', id);
         const response = await fetch(`/api/weapons/${id}`);
         if (response.ok) {
           const weapon = await response.json();
+          console.log('BuildCard weapon data received:', weapon);
           setSelectedWeapon(weapon);
           setIsWeaponModalOpen(true);
+        } else {
+          console.error('BuildCard failed to fetch weapon:', response.status, response.statusText);
         }
       } else if (type === 'artifact') {
+        console.log('BuildCard fetching artifact:', id);
         const response = await fetch(`/api/artifacts/${id}`);
         if (response.ok) {
           const artifact = await response.json();
+          console.log('BuildCard artifact data received:', artifact);
           setSelectedArtifact(artifact);
           setIsArtifactModalOpen(true);
+        } else {
+          console.error('BuildCard failed to fetch artifact:', response.status, response.statusText);
         }
       } else if (type === 'talent') {
+        console.log('BuildCard fetching talent:', id);
         const response = await fetch(`/api/talents/${id}`);
         if (response.ok) {
           const talent = await response.json();
+          console.log('BuildCard talent data received:', talent);
           setSelectedTalent(talent);
           setIsTalentModalOpen(true);
+        } else {
+          console.error('BuildCard failed to fetch talent:', response.status, response.statusText);
         }
+      } else if (type === 'character') {
+        console.log('BuildCard redirecting to character:', id);
+        // Для персонажей перенаправляем на страницу персонажа
+        window.location.href = `/characters/${id}`;
       }
     } catch (error) {
-      console.error('Error fetching item data:', error);
+      console.error('BuildCard error fetching item data:', error);
     }
   };
 

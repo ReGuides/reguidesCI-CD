@@ -14,6 +14,8 @@ interface ArtifactModalProps {
 export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps) {
   if (!isOpen || !artifact) return null;
 
+  console.log('ArtifactModal received artifact:', artifact);
+
   const getRarityStars = (rarity: number) => {
     return Array.from({ length: rarity }, (_, i) => (
       <span key={i} className="text-yellow-400">★</span>

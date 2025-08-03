@@ -14,6 +14,8 @@ interface WeaponModalProps {
 export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
   if (!isOpen || !weapon) return null;
 
+  console.log('WeaponModal received weapon:', weapon);
+
   const getRarityStars = (rarity: number) => {
     return Array.from({ length: rarity }, (_, i) => (
       <span key={i} className="text-yellow-400">★</span>
