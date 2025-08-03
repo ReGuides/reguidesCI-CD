@@ -4,7 +4,6 @@ import { Weapon } from '@/types';
 import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import Image from 'next/image';
 import { X } from 'lucide-react';
-import { useEffect } from 'react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
 interface WeaponModalProps {
