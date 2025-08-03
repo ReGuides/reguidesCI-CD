@@ -30,6 +30,33 @@ export async function GET(
     }
     
     console.log('Found weapon:', weapon);
+    console.log('Weapon fields from DB:', {
+      id: weapon.id,
+      _id: weapon._id,
+      name: weapon.name,
+      type: weapon.type,
+      rarity: weapon.rarity,
+      baseAttack: weapon.baseAttack,
+      subStatName: weapon.subStatName,
+      subStatValue: weapon.subStatValue,
+      passiveName: weapon.passiveName,
+      passiveEffect: weapon.passiveEffect,
+      image: weapon.image
+    });
+    
+    // Проверяем, какие поля существуют
+    console.log('Weapon hasOwnProperty checks:', {
+      hasId: weapon.hasOwnProperty('id'),
+      hasName: weapon.hasOwnProperty('name'),
+      hasType: weapon.hasOwnProperty('type'),
+      hasRarity: weapon.hasOwnProperty('rarity'),
+      hasBaseAttack: weapon.hasOwnProperty('baseAttack'),
+      hasSubStatName: weapon.hasOwnProperty('subStatName'),
+      hasSubStatValue: weapon.hasOwnProperty('subStatValue'),
+      hasPassiveName: weapon.hasOwnProperty('passiveName'),
+      hasPassiveEffect: weapon.hasOwnProperty('passiveEffect'),
+      hasImage: weapon.hasOwnProperty('image')
+    });
     
     // Убеждаемся, что id поле присутствует
     const weaponData = {
@@ -46,6 +73,18 @@ export async function GET(
     };
     
     console.log('Returning weapon data:', weaponData);
+    console.log('Weapon data fields:', {
+      id: weaponData.id,
+      name: weaponData.name,
+      type: weaponData.type,
+      rarity: weaponData.rarity,
+      baseAttack: weaponData.baseAttack,
+      subStatName: weaponData.subStatName,
+      subStatValue: weaponData.subStatValue,
+      passiveName: weaponData.passiveName,
+      passiveEffect: weaponData.passiveEffect,
+      image: weaponData.image
+    });
     
     return NextResponse.json(weaponData);
   } catch (error) {

@@ -4,6 +4,7 @@ import { Weapon } from '@/types';
 import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import Image from 'next/image';
 import { X } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface WeaponModalProps {
   weapon: Weapon | null;
@@ -14,7 +15,22 @@ interface WeaponModalProps {
 export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
   if (!isOpen || !weapon) return null;
 
+  useEffect(() => {
+    console.log('WeaponModal weapon changed:', weapon);
+  }, [weapon]);
+
   console.log('WeaponModal received weapon:', weapon);
+  console.log('Weapon fields:', {
+    name: weapon.name,
+    type: weapon.type,
+    rarity: weapon.rarity,
+    baseAttack: weapon.baseAttack,
+    subStatName: weapon.subStatName,
+    subStatValue: weapon.subStatValue,
+    passiveName: weapon.passiveName,
+    passiveEffect: weapon.passiveEffect,
+    image: weapon.image
+  });
 
   const getRarityStars = (rarity: number) => {
     return Array.from({ length: rarity }, (_, i) => (
@@ -68,15 +84,27 @@ export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between py-1 border-b border-neutral-700">
                     <span className="text-gray-400">Базовая атака</span>
-                    <span className="text-white font-medium">{weapon.baseAttack || 'Не указано'}</span>
+                    <span className="text-white font-medium">
+                      {weapon.baseAttack || 'Не указано'}
+                      {weapon.baseAttack === undefined && ' (undefined)'}
+                      {weapon.baseAttack === null && ' (null)'}
+                    </span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-neutral-700">
                     <span className="text-gray-400">Дополнительная характеристика</span>
-                    <span className="text-white font-medium">{weapon.subStatName || 'Не указано'}</span>
+                    <span className="text-white font-medium">
+                      {weapon.subStatName || 'Не указано'}
+                      {weapon.subStatName === undefined && ' (undefined)'}
+                      {weapon.subStatName === null && ' (null)'}
+                    </span>
                   </div>
                   <div className="flex justify-between py-1">
                     <span className="text-gray-400">Значение</span>
-                    <span className="text-white font-medium">{weapon.subStatValue || 'Не указано'}</span>
+                    <span className="text-white font-medium">
+                      {weapon.subStatValue || 'Не указано'}
+                      {weapon.subStatValue === undefined && ' (undefined)'}
+                      {weapon.subStatValue === null && ' (null)'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -86,12 +114,18 @@ export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
                 <div className="space-y-3 text-sm">
                   <div>
                     <span className="text-gray-400 text-xs">Название</span>
-                    <p className="text-white font-medium mt-1">{weapon.passiveName || 'Не указано'}</p>
+                    <p className="text-white font-medium mt-1">
+                      {weapon.passiveName || 'Не указано'}
+                      {weapon.passiveName === undefined && ' (undefined)'}
+                      {weapon.passiveName === null && ' (null)'}
+                    </p>
                   </div>
                   <div>
                     <span className="text-gray-400 text-xs">Эффект</span>
                     <p className="text-white mt-2 text-sm leading-relaxed bg-neutral-900 rounded p-3">
                       {weapon.passiveEffect || 'Не указано'}
+                      {weapon.passiveEffect === undefined && ' (undefined)'}
+                      {weapon.passiveEffect === null && ' (null)'}
                     </p>
                   </div>
                 </div>

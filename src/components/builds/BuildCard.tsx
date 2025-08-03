@@ -85,6 +85,15 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
         if (response.ok) {
           const artifact = await response.json();
           console.log('BuildCard artifact data received:', artifact);
+          console.log('BuildCard artifact fields check:', {
+            name: artifact.name,
+            rarity: artifact.rarity,
+            bonus1: artifact.bonus1,
+            bonus2: artifact.bonus2,
+            bonus4: artifact.bonus4,
+            pieces: artifact.pieces,
+            image: artifact.image
+          });
           setSelectedArtifact(artifact);
           setIsArtifactModalOpen(true);
         } else {

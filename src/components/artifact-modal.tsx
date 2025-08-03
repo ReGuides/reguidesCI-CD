@@ -4,6 +4,7 @@ import { Artifact } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import Image from 'next/image';
 import { X } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface ArtifactModalProps {
   artifact: Artifact | null;
@@ -14,7 +15,20 @@ interface ArtifactModalProps {
 export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps) {
   if (!isOpen || !artifact) return null;
 
+  useEffect(() => {
+    console.log('ArtifactModal artifact changed:', artifact);
+  }, [artifact]);
+
   console.log('ArtifactModal received artifact:', artifact);
+  console.log('Artifact fields:', {
+    name: artifact.name,
+    rarity: artifact.rarity,
+    bonus1: artifact.bonus1,
+    bonus2: artifact.bonus2,
+    bonus4: artifact.bonus4,
+    pieces: artifact.pieces,
+    image: artifact.image
+  });
 
   const getRarityStars = (rarity: number) => {
     return Array.from({ length: rarity }, (_, i) => (
@@ -76,6 +90,8 @@ export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps)
                       <div className="text-green-300 text-xs mb-2">1 предмет</div>
                       <p className="text-white leading-relaxed">
                         {artifact.bonus1}
+                        {artifact.bonus1 === undefined && ' (undefined)'}
+                        {artifact.bonus1 === null && ' (null)'}
                       </p>
                     </div>
                   )}
@@ -84,6 +100,8 @@ export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps)
                       <div className="text-blue-300 text-xs mb-2">2 предмета</div>
                       <p className="text-white leading-relaxed">
                         {artifact.bonus2}
+                        {artifact.bonus2 === undefined && ' (undefined)'}
+                        {artifact.bonus2 === null && ' (null)'}
                       </p>
                     </div>
                   )}
@@ -92,6 +110,8 @@ export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps)
                       <div className="text-purple-300 text-xs mb-2">4 предмета</div>
                       <p className="text-white leading-relaxed">
                         {artifact.bonus4}
+                        {artifact.bonus4 === undefined && ' (undefined)'}
+                        {artifact.bonus4 === null && ' (null)'}
                       </p>
                     </div>
                   )}
@@ -100,6 +120,9 @@ export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps)
                       <div className="text-gray-400 text-xs mb-2">Информация о бонусах</div>
                       <p className="text-gray-300 leading-relaxed">
                         Бонусы сета не указаны
+                        {artifact.bonus1 === undefined && ' (bonus1: undefined)'}
+                        {artifact.bonus2 === undefined && ' (bonus2: undefined)'}
+                        {artifact.bonus4 === undefined && ' (bonus4: undefined)'}
                       </p>
                     </div>
                   )}

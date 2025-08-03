@@ -115,6 +115,15 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
         if (response.ok) {
           const artifact = await response.json();
           console.log('Artifact data received:', artifact);
+          console.log('Artifact fields check:', {
+            name: artifact.name,
+            rarity: artifact.rarity,
+            bonus1: artifact.bonus1,
+            bonus2: artifact.bonus2,
+            bonus4: artifact.bonus4,
+            pieces: artifact.pieces,
+            image: artifact.image
+          });
           setSelectedArtifact(artifact);
           setIsArtifactModalOpen(true);
         } else {

@@ -30,6 +30,29 @@ export async function GET(
     }
     
     console.log('Found artifact:', artifact);
+    console.log('Artifact fields from DB:', {
+      id: artifact.id,
+      _id: artifact._id,
+      name: artifact.name,
+      rarity: artifact.rarity,
+      bonus1: artifact.bonus1,
+      bonus2: artifact.bonus2,
+      bonus4: artifact.bonus4,
+      pieces: artifact.pieces,
+      image: artifact.image
+    });
+    
+    // Проверяем, какие поля существуют
+    console.log('Artifact hasOwnProperty checks:', {
+      hasId: artifact.hasOwnProperty('id'),
+      hasName: artifact.hasOwnProperty('name'),
+      hasRarity: artifact.hasOwnProperty('rarity'),
+      hasBonus1: artifact.hasOwnProperty('bonus1'),
+      hasBonus2: artifact.hasOwnProperty('bonus2'),
+      hasBonus4: artifact.hasOwnProperty('bonus4'),
+      hasPieces: artifact.hasOwnProperty('pieces'),
+      hasImage: artifact.hasOwnProperty('image')
+    });
     
     // Убеждаемся, что id поле присутствует
     const artifactData = {
@@ -46,6 +69,16 @@ export async function GET(
     };
     
     console.log('Returning artifact data:', artifactData);
+    console.log('Artifact data fields:', {
+      id: artifactData.id,
+      name: artifactData.name,
+      rarity: artifactData.rarity,
+      bonus1: artifactData.bonus1,
+      bonus2: artifactData.bonus2,
+      bonus4: artifactData.bonus4,
+      pieces: artifactData.pieces,
+      image: artifactData.image
+    });
     
     return NextResponse.json(artifactData);
   } catch (error) {
