@@ -1,216 +1,166 @@
 'use client';
 
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import rehypeSanitize from 'rehype-sanitize';
-import ImageCarousel from './image-carousel';
-import Image from 'next/image';
+import React from 'react';
+
+// Поддерживаемые цвета (как в старой версии)
+const COLORS: Record<string, string> = {
+  red: 'text-red-400',
+  blue: 'text-blue-400',
+  green: 'text-green-400',
+  yellow: 'text-yellow-400',
+  pyro: 'text-red-500',
+  hydro: 'text-cyan-400',
+  electro: 'text-purple-400',
+  cryo: 'text-sky-300',
+  anemo: 'text-emerald-400',
+  geo: 'text-amber-400',
+  dendro: 'text-lime-400',
+  orange: 'text-orange-400',
+  purple: 'text-purple-400',
+  cyan: 'text-cyan-400',
+  pink: 'text-pink-400',
+  // Алиасы
+  голубой: 'text-cyan-400',
+  синий: 'text-blue-400',
+  зелёный: 'text-green-400',
+  жёлтый: 'text-yellow-400',
+  оранжевый: 'text-orange-400',
+  фиолетовый: 'text-purple-400',
+  лаймовый: 'text-lime-400',
+};
 
 interface MarkdownRendererProps {
   content: string;
   className?: string;
+  onItemClick?: (type: string, id: string, name: string) => void;
 }
 
-export default function MarkdownRenderer({ content, className = '' }: MarkdownRendererProps) {
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '', onItemClick }) => {
+  // Главная функция для рендера разметки (как в старой версии)
+  const renderRichText = (text: string): React.ReactNode => {
+    if (!text) return null;
+
+    // Парсим строки по \n для поддержки переносов
+    const lines = text.split(/\n/);
+    return lines.map((line, i) => (
+      <React.Fragment key={i}>
+        {parseLine(line)}
+        {i < lines.length - 1 && <br />}
+      </React.Fragment>
+    ));
+  };
+
+  // Парсинг строки (как в старой версии)
+  const parseLine = (line: string): React.ReactNode => {
+    // Сначала ссылки и спец-ссылки: [текст](url)
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let lastIndex = 0;
+    const result: React.ReactNode[] = [];
+    let match: RegExpExecArray | null;
+    
+    while ((match = linkRegex.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        result.push(parseColorsAndBold(line.slice(lastIndex, match.index)));
+      }
+      const [full, text, href] = match;
+      
+      if (/^(weapon|artifact|character|talent|constellation):/.test(href)) {
+        // Спец-ссылка
+        const [type, id] = href.split(':');
+        result.push(
+          <button
+            key={href + match.index}
+            className="underline text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
+            onClick={() => onItemClick?.(type, id, text)}
+          >
+            {text}
+          </button>
+        );
+      } else {
+        // Обычная ссылка
+        result.push(
+          <a
+            key={href + match.index}
+            href={href}
+            className="underline text-blue-400 hover:text-blue-300"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {text}
+          </a>
+        );
+      }
+      lastIndex = match.index + full.length;
+    }
+    
+    if (lastIndex < line.length) {
+      result.push(parseColorsAndBold(line.slice(lastIndex)));
+    }
+    return result;
+  };
+
+  // Парсинг цветов и жирного текста (как в старой версии)
+  const parseColorsAndBold = (text: string): React.ReactNode => {
+    // Цвет: [color:текст]
+    const colorRegex = /\[([a-z]+):([^\]]+)\]/gi;
+    let lastIndex = 0;
+    const result: React.ReactNode[] = [];
+    let match: RegExpExecArray | null;
+    
+    while ((match = colorRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        result.push(parseBold(text.slice(lastIndex, match.index)));
+      }
+      const [full, color, inner] = match;
+      const colorClass = COLORS[color.toLowerCase()] || '';
+      result.push(
+        <span key={color + match.index} className={colorClass}>
+          {parseBold(inner)}
+        </span>
+      );
+      lastIndex = match.index + full.length;
+    }
+    
+    if (lastIndex < text.length) {
+      result.push(parseBold(text.slice(lastIndex)));
+    }
+    return result;
+  };
+
+  // Парсинг жирного текста (как в старой версии)
+  const parseBold = (text: string): React.ReactNode => {
+    // Жирный: **текст** или __текст__
+    const boldRegex = /\*\*([^*]+)\*\*|__([^_]+)__/g;
+    let lastIndex = 0;
+    const result: React.ReactNode[] = [];
+    let match: RegExpExecArray | null;
+    
+    while ((match = boldRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        result.push(text.slice(lastIndex, match.index));
+      }
+      const boldText = match[1] || match[2];
+      result.push(
+        <strong key={match.index} className="font-bold text-white">
+          {boldText}
+        </strong>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+    
+    if (lastIndex < text.length) {
+      result.push(text.slice(lastIndex));
+    }
+    return result;
+  };
+
   return (
     <div className={`prose prose-invert max-w-none ${className}`}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeSanitize]}
-        components={{
-          // Кастомные стили для заголовков
-          h1: ({ children }) => (
-            <h1 className="text-3xl font-bold text-white mb-6 mt-8 border-b border-neutral-700 pb-2">
-              {children}
-            </h1>
-          ),
-          h2: ({ children }) => (
-            <h2 className="text-2xl font-bold text-white mb-4 mt-6">
-              {children}
-            </h2>
-          ),
-          h3: ({ children }) => (
-            <h3 className="text-xl font-bold text-white mb-3 mt-5">
-              {children}
-            </h3>
-          ),
-          h4: ({ children }) => (
-            <h4 className="text-lg font-bold text-white mb-2 mt-4">
-              {children}
-            </h4>
-          ),
-          // Кастомные стили для параграфов
-          p: ({ children }) => (
-            <p className="text-neutral-300 mb-4 leading-relaxed">
-              {children}
-            </p>
-          ),
-          // Кастомные стили для списков
-          ul: ({ children }) => (
-            <ul className="list-disc list-inside text-neutral-300 mb-4 space-y-2">
-              {children}
-            </ul>
-          ),
-          ol: ({ children }) => (
-            <ol className="list-decimal list-inside text-neutral-300 mb-4 space-y-2">
-              {children}
-            </ol>
-          ),
-          li: ({ children }) => (
-            <li className="text-neutral-300">
-              {children}
-            </li>
-          ),
-          // Кастомные стили для ссылок
-          a: ({ href, children }) => (
-            <a 
-              href={href} 
-              className="text-accent hover:text-accent/80 underline transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {children}
-            </a>
-          ),
-          // Кастомные стили для блоков кода
-          code: ({ children, className }) => {
-            const isInline = !className;
-            if (isInline) {
-              return (
-                <code className="bg-neutral-800 text-accent px-1 py-0.5 rounded text-sm">
-                  {children}
-                </code>
-              );
-            }
-            return (
-              <code className="block bg-neutral-800 text-neutral-300 p-4 rounded-lg overflow-x-auto text-sm">
-                {children}
-              </code>
-            );
-          },
-          pre: ({ children }) => (
-            <pre className="bg-neutral-800 text-neutral-300 p-4 rounded-lg overflow-x-auto mb-4">
-              {children}
-            </pre>
-          ),
-          // Кастомные стили для цитат
-          blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-accent pl-4 italic text-neutral-400 mb-4">
-              {children}
-            </blockquote>
-          ),
-          // Кастомные стили для таблиц
-          table: ({ children }) => (
-            <div className="overflow-x-auto mb-4">
-              <table className="min-w-full border-collapse border border-neutral-700">
-                {children}
-              </table>
-            </div>
-          ),
-          thead: ({ children }) => (
-            <thead className="bg-neutral-800">
-              {children}
-            </thead>
-          ),
-          tbody: ({ children }) => (
-            <tbody className="bg-neutral-900">
-              {children}
-            </tbody>
-          ),
-          tr: ({ children }) => (
-            <tr className="border-b border-neutral-700">
-              {children}
-            </tr>
-          ),
-          th: ({ children }) => (
-            <th className="border border-neutral-700 px-4 py-2 text-left text-white font-semibold">
-              {children}
-            </th>
-          ),
-          td: ({ children }) => (
-            <td className="border border-neutral-700 px-4 py-2 text-neutral-300">
-              {children}
-            </td>
-          ),
-          // Кастомные стили для изображений
-          img: ({ src, alt }) => {
-            // Если src начинается с http://localhost:3000, обрезаем до относительного
-            let safeSrc = src || '';
-            if (safeSrc.startsWith('http://localhost:3000')) {
-              safeSrc = safeSrc.replace('http://localhost:3000', '');
-            }
-            // Если src не начинается с /, добавить /images/articles/
-            if (safeSrc && !safeSrc.startsWith('/')) {
-              safeSrc = `/images/articles/${safeSrc}`;
-            }
-            return (
-              <Image 
-                src={safeSrc}
-                alt={alt || ''}
-                width={800}
-                height={600}
-                className="max-w-full h-auto rounded-lg my-4"
-                onError={(e) => {
-                  e.currentTarget.src = '/images/placeholder.png';
-                }}
-              />
-            );
-          },
-          // Кастомные компоненты для div элементов
-          div: ({ className, children, ...props }) => {
-            // Обработка контейнеров изображений с обтеканием
-            if (className?.includes('image-container')) {
-              const isFloatLeft = className.includes('float-left');
-              const isFloatRight = className.includes('float-right');
-              const isCenter = className.includes('mx-auto');
-              
-              let floatClass = '';
-              if (isFloatLeft) floatClass = 'float-left mr-4 mb-4';
-              else if (isFloatRight) floatClass = 'float-right ml-4 mb-4';
-              else if (isCenter) floatClass = 'mx-auto mb-4';
-              
-              return (
-                <div className={`${floatClass} ${className}`} {...props}>
-                  {children}
-                </div>
-              );
-            }
-
-            // Обработка карусели изображений
-            if (className?.includes('carousel-placeholder')) {
-              try {
-                const imagesData = (props as Record<string, unknown>)['data-images'];
-                if (imagesData) {
-                  const images = JSON.parse(imagesData as string);
-                  return <ImageCarousel images={images} className="my-6" />;
-                }
-              } catch (error) {
-                console.error('Error parsing carousel data:', error);
-              }
-            }
-
-            return <div className={className} {...props}>{children}</div>;
-          },
-          // Кастомные стили для горизонтальной линии
-          hr: () => (
-            <hr className="border-neutral-700 my-8" />
-          ),
-          // Кастомные стили для выделения
-          strong: ({ children }) => (
-            <strong className="font-bold text-white">
-              {children}
-            </strong>
-          ),
-          em: ({ children }) => (
-            <em className="italic text-neutral-200">
-              {children}
-            </em>
-          ),
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+      <div className="text-gray-300 leading-relaxed">
+        {renderRichText(content)}
+      </div>
     </div>
   );
-} 
+};
+
+export default MarkdownRenderer; 

@@ -10,6 +10,7 @@ import CharacterWeaponsSection from '@/components/character/CharacterWeaponsSect
 import CharacterTeamsSection from '@/components/character/CharacterTeamsSection';
 import CharacterTalentsSection from '@/components/character/CharacterTalentsSection';
 import CharacterConstellationsSection from '@/components/character/CharacterConstellationsSection';
+import BuildsSection from '@/components/builds/BuildsSection';
 import { Zap, Users, Sword, Star, BookOpen } from 'lucide-react';
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations';
@@ -313,11 +314,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
                   <p className="text-gray-300 leading-relaxed whitespace-pre-line">{character.gameplayDescription}</p>
                 </div>
               )}
-              <div className="text-center text-gray-400 py-12">
-                <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-600" />
-                <h3 className="text-lg font-semibold mb-2">Сборки пока не настроены</h3>
-                <p>Детальные сборки для этого персонажа будут добавлены позже</p>
-              </div>
+              <BuildsSection characterId={character.id} />
             </div>
           )}
 

@@ -288,4 +288,24 @@ export interface SiteSettings {
     maintenanceMode: boolean;
     registrationEnabled: boolean;
   };
+}
+
+// Build types
+export interface Build {
+  _id: string;
+  title: string;
+  description?: string;
+  characterId: string;
+  role: 'main_dps' | 'sub_dps' | 'support' | 'healer' | 'waifu' | 'pocket_dps';
+  weapons: string[];
+  artifacts: ArtifactOrCombination[];
+  mainStats: string[];
+  subStats: string[];
+  talentPriorities: string[];
+  teams: string[][];
+  filters: string[];
+  isFeatured: boolean;
+  authorLogin?: string;
+  createdAt: string;
+  updatedAt: string;
 } 
