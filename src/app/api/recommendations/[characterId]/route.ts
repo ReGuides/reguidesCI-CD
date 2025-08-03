@@ -28,18 +28,30 @@ interface WeaponDocument {
   image: unknown;
 }
 
+interface MainStat {
+  stat: string;
+  targetValue?: string;
+  unit?: string;
+  description?: string;
+  artifactType?: 'sands' | 'goblet' | 'circlet' | 'general';
+}
 
+interface TalentPriority {
+  talentName: string;
+  priority: number;
+  description?: string;
+}
 
 interface CharacterStatsDocument {
   characterId: string;
+  mainStats?: MainStat[];
   mainStatSands?: string[];
   mainStatGoblet?: string[];
   mainStatCirclet?: string[];
   subStats?: string[];
+  talentPriorities?: TalentPriority[];
   notes?: string;
 }
-
-
 
 export async function GET(
   request: NextRequest,
@@ -86,80 +98,96 @@ export async function GET(
         artifacts: [],
         mainStats: undefined,
         subStats: [],
+        talentPriorities: [],
         notes: undefined
       });
     }
 
-         // Получаем полные данные оружий
-     const weaponsWithFullData = recommendation ? (recommendation.weapons || []).map((weapon: unknown) => {
-       // Если оружие уже является объектом с полными данными
-       if (typeof weapon === 'object' && weapon !== null && 'name' in weapon) {
-         const weaponObj = weapon as WeaponDocument;
-         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-         const { _id, __v, createdAt, updatedAt, ...cleanWeapon } = weaponObj;
-         
-         // Убеждаемся, что все поля являются примитивами
-         return {
-           ...cleanWeapon,
-           id: typeof cleanWeapon.id === 'object' ? cleanWeapon.id?.toString() || '' : (cleanWeapon.id?.toString() || ''),
-           name: cleanWeapon.name?.toString() || '',
-           type: cleanWeapon.type?.toString() || '',
-           rarity: Number(cleanWeapon.rarity) || 1,
-           baseAttack: cleanWeapon.baseAttack?.toString() || '',
-           subStatName: cleanWeapon.subStatName?.toString() || '',
-           subStatValue: cleanWeapon.subStatValue?.toString() || '',
-           passiveName: cleanWeapon.passiveName?.toString() || '',
-           passiveEffect: cleanWeapon.passiveEffect?.toString() || '',
-           image: cleanWeapon.image?.toString() || ''
-         };
-       }
-       
-       // Если оружие является строкой (ID), ищем в базе данных
-       if (typeof weapon === 'string') {
-         // Здесь можно добавить поиск по базе данных, если нужно
-         return { id: weapon, name: weapon } as Weapon;
-       }
-       
-       return { id: 'unknown', name: 'Неизвестное оружие' } as Weapon;
-     }) : [];
+    // Получаем полные данные оружий
+    const weaponsWithFullData = recommendation ? (recommendation.weapons || []).map((weapon: unknown) => {
+      // Если оружие уже является объектом с полными данными
+      if (typeof weapon === 'object' && weapon !== null && 'name' in weapon) {
+        const weaponObj = weapon as WeaponDocument;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _id, __v, createdAt, updatedAt, ...cleanWeapon } = weaponObj;
+        
+        // Убеждаемся, что все поля являются примитивами
+        return {
+          ...cleanWeapon,
+          id: typeof cleanWeapon.id === 'object' ? cleanWeapon.id?.toString() || '' : (cleanWeapon.id?.toString() || ''),
+          name: cleanWeapon.name?.toString() || '',
+          type: cleanWeapon.type?.toString() || '',
+          rarity: Number(cleanWeapon.rarity) || 1,
+          baseAttack: cleanWeapon.baseAttack?.toString() || '',
+          subStatName: cleanWeapon.subStatName?.toString() || '',
+          subStatValue: cleanWeapon.subStatValue?.toString() || '',
+          passiveName: cleanWeapon.passiveName?.toString() || '',
+          passiveEffect: cleanWeapon.passiveEffect?.toString() || '',
+          image: cleanWeapon.image?.toString() || ''
+        };
+      }
+      
+      // Если оружие является строкой (ID), ищем в базе данных
+      if (typeof weapon === 'string') {
+        // Здесь можно добавить поиск по базе данных, если нужно
+        return { id: weapon, name: weapon } as Weapon;
+      }
+      
+      return { id: 'unknown', name: 'Неизвестное оружие' } as Weapon;
+    }) : [];
 
-              // Получаем полные данные артефактов
-     const artifactsWithFullData = recommendation ? (recommendation.artifacts || []).map((artifact: unknown) => {
-       if (typeof artifact === 'string') {
-         // Если это ID артефакта - пока возвращаем базовый объект
-         return { id: artifact, name: artifact } as Artifact;
-               } else if (typeof artifact === 'object' && artifact !== null) {
-          const artifactObj = artifact as Record<string, unknown>;
-          // Обрабатываем как объект с полными данными
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { _id, __v, createdAt, updatedAt, ...cleanArtifact } = artifactObj;
-         return {
-           ...cleanArtifact,
-           id: typeof cleanArtifact.id === 'object' ? cleanArtifact.id?.toString() || '' : (cleanArtifact.id?.toString() || ''),
-           name: cleanArtifact.name?.toString() || '',
-           type: cleanArtifact.type?.toString() || '',
-           rarity: Array.isArray(cleanArtifact.rarity) && cleanArtifact.rarity.length > 0
-             ? cleanArtifact.rarity.map((r: unknown) => Number(r))
-             : [5],
-           description: cleanArtifact.description?.toString() || '',
-           image: cleanArtifact.image?.toString() || ''
-         };
-       }
-       return artifact;
-     }) : [];
+    // Получаем полные данные артефактов
+    const artifactsWithFullData = recommendation ? (recommendation.artifacts || []).map((artifact: unknown) => {
+      if (typeof artifact === 'string') {
+        // Если это ID артефакта - пока возвращаем базовый объект
+        return { id: artifact, name: artifact } as Artifact;
+      } else if (typeof artifact === 'object' && artifact !== null) {
+        const artifactObj = artifact as Record<string, unknown>;
+        // Обрабатываем как объект с полными данными
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _id, __v, createdAt, updatedAt, ...cleanArtifact } = artifactObj;
+        return {
+          ...cleanArtifact,
+          id: typeof cleanArtifact.id === 'object' ? cleanArtifact.id?.toString() || '' : (cleanArtifact.id?.toString() || ''),
+          name: cleanArtifact.name?.toString() || '',
+          type: cleanArtifact.type?.toString() || '',
+          rarity: Array.isArray(cleanArtifact.rarity) && cleanArtifact.rarity.length > 0
+            ? cleanArtifact.rarity.map((r: unknown) => Number(r))
+            : [5],
+          description: cleanArtifact.description?.toString() || '',
+          image: cleanArtifact.image?.toString() || ''
+        };
+      }
+      return artifact;
+    }) : [];
 
-         // Создаем объект рекомендации с полными данными
-     const recommendationWithFullData = {
+    // Обрабатываем статы из characterstats
+    let processedMainStats;
+    if (characterStats?.mainStats && characterStats.mainStats.length > 0) {
+      // Если есть детальные mainStats, используем их
+      processedMainStats = {
+        detailedStats: characterStats.mainStats,
+        sands: characterStats.mainStatSands || [],
+        goblet: characterStats.mainStatGoblet || [],
+        circlet: characterStats.mainStatCirclet || []
+      };
+    } else if (characterStats?.mainStatSands || characterStats?.mainStatGoblet || characterStats?.mainStatCirclet) {
+      // Если есть только базовые статы артефактов
+      processedMainStats = {
+        sands: characterStats.mainStatSands || [],
+        goblet: characterStats.mainStatGoblet || [],
+        circlet: characterStats.mainStatCirclet || []
+      };
+    }
+
+    // Создаем объект рекомендации с полными данными
+    const recommendationWithFullData = {
       characterId: character.id,
       weapons: weaponsWithFullData,
       artifacts: artifactsWithFullData,
-      // Добавляем статы из characterstats
-      mainStats: characterStats ? {
-        sands: characterStats.mainStatSands?.[0] || '',
-        goblet: characterStats.mainStatGoblet?.[0] || '',
-        circlet: characterStats.mainStatCirclet?.[0] || ''
-      } : undefined,
+      mainStats: processedMainStats,
       subStats: characterStats?.subStats || [],
+      talentPriorities: characterStats?.talentPriorities || [],
       notes: characterStats?.notes || recommendation?.notes
     };
 

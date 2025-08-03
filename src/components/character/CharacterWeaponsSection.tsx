@@ -4,21 +4,37 @@ import React, { useState, useEffect } from 'react';
 import { Weapon, ArtifactOrCombination } from '@/types';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
-import { Zap, Shield, Heart } from 'lucide-react';
+import { Zap, Shield, Heart, Target, Info } from 'lucide-react';
 
 interface CharacterWeaponsSectionProps {
   characterId: string;
 }
 
+interface MainStat {
+  stat: string;
+  targetValue?: string;
+  unit?: string;
+  description?: string;
+  artifactType?: 'sands' | 'goblet' | 'circlet' | 'general';
+}
+
+interface TalentPriority {
+  talentName: string;
+  priority: number;
+  description?: string;
+}
+
 interface Recommendation {
   weapons: Weapon[];
-  artifacts: ArtifactOrCombination[]; // Используем правильный тип для артефактов
+  artifacts: ArtifactOrCombination[];
   mainStats?: {
-    sands: string;
-    goblet: string;
-    circlet: string;
+    detailedStats?: MainStat[];
+    sands?: string[];
+    goblet?: string[];
+    circlet?: string[];
   };
   subStats?: string[];
+  talentPriorities?: TalentPriority[];
   notes?: string;
 }
 
@@ -41,6 +57,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
             artifacts: [],
             mainStats: undefined,
             subStats: [],
+            talentPriorities: [],
             notes: undefined
           } as Recommendation);
         }
@@ -51,6 +68,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
           artifacts: [],
           mainStats: undefined,
           subStats: [],
+          talentPriorities: [],
           notes: undefined
         } as Recommendation);
       } finally {
@@ -60,6 +78,35 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
 
     fetchRecommendation();
   }, [characterId]);
+
+  const formatStatValue = (stat: MainStat) => {
+    if (!stat.targetValue) return 'Не указано';
+    
+    const value = stat.targetValue;
+    const unit = stat.unit || '';
+    
+    if (unit === '%') {
+      return `${value}%`;
+    } else if (unit === 'EM') {
+      return `${value} EM`;
+    } else if (unit) {
+      return `${value} ${unit}`;
+    } else {
+      return value;
+    }
+  };
+
+  const getStatIcon = (stat: string) => {
+    const statLower = stat.toLowerCase();
+    if (statLower.includes('хп') || statLower.includes('hp')) return '❤️';
+    if (statLower.includes('атака') || statLower.includes('attack')) return '⚔️';
+    if (statLower.includes('защита') || statLower.includes('defense')) return '🛡️';
+    if (statLower.includes('крит') || statLower.includes('crit')) return '🎯';
+    if (statLower.includes('энергия') || statLower.includes('energy')) return '⚡';
+    if (statLower.includes('мастерство') || statLower.includes('elemental')) return '🌟';
+    if (statLower.includes('лечение') || statLower.includes('healing')) return '💚';
+    return '📊';
+  };
 
   if (loading) {
     return (
@@ -138,23 +185,23 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
             </h2>
             {recommendation.weapons.length > 0 ? (
               <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 px-2">
-                                 {recommendation.weapons.map((weapon, idx) => {
-                   if (!weapon || typeof weapon !== 'object' || !('name' in weapon) || !('id' in weapon)) {
-                     return (
-                       <div key={idx} className="text-red-400">Ошибка данных оружия</div>
-                     );
-                   }
-                                     // Убеждаемся, что у нас есть уникальный строковый ключ
-                   let weaponKey;
-                   if (typeof weapon.id === 'object' && weapon.id !== null) {
-                     // Если id является объектом MongoDB, используем индекс
-                     weaponKey = `weapon-obj-${idx}`;
-                   } else {
-                     // Если id является примитивом, используем его строковое представление
-                     weaponKey = `weapon-${weapon.id?.toString() || idx}`;
-                   }
-                   return (
-                     <div key={weaponKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
+                {recommendation.weapons.map((weapon, idx) => {
+                  if (!weapon || typeof weapon !== 'object' || !('name' in weapon) || !('id' in weapon)) {
+                    return (
+                      <div key={idx} className="text-red-400">Ошибка данных оружия</div>
+                    );
+                  }
+                  // Убеждаемся, что у нас есть уникальный строковый ключ
+                  let weaponKey;
+                  if (typeof weapon.id === 'object' && weapon.id !== null) {
+                    // Если id является объектом MongoDB, используем индекс
+                    weaponKey = `weapon-obj-${idx}`;
+                  } else {
+                    // Если id является примитивом, используем его строковое представление
+                    weaponKey = `weapon-${weapon.id?.toString() || idx}`;
+                  }
+                  return (
+                    <div key={weaponKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                       <OptimizedImage
                         src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
                         alt={weapon.name?.toString() || 'Оружие'}
@@ -203,24 +250,24 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                               name: set.name?.toString() || '',
                               image: set.image?.toString() || ''
                             };
-                                                         // Убеждаемся, что у нас есть уникальный строковый ключ
-                             let setKey;
-                             if (typeof cleanSet.id === 'object' && cleanSet.id !== null) {
-                               // Если id является объектом MongoDB, используем индекс
-                               setKey = `set-obj-${setIndex}`;
-                             } else {
-                               // Если id является примитивом, используем его строковое представление
-                               setKey = `set-${cleanSet.id}-${setIndex}`;
-                             }
-                             return (
-                               <OptimizedImage
-                                 key={setKey}
-                                 src={getImageWithFallback(cleanSet.image, cleanSet.name, 'artifact')}
-                                 alt={cleanSet.name}
-                                 className="w-full h-full rounded"
-                                 type="artifact"
-                               />
-                             );
+                            // Убеждаемся, что у нас есть уникальный строковый ключ
+                            let setKey;
+                            if (typeof cleanSet.id === 'object' && cleanSet.id !== null) {
+                              // Если id является объектом MongoDB, используем индекс
+                              setKey = `set-obj-${setIndex}`;
+                            } else {
+                              // Если id является примитивом, используем его строковое представление
+                              setKey = `set-${cleanSet.id}-${setIndex}`;
+                            }
+                            return (
+                              <OptimizedImage
+                                key={setKey}
+                                src={getImageWithFallback(cleanSet.image, cleanSet.name, 'artifact')}
+                                alt={cleanSet.name}
+                                className="w-full h-full rounded"
+                                type="artifact"
+                              />
+                            );
                           })}
                         </div>
                         <div className="text-center w-full">
@@ -233,17 +280,17 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     );
                   } else if (artifact.setType === 'single') {
                     // Одиночный сет
-                                         // Убеждаемся, что у нас есть уникальный строковый ключ
-                     let artifactKey;
-                     if (typeof artifact.id === 'object' && artifact.id !== null) {
-                       // Если id является объектом MongoDB, используем индекс
-                       artifactKey = `single-obj-${index}`;
-                     } else {
-                       // Если id является примитивом, используем его строковое представление
-                       artifactKey = `single-${artifact.id?.toString() || artifact.name?.toString() || index}`;
-                     }
-                     return (
-                       <div key={artifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
+                    // Убеждаемся, что у нас есть уникальный строковый ключ
+                    let artifactKey;
+                    if (typeof artifact.id === 'object' && artifact.id !== null) {
+                      // Если id является объектом MongoDB, используем индекс
+                      artifactKey = `single-obj-${index}`;
+                    } else {
+                      // Если id является примитивом, используем его строковое представление
+                      artifactKey = `single-${artifact.id?.toString() || artifact.name?.toString() || index}`;
+                    }
+                    return (
+                      <div key={artifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                         <OptimizedImage
                           src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
                           alt={artifact.name?.toString() || 'Артефакт'}
@@ -259,17 +306,17 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     );
                   } else if ('id' in artifact && 'name' in artifact && !artifact.setType) {
                     // Обычный артефакт (для обратной совместимости) - без setType
-                                         // Убеждаемся, что у нас есть уникальный строковый ключ
-                     let regularArtifactKey;
-                     if (typeof artifact.id === 'object' && artifact.id !== null) {
-                       // Если id является объектом MongoDB, используем индекс
-                       regularArtifactKey = `regular-obj-${index}`;
-                     } else {
-                       // Если id является примитивом, используем его строковое представление
-                       regularArtifactKey = `regular-${artifact.id?.toString() || artifact.name?.toString() || index}`;
-                     }
-                     return (
-                       <div key={regularArtifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
+                    // Убеждаемся, что у нас есть уникальный строковый ключ
+                    let regularArtifactKey;
+                    if (typeof artifact.id === 'object' && artifact.id !== null) {
+                      // Если id является объектом MongoDB, используем индекс
+                      regularArtifactKey = `regular-obj-${index}`;
+                    } else {
+                      // Если id является примитивом, используем его строковое представление
+                      regularArtifactKey = `regular-${artifact.id?.toString() || artifact.name?.toString() || index}`;
+                    }
+                    return (
+                      <div key={regularArtifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
                         <OptimizedImage
                           src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
                           alt={artifact.name?.toString() || 'Артефакт'}
@@ -309,50 +356,124 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
         {/* Правая колонка: Статы */}
         <div>
           <div className="bg-card border border-neutral-700 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4 text-white">Рекомендуемые статы</h3>
-            {recommendation.mainStats || recommendation.subStats ? (
-              <div className="space-y-4">
-                {recommendation.mainStats && (
-                  <div>
-                    <h5 className="text-sm font-medium text-gray-300 mb-2">Основные статы</h5>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Пески времени:</span>
-                        <span className="text-white">{recommendation.mainStats.sands || 'Не указано'}</span>
+            <h3 className="text-lg font-semibold mb-4 text-white flex items-center gap-2">
+              <Target className="w-5 h-5 text-blue-400" />
+              Рекомендуемые статы
+            </h3>
+            
+            {/* Детальные статы */}
+            {recommendation.mainStats?.detailedStats && recommendation.mainStats.detailedStats.length > 0 ? (
+              <div className="space-y-3">
+                <h5 className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                  <Heart className="w-4 h-4" />
+                  Целевые характеристики
+                </h5>
+                <div className="grid gap-2">
+                  {recommendation.mainStats.detailedStats.map((stat, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-neutral-800 rounded-lg border border-neutral-700">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{getStatIcon(stat.stat)}</span>
+                        <span className="font-medium text-white">{stat.stat}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Кубок:</span>
-                        <span className="text-white">{recommendation.mainStats.goblet || 'Не указано'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Корона:</span>
-                        <span className="text-white">{recommendation.mainStats.circlet || 'Не указано'}</span>
+                      <div className="text-right">
+                        <div className="text-white font-semibold">{formatStatValue(stat)}</div>
+                        {stat.description && (
+                          <div className="text-xs text-gray-400 mt-1 max-w-48 text-right">
+                            {stat.description}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                )}
-                {recommendation.subStats && recommendation.subStats.length > 0 && (
-                  <div>
-                    <h5 className="text-sm font-medium text-gray-300 mb-2">Дополнительные статы</h5>
-                    <div className="flex flex-wrap gap-1">
-                                             {recommendation.subStats.map((stat, statIndex) => (
-                         <span key={`stat-${statIndex}-${stat?.toString() || ''}`} className="px-2 py-1 bg-neutral-700 rounded text-xs text-white">
-                          {stat}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {recommendation.notes && (
-                  <div>
-                    <h5 className="text-sm font-medium text-gray-300 mb-2">Заметки</h5>
-                    <p className="text-sm text-gray-400 bg-neutral-800 rounded-lg p-3">
-                      {recommendation.notes}
-                    </p>
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
-            ) : (
+            ) : null}
+
+            {/* Базовые статы артефактов */}
+            {recommendation.mainStats && (recommendation.mainStats.sands?.length || recommendation.mainStats.goblet?.length || recommendation.mainStats.circlet?.length) ? (
+              <div className="space-y-3 mt-4">
+                <h5 className="text-sm font-medium text-gray-300 mb-2">Основные статы артефактов</h5>
+                <div className="space-y-2 text-sm">
+                  {recommendation.mainStats.sands && recommendation.mainStats.sands.length > 0 && (
+                    <div className="flex justify-between items-center p-2 bg-neutral-800 rounded">
+                      <span className="text-gray-400">Пески времени:</span>
+                      <span className="text-white">{recommendation.mainStats.sands.join(', ')}</span>
+                    </div>
+                  )}
+                  {recommendation.mainStats.goblet && recommendation.mainStats.goblet.length > 0 && (
+                    <div className="flex justify-between items-center p-2 bg-neutral-800 rounded">
+                      <span className="text-gray-400">Кубок:</span>
+                      <span className="text-white">{recommendation.mainStats.goblet.join(', ')}</span>
+                    </div>
+                  )}
+                  {recommendation.mainStats.circlet && recommendation.mainStats.circlet.length > 0 && (
+                    <div className="flex justify-between items-center p-2 bg-neutral-800 rounded">
+                      <span className="text-gray-400">Корона:</span>
+                      <span className="text-white">{recommendation.mainStats.circlet.join(', ')}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
+
+            {/* Дополнительные статы */}
+            {recommendation.subStats && recommendation.subStats.length > 0 && (
+              <div className="space-y-3 mt-4">
+                <h5 className="text-sm font-medium text-gray-300 mb-2">Дополнительные статы</h5>
+                <div className="flex flex-wrap gap-2">
+                  {recommendation.subStats.map((stat, statIndex) => (
+                    <span key={`stat-${statIndex}-${stat?.toString() || ''}`} className="px-3 py-1 bg-neutral-700 rounded text-xs text-white">
+                      {stat}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Приоритеты талантов */}
+            {recommendation.talentPriorities && recommendation.talentPriorities.length > 0 && (
+              <div className="space-y-3 mt-4">
+                <h5 className="text-sm font-medium text-gray-300 mb-2">Приоритеты прокачки талантов</h5>
+                <div className="space-y-2">
+                  {recommendation.talentPriorities
+                    .sort((a, b) => a.priority - b.priority)
+                    .map((talent, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-2 bg-neutral-800 rounded">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          talent.priority === 1 ? 'bg-red-500/20 text-red-400' :
+                          talent.priority === 2 ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
+                          {talent.priority}
+                        </span>
+                        <span className="text-white text-sm">{talent.talentName}</span>
+                        {talent.description && (
+                          <span className="text-gray-400 text-xs ml-auto">({talent.description})</span>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Заметки */}
+            {recommendation.notes && (
+              <div className="space-y-3 mt-4">
+                <h5 className="text-sm font-medium text-gray-300 mb-2">Заметки</h5>
+                <p className="text-sm text-gray-400 bg-neutral-800 rounded-lg p-3">
+                  {recommendation.notes}
+                </p>
+              </div>
+            )}
+
+            {/* Если нет никаких данных */}
+            {!recommendation.mainStats?.detailedStats && 
+             !recommendation.mainStats?.sands && 
+             !recommendation.mainStats?.goblet && 
+             !recommendation.mainStats?.circlet && 
+             !recommendation.subStats?.length && 
+             !recommendation.talentPriorities?.length && 
+             !recommendation.notes && (
               <div className="text-center text-gray-400 py-8">
                 <Heart className="w-12 h-12 mx-auto mb-4 text-gray-500" />
                 Статы для этого персонажа пока не настроены
