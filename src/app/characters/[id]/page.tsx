@@ -16,6 +16,7 @@ import { Zap, Users, Sword, Star, BookOpen } from 'lucide-react';
 import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
+import { Weapon, Artifact, Talent } from '@/types';
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations';
 
@@ -25,9 +26,9 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('weapons');
-  const [selectedWeapon, setSelectedWeapon] = useState<any>(null);
-  const [selectedArtifact, setSelectedArtifact] = useState<any>(null);
-  const [selectedTalent, setSelectedTalent] = useState<any>(null);
+  const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
+  const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
+  const [selectedTalent, setSelectedTalent] = useState<Talent | null>(null);
   const [isWeaponModalOpen, setIsWeaponModalOpen] = useState(false);
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);

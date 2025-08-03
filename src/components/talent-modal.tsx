@@ -2,21 +2,7 @@
 
 import React from 'react';
 import { X, Sword, Zap, Shield, Star } from 'lucide-react';
-
-interface Talent {
-  _id?: string;
-  name: string;
-  type: 'normal' | 'skill' | 'burst' | 'passive';
-  description: string;
-  cooldown?: string;
-  energyCost?: number;
-  priority?: number;
-  scaling?: {
-    [key: string]: {
-      [level: string]: string;
-    };
-  };
-}
+import { Talent } from '@/types';
 
 interface TalentModalProps {
   talent: Talent | null;

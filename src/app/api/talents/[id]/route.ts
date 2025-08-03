@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Talent } from '@/models/Talent';
 
+interface TalentItem {
+  _id?: string;
+  name: string;
+  type: string;
+  description: string;
+  cooldown?: string;
+  energyCost?: number;
+  priority?: number;
+  scaling?: Record<string, Record<string, string>>;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -21,7 +32,7 @@ export async function GET(
       
       if (talentDoc) {
         // Находим конкретный талант в массиве
-        const talent = talentDoc.talents.find((t: any) => t.type === id);
+        const talent = talentDoc.talents.find((t: TalentItem) => t.type === id);
         if (talent) {
           return NextResponse.json(talent);
         }
@@ -34,7 +45,7 @@ export async function GET(
     }
 
     // Если найден документ по characterId, ищем талант по типу
-    const talent = talentDoc.talents.find((t: any) => t.type === id || t.name === id);
+    const talent = talentDoc.talents.find((t: TalentItem) => t.type === id || t.name === id);
     
     if (!talent) {
       return NextResponse.json(

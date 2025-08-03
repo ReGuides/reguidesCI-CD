@@ -308,4 +308,15 @@ export interface Build {
   authorLogin?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Talent {
+  _id?: string;
+  name: string;
+  type: 'normal' | 'skill' | 'burst' | 'passive';
+  description: string;
+  cooldown?: string;
+  energyCost?: number;
+  priority?: number;
+  scaling?: Record<string, Record<string, string>>;
 } 

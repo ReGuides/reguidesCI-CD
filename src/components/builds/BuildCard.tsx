@@ -8,7 +8,7 @@ import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
-import { Weapon, Artifact } from '@/types';
+import { Weapon, Artifact, Talent } from '@/types';
 
 interface BuildCardProps {
   build: {
@@ -36,7 +36,7 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
   const [loadingWeapons, setLoadingWeapons] = useState(false);
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
-  const [selectedTalent, setSelectedTalent] = useState<any>(null);
+  const [selectedTalent, setSelectedTalent] = useState<Talent | null>(null);
   const [isWeaponModalOpen, setIsWeaponModalOpen] = useState(false);
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
