@@ -6,6 +6,7 @@ import OptimizedImage from '@/components/ui/optimized-image';
 import MarkdownRenderer from '@/components/ui/markdown-renderer';
 import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
+import { TalentModal } from '@/components/talent-modal';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import { Weapon, Artifact } from '@/types';
 
@@ -35,8 +36,10 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
   const [loadingWeapons, setLoadingWeapons] = useState(false);
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
+  const [selectedTalent, setSelectedTalent] = useState<any>(null);
   const [isWeaponModalOpen, setIsWeaponModalOpen] = useState(false);
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
+  const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchWeapons = async () => {
@@ -78,6 +81,13 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
           setSelectedArtifact(artifact);
           setIsArtifactModalOpen(true);
         }
+      } else if (type === 'talent') {
+        const response = await fetch(`/api/talents/${id}`);
+        if (response.ok) {
+          const talent = await response.json();
+          setSelectedTalent(talent);
+          setIsTalentModalOpen(true);
+        }
       }
     } catch (error) {
       console.error('Error fetching item data:', error);
@@ -92,6 +102,11 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
   const closeArtifactModal = () => {
     setIsArtifactModalOpen(false);
     setSelectedArtifact(null);
+  };
+
+  const closeTalentModal = () => {
+    setIsTalentModalOpen(false);
+    setSelectedTalent(null);
   };
 
   const getRoleLabel = (role: string) => {
@@ -373,6 +388,11 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
         isOpen={isArtifactModalOpen}
         onClose={closeArtifactModal}
         artifact={selectedArtifact}
+      />
+      <TalentModal
+        talent={selectedTalent}
+        isOpen={isTalentModalOpen}
+        onClose={closeTalentModal}
       />
     </div>
   );

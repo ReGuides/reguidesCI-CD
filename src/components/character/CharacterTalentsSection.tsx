@@ -47,7 +47,7 @@ const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ chara
     const fetchTalents = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/characters/${characterId}/talents`);
+        const response = await fetch(`/api/talents/character/${characterId}`);
         if (response.ok) {
           const data = await response.json();
           setTalentsData(data);

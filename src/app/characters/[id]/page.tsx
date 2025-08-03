@@ -11,7 +11,11 @@ import CharacterTeamsSection from '@/components/character/CharacterTeamsSection'
 import CharacterTalentsSection from '@/components/character/CharacterTalentsSection';
 import CharacterConstellationsSection from '@/components/character/CharacterConstellationsSection';
 import BuildsSection from '@/components/builds/BuildsSection';
+import MarkdownRenderer from '@/components/ui/markdown-renderer';
 import { Zap, Users, Sword, Star, BookOpen } from 'lucide-react';
+import { WeaponModal } from '@/components/weapon-modal';
+import { ArtifactModal } from '@/components/artifact-modal';
+import { TalentModal } from '@/components/talent-modal';
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations';
 
@@ -21,6 +25,12 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('weapons');
+  const [selectedWeapon, setSelectedWeapon] = useState<any>(null);
+  const [selectedArtifact, setSelectedArtifact] = useState<any>(null);
+  const [selectedTalent, setSelectedTalent] = useState<any>(null);
+  const [isWeaponModalOpen, setIsWeaponModalOpen] = useState(false);
+  const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
+  const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -83,6 +93,50 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
   }
 
   const elementColor = getElementColor(character.element || '');
+
+  const handleItemClick = async (type: string, id: string) => {
+    try {
+      if (type === 'weapon') {
+        const response = await fetch(`/api/weapons/${id}`);
+        if (response.ok) {
+          const weapon = await response.json();
+          setSelectedWeapon(weapon);
+          setIsWeaponModalOpen(true);
+        }
+      } else if (type === 'artifact') {
+        const response = await fetch(`/api/artifacts/${id}`);
+        if (response.ok) {
+          const artifact = await response.json();
+          setSelectedArtifact(artifact);
+          setIsArtifactModalOpen(true);
+        }
+      } else if (type === 'talent') {
+        const response = await fetch(`/api/talents/${id}`);
+        if (response.ok) {
+          const talent = await response.json();
+          setSelectedTalent(talent);
+          setIsTalentModalOpen(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching item data:', error);
+    }
+  };
+
+  const closeWeaponModal = () => {
+    setIsWeaponModalOpen(false);
+    setSelectedWeapon(null);
+  };
+
+  const closeArtifactModal = () => {
+    setIsArtifactModalOpen(false);
+    setSelectedArtifact(null);
+  };
+
+  const closeTalentModal = () => {
+    setIsTalentModalOpen(false);
+    setSelectedTalent(null);
+  };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row w-full h-full">
@@ -311,7 +365,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
                     <BookOpen className="w-5 h-5 text-blue-400" />
                     Общее описание геймплея
                   </h3>
-                  <p className="text-gray-300 leading-relaxed whitespace-pre-line">{character.gameplayDescription}</p>
+                  <MarkdownRenderer content={character.gameplayDescription} onItemClick={handleItemClick} />
                 </div>
               )}
               <BuildsSection characterId={character.id} />
@@ -339,6 +393,23 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           )}
         </div>
       </div>
+      
+      {/* Модалки */}
+      <WeaponModal
+        weapon={selectedWeapon}
+        isOpen={isWeaponModalOpen}
+        onClose={closeWeaponModal}
+      />
+      <ArtifactModal
+        artifact={selectedArtifact}
+        isOpen={isArtifactModalOpen}
+        onClose={closeArtifactModal}
+      />
+      <TalentModal
+        talent={selectedTalent}
+        isOpen={isTalentModalOpen}
+        onClose={closeTalentModal}
+      />
     </div>
   );
 } 
