@@ -13,11 +13,13 @@ interface WeaponModalProps {
 }
 
 export function WeaponModal({ weapon, isOpen, onClose }: WeaponModalProps) {
-  if (!isOpen || !weapon) return null;
-
   useEffect(() => {
-    console.log('WeaponModal weapon changed:', weapon);
+    if (weapon) {
+      console.log('WeaponModal weapon changed:', weapon);
+    }
   }, [weapon]);
+
+  if (!isOpen || !weapon) return null;
 
   console.log('WeaponModal received weapon:', weapon);
   console.log('Weapon fields:', {

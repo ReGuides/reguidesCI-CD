@@ -13,11 +13,13 @@ interface ArtifactModalProps {
 }
 
 export function ArtifactModal({ artifact, isOpen, onClose }: ArtifactModalProps) {
-  if (!isOpen || !artifact) return null;
-
   useEffect(() => {
-    console.log('ArtifactModal artifact changed:', artifact);
+    if (artifact) {
+      console.log('ArtifactModal artifact changed:', artifact);
+    }
   }, [artifact]);
+
+  if (!isOpen || !artifact) return null;
 
   console.log('ArtifactModal received artifact:', artifact);
   console.log('Artifact fields:', {
