@@ -15,12 +15,6 @@ interface WeaponModalProps {
 }
 
 export function WeaponModal({ weapon, isOpen, onClose, isLoading = false }: WeaponModalProps) {
-  useEffect(() => {
-    if (weapon) {
-      console.log('WeaponModal weapon changed:', weapon);
-    }
-  }, [weapon]);
-
   if (!isOpen || !weapon) return null;
 
   if (isLoading) {

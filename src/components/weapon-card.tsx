@@ -36,7 +36,6 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
       }
       
       const weaponData = await response.json();
-      console.log('Full weapon data loaded:', weaponData);
       setFullWeapon(weaponData);
     } catch (err) {
       console.error('Error loading full weapon data:', err);

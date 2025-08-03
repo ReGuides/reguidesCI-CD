@@ -21,10 +21,6 @@ export default function WeaponsPage() {
   }, []);
 
   useEffect(() => {
-    console.log('State changed:', { loading, error, weaponsLength: weapons.length });
-  }, [loading, error, weapons.length]);
-
-  useEffect(() => {
     const fetchWeapons = async () => {
       try {
         setLoading(true);
@@ -41,11 +37,6 @@ export default function WeaponsPage() {
         }
         
         const data = await response.json();
-        
-        console.log('Weapons data received:', data);
-        console.log('Weapons array:', data.data);
-        console.log('Weapons length:', data.data?.length);
-        console.log('First weapon:', data.data?.[0]);
         
         setWeapons(data.data || []);
       } catch (err) {

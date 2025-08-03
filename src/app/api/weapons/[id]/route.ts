@@ -26,7 +26,7 @@ export async function GET(
       try {
         const objectId = new mongoose.Types.ObjectId(id);
         weapon = await weaponsCollection.findOne({ _id: objectId });
-      } catch (error) {
+      } catch {
         // Если id не является валидным ObjectId, игнорируем ошибку
       }
     }
@@ -51,9 +51,6 @@ export async function GET(
       passiveEffect: weapon.passiveEffect || weapon.passive_effect || weapon.passiveDescription,
       image: weapon.image
     };
-    
-    console.log('Original weapon data:', weapon);
-    console.log('Processed weapon data:', weaponData);
     
     return NextResponse.json(weaponData);
   } catch (error) {
