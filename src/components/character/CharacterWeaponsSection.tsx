@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Weapon, ArtifactOrCombination } from '@/types';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
-import { Zap, Shield, Heart, Target, Info } from 'lucide-react';
+import { Zap, Shield, Heart, Target } from 'lucide-react';
 
 interface CharacterWeaponsSectionProps {
   characterId: string;
