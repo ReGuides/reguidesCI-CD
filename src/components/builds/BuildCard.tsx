@@ -62,7 +62,7 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
     fetchWeapons();
   }, [build.weapons]);
 
-  const handleItemClick = async (type: string, id: string, name: string) => {
+  const handleItemClick = async (type: string, id: string) => {
     try {
       if (type === 'weapon') {
         const response = await fetch(`/api/weapons/${id}`);

@@ -32,7 +32,7 @@ const COLORS: Record<string, string> = {
 interface MarkdownRendererProps {
   content: string;
   className?: string;
-  onItemClick?: (type: string, id: string, name: string) => void;
+  onItemClick?: (type: string, id: string) => void;
 }
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '', onItemClick }) => {
@@ -71,7 +71,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className 
           <button
             key={href + match.index}
             className="underline text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
-            onClick={() => onItemClick?.(type, id, text)}
+            onClick={() => onItemClick?.(type, id)}
           >
             {text}
           </button>
