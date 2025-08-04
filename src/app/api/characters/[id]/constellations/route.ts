@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import mongoose from 'mongoose';
 
+interface ConstellationData {
+  name: string;
+  level: number;
+  description: string;
+  effect?: string;
+  priority?: number;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -34,7 +42,7 @@ export async function GET(
     }
     
     // Преобразуем данные в нужный формат
-    const constellations = constellationsData.constellations.map((constellation: any) => ({
+    const constellations = constellationsData.constellations.map((constellation: ConstellationData) => ({
       name: constellation.name,
       level: constellation.level,
       description: constellation.description,
