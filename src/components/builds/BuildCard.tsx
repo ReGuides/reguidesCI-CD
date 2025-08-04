@@ -183,30 +183,30 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
     const statNames: { [key: string]: string } = {
       'hp': 'HP',
       'hp_percent': 'HP%',
-      'atk': 'ATK',
-      'atk_percent': 'ATK%',
-      'def': 'DEF',
-      'def_percent': 'DEF%',
-      'elemental_mastery': 'Elemental Mastery',
-      'energy_recharge': 'Energy Recharge',
-      'crit_rate': 'Crit Rate',
-      'crit_dmg': 'Crit DMG',
-      'pyro_dmg_bonus': 'Pyro DMG',
-      'cryo_dmg_bonus': 'Cryo DMG',
-      'hydro_dmg_bonus': 'Hydro DMG',
-      'electro_dmg_bonus': 'Electro DMG',
-      'dendro_dmg_bonus': 'Dendro DMG',
-      'anemo_dmg_bonus': 'Anemo DMG',
-      'geo_dmg_bonus': 'Geo DMG',
-      'physical_dmg_bonus': 'Physical DMG',
+      'atk': 'Сила атаки',
+      'atk_percent': 'Сила атаки%',
+      'def': 'Защита',
+      'def_percent': 'Защита%',
+      'elemental_mastery': 'Мастерство стихий',
+      'energy_recharge': 'Восстановление энергии',
+      'crit_rate': 'Шанс крит. попадания',
+      'crit_dmg': 'Крит. урон',
+      'pyro_dmg_bonus': 'Бонус Пиро урона',
+      'cryo_dmg_bonus': 'Бонус Крио урона',
+      'hydro_dmg_bonus': 'Бонус Гидро урона',
+      'electro_dmg_bonus': 'Бонус Электро урона',
+      'dendro_dmg_bonus': 'Бонус Дендро урона',
+      'anemo_dmg_bonus': 'Бонус Анемо урона',
+      'geo_dmg_bonus': 'Бонус Гео урона',
+      'physical_dmg_bonus': 'Бонус физ. урона',
       'hp%': 'HP%',
-      'atk%': 'ATK%',
-      'def%': 'DEF%',
-      'em': 'EM',
-      'er': 'ER',
-      'cr': 'CR',
-      'cd': 'CD',
-      'crit': 'Crit'
+      'atk%': 'Сила атаки%',
+      'def%': 'Защита%',
+      'em': 'Мастерство стихий',
+      'er': 'Восстановление энергии',
+      'cr': 'Шанс крит. попадания',
+      'cd': 'Крит. урон',
+      'crit': 'Крит'
     };
     return statNames[stat.toLowerCase()] || stat;
   };
@@ -229,16 +229,16 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
 
   const formatTalentName = (talent: string) => {
     const talentNames: { [key: string]: string } = {
-      'normal': 'Normal Attack',
-      'skill': 'Elemental Skill',
-      'burst': 'Elemental Burst',
-      'passive': 'Passive',
-      'auto': 'Auto Attack',
-      'e': 'E Skill',
-      'q': 'Q Burst',
-      'basic': 'Basic Attack',
-      'elemental': 'Elemental Skill',
-      'ultimate': 'Elemental Burst'
+      'normal': 'Обычная атака',
+      'skill': 'Элементальный навык',
+      'burst': 'Взрыв стихии',
+      'passive': 'Пассивный талант',
+      'auto': 'Обычная атака',
+      'e': 'Элементальный навык',
+      'q': 'Взрыв стихии',
+      'basic': 'Обычная атака',
+      'elemental': 'Элементальный навык',
+      'ultimate': 'Взрыв стихии'
     };
     return talentNames[talent.toLowerCase()] || talent;
   };

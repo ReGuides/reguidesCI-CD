@@ -96,6 +96,54 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
     }
   };
 
+  const formatStatName = (stat: string) => {
+    const statNames: { [key: string]: string } = {
+      'hp': 'HP',
+      'hp_percent': 'HP%',
+      'atk': 'Сила атаки',
+      'atk_percent': 'Сила атаки%',
+      'def': 'Защита',
+      'def_percent': 'Защита%',
+      'elemental_mastery': 'Мастерство стихий',
+      'energy_recharge': 'Восстановление энергии',
+      'crit_rate': 'Шанс крит. попадания',
+      'crit_dmg': 'Крит. урон',
+      'pyro_dmg_bonus': 'Бонус Пиро урона',
+      'cryo_dmg_bonus': 'Бонус Крио урона',
+      'hydro_dmg_bonus': 'Бонус Гидро урона',
+      'electro_dmg_bonus': 'Бонус Электро урона',
+      'dendro_dmg_bonus': 'Бонус Дендро урона',
+      'anemo_dmg_bonus': 'Бонус Анемо урона',
+      'geo_dmg_bonus': 'Бонус Гео урона',
+      'physical_dmg_bonus': 'Бонус физ. урона',
+      'hp%': 'HP%',
+      'atk%': 'Сила атаки%',
+      'def%': 'Защита%',
+      'em': 'Мастерство стихий',
+      'er': 'Восстановление энергии',
+      'cr': 'Шанс крит. попадания',
+      'cd': 'Крит. урон',
+      'crit': 'Крит'
+    };
+    return statNames[stat.toLowerCase()] || stat;
+  };
+
+  const formatTalentName = (talent: string) => {
+    const talentNames: { [key: string]: string } = {
+      'normal': 'Обычная атака',
+      'skill': 'Элементальный навык',
+      'burst': 'Взрыв стихии',
+      'passive': 'Пассивный талант',
+      'auto': 'Обычная атака',
+      'e': 'Элементальный навык',
+      'q': 'Взрыв стихии',
+      'basic': 'Обычная атака',
+      'elemental': 'Элементальный навык',
+      'ultimate': 'Взрыв стихии'
+    };
+    return talentNames[talent.toLowerCase()] || talent;
+  };
+
   const getStatIcon = (stat: string) => {
     const statLower = stat.toLowerCase();
     if (statLower.includes('хп') || statLower.includes('hp')) return '❤️';
@@ -373,7 +421,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     <div key={idx} className="flex items-center justify-between p-3 bg-neutral-800 rounded-lg border border-neutral-700">
                       <div className="flex items-center gap-2">
                         <span className="text-lg">{getStatIcon(stat.stat)}</span>
-                        <span className="font-medium text-white">{stat.stat}</span>
+                        <span className="font-medium text-white">{formatStatName(stat.stat)}</span>
                       </div>
                       <div className="text-right">
                         <div className="text-white font-semibold">{formatStatValue(stat)}</div>
@@ -397,19 +445,19 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                   {recommendation.mainStats.sands && recommendation.mainStats.sands.length > 0 && (
                     <div className="flex justify-between items-center p-2 bg-neutral-800 rounded">
                       <span className="text-gray-400">Пески времени:</span>
-                      <span className="text-white">{recommendation.mainStats.sands.join(', ')}</span>
+                      <span className="text-white">{recommendation.mainStats.sands.map(stat => formatStatName(stat)).join(', ')}</span>
                     </div>
                   )}
                   {recommendation.mainStats.goblet && recommendation.mainStats.goblet.length > 0 && (
                     <div className="flex justify-between items-center p-2 bg-neutral-800 rounded">
                       <span className="text-gray-400">Кубок:</span>
-                      <span className="text-white">{recommendation.mainStats.goblet.join(', ')}</span>
+                      <span className="text-white">{recommendation.mainStats.goblet.map(stat => formatStatName(stat)).join(', ')}</span>
                     </div>
                   )}
                   {recommendation.mainStats.circlet && recommendation.mainStats.circlet.length > 0 && (
                     <div className="flex justify-between items-center p-2 bg-neutral-800 rounded">
                       <span className="text-gray-400">Корона:</span>
-                      <span className="text-white">{recommendation.mainStats.circlet.join(', ')}</span>
+                      <span className="text-white">{recommendation.mainStats.circlet.map(stat => formatStatName(stat)).join(', ')}</span>
                     </div>
                   )}
                 </div>
@@ -423,7 +471,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                 <div className="flex flex-wrap gap-2">
                   {recommendation.subStats.map((stat, statIndex) => (
                     <span key={`stat-${statIndex}-${stat?.toString() || ''}`} className="px-3 py-1 bg-neutral-700 rounded text-xs text-white">
-                      {stat}
+                      {formatStatName(stat)}
                     </span>
                   ))}
                 </div>
@@ -446,7 +494,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                         }`}>
                           {talent.priority}
                         </span>
-                        <span className="text-white text-sm">{talent.talentName}</span>
+                        <span className="text-white text-sm">{formatTalentName(talent.talentName)}</span>
                         {talent.description && (
                           <span className="text-gray-400 text-xs ml-auto">({talent.description})</span>
                         )}

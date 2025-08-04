@@ -1,19 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sword, Zap, Shield } from 'lucide-react';
+import { Sword, Zap, Shield, HelpCircle, Star } from 'lucide-react';
+import { TalentModal } from '@/components/talent-modal';
+import { Talent } from '@/types';
 
 interface CharacterTalentsSectionProps {
   characterId: string;
-}
-
-interface Talent {
-  name: string;
-  type: 'normal' | 'skill' | 'burst';
-  description: string;
-  cooldown?: string;
-  energyCost?: number;
-  priority?: number;
 }
 
 interface CharacterTalents {
@@ -30,18 +23,45 @@ interface CharacterTalents {
 const TALENT_ICONS = {
   normal: Sword,
   skill: Zap,
-  burst: Shield
+  burst: Shield,
+  passive: Star
 };
 
 const TALENT_LABELS = {
   normal: 'Обычная атака',
   skill: 'Элементальный навык',
-  burst: 'Взрыв стихии'
+  burst: 'Взрыв стихии',
+  passive: 'Пассивный талант'
+};
+
+const TALENT_COLORS = {
+  normal: 'text-blue-400',
+  skill: 'text-green-400',
+  burst: 'text-purple-400',
+  passive: 'text-yellow-400'
 };
 
 const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ characterId }) => {
   const [talentsData, setTalentsData] = useState<CharacterTalents | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedTalent, setSelectedTalent] = useState<Talent | null>(null);
+  const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
+
+  const formatTalentName = (talent: string) => {
+    const talentNames: { [key: string]: string } = {
+      'normal': 'Обычная атака',
+      'skill': 'Элементальный навык',
+      'burst': 'Взрыв стихии',
+      'passive': 'Пассивный талант',
+      'auto': 'Обычная атака',
+      'e': 'Элементальный навык',
+      'q': 'Взрыв стихии',
+      'basic': 'Обычная атака',
+      'elemental': 'Элементальный навык',
+      'ultimate': 'Взрыв стихии'
+    };
+    return talentNames[talent.toLowerCase()] || talent;
+  };
 
   useEffect(() => {
     const fetchTalents = async () => {
@@ -52,8 +72,8 @@ const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ chara
           const data = await response.json();
           setTalentsData(data);
         }
-      } catch (error) {
-        console.error('Error fetching talents:', error);
+      } catch (state) {
+        console.error('Error fetching talents:', state);
       } finally {
         setLoading(false);
       }
@@ -62,12 +82,22 @@ const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ chara
     fetchTalents();
   }, [characterId]);
 
+  const handleTalentClick = (talent: Talent) => {
+    setSelectedTalent(talent);
+    setIsTalentModalOpen(true);
+  };
+
+  const closeTalentModal = () => {
+    setIsTalentModalOpen(false);
+    setSelectedTalent(null);
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
           <div className="h-8 bg-neutral-700 rounded mb-4"></div>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map(i => (
               <div key={i} className="h-32 bg-neutral-700 rounded"></div>
             ))}
@@ -92,36 +122,43 @@ const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ chara
       {/* Таланты */}
       <div>
         <h3 className="text-lg font-semibold mb-4 text-white">Таланты персонажа</h3>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {talentsData.talents.map((talent, index) => {
-            const Icon = TALENT_ICONS[talent.type];
-            const label = TALENT_LABELS[talent.type];
+            const Icon = TALENT_ICONS[talent.type] || HelpCircle;
+            const label = TALENT_LABELS[talent.type] || 'Неизвестный тип';
+            const color = TALENT_COLORS[talent.type] || 'text-blue-400';
             
             return (
-              <div key={index} className="bg-card border border-neutral-700 rounded-lg p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Icon className="w-6 h-6 text-blue-400" />
-                  <div>
-                    <h4 className="text-lg font-semibold text-white">{talent.name}</h4>
+              <div 
+                key={index} 
+                className="bg-card border border-neutral-700 rounded-lg p-4 cursor-pointer hover:border-neutral-600 hover:bg-neutral-800 transition-all duration-200 group"
+                onClick={() => handleTalentClick(talent)}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <Icon className={`w-6 h-6 ${color}`} />
+                  <div className="flex-1">
+                    <h4 className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors">
+                      {talent.name}
+                    </h4>
                     <p className="text-sm text-gray-400">{label}</p>
                   </div>
                 </div>
                 
-                <div className="space-y-3">
-                  <p className="text-gray-300 leading-relaxed">{talent.description}</p>
+                <div className="space-y-2">
+                  <p className="text-gray-300 text-sm line-clamp-3 leading-relaxed">
+                    {talent.description}
+                  </p>
                   
-                  <div className="flex flex-wrap gap-4 text-sm">
+                  <div className="flex flex-wrap gap-2 text-xs">
                     {talent.cooldown && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400">Перезарядка:</span>
-                        <span className="text-white">{talent.cooldown}</span>
-                      </div>
+                      <span className="px-2 py-1 bg-neutral-800 rounded text-gray-300">
+                        ⏱️ {talent.cooldown}
+                      </span>
                     )}
                     {talent.energyCost && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400">Энергия:</span>
-                        <span className="text-white">{talent.energyCost}</span>
-                      </div>
+                      <span className="px-2 py-1 bg-neutral-800 rounded text-gray-300">
+                        ⚡ {talent.energyCost}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -144,7 +181,7 @@ const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ chara
                     {priority.priority}
                   </div>
                   <div className="flex-1">
-                    <p className="text-white font-medium">{priority.talentName}</p>
+                    <p className="text-white font-medium">{formatTalentName(priority.talentName)}</p>
                     {priority.description && (
                       <p className="text-sm text-gray-400">{priority.description}</p>
                     )}
@@ -162,6 +199,13 @@ const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ chara
           <p className="text-gray-400 whitespace-pre-line">{talentsData.notes}</p>
         </div>
       )}
+
+      {/* Модальное окно таланта */}
+      <TalentModal
+        talent={selectedTalent}
+        isOpen={isTalentModalOpen}
+        onClose={closeTalentModal}
+      />
     </div>
   );
 };

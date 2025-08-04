@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { CharacterConstellationsModel } from '@/models/CharacterConstellations';
+import mongoose from 'mongoose';
 
 export async function GET(
   request: NextRequest,
@@ -10,26 +10,51 @@ export async function GET(
     await connectDB();
     
     const { id } = await params;
+    console.log('API: Searching for constellations with characterId:', id);
     
-    const constellationsData = await CharacterConstellationsModel.findOne({ characterId: id });
+    // Получаем подключение к базе данных
+    const db = mongoose.connection.db;
+    if (!db) {
+      throw new Error('Database connection not available');
+    }
+    
+    const constellationsCollection = db.collection('constellations');
+    
+    const constellationsData = await constellationsCollection.findOne({ characterId: id });
+    console.log('API: Found constellations data:', constellationsData);
     
     if (!constellationsData) {
+      console.log('API: No constellations found for characterId:', id);
       return NextResponse.json({
+        characterId: id,
         constellations: [],
         priorities: [],
         notes: ''
       });
     }
     
+    // Преобразуем данные в нужный формат
+    const constellations = constellationsData.constellations.map((constellation: any) => ({
+      name: constellation.name,
+      level: constellation.level,
+      description: constellation.description,
+      effect: constellation.effect || '',
+      priority: constellation.priority || 0
+    }));
+    
+    console.log('API: Processed constellations:', constellations);
+    
     return NextResponse.json({
-      constellations: constellationsData.constellations || [],
+      characterId: constellationsData.characterId,
+      constellations: constellations,
       priorities: constellationsData.priorities || [],
       notes: constellationsData.notes || ''
     });
   } catch (error) {
     console.error('Error fetching constellations:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to fetch constellations' },
+      { error: 'Failed to fetch constellations', details: errorMessage },
       { status: 500 }
     );
   }
@@ -44,25 +69,43 @@ export async function POST(
     
     const { id } = await params;
     const body = await request.json();
-    const { constellations } = body;
+    const { constellations, priorities, notes } = body;
     
     if (!Array.isArray(constellations)) {
       return NextResponse.json({ error: 'Constellations must be an array' }, { status: 400 });
     }
     
+    // Получаем подключение к базе данных
+    const db = mongoose.connection.db;
+    if (!db) {
+      throw new Error('Database connection not available');
+    }
+    
+    const constellationsCollection = db.collection('constellations');
+    
     // Проверяем, существует ли уже запись для этого персонажа
-    const existingConstellation = await CharacterConstellationsModel.findOne({ characterId: id });
+    const existingConstellation = await constellationsCollection.findOne({ characterId: id });
     
     if (existingConstellation) {
       // Обновляем существующую запись
-      existingConstellation.constellations = constellations;
-      existingConstellation.updatedAt = new Date();
-      await existingConstellation.save();
+      await constellationsCollection.updateOne(
+        { characterId: id },
+        {
+          $set: {
+            constellations: constellations,
+            priorities: priorities || [],
+            notes: notes || '',
+            updatedAt: new Date()
+          }
+        }
+      );
     } else {
       // Создаем новую запись
-      await CharacterConstellationsModel.create({
+      await constellationsCollection.insertOne({
         characterId: id,
         constellations: constellations,
+        priorities: priorities || [],
+        notes: notes || '',
         updatedAt: new Date()
       });
     }
@@ -70,6 +113,7 @@ export async function POST(
     return NextResponse.json({ success: true, message: 'Constellations saved successfully' });
   } catch (error) {
     console.error('Error saving constellations:', error);
-    return NextResponse.json({ error: 'Failed to save constellations' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to save constellations', details: errorMessage }, { status: 500 });
   }
 } 
