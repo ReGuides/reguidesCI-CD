@@ -830,14 +830,21 @@ export default function AddCharacterPage() {
         {/* Таланты */}
         {activeTab === 'talents' && (
           <div className="space-y-4">
-            <TalentManager 
-              characterId={formData.id || ''} 
-              onSave={() => {
-                const event = new CustomEvent('talentsUpdated', { detail: { characterId: formData.id } });
-                window.dispatchEvent(event);
-                console.log('Talents saved successfully');
-              }}
-            />
+            {formData.id ? (
+              <TalentManager 
+                characterId={formData.id} 
+                onSave={() => {
+                  const event = new CustomEvent('talentsUpdated', { detail: { characterId: formData.id } });
+                  window.dispatchEvent(event);
+                  console.log('Talents saved successfully');
+                }}
+              />
+            ) : (
+              <div className="text-center py-8 text-gray-400">
+                <p>Сначала заполните ID персонажа в основной информации</p>
+                <p className="text-sm">Таланты можно будет настроить после сохранения персонажа</p>
+              </div>
+            )}
           </div>
         )}
 
