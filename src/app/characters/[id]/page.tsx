@@ -347,7 +347,17 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           {activeTab === 'weapons' && (
             <div>
               <div className="mb-6">
-                <p className="text-gray-400">Информация подходит для всех игроков - базовые рекомендации по оружию, артефактам и статам для {character.name}</p>
+                <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-xs font-bold">i</span>
+                    </div>
+                    <div>
+                      <h3 className="text-blue-300 font-medium mb-1">Информация для всех игроков</h3>
+                      <p className="text-blue-200 text-sm">Базовые рекомендации по оружию, артефактам и статам для {character.name}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
               <CharacterWeaponsSection characterId={character.id} />
             </div>
@@ -362,7 +372,17 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           {activeTab === 'builds' && (
             <div>
               <div className="mb-6">
-                <p className="text-gray-400">Для тех, кто хочет лучше разобраться в персонаже и готов читать много текста из сборок</p>
+                <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-xs font-bold">!</span>
+                    </div>
+                    <div>
+                      <h3 className="text-orange-300 font-medium mb-1">Детальные сборки</h3>
+                      <p className="text-orange-200 text-sm">Для тех, кто хочет разобраться как реально усилить персонажа. Включает сравнения и детальные объяснения</p>
+                    </div>
+                  </div>
+                </div>
               </div>
               {character.gameplayDescription && (
                 <div className="bg-card border border-neutral-700 rounded-lg mb-6">
