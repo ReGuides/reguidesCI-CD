@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Character } from '@/types';
-import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
-import { Shield, Zap, Heart, Users, Star } from 'lucide-react';
+import { Users, Star } from 'lucide-react';
 import Link from 'next/link';
 
 interface CharacterTeamsSectionProps {
