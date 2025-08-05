@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Character } from '@/types';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
-import { Shield, Zap, Heart, Users } from 'lucide-react';
+import { Shield, Zap, Heart, Users, Star } from 'lucide-react';
+import Link from 'next/link';
 
 interface CharacterTeamsSectionProps {
   characterId: string;
@@ -32,17 +33,24 @@ interface CharacterTeams {
 }
 
 const POSITION_ICONS = {
-  main_dps: Shield,
-  sub_dps: Zap,
+  main_dps: Users,
+  sub_dps: Users,
   support: Users,
-  healer: Heart
+  healer: Users
 };
 
 const POSITION_LABELS = {
-  main_dps: 'Основной ДПС',
-  sub_dps: 'Вторичный ДПС',
-  support: 'Поддержка',
-  healer: 'Лекарь'
+  main_dps: 'Позиция 1',
+  sub_dps: 'Позиция 2',
+  support: 'Позиция 3',
+  healer: 'Позиция 4'
+};
+
+const POSITION_COLORS = {
+  main_dps: 'text-blue-400',
+  sub_dps: 'text-blue-400',
+  support: 'text-blue-400',
+  healer: 'text-blue-400'
 };
 
 const CharacterTeamsSection: React.FC<CharacterTeamsSectionProps> = ({ characterId }) => {
@@ -84,10 +92,10 @@ const CharacterTeamsSection: React.FC<CharacterTeamsSectionProps> = ({ character
       <div className="space-y-6">
         <div className="animate-pulse">
           <div className="h-8 bg-neutral-700 rounded mb-4"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[1, 2].map(i => (
-              <div key={i} className="h-48 bg-neutral-700 rounded"></div>
-            ))}
+          <div className="overflow-x-auto">
+            <div className="min-w-full bg-neutral-800 rounded-lg">
+              <div className="h-64 bg-neutral-700 rounded"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -108,67 +116,112 @@ const CharacterTeamsSection: React.FC<CharacterTeamsSectionProps> = ({ character
     return characters.find(c => c.id === id);
   };
 
+  const positions = ['main_dps', 'sub_dps', 'support', 'healer'] as const;
+
   return (
     <div className="space-y-8">
-      {/* Рекомендуемые команды */}
+      {/* Рекомендуемые команды в табличном виде */}
       {teamsData.recommendedTeams.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mb-4 text-white">Рекомендуемые команды</h3>
-          <div className="space-y-6">
-            {teamsData.recommendedTeams.map((team, teamIndex) => (
-              <div key={teamIndex} className="bg-card border border-neutral-700 rounded-lg p-6">
-                <h4 className="text-md font-semibold mb-4 text-white">
-                  Команда {teamsData.recommendedTeams.length > 1 ? teamIndex + 1 : ''}
-                </h4>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {Object.entries(team.positions).map(([position, positionData]) => {
-                    const Icon = POSITION_ICONS[position as keyof typeof POSITION_ICONS];
-                    const label = POSITION_LABELS[position as keyof typeof POSITION_LABELS];
-                    
-                    return (
-                      <div key={position} className="bg-neutral-800 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Icon className="w-4 h-4 text-blue-400" />
-                          <span className="text-sm font-medium text-white">{label}</span>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          {positionData.characters.length === 0 ? (
-                            <p className="text-gray-400 text-xs">Нет персонажей</p>
-                          ) : (
-                            positionData.characters.map(characterId => {
-                              const character = getCharacterById(characterId);
-                              if (!character) return null;
-                              
-                              return (
-                                <div key={characterId} className="flex items-center gap-2 bg-neutral-700 rounded px-2 py-1">
-                                  <OptimizedImage
-                                    src={getImageWithFallback(character.image, character.name, 'character')}
-                                    alt={character.name}
-                                    className="w-6 h-6 rounded"
-                                    type="character"
-                                  />
-                                  <span className="text-xs text-white truncate">{character.name}</span>
-                                </div>
-                              );
-                            })
-                          )}
+          
+          <div className="overflow-x-auto">
+            <div className="min-w-full bg-neutral-800 rounded-lg border border-neutral-700">
+              {/* Заголовок таблицы */}
+              <div className="grid grid-cols-5 gap-4 p-4 border-b border-neutral-700 bg-neutral-750">
+                <div className="text-sm font-medium text-gray-400">Команда</div>
+                {positions.map(position => {
+                  const Icon = POSITION_ICONS[position];
+                  const label = POSITION_LABELS[position];
+                  const color = POSITION_COLORS[position];
+                  
+                  return (
+                    <div key={position} className="flex items-center gap-2">
+                      <Icon className={`w-4 h-4 ${color}`} />
+                      <span className="text-sm font-medium text-white">{label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Строки команд */}
+              <div className="divide-y divide-neutral-700">
+                {teamsData.recommendedTeams.map((team, teamIndex) => (
+                  <div key={teamIndex}>
+                    {/* Основная строка команды */}
+                    <div className="grid grid-cols-5 gap-4 p-4 hover:bg-neutral-750 transition-colors">
+                      {/* Название команды */}
+                      <div className="flex items-center">
+                        <div className="flex items-center gap-2">
+                          <Star className="w-4 h-4 text-yellow-400" />
+                          <span className="text-sm font-medium text-white">
+                            Команда {teamsData.recommendedTeams.length > 1 ? teamIndex + 1 : ''}
+                          </span>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-                
-                {team.notes && (
-                  <div className="mt-4 p-3 bg-neutral-800 rounded-lg">
-                    <h5 className="text-sm font-medium text-gray-300 mb-1">Заметки к команде</h5>
-                    <p className="text-sm text-gray-400">{team.notes}</p>
+                      
+                      {/* Персонажи по ролям */}
+                      {positions.map(position => {
+                        const positionData = team.positions[position];
+                        
+                        return (
+                          <div key={position} className="space-y-2">
+                            {positionData.characters.length === 0 ? (
+                              <div className="text-gray-500 text-xs italic">—</div>
+                            ) : (
+                              positionData.characters.map(characterId => {
+                                const character = getCharacterById(characterId);
+                                if (!character) return null;
+                                
+                                return (
+                                  <Link 
+                                    key={characterId} 
+                                    href={`/characters/${character.id}`}
+                                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-700 transition-colors group"
+                                  >
+                                    <div className="relative w-12 h-12 rounded-full overflow-hidden bg-neutral-700">
+                                      <img
+                                        src={getImageWithFallback(character.image, character.name, 'character')}
+                                        alt={character.name}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                          const target = e.target as HTMLImageElement;
+                                          target.src = '/images/characters/default.png';
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm text-white truncate group-hover:text-blue-400 transition-colors">
+                                        {character.name}
+                                      </p>
+                                      <p className="text-xs text-gray-400">{character.element}</p>
+                                    </div>
+                                  </Link>
+                                );
+                              })
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Строка с заметками к команде */}
+                    {team.notes && (
+                      <div className="grid grid-cols-5 gap-4 p-4 bg-neutral-750/50">
+                        <div></div>
+                        <div className="col-span-4">
+                          <p className="text-sm text-gray-400">{team.notes}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
-            ))}
+            </div>
           </div>
+          
+          {/* Заметки к командам */}
+          {/* This section is now integrated into the table */}
         </div>
       )}
 
@@ -182,18 +235,29 @@ const CharacterTeamsSection: React.FC<CharacterTeamsSectionProps> = ({ character
               if (!character) return null;
               
               return (
-                <div key={index} className="flex items-center gap-2 bg-neutral-800 rounded-lg p-2">
-                  <OptimizedImage
-                    src={getImageWithFallback(character.image, character.name, 'character')}
-                    alt={character.name}
-                    className="w-8 h-8 rounded"
-                    type="character"
-                  />
+                <Link 
+                  key={index} 
+                  href={`/characters/${character.id}`}
+                  className="flex items-center gap-3 bg-neutral-800 rounded-lg p-3 hover:bg-neutral-700 transition-colors group"
+                >
+                  <div className="relative w-12 h-12 rounded-full overflow-hidden bg-neutral-700">
+                    <img
+                      src={getImageWithFallback(character.image, character.name, 'character')}
+                      alt={character.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/images/characters/default.png';
+                      }}
+                    />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{character.name}</p>
+                    <p className="text-sm text-white truncate group-hover:text-blue-400 transition-colors">
+                      {character.name}
+                    </p>
                     <p className="text-xs text-gray-400">{character.element}</p>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

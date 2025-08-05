@@ -18,7 +18,7 @@ import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
 import { Weapon, Artifact, Talent } from '@/types';
 
-type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations';
+type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations'; // weapons теперь используется для рекомендаций
 
 export default function CharacterDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -289,19 +289,19 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'weapons'
-                ? 'bg-accent text-white shadow-lg shadow-accent/25'
-                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
+                : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
             onClick={() => setActiveTab('weapons')}
           >
             <Zap className="w-4 h-4" />
-            Оружия и Артефакты
+            Рекомендации
           </button>
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'teams'
-                ? 'bg-accent text-white shadow-lg shadow-accent/25'
-                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
+                : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
             onClick={() => setActiveTab('teams')}
           >
@@ -311,8 +311,8 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'builds'
-                ? 'bg-accent text-white shadow-lg shadow-accent/25'
-                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
+                : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
             onClick={() => setActiveTab('builds')}
           >
@@ -322,8 +322,8 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'talents'
-                ? 'bg-accent text-white shadow-lg shadow-accent/25'
-                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
+                : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
             onClick={() => setActiveTab('talents')}
           >
@@ -333,8 +333,8 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'constellations'
-                ? 'bg-accent text-white shadow-lg shadow-accent/25'
-                : 'bg-card text-gray-400 hover:bg-accent/10 hover:text-white'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
+                : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
             onClick={() => setActiveTab('constellations')}
           >
@@ -347,8 +347,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           {activeTab === 'weapons' && (
             <div>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Оружия и Артефакты</h2>
-                <p className="text-gray-400">Рекомендуемое оружие, артефакты и статы для {character.name}</p>
+                <p className="text-gray-400">Информация подходит для всех игроков - базовые рекомендации по оружию, артефактам и статам для {character.name}</p>
               </div>
               <CharacterWeaponsSection characterId={character.id} />
             </div>
@@ -356,10 +355,6 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
 
           {activeTab === 'teams' && (
             <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Команды</h2>
-                <p className="text-gray-400">Рекомендуемые команды и совместимые персонажи для {character.name}</p>
-              </div>
               <CharacterTeamsSection characterId={character.id} />
             </div>
           )}
@@ -367,8 +362,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           {activeTab === 'builds' && (
             <div>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Сборки</h2>
-                <p className="text-gray-400">Готовые сборки и стратегии для {character.name}</p>
+                <p className="text-gray-400">Для тех, кто хочет лучше разобраться в персонаже и готов читать много текста из сборок</p>
               </div>
               {character.gameplayDescription && (
                 <div className="bg-card border border-neutral-700 rounded-lg mb-6">
@@ -399,20 +393,12 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
 
           {activeTab === 'talents' && (
             <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Таланты</h2>
-                <p className="text-gray-400">Таланты и приоритеты прокачки для {character.name}</p>
-              </div>
               <CharacterTalentsSection characterId={character.id} />
             </div>
           )}
 
           {activeTab === 'constellations' && (
             <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Созвездия</h2>
-                <p className="text-gray-400">Созвездия и приоритеты для {character.name}</p>
-              </div>
               <CharacterConstellationsSection characterId={character.id} />
             </div>
           )}
