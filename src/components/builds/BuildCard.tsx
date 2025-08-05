@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Zap, Shield, Target, Users, Star } from 'lucide-react';
+import { Zap, Shield, Target, Users, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import OptimizedImage from '@/components/ui/optimized-image';
 import MarkdownRenderer from '@/components/ui/markdown-renderer';
 import { WeaponModal } from '@/components/weapon-modal';
@@ -29,9 +29,10 @@ interface BuildCardProps {
     talentPriorities: string[];
     isFeatured?: boolean;
   };
+  index: number;
 }
 
-const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
+const BuildCard: React.FC<BuildCardProps> = ({ build, index }) => {
   const [weaponsData, setWeaponsData] = useState<Weapon[]>([]);
   const [loadingWeapons, setLoadingWeapons] = useState(false);
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
@@ -40,6 +41,7 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
   const [isWeaponModalOpen, setIsWeaponModalOpen] = useState(false);
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(index !== 0);
 
   useEffect(() => {
     const fetchWeapons = async () => {
@@ -244,150 +246,166 @@ const BuildCard: React.FC<BuildCardProps> = ({ build }) => {
   };
 
   return (
-    <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-6 hover:bg-neutral-750 transition-colors">
-      {/* Заголовок и роль */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            {build.isFeatured && (
-              <Star className="w-4 h-4 text-yellow-400" />
-            )}
-            <h3 className="text-lg font-semibold text-white">{build.title}</h3>
+    <div className="bg-neutral-800 border border-neutral-700 rounded-lg hover:bg-neutral-750 transition-colors">
+      {/* Заголовок и кнопка сворачивания */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="w-full p-6 flex items-center justify-between hover:bg-neutral-750 transition-colors"
+      >
+        <div className="flex items-start justify-between flex-1">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              {build.isFeatured && (
+                <Star className="w-4 h-4 text-yellow-400" />
+              )}
+              <h3 className="text-lg font-semibold text-white">{build.title}</h3>
+              <span className={`px-2 py-1 rounded text-xs font-medium ${getRoleColor(build.role)}`}>
+                {getRoleLabel(build.role)}
+              </span>
+            </div>
           </div>
-          <span className={`px-2 py-1 rounded text-xs font-medium ${getRoleColor(build.role)}`}>
-            {getRoleLabel(build.role)}
-          </span>
         </div>
-      </div>
+        {isCollapsed ? (
+          <ChevronDown className="w-5 h-5 text-gray-400 ml-4" />
+        ) : (
+          <ChevronUp className="w-5 h-5 text-gray-400 ml-4" />
+        )}
+      </button>
 
-      {/* Описание */}
-      {build.description && (
-        <div className="mb-4">
-          <MarkdownRenderer content={build.description} onItemClick={handleItemClick} />
-        </div>
-      )}
+      {/* Свернутый контент */}
+      {!isCollapsed && (
+        <div className="px-6 pb-6">
+          {/* Описание */}
+          {build.description && (
+            <div className="mb-4">
+              <MarkdownRenderer content={build.description} onItemClick={handleItemClick} />
+            </div>
+          )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Левая колонка: Оружия и Артефакты */}
-        <div className="space-y-4">
-          {/* Оружия */}
-          {build.weapons.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Zap className="w-4 h-4 text-blue-400" />
-                <h4 className="text-sm font-medium text-gray-300">Оружия</h4>
-              </div>
-              {loadingWeapons ? (
-                <div className="flex flex-wrap gap-2">
-                  {build.weapons.map((weaponId, idx) => (
-                    <span key={idx} className="px-2 py-1 bg-neutral-700 rounded text-xs text-white">
-                      {weaponId}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {weaponsData.map((weapon, idx) => (
-                    <div key={idx} className="flex flex-col items-center p-2 bg-neutral-700 rounded">
-                      <OptimizedImage
-                        src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
-                        alt={weapon.name}
-                        className="w-8 h-8 rounded mb-1"
-                        type="weapon"
-                      />
-                      <div className="flex items-center gap-1 mb-1">
-                        <span className="text-yellow-400 text-xs">★{weapon.rarity}</span>
-                      </div>
-                      <span className="text-xs text-gray-300 text-center leading-tight">
-                        {weapon.name}
-                      </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Левая колонка: Оружия и Артефакты */}
+            <div className="space-y-4">
+              {/* Оружия */}
+              {build.weapons.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Zap className="w-4 h-4 text-blue-400" />
+                    <h4 className="text-sm font-medium text-gray-300">Оружия</h4>
+                  </div>
+                  {loadingWeapons ? (
+                    <div className="flex flex-wrap gap-2">
+                      {build.weapons.map((weaponId, idx) => (
+                        <span key={idx} className="px-2 py-1 bg-neutral-700 rounded text-xs text-white">
+                          {weaponId}
+                        </span>
+                      ))}
                     </div>
-                  ))}
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {weaponsData.map((weapon, idx) => (
+                        <div key={idx} className="flex flex-col items-center p-2 bg-neutral-700 rounded">
+                          <OptimizedImage
+                            src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
+                            alt={weapon.name}
+                            className="w-8 h-8 rounded mb-1"
+                            type="weapon"
+                          />
+                          <div className="flex items-center gap-1 mb-1">
+                            <span className="text-yellow-400 text-xs">★{weapon.rarity}</span>
+                          </div>
+                          <span className="text-xs text-gray-300 text-center leading-tight">
+                            {weapon.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Артефакты */}
+              {build.artifacts.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield className="w-4 h-4 text-green-400" />
+                    <h4 className="text-sm font-medium text-gray-300">Артефакты</h4>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {build.artifacts.map((artifact, idx) => (
+                      <div key={idx} className="flex flex-col items-center p-2 bg-neutral-700 rounded">
+                        <OptimizedImage
+                          src={getImageWithFallback(artifact.image, artifact.name || 'artifact', 'artifact')}
+                          alt={artifact.name || 'Артефакт'}
+                          className="w-8 h-8 rounded mb-1"
+                          type="artifact"
+                        />
+                        <span className="text-xs text-gray-300 text-center leading-tight">
+                          {artifact.name || artifact.id}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
-          )}
 
-          {/* Артефакты */}
-          {build.artifacts.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Shield className="w-4 h-4 text-green-400" />
-                <h4 className="text-sm font-medium text-gray-300">Артефакты</h4>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {build.artifacts.map((artifact, idx) => (
-                  <div key={idx} className="flex flex-col items-center p-2 bg-neutral-700 rounded">
-                    <OptimizedImage
-                      src={getImageWithFallback(artifact.image, artifact.name || 'artifact', 'artifact')}
-                      alt={artifact.name || 'Артефакт'}
-                      className="w-8 h-8 rounded mb-1"
-                      type="artifact"
-                    />
-                    <span className="text-xs text-gray-300 text-center leading-tight">
-                      {artifact.name || artifact.id}
-                    </span>
+            {/* Правая колонка: Статы и приоритеты */}
+            <div className="space-y-4">
+              {/* Основные статы */}
+              {build.mainStats.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="w-4 h-4 text-red-400" />
+                    <h4 className="text-sm font-medium text-gray-300">Основные статы</h4>
                   </div>
-                ))}
-              </div>
+                  <div className="flex flex-wrap gap-2">
+                    {build.mainStats.map((stat, idx) => (
+                      <span key={idx} className={`px-2 py-1 rounded text-xs font-medium ${getStatColor(stat)}`}>
+                        {formatStatName(stat)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Дополнительные статы */}
+              {build.subStats.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="w-4 h-4 text-blue-400" />
+                    <h4 className="text-sm font-medium text-gray-300">Дополнительные статы</h4>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {build.subStats.map((stat, idx) => (
+                      <span key={idx} className={`px-2 py-1 rounded text-xs font-medium ${getStatColor(stat)}`}>
+                        {formatStatName(stat)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Приоритеты талантов */}
+              {build.talentPriorities.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="w-4 h-4 text-yellow-400" />
+                    <h4 className="text-sm font-medium text-gray-300">Приоритеты талантов</h4>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {build.talentPriorities.map((talent, idx) => (
+                      <span key={idx} className={`px-2 py-1 rounded text-xs font-medium ${getTalentColor(talent)}`}>
+                        {formatTalentName(talent)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
-
-        {/* Правая колонка: Статы и приоритеты */}
-        <div className="space-y-4">
-          {/* Основные статы */}
-          {build.mainStats.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Target className="w-4 h-4 text-red-400" />
-                <h4 className="text-sm font-medium text-gray-300">Основные статы</h4>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {build.mainStats.map((stat, idx) => (
-                  <span key={idx} className={`px-2 py-1 rounded text-xs font-medium ${getStatColor(stat)}`}>
-                    {formatStatName(stat)}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Дополнительные статы */}
-          {build.subStats.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Target className="w-4 h-4 text-blue-400" />
-                <h4 className="text-sm font-medium text-gray-300">Дополнительные статы</h4>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {build.subStats.map((stat, idx) => (
-                  <span key={idx} className={`px-2 py-1 rounded text-xs font-medium ${getStatColor(stat)}`}>
-                    {formatStatName(stat)}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Приоритеты талантов */}
-          {build.talentPriorities.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Users className="w-4 h-4 text-yellow-400" />
-                <h4 className="text-sm font-medium text-gray-300">Приоритеты талантов</h4>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {build.talentPriorities.map((talent, idx) => (
-                  <span key={idx} className={`px-2 py-1 rounded text-xs font-medium ${getTalentColor(talent)}`}>
-                    {formatTalentName(talent)}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      )}
+      
       <WeaponModal
         isOpen={isWeaponModalOpen}
         onClose={closeWeaponModal}

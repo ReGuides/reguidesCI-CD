@@ -58,11 +58,11 @@ export default function CharactersPage() {
   }, [filters]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-6">
-      <aside className="w-full md:w-64 flex-shrink-0">
+    <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-6 overflow-hidden">
+      <aside className="w-full md:w-64 flex-shrink-0 min-w-0">
         <CharacterFilters filters={filters} onFiltersChange={handleFiltersChange} />
       </aside>
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         {/* Loading State */}
         {loading && (
           <div className="flex justify-center items-center h-64">

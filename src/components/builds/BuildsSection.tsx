@@ -91,8 +91,8 @@ const BuildsSection: React.FC<BuildsSectionProps> = ({ characterId }) => {
       </div>
       
       <div className="grid gap-6">
-        {builds.map((build) => (
-          <BuildCard key={build._id} build={build} />
+        {builds.map((build, index) => (
+          <BuildCard key={build._id} build={build} index={index} />
         ))}
       </div>
     </div>

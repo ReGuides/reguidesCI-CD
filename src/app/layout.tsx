@@ -19,14 +19,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className={inter.className}>
+      <body className={`${inter.className} overflow-x-hidden`}>
         <div className="min-h-screen flex flex-col">
           <Header />
           
           {/* Main Content */}
           <main className="flex-1 bg-neutral-900">
-            <div className="flex">
-              <div className="flex-1">
+            <div className="flex w-full">
+              <div className="flex-1 min-w-0">
                 {children}
               </div>
               <SidebarWrapper />

@@ -22,6 +22,7 @@ html {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 body {
@@ -32,6 +33,11 @@ body {
   box-sizing: border-box;
   background: #18181b;
   color: #f8f4ff;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 /* Ссылки */

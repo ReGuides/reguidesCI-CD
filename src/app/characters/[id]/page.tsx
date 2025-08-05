@@ -12,7 +12,7 @@ import CharacterTalentsSection from '@/components/character/CharacterTalentsSect
 import CharacterConstellationsSection from '@/components/character/CharacterConstellationsSection';
 import BuildsSection from '@/components/builds/BuildsSection';
 import MarkdownRenderer from '@/components/ui/markdown-renderer';
-import { Zap, Users, Sword, Star, BookOpen } from 'lucide-react';
+import { Zap, Users, Sword, Star, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
@@ -32,6 +32,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
   const [isWeaponModalOpen, setIsWeaponModalOpen] = useState(false);
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
+  const [isGameplayDescriptionCollapsed, setIsGameplayDescriptionCollapsed] = useState(false);
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -149,10 +150,10 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row w-full h-full">
+    <div className="min-h-screen flex flex-col md:flex-row w-full h-full overflow-hidden">
       {/* Левая колонка: информация о персонаже */}
       <div 
-        className="relative md:w-80 min-h-full flex flex-col w-full overflow-y-auto" 
+        className="relative md:w-80 min-h-full flex flex-col w-full overflow-y-auto overflow-x-hidden" 
         style={{ background: elementColor + '33' }}
       >
         {/* Декоративная полоска */}
@@ -283,7 +284,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
       </div>
 
       {/* Правая колонка: контент */}
-      <div className="flex-1 flex flex-col min-h-full">
+      <div className="flex-1 flex flex-col min-h-full min-w-0">
         <div className="flex gap-2 mb-6 mt-2 md:mt-4 flex-wrap px-4">
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
@@ -342,7 +343,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
           </button>
         </div>
 
-        <div className="flex-1 px-4 animate-in fade-in duration-300">
+        <div className="flex-1 px-4 animate-in fade-in duration-300 min-w-0">
           {activeTab === 'weapons' && (
             <div>
               <div className="mb-6">
@@ -370,12 +371,26 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
                 <p className="text-gray-400">Готовые сборки и стратегии для {character.name}</p>
               </div>
               {character.gameplayDescription && (
-                <div className="bg-card border border-neutral-700 rounded-lg p-6 mb-6">
-                  <h3 className="text-lg font-semibold mb-3 text-white flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-blue-400" />
-                    Общее описание геймплея
-                  </h3>
-                  <MarkdownRenderer content={character.gameplayDescription} onItemClick={handleItemClick} />
+                <div className="bg-card border border-neutral-700 rounded-lg mb-6">
+                  <button
+                    onClick={() => setIsGameplayDescriptionCollapsed(!isGameplayDescriptionCollapsed)}
+                    className="w-full p-6 flex items-center justify-between hover:bg-neutral-750 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-blue-400" />
+                      <h3 className="text-lg font-semibold text-white">Общее описание геймплея</h3>
+                    </div>
+                    {isGameplayDescriptionCollapsed ? (
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                    ) : (
+                      <ChevronUp className="w-5 h-5 text-gray-400" />
+                    )}
+                  </button>
+                  {!isGameplayDescriptionCollapsed && (
+                    <div className="px-6 pb-6">
+                      <MarkdownRenderer content={character.gameplayDescription} onItemClick={handleItemClick} />
+                    </div>
+                  )}
                 </div>
               )}
               <BuildsSection characterId={character.id} />

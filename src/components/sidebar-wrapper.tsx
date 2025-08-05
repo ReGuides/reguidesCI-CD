@@ -13,7 +13,7 @@ export default function SidebarWrapper() {
     <>
       {/* Сайдбар - скрыт в админке */}
       {!pathname?.startsWith('/admin') && (
-        <div className="hidden lg:block w-72 flex-shrink-0 p-4">
+        <div className="hidden lg:block w-72 flex-shrink-0 p-4 overflow-hidden">
           <Sidebar onNewsSelect={setSelectedNews} />
         </div>
       )}

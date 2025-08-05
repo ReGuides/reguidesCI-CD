@@ -13,9 +13,9 @@ export function Header() {
   };
 
   return (
-    <header className="bg-header text-text shadow-lg">
+    <header className="bg-header text-text shadow-lg overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
-        <nav className="flex items-center justify-between">
+        <nav className="flex items-center justify-between min-w-0">
           {/* Логотип и название сайта слева */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
@@ -31,11 +31,11 @@ export function Header() {
               </div>
               
               {/* Название сайта и игры */}
-              <div className="flex flex-col">
-                <span className="text-lg sm:text-2xl font-bold text-accent group-hover:text-accent-dark transition-colors">
+              <div className="flex flex-col min-w-0">
+                <span className="text-lg sm:text-2xl font-bold text-accent group-hover:text-accent-dark transition-colors truncate">
                   ReGuides
                 </span>
-                <span className="text-xs sm:text-sm text-text-secondary font-medium">
+                <span className="text-xs sm:text-sm text-text-secondary font-medium truncate">
                   Genshin Impact
                 </span>
               </div>
@@ -43,7 +43,7 @@ export function Header() {
           </div>
           
           {/* Поиск по центру */}
-          <div className="hidden md:flex flex-1 justify-center px-8">
+          <div className="hidden md:flex flex-1 justify-center px-8 min-w-0">
             <div className="relative w-full max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
               <input
@@ -56,7 +56,7 @@ export function Header() {
 
           {/* Мобильное меню */}
           <button 
-            className="md:hidden p-2 hover:bg-neutral-700 rounded-lg transition-colors"
+            className="md:hidden p-2 hover:bg-neutral-700 rounded-lg transition-colors flex-shrink-0"
             onClick={toggleMenu}
             aria-label="Открыть меню"
           >
@@ -68,20 +68,20 @@ export function Header() {
           </button>
 
           {/* Десктопное меню справа */}
-          <div className="hidden md:flex space-x-6 items-center">
-            <Link href="/characters" className="text-text hover:text-highlight transition-colors">
+          <div className="hidden md:flex space-x-6 items-center flex-shrink-0">
+            <Link href="/characters" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
               Персонажи
             </Link>
-            <Link href="/weapons" className="text-text hover:text-highlight transition-colors">
+            <Link href="/weapons" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
               Оружие
             </Link>
-            <Link href="/artifacts" className="text-text hover:text-highlight transition-colors">
+            <Link href="/artifacts" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
               Артефакты
             </Link>
-            <Link href="/articles" className="text-text hover:text-highlight transition-colors">
+            <Link href="/articles" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
               Статьи
             </Link>
-            <Link href="/about" className="text-text hover:text-highlight transition-colors">
+            <Link href="/about" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
               О проекте
             </Link>
           </div>
