@@ -157,6 +157,7 @@ export async function POST(request: NextRequest) {
       id: body.id,
       name: body.name,
       element: body.element,
+      weapon: body.weaponType, // Сохраняем weaponType как weapon
       weaponType: body.weaponType,
       rarity: body.rarity,
       region: body.region,
@@ -169,7 +170,6 @@ export async function POST(request: NextRequest) {
       role: body.role,
       isActive: body.isActive !== undefined ? body.isActive : true,
       isFeatured: body.isFeatured || false,
-      weapon: body.weapon,
       createdAt: new Date(),
       updatedAt: new Date()
     };

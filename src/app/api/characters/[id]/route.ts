@@ -67,10 +67,16 @@ export async function PUT(
     const body = await request.json();
     const { id: characterId } = await params;
     
+    // Если есть weaponType, сохраняем его как weapon
+    const updateData = { ...body };
+    if (body.weaponType) {
+      updateData.weapon = body.weaponType;
+    }
+    
     const updatedCharacter = await CharacterModel.findOneAndUpdate(
       { id: characterId },
       {
-        ...body,
+        ...updateData,
         updatedAt: new Date()
       },
       { new: true }
