@@ -348,7 +348,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
   const weaponTypes = [
     { value: 'Одноручный меч', label: 'Одноручный меч', icon: '⚔️' },
     { value: 'Двуручный меч', label: 'Двуручный меч', icon: '🗡️' },
-    { value: 'Копье', label: 'Копье', icon: '🔱' },
+    { value: 'Копьё', label: 'Копьё', icon: '🔱' },
     { value: 'Лук', label: 'Лук', icon: '🏹' },
     { value: 'Катализатор', label: 'Катализатор', icon: '📖' }
   ];

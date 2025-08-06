@@ -21,7 +21,7 @@ const CharacterSchema = new mongoose.Schema({
   },
   weapon: { 
     type: String,
-    enum: ['Меч', 'Двуручный меч', 'Лук', 'Катализатор', 'Копьё']
+    enum: ['Одноручный меч', 'Двуручный меч', 'Лук', 'Катализатор', 'Копьё']
   },
   region: { 
     type: String 
