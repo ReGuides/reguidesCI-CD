@@ -47,22 +47,15 @@ const TalentManager: React.FC<TalentManagerProps> = ({ characterId, onSave }) =>
   const fetchTalents = useCallback(async () => {
     setLoading(true);
     try {
-      console.log('TalentManager: Fetching talents for characterId:', characterId);
       const response = await fetch(`/api/characters/${characterId}/talents`);
-      console.log('TalentManager: Response status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('TalentManager: Received data:', data);
         // Убеждаемся, что talents - это массив
         const talentsArray = Array.isArray(data.talents) ? data.talents : [];
-        console.log('TalentManager: Processed talents array:', talentsArray);
         setTalents(talentsArray);
-      } else {
-        console.error('TalentManager: Response not ok:', response.status, response.statusText);
       }
     } catch (error) {
-      console.error('TalentManager: Error fetching talents:', error);
+      console.error('Error fetching talents:', error);
     } finally {
       setLoading(false);
     }
@@ -243,8 +236,6 @@ const TalentManager: React.FC<TalentManagerProps> = ({ characterId, onSave }) =>
   if (loading) {
     return <div className="text-center py-4 text-gray-400">Загрузка талантов...</div>;
   }
-
-  console.log('TalentManager: Rendering with talents:', talents);
 
   return (
     <div className="space-y-4">

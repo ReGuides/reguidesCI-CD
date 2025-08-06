@@ -37,6 +37,7 @@ export default function AddCharacterPage() {
     isFeatured: false
   });
   const [saving, setSaving] = useState(false);
+  const [isCharacterSaved, setIsCharacterSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'stats' | 'media' | 'builds' | 'recommendations' | 'talents' | 'constellations'>('basic');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [builds, setBuilds] = useState<any[]>([]);
@@ -93,7 +94,18 @@ export default function AddCharacterPage() {
       if (response.ok) {
         const result = await response.json();
         if (result.success && result.character) {
-          router.push(`/admin/characters/${result.character.id}/edit`);
+          // Обновляем состояние и данные формы с сохраненным персонажем
+          setIsCharacterSaved(true);
+          setFormData(prev => ({
+            ...prev,
+            ...result.character
+          }));
+          
+          // Показываем уведомление об успешном сохранении
+          alert('Персонаж успешно создан! Теперь вы можете настроить таланты, созвездия и другие параметры.');
+          
+          // Переключаемся на вкладку талантов для дальнейшей настройки
+          setActiveTab('talents');
         } else {
           console.error('Error creating character: Invalid response format');
           alert('Ошибка при создании персонажа: неверный формат ответа');
@@ -283,18 +295,23 @@ export default function AddCharacterPage() {
         <div className="flex space-x-1 bg-neutral-700/50 rounded-lg p-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;
+            const isDisabled = !isCharacterSaved && ['builds', 'recommendations', 'talents', 'constellations'].includes(tab.id);
             return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id as 'basic' | 'details' | 'stats' | 'media' | 'builds' | 'recommendations' | 'talents' | 'constellations')}
+                disabled={isDisabled}
+                onClick={() => !isDisabled && setActiveTab(tab.id as 'basic' | 'details' | 'stats' | 'media' | 'builds' | 'recommendations' | 'talents' | 'constellations')}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  activeTab === tab.id
+                  isDisabled 
+                    ? 'text-neutral-600 cursor-not-allowed'
+                    : activeTab === tab.id
                     ? 'bg-purple-600 text-white shadow-lg'
                     : 'text-neutral-400 hover:text-white hover:bg-neutral-600'
                 }`}
+                title={isDisabled ? 'Сначала сохраните основную информацию о персонаже' : ''}
               >
-                <Icon className="w-4 h-4 text-neutral-400" />
+                <Icon className={`w-4 h-4 ${isDisabled ? 'text-neutral-600' : 'text-neutral-400'}`} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -556,8 +573,15 @@ export default function AddCharacterPage() {
         {/* Билды */}
         {activeTab === 'builds' && (
           <div className="space-y-4">
-            {/* Описание геймплея */}
-            <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
+            {!isCharacterSaved ? (
+              <div className="text-center py-8 text-gray-400">
+                <p>Сначала сохраните основную информацию о персонаже</p>
+                <p className="text-sm">Билды можно будет настроить после сохранения персонажа</p>
+              </div>
+            ) : (
+              <>
+                {/* Описание геймплея */}
+                <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white">Общее описание геймплея</h3>
                 {isEditingGameplayDescription ? (
@@ -678,13 +702,22 @@ export default function AddCharacterPage() {
                 ))}
               </div>
             )}
+                </>
+            )}
           </div>
         )}
 
         {/* Рекомендации */}
         {activeTab === 'recommendations' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            {!isCharacterSaved ? (
+              <div className="text-center py-8 text-gray-400">
+                <p>Сначала сохраните основную информацию о персонаже</p>
+                <p className="text-sm">Рекомендации можно будет настроить после сохранения персонажа</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-white">Рекомендации персонажа</h3>
               <Button 
                 type="button" 
@@ -824,13 +857,15 @@ export default function AddCharacterPage() {
                 </div>
               </div>
             )}
+                </>
+            )}
           </div>
         )}
 
         {/* Таланты */}
         {activeTab === 'talents' && (
           <div className="space-y-4">
-            {formData.id ? (
+            {isCharacterSaved && formData.id ? (
               <TalentManager 
                 characterId={formData.id} 
                 onSave={() => {
@@ -841,7 +876,7 @@ export default function AddCharacterPage() {
               />
             ) : (
               <div className="text-center py-8 text-gray-400">
-                <p>Сначала заполните ID персонажа в основной информации</p>
+                <p>Сначала сохраните основную информацию о персонаже</p>
                 <p className="text-sm">Таланты можно будет настроить после сохранения персонажа</p>
               </div>
             )}
@@ -851,14 +886,21 @@ export default function AddCharacterPage() {
         {/* Созвездия */}
         {activeTab === 'constellations' && (
           <div className="space-y-4">
-            <ConstellationManager 
-              characterId={formData.id || ''} 
-              onSave={() => {
-                const event = new CustomEvent('constellationsUpdated', { detail: { characterId: formData.id } });
-                window.dispatchEvent(event);
-                console.log('Constellations saved successfully');
-              }}
-            />
+            {isCharacterSaved && formData.id ? (
+              <ConstellationManager 
+                characterId={formData.id} 
+                onSave={() => {
+                  const event = new CustomEvent('constellationsUpdated', { detail: { characterId: formData.id } });
+                  window.dispatchEvent(event);
+                  console.log('Constellations saved successfully');
+                }}
+              />
+            ) : (
+              <div className="text-center py-8 text-gray-400">
+                <p>Сначала сохраните основную информацию о персонаже</p>
+                <p className="text-sm">Созвездия можно будет настроить после сохранения персонажа</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -870,16 +912,18 @@ export default function AddCharacterPage() {
             onClick={() => router.push('/admin/characters')}
             className="border-neutral-600 text-gray-400 hover:text-white"
           >
-            Отмена
+            {isCharacterSaved ? 'К списку персонажей' : 'Отмена'}
           </Button>
-          <Button
-            type="submit"
-            disabled={saving}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {saving ? 'Сохранение...' : 'Сохранить'}
-          </Button>
+          {!isCharacterSaved && (
+            <Button
+              type="submit"
+              disabled={saving}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {saving ? 'Сохранение...' : 'Создать персонажа'}
+            </Button>
+          )}
         </div>
       </form>
 
