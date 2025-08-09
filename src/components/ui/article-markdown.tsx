@@ -41,6 +41,17 @@ const sanitizeSchema: Schema = {
       'className',
     ],
   },
+  protocols: {
+    ...(defaultSchema.protocols || {}),
+    href: [
+      ...(((defaultSchema.protocols && defaultSchema.protocols.href) || []) as string[]),
+      'relative',
+    ],
+    src: [
+      ...(((defaultSchema.protocols && (defaultSchema as any).protocols?.src) || []) as string[]),
+      'data', 'relative',
+    ],
+  },
 };
 
 const ArticleMarkdown: React.FC<ArticleMarkdownProps> = ({ content, className = '' }) => {
@@ -68,7 +79,7 @@ const ArticleMarkdown: React.FC<ArticleMarkdownProps> = ({ content, className = 
     img: ({ src, alt }) => (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={src || ''}
+        src={(src || '').toString()}
         alt={alt || ''}
         className="max-w-full h-auto rounded"
         onError={(e) => {
