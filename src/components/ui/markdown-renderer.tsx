@@ -112,8 +112,11 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className 
         </a>
       );
     },
-    code: (rawProps) => {
-      const { inline, className: cls, children, ...props } = rawProps as any;
+    code: ({ inline, className: cls, children, ...props }: {
+      inline?: boolean;
+      className?: string;
+      children?: React.ReactNode;
+    } & React.HTMLAttributes<HTMLElement>) => {
       const base = 'text-sm';
       if (inline) {
         return (
