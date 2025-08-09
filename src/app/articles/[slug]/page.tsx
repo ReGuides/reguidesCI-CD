@@ -6,7 +6,7 @@ import { IArticle } from '@/lib/db/models/Article';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import Link from 'next/link';
 import { ArrowLeft, Eye, Clock, Calendar, User } from 'lucide-react';
-import MarkdownRenderer from '@/components/ui/markdown-renderer';
+import ArticleMarkdown from '@/components/ui/article-markdown';
 
 interface ArticleDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -207,7 +207,7 @@ export default function ArticleDetailPage({ params }: ArticleDetailPageProps) {
 
         {/* Содержание статьи */}
         <div className="mb-8">
-          <MarkdownRenderer content={article.content} />
+          <ArticleMarkdown content={article.content} />
         </div>
 
         {/* Теги */}
