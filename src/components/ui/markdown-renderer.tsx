@@ -6,6 +6,7 @@ import type { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import type { Schema } from 'hast-util-sanitize';
 
 // Поддерживаемые цвета (как в старой версии)
 const COLORS: Record<string, string> = {
@@ -40,43 +41,29 @@ interface MarkdownRendererProps {
   onItemClick?: (type: string, id: string) => void;
 }
 
-// Разрешаем необходимые теги и атрибуты для безопасного HTML в markdown
-const sanitizeSchema: Parameters<typeof rehypeSanitize>[0] = {
-  ...(defaultSchema as any),
+// Безопасная схема для HTML внутри markdown
+const sanitizeSchema: Schema = {
+  ...defaultSchema,
   tagNames: [
-    ...((defaultSchema as any).tagNames || []),
-    'span',
-    'img',
-    'table',
-    'thead',
-    'tbody',
-    'th',
-    'tr',
-    'td',
+    ...(defaultSchema.tagNames || []),
+    'span', 'img', 'table', 'thead', 'tbody', 'th', 'tr', 'td',
   ],
   attributes: {
-    ...((defaultSchema as any).attributes || {}),
+    ...(defaultSchema.attributes || {}),
     '*': [
-      ...(((defaultSchema as any).attributes || {})['*'] || []),
+      ...((defaultSchema.attributes && defaultSchema.attributes['*']) || []),
       'className',
     ],
     a: [
-      ...(((defaultSchema as any).attributes || {}).a || []),
-      'href',
-      'target',
-      'rel',
-      'className',
+      ...((defaultSchema.attributes && defaultSchema.attributes.a) || []),
+      'href', 'target', 'rel', 'className',
     ],
     img: [
-      ...(((defaultSchema as any).attributes || {}).img || []),
-      'src',
-      'alt',
-      'width',
-      'height',
-      'className',
+      ...((defaultSchema.attributes && defaultSchema.attributes.img) || []),
+      'src', 'alt', 'width', 'height', 'className',
     ],
     span: [
-      ...(((defaultSchema as any).attributes || {}).span || []),
+      ...((defaultSchema.attributes && defaultSchema.attributes.span) || []),
       'className',
     ],
   },
@@ -88,7 +75,7 @@ function preprocessColors(input: string): string {
 
   const replaceYoVariants = (s: string) => s.replace(/ё/g, 'е');
 
-  return input.replace(/\[([a-zA-Zа-яА-ЯёЁ]+):([^\]]+)\]/g, (_m, rawColor: string, inner: string) => {
+  return input.replace(/\[([a-zA-Zа-яА-ЯёЁ]+):([^\]]+)\]/g, (_m: string, rawColor: string, inner: string) => {
     const c1 = rawColor.toLowerCase();
     const c2 = replaceYoVariants(c1);
     const c3 = c2.replace(/e/g, 'ё');
