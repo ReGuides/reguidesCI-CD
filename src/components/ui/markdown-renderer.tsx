@@ -1,12 +1,6 @@
 'use client';
 
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import type { Components } from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
-import type { Schema } from 'hast-util-sanitize';
 
 // Поддерживаемые цвета (как в старой версии)
 const COLORS: Record<string, string> = {
@@ -25,7 +19,7 @@ const COLORS: Record<string, string> = {
   purple: 'text-purple-400',
   cyan: 'text-cyan-400',
   pink: 'text-pink-400',
-  // Алиасы (рус)
+  // Алиасы
   голубой: 'text-cyan-400',
   синий: 'text-blue-400',
   зелёный: 'text-green-400',
@@ -41,122 +35,142 @@ interface MarkdownRendererProps {
   onItemClick?: (type: string, id: string) => void;
 }
 
-// Безопасная схема для HTML внутри markdown
-const sanitizeSchema: Schema = {
-  ...defaultSchema,
-  tagNames: [
-    ...(defaultSchema.tagNames || []),
-    'span', 'img', 'table', 'thead', 'tbody', 'th', 'tr', 'td',
-  ],
-  attributes: {
-    ...(defaultSchema.attributes || {}),
-    '*': [
-      ...((defaultSchema.attributes && defaultSchema.attributes['*']) || []),
-      'className',
-    ],
-    a: [
-      ...((defaultSchema.attributes && defaultSchema.attributes.a) || []),
-      'href', 'target', 'rel', 'className',
-    ],
-    img: [
-      ...((defaultSchema.attributes && defaultSchema.attributes.img) || []),
-      'src', 'alt', 'width', 'height', 'className',
-    ],
-    span: [
-      ...((defaultSchema.attributes && defaultSchema.attributes.span) || []),
-      'className',
-    ],
-  },
-};
-
-// Преобразуем нашу кастомную раскраску [color:текст] в безопасный HTML перед парсингом markdown
-function preprocessColors(input: string): string {
-  if (!input) return '';
-
-  const replaceYoVariants = (s: string) => s.replace(/ё/g, 'е');
-
-  return input.replace(/\[([a-zA-Zа-яА-ЯёЁ]+):([^\]]+)\]/g, (_m: string, rawColor: string, inner: string) => {
-    const c1 = rawColor.toLowerCase();
-    const c2 = replaceYoVariants(c1);
-    const c3 = c2.replace(/e/g, 'ё');
-    const colorClass = COLORS[c1] || COLORS[c2] || COLORS[c3];
-    if (!colorClass) return inner; // если цвет неизвестен — вернуть текст без обертки
-    return `<span class="${colorClass}">${inner}</span>`;
-  });
-}
-
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '', onItemClick }) => {
-  const processed = preprocessColors(content);
+  // Главная функция для рендера разметки (как в старой версии)
+  const renderRichText = (text: string): React.ReactNode => {
+    if (!text) return null;
 
-  const markdownComponents: Components = {
-    a: ({ href, children }) => {
-      const url = href || '';
-      if (typeof url === 'string' && /^(weapon|artifact|character|talent|constellation):/.test(url)) {
-        const [type, idRaw] = url.split(':');
-        let id = idRaw || '';
-        if (type === 'talent' && id.includes('_')) {
-          id = id.split('_')[0];
+    // Парсим строки по \n для поддержки переносов
+    const lines = text.split(/\n/);
+    return lines.map((line, i) => (
+      <React.Fragment key={i}>
+        {parseLine(line)}
+        {i < lines.length - 1 && <br />}
+      </React.Fragment>
+    ));
+  };
+
+  // Парсинг строки (как в старой версии)
+  const parseLine = (line: string): React.ReactNode => {
+    // Сначала ссылки и спец-ссылки: [текст](url)
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let lastIndex = 0;
+    const result: React.ReactNode[] = [];
+    let match: RegExpExecArray | null;
+    
+    while ((match = linkRegex.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        result.push(parseColorsAndBold(line.slice(lastIndex, match.index)));
+      }
+      const [full, text, href] = match;
+      
+      if (/^(weapon|artifact|character|talent|constellation):/.test(href)) {
+        // Спец-ссылка
+        const [type, id] = href.split(':');
+        
+        // Для талантов извлекаем тип из полного ID
+        let processedId = id;
+        if (type === 'talent') {
+          // Если ID содержит подчеркивание, извлекаем тип (например, passive_6862fa05411509dc6fa5172b -> passive)
+          if (id.includes('_')) {
+            processedId = id.split('_')[0];
+          }
         }
-        return (
+        
+        result.push(
           <button
+            key={href + match.index}
             className="underline text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
-            onClick={() => onItemClick?.(type, id)}
+            onClick={() => onItemClick?.(type, processedId)}
           >
-            {children}
+            {text}
           </button>
         );
-      }
-      return (
-        <a href={url as string} target="_blank" rel="noopener noreferrer" className="underline text-blue-400 hover:text-blue-300">
-          {children}
-        </a>
-      );
-    },
-    code: ({ inline, className: cls, children, ...props }: {
-      inline?: boolean;
-      className?: string;
-      children?: React.ReactNode;
-    } & React.HTMLAttributes<HTMLElement>) => {
-      const base = 'text-sm';
-      if (inline) {
-        return (
-          <code className={`px-1 py-0.5 rounded bg-neutral-800 text-pink-300 ${base}`} {...props}>
-            {children}
-          </code>
+      } else {
+        // Обычная ссылка
+        result.push(
+          <a
+            key={href + match.index}
+            href={href}
+            className="underline text-blue-400 hover:text-blue-300"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {text}
+          </a>
         );
       }
-      return (
-        <pre className="p-3 rounded bg-neutral-900 overflow-x-auto">
-          <code className={`text-neutral-200 ${base} ${cls || ''}`} {...props}>
-            {children}
-          </code>
-        </pre>
+      lastIndex = match.index + full.length;
+    }
+    
+    if (lastIndex < line.length) {
+      result.push(parseColorsAndBold(line.slice(lastIndex)));
+    }
+    return result;
+  };
+
+  // Парсинг цветов и жирного текста (как в старой версии)
+  const parseColorsAndBold = (text: string): React.ReactNode => {
+    // Цвет: [color:текст]
+    const colorRegex = /\[([a-z]+):([^\]]+)\]/gi;
+    let lastIndex = 0;
+    const result: React.ReactNode[] = [];
+    let match: RegExpExecArray | null;
+    
+    while ((match = colorRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        result.push(parseBold(text.slice(lastIndex, match.index)));
+      }
+      const [full, color, inner] = match;
+      const colorClass = COLORS[color.toLowerCase()] || '';
+      result.push(
+        <span key={color + match.index} className={colorClass}>
+          {parseBold(inner)}
+        </span>
       );
-    },
-    img: ({ src, alt }) => (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={src || ''}
-        alt={alt || ''}
-        className="max-w-full h-auto rounded"
-        onError={(e) => {
-          (e.currentTarget as HTMLImageElement).style.display = 'none';
-        }}
-      />
-    ),
+      lastIndex = match.index + full.length;
+    }
+    
+    if (lastIndex < text.length) {
+      result.push(parseBold(text.slice(lastIndex)));
+    }
+    return result;
+  };
+
+  // Парсинг жирного текста (как в старой версии)
+  const parseBold = (text: string): React.ReactNode => {
+    // Жирный: **текст** или __текст__
+    const boldRegex = /\*\*([^*]+)\*\*|__([^_]+)__/g;
+    let lastIndex = 0;
+    const result: React.ReactNode[] = [];
+    let match: RegExpExecArray | null;
+    
+    while ((match = boldRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        result.push(text.slice(lastIndex, match.index));
+      }
+      const boldText = match[1] || match[2];
+      result.push(
+        <strong key={match.index} className="font-bold text-white">
+          {boldText}
+        </strong>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+    
+    if (lastIndex < text.length) {
+      result.push(text.slice(lastIndex));
+    }
+    return result;
   };
 
   return (
     <div className={`prose prose-invert max-w-none ${className}`}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[[rehypeRaw], [rehypeSanitize, sanitizeSchema]]}
-        components={markdownComponents}
-      >
-        {processed}
-      </ReactMarkdown>
+      <div className="text-gray-300 leading-relaxed">
+        {renderRichText(content)}
+      </div>
     </div>
   );
 };
 
-export default MarkdownRenderer;
+export default MarkdownRenderer; 
