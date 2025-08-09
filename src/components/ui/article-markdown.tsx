@@ -47,9 +47,9 @@ const sanitizeSchema: Schema = {
       ...(((defaultSchema.protocols && defaultSchema.protocols.href) || []) as string[]),
       'relative',
     ],
+    // В базовой схеме src может отсутствовать — явно разрешим безопасные источники
     src: [
-      ...(((defaultSchema.protocols && (defaultSchema as any).protocols?.src) || []) as string[]),
-      'data', 'relative',
+      'http', 'https', 'data', 'relative'
     ],
   },
 };
