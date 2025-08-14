@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { Eye, Pencil, Trash, Plus } from 'lucide-react';
 import { getSafeImageUrl } from '@/lib/utils/imageUtils';
+import Link from 'next/link';
 
 export default function WeaponsAdminPage() {
   const [weapons, setWeapons] = useState<Weapon[]>([]);
@@ -57,14 +58,16 @@ export default function WeaponsAdminPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-white">Управление оружием</h1>
-        <AddButton 
-          variant="primary"
-          size="lg"
-          icon={<Plus />}
-          iconPosition="left"
-        >
-          Добавить оружие
-        </AddButton>
+        <Link href="/admin/weapons/add">
+          <AddButton 
+            variant="primary"
+            size="lg"
+            icon={<Plus />}
+            iconPosition="left"
+          >
+            Добавить оружие
+          </AddButton>
+        </Link>
       </div>
 
       {/* Фильтры */}

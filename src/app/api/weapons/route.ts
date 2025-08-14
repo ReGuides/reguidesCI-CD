@@ -30,4 +30,61 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+export async function POST(request: Request) {
+  try {
+    await connectDB();
+    
+    if (!mongoose.connection.db) {
+      return NextResponse.json(
+        { error: 'Database connection failed' },
+        { status: 500 }
+      );
+    }
+
+    const weaponData = await request.json();
+    
+    // Валидация обязательных полей
+    if (!weaponData.name || !weaponData.id || !weaponData.type || !weaponData.rarity) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name, id, type, rarity' },
+        { status: 400 }
+      );
+    }
+
+    const weaponsCollection = mongoose.connection.db.collection('weapons');
+    
+    // Проверяем, не существует ли уже оружие с таким ID
+    const existingWeapon = await weaponsCollection.findOne({ id: weaponData.id });
+    if (existingWeapon) {
+      return NextResponse.json(
+        { error: 'Weapon with this ID already exists' },
+        { status: 409 }
+      );
+    }
+
+    // Создаем новое оружие
+    const newWeapon = {
+      ...weaponData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const result = await weaponsCollection.insertOne(newWeapon);
+    
+    return NextResponse.json(
+      { 
+        message: 'Weapon created successfully',
+        weaponId: result.insertedId 
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error creating weapon:', error);
+    return NextResponse.json(
+      { error: 'Failed to create weapon' },
+      { status: 500 }
+    );
+  }
 } 
