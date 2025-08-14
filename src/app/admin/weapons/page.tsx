@@ -136,16 +136,39 @@ export default function WeaponsAdminPage() {
                 variant="view" 
                 icon={<Eye />} 
                 title="Просмотр"
+                onClick={() => window.open(`/weapons/${weapon.id}`, '_blank')}
               />
-              <IconActionButton 
-                variant="edit" 
-                icon={<Pencil />} 
-                title="Редактировать"
-              />
+              <Link href={`/admin/weapons/${weapon.id}/edit`}>
+                <IconActionButton 
+                  variant="edit" 
+                  icon={<Pencil />} 
+                  title="Редактировать"
+                />
+              </Link>
               <IconActionButton 
                 variant="delete" 
                 icon={<Trash />} 
                 title="Удалить"
+                onClick={async () => {
+                  if (confirm(`Вы уверены, что хотите удалить оружие "${weapon.name}"?`)) {
+                    try {
+                      const response = await fetch(`/api/weapons/${weapon.id}`, {
+                        method: 'DELETE',
+                      });
+                      
+                      if (response.ok) {
+                        alert('Оружие успешно удалено!');
+                        fetchWeapons(); // Обновляем список
+                      } else {
+                        const errorData = await response.json();
+                        alert(`Ошибка удаления: ${errorData.error || 'Неизвестная ошибка'}`);
+                      }
+                    } catch (error) {
+                      console.error('Ошибка при удалении оружия:', error);
+                      alert('Произошла ошибка при удалении оружия');
+                    }
+                  }
+                }}
               />
             </div>
           </Card>
