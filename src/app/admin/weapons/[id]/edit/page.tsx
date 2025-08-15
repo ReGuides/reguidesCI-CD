@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { use } from 'react';
 import { Weapon } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { ArrowLeft, Save, Upload, X, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import Image from 'next/image';
 
 interface EditWeaponPageProps {
   params: Promise<{ id: string }>;
@@ -446,9 +446,11 @@ export default function EditWeaponPage({ params }: EditWeaponPageProps) {
                     {previewImage ? (
                       <div className="space-y-4">
                         <div className="relative inline-block">
-                          <img
+                          <Image
                             src={previewImage}
                             alt="Preview"
+                            width={128}
+                            height={128}
                             className="w-32 h-32 object-cover rounded-lg border border-neutral-600"
                           />
                           <button
