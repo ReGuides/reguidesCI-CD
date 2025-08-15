@@ -138,13 +138,12 @@ export default function WeaponsAdminPage() {
                 title="Просмотр"
                 onClick={() => window.open(`/weapons/${weapon.id}`, '_blank')}
               />
-              <Link href={`/admin/weapons/${weapon.id}/edit`}>
-                <IconActionButton 
-                  variant="edit" 
-                  icon={<Pencil />} 
-                  title="Редактировать"
-                />
-              </Link>
+              <IconActionButton 
+                variant="edit" 
+                icon={<Pencil />} 
+                title="Редактировать"
+                onClick={() => window.location.href = `/admin/weapons/${weapon.id}/edit`}
+              />
               <IconActionButton 
                 variant="delete" 
                 icon={<Trash />} 
