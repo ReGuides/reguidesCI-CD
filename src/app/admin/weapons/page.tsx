@@ -17,8 +17,8 @@ export default function WeaponsAdminPage() {
   const [weapons, setWeapons] = useState<Weapon[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterRarity, setFilterRarity] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -45,9 +45,18 @@ export default function WeaponsAdminPage() {
 
   const filteredWeapons = weapons.filter(weapon => {
     const matchesSearch = weapon.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRarity = filterRarity === 'all' || weapon.rarity.toString() === filterRarity;
     const matchesType = filterType === 'all' || weapon.type === filterType;
-    return matchesSearch && matchesRarity && matchesType;
+    return matchesSearch && matchesType;
+  }).sort((a, b) => {
+    if (sortBy === 'date') {
+      // По дате добавления (новые первыми)
+      const dateA = new Date(a.createdAt || 0);
+      const dateB = new Date(b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    } else {
+      // По названию (А-Я)
+      return a.name.localeCompare(b.name, 'ru');
+    }
   });
 
   const openWeaponModal = (weapon: Weapon) => {
@@ -96,18 +105,6 @@ export default function WeaponsAdminPage() {
         </div>
         <div>
           <select
-            value={filterRarity}
-            onChange={(e) => setFilterRarity(e.target.value)}
-            className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-white"
-          >
-            <option value="all">Все редкости</option>
-            <option value="5">5★</option>
-            <option value="4">4★</option>
-            <option value="3">3★</option>
-          </select>
-        </div>
-        <div>
-          <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
             className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-white"
@@ -118,6 +115,16 @@ export default function WeaponsAdminPage() {
             <option value="Polearm">Древковое</option>
             <option value="Bow">Лук</option>
             <option value="Catalyst">Катализатор</option>
+          </select>
+        </div>
+        <div>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'date' | 'name')}
+            className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-white"
+          >
+            <option value="date">По дате добавления (новые первыми)</option>
+            <option value="name">По названию (А-Я)</option>
           </select>
         </div>
         <div className="text-white">

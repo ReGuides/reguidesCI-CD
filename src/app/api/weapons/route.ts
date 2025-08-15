@@ -24,8 +24,10 @@ export async function GET() {
       subStatName: 1,
       subStatValue: 1,
       passiveName: 1,
-      passiveEffect: 1
-    }).toArray();
+      passiveEffect: 1,
+      createdAt: 1,
+      updatedAt: 1
+    }).sort({ createdAt: -1 }).toArray();
 
     return NextResponse.json({ data: weapons });
   } catch (error) {

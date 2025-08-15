@@ -129,6 +129,8 @@ export interface Weapon {
   passiveName: string;
   passiveEffect: string;
   image?: string; // теперь опционально
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Artifact types

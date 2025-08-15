@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { WeaponCard } from '@/components/weapon-card';
 import { WeaponFilters } from '@/components/features/weapon-filters';
 import { Weapon } from '@/types';
@@ -11,9 +11,9 @@ export default function WeaponsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
+    search: '',
     type: 'all',
-    rarity: 'all',
-    search: ''
+    sortBy: 'date' as 'date' | 'name'
   });
 
   const handleFiltersChange = useCallback((newFilters: typeof filters) => {
@@ -25,12 +25,7 @@ export default function WeaponsPage() {
       try {
         setLoading(true);
         
-        const params = new URLSearchParams();
-        if (filters.type !== 'all') params.append('type', filters.type);
-        if (filters.rarity !== 'all') params.append('rarity', filters.rarity);
-        if (filters.search) params.append('search', filters.search);
-
-        const response = await fetch(`/api/weapons?${params.toString()}`);
+        const response = await fetch('/api/weapons');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -50,7 +45,40 @@ export default function WeaponsPage() {
     };
 
     fetchWeapons();
-  }, [filters]);
+  }, []);
+
+  // Фильтрация и сортировка оружия
+  const filteredAndSortedWeapons = useMemo(() => {
+    let result = [...weapons];
+
+    // Фильтрация по названию
+    if (filters.search.trim()) {
+      const searchLower = filters.search.toLowerCase();
+      result = result.filter(weapon => 
+        weapon.name.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Фильтрация по типу
+    if (filters.type !== 'all') {
+      result = result.filter(weapon => weapon.type === filters.type);
+    }
+
+    // Сортировка
+    result.sort((a, b) => {
+      if (filters.sortBy === 'date') {
+        // По дате добавления (новые первыми)
+        const dateA = new Date(a.createdAt || 0);
+        const dateB = new Date(b.createdAt || 0);
+        return dateB.getTime() - dateA.getTime();
+      } else {
+        // По названию (А-Я)
+        return a.name.localeCompare(b.name, 'ru');
+      }
+    });
+
+    return result;
+  }, [weapons, filters]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-6 overflow-hidden">
@@ -74,13 +102,13 @@ export default function WeaponsPage() {
         {/* Weapons Grid */}
         {!loading && !error && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {weapons.map((weapon) => (
+            {filteredAndSortedWeapons.map((weapon) => (
               <WeaponCard key={weapon.id} weapon={weapon} />
             ))}
           </div>
         )}
         {/* No Results */}
-        {!loading && !error && weapons.length === 0 && (
+        {!loading && !error && filteredAndSortedWeapons.length === 0 && (
           <div className="text-center text-text-secondary">
             <p>Оружие не найдено</p>
           </div>
