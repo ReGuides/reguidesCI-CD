@@ -33,7 +33,8 @@ export default function WeaponsAdminPage() {
       if (response.ok) {
         const data = await response.json();
         // Гарантируем, что всегда массив
-        setWeapons(Array.isArray(data.data) ? data.data : data.data?.weapons || data.weapons || data || []);
+        const weaponsData = data.data || data.weapons || data || [];
+        setWeapons(Array.isArray(weaponsData) ? weaponsData : []);
       }
     } catch (error) {
       console.error('Error fetching weapons:', error);

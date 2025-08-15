@@ -84,24 +84,18 @@ export function WeaponModal({ weapon, isOpen, onClose, isLoading = false }: Weap
                     <span className="text-gray-400">Базовая атака</span>
                     <span className="text-white font-medium">
                       {weapon.baseAttack || 'Не указано'}
-                      {weapon.baseAttack === undefined && ' (undefined)'}
-                      {weapon.baseAttack === null && ' (null)'}
                     </span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-neutral-700">
                     <span className="text-gray-400">Дополнительная характеристика</span>
                     <span className="text-white font-medium">
                       {weapon.subStatName || 'Не указано'}
-                      {weapon.subStatName === undefined && ' (undefined)'}
-                      {weapon.subStatName === null && ' (null)'}
                     </span>
                   </div>
                   <div className="flex justify-between py-1">
                     <span className="text-gray-400">Значение</span>
                     <span className="text-white font-medium">
                       {weapon.subStatValue || 'Не указано'}
-                      {weapon.subStatValue === undefined && ' (undefined)'}
-                      {weapon.subStatValue === null && ' (null)'}
                     </span>
                   </div>
                 </div>
@@ -114,16 +108,12 @@ export function WeaponModal({ weapon, isOpen, onClose, isLoading = false }: Weap
                     <span className="text-gray-400 text-xs">Название</span>
                     <p className="text-white font-medium mt-1">
                       {weapon.passiveName || 'Не указано'}
-                      {weapon.passiveName === undefined && ' (undefined)'}
-                      {weapon.passiveName === null && ' (null)'}
                     </p>
                   </div>
                   <div>
                     <span className="text-gray-400 text-xs">Эффект</span>
                     <p className="text-white mt-2 text-sm leading-relaxed bg-neutral-900 rounded p-3">
                       {weapon.passiveEffect || 'Не указано'}
-                      {weapon.passiveEffect === undefined && ' (undefined)'}
-                      {weapon.passiveEffect === null && ' (null)'}
                     </p>
                   </div>
                 </div>

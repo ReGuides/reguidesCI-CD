@@ -19,7 +19,12 @@ export async function GET() {
       name: 1,
       type: 1,
       rarity: 1,
-      image: 1
+      image: 1,
+      baseAttack: 1,
+      subStatName: 1,
+      subStatValue: 1,
+      passiveName: 1,
+      passiveEffect: 1
     }).toArray();
 
     return NextResponse.json({ data: weapons });

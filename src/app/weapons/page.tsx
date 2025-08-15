@@ -38,7 +38,9 @@ export default function WeaponsPage() {
         
         const data = await response.json();
         
-        setWeapons(data.data || []);
+        // Исправляем извлечение данных из ответа API
+        const weaponsData = data.data || data.weapons || data || [];
+        setWeapons(Array.isArray(weaponsData) ? weaponsData : []);
       } catch (err) {
         console.error('Error fetching weapons:', err);
         setError(err instanceof Error ? err.message : 'An error occurred');

@@ -36,7 +36,9 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
       }
       
       const weaponData = await response.json();
-      setFullWeapon(weaponData);
+      // Исправляем извлечение данных из ответа API
+      const weaponInfo = weaponData.data || weaponData;
+      setFullWeapon(weaponInfo);
     } catch (err) {
       console.error('Error loading full weapon data:', err);
       // Используем базовые данные если загрузка не удалась
