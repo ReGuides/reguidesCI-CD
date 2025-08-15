@@ -8,9 +8,10 @@ import { IconActionButton } from '@/components/ui/icon-action-button';
 import { AddButton } from '@/components/ui/add-button';
 import { Input } from '@/components/ui/input';
 import OptimizedImage from '@/components/ui/optimized-image';
-import { Eye, Pencil, Trash, Plus } from 'lucide-react';
+import { Eye, Pencil, Trash, Plus, X } from 'lucide-react';
 import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function WeaponsAdminPage() {
   const [weapons, setWeapons] = useState<Weapon[]>([]);
@@ -18,6 +19,8 @@ export default function WeaponsAdminPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRarity, setFilterRarity] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
+  const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchWeapons();
@@ -45,6 +48,16 @@ export default function WeaponsAdminPage() {
     const matchesType = filterType === 'all' || weapon.type === filterType;
     return matchesSearch && matchesRarity && matchesType;
   });
+
+  const openWeaponModal = (weapon: Weapon) => {
+    setSelectedWeapon(weapon);
+    setShowModal(true);
+  };
+
+  const closeWeaponModal = () => {
+    setShowModal(false);
+    setSelectedWeapon(null);
+  };
 
   if (loading) {
     return (
@@ -136,7 +149,7 @@ export default function WeaponsAdminPage() {
                 variant="view" 
                 icon={<Eye />} 
                 title="Просмотр"
-                onClick={() => window.open(`/weapons/${weapon.id}`, '_blank')}
+                onClick={() => openWeaponModal(weapon)}
               />
               <IconActionButton 
                 variant="edit" 
@@ -177,6 +190,116 @@ export default function WeaponsAdminPage() {
       {filteredWeapons.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-400 text-lg">Оружие не найдено</p>
+        </div>
+      )}
+
+      {/* Модальное окно с информацией об оружии */}
+      {showModal && selectedWeapon && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-neutral-800 border border-neutral-700 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Заголовок модального окна */}
+            <div className="flex items-center justify-between p-6 border-b border-neutral-700">
+              <h2 className="text-2xl font-bold text-white">{selectedWeapon.name}</h2>
+              <button
+                onClick={closeWeaponModal}
+                className="text-neutral-400 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Содержимое модального окна */}
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Изображение оружия */}
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <Image
+                      src={getSafeImageUrl(selectedWeapon.image, selectedWeapon.name, 'weapon')}
+                      alt={selectedWeapon.name}
+                      width={200}
+                      height={200}
+                      className="rounded-lg border border-neutral-600"
+                    />
+                  </div>
+                </div>
+
+                {/* Информация об оружии */}
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Основная информация</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-neutral-400">ID:</span>
+                        <span className="text-white">{selectedWeapon.id}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-400">Тип:</span>
+                        <span className="text-white">{selectedWeapon.type}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-400">Редкость:</span>
+                        <span className="text-white">{'★'.repeat(selectedWeapon.rarity)}</span>
+                      </div>
+                      {selectedWeapon.baseAttack && (
+                        <div className="flex justify-between">
+                          <span className="text-neutral-400">Базовая атака:</span>
+                          <span className="text-white">{selectedWeapon.baseAttack}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Дополнительная характеристика */}
+                  {selectedWeapon.subStatName && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Дополнительная характеристика</h3>
+                      <div className="text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-neutral-400">{selectedWeapon.subStatName}:</span>
+                          <span className="text-white">{selectedWeapon.subStatValue}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Пассивная способность */}
+                  {selectedWeapon.passiveName && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Пассивная способность</h3>
+                      <div className="text-sm">
+                        <div className="text-neutral-400 mb-1">{selectedWeapon.passiveName}</div>
+                        {selectedWeapon.passiveEffect && (
+                          <div className="text-white text-xs leading-relaxed">
+                            {selectedWeapon.passiveEffect}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Кнопки действий */}
+            <div className="flex justify-end gap-3 p-6 border-t border-neutral-700">
+              <button
+                onClick={closeWeaponModal}
+                className="px-4 py-2 text-neutral-400 hover:text-white transition-colors"
+              >
+                Закрыть
+              </button>
+              <button
+                onClick={() => {
+                  closeWeaponModal();
+                  window.location.href = `/admin/weapons/${selectedWeapon.id}/edit`;
+                }}
+                className="px-4 py-2 bg-accent hover:bg-accent-dark text-white rounded-lg transition-colors"
+              >
+                Редактировать
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
