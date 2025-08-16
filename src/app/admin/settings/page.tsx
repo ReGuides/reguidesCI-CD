@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 interface SiteSettings {
+  _id?: string;
   siteName: string;
   siteDescription: string;
   logo?: string;
@@ -54,6 +55,8 @@ interface SiteSettings {
     pushNotifications: boolean;
     birthdayReminders: boolean;
   };
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export default function SettingsPage() {

@@ -1,6 +1,51 @@
 import mongoose from 'mongoose';
 
-const siteSettingsSchema = new mongoose.Schema({
+interface ISiteSettings {
+  siteName: string;
+  siteDescription: string;
+  logo?: string;
+  favicon?: string;
+  seo: {
+    defaultTitle: string;
+    defaultDescription: string;
+    googleAnalyticsId?: string;
+    metaKeywords?: string;
+  };
+  social: {
+    telegram?: string;
+    discord?: string;
+    twitter?: string;
+    youtube?: string;
+    vk?: string;
+  };
+  features: {
+    r34Mode: boolean;
+    maintenanceMode: boolean;
+    registrationEnabled: boolean;
+    commentsEnabled: boolean;
+    searchEnabled: boolean;
+  };
+  content: {
+    maxCharactersPerPage: number;
+    maxWeaponsPerPage: number;
+    maxArtifactsPerPage: number;
+    enableCharacterBuilds: boolean;
+    enableWeaponComparison: boolean;
+  };
+  notifications: {
+    emailNotifications: boolean;
+    pushNotifications: boolean;
+    birthdayReminders: boolean;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ISiteSettingsModel extends mongoose.Model<ISiteSettings> {
+  getSettings(): Promise<ISiteSettings>;
+}
+
+const siteSettingsSchema = new mongoose.Schema<ISiteSettings>({
   // Основные настройки
   siteName: {
     type: String,
@@ -149,7 +194,7 @@ siteSettingsSchema.pre('save', function(next) {
 });
 
 // Создаем единственный документ настроек
-siteSettingsSchema.statics.getSettings = async function() {
+siteSettingsSchema.statics.getSettings = async function(): Promise<ISiteSettings> {
   let settings = await this.findOne();
   if (!settings) {
     settings = await this.create({});
@@ -157,6 +202,7 @@ siteSettingsSchema.statics.getSettings = async function() {
   return settings;
 };
 
-const SiteSettings = mongoose.models.SiteSettings || mongoose.model('SiteSettings', siteSettingsSchema);
+const SiteSettings = mongoose.models.SiteSettings as ISiteSettingsModel || 
+  mongoose.model<ISiteSettings, ISiteSettingsModel>('SiteSettings', siteSettingsSchema);
 
 export default SiteSettings;
