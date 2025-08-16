@@ -237,22 +237,25 @@ export default function AdvertisementsPage() {
                     size="sm"
                     onClick={() => toggleStatus(ad._id, ad.isActive)}
                     className={ad.isActive 
-                      ? 'bg-red-600 hover:bg-red-700 text-white' 
-                      : 'bg-green-600 hover:bg-green-700 text-white'
+                      ? '!bg-red-600 !hover:bg-red-700 !text-white border-0' 
+                      : '!bg-green-600 !hover:bg-green-700 !text-white border-0'
                     }
                   >
                     {ad.isActive ? 'Деактивировать' : 'Активировать'}
                   </Button>
                   <div className="flex gap-2">
                     <Link href={`/admin/advertisements/${ad._id}/edit`}>
-                      <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
+                      <Button 
+                        size="sm" 
+                        className="!bg-purple-600 !hover:bg-purple-700 !text-white border-0"
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
                     </Link>
                     <Button
                       size="sm"
                       onClick={() => handleDelete(ad._id)}
-                      className="bg-red-600 hover:bg-red-700 text-white"
+                      className="!bg-red-600 !hover:bg-red-700 !text-white border-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

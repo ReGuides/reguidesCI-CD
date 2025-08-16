@@ -341,7 +341,7 @@ export default function AddAdvertisementPage() {
           <Button
             type="submit"
             disabled={saving}
-            className="bg-purple-600 hover:bg-purple-700"
+            className="!bg-purple-600 !hover:bg-purple-700 !text-white border-0"
           >
             <Save className="w-4 h-4 mr-2" />
             {saving ? 'Сохранение...' : 'Сохранить'}
