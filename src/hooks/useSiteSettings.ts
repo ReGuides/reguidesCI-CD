@@ -5,41 +5,8 @@ import { useState, useEffect } from 'react';
 interface SiteSettings {
   _id?: string;
   siteName: string;
-  siteDescription: string;
   logo?: string;
   favicon?: string;
-  seo: {
-    defaultTitle: string;
-    defaultDescription: string;
-    googleAnalyticsId?: string;
-    metaKeywords?: string;
-  };
-  social: {
-    telegram?: string;
-    discord?: string;
-    twitter?: string;
-    youtube?: string;
-    vk?: string;
-  };
-  features: {
-    r34Mode: boolean;
-    maintenanceMode: boolean;
-    registrationEnabled: boolean;
-    commentsEnabled: boolean;
-    searchEnabled: boolean;
-  };
-  content: {
-    maxCharactersPerPage: number;
-    maxWeaponsPerPage: number;
-    maxArtifactsPerPage: number;
-    enableCharacterBuilds: boolean;
-    enableWeaponComparison: boolean;
-  };
-  notifications: {
-    emailNotifications: boolean;
-    pushNotifications: boolean;
-    birthdayReminders: boolean;
-  };
   createdAt?: string;
   updatedAt?: string;
 }
