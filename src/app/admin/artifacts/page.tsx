@@ -16,6 +16,7 @@ export default function ArtifactsAdminPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRarity, setFilterRarity] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'name' | 'date'>('name');
 
   useEffect(() => {
     fetchArtifacts();
@@ -41,6 +42,16 @@ export default function ArtifactsAdminPage() {
     const matchesSearch = artifact.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRarity = filterRarity === 'all' || artifact.rarity.includes(Number(filterRarity));
     return matchesSearch && matchesRarity;
+  }).sort((a, b) => {
+    if (sortBy === 'date') {
+      // По дате добавления (новые первыми)
+      const dateA = new Date(a.createdAt || 0);
+      const dateB = new Date(b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    } else {
+      // По названию (А-Я)
+      return a.name.localeCompare(b.name, 'ru');
+    }
   });
 
   if (loading) {
@@ -60,6 +71,7 @@ export default function ArtifactsAdminPage() {
           size="lg"
           icon={<Plus />}
           iconPosition="left"
+          onClick={() => window.location.href = '/admin/artifacts/add'}
         >
           Добавить артефакт
         </AddButton>
@@ -87,13 +99,23 @@ export default function ArtifactsAdminPage() {
             <option value="3">3★</option>
           </select>
         </div>
+        <div>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'name' | 'date')}
+            className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-white"
+          >
+            <option value="name">По названию</option>
+            <option value="date">По дате добавления</option>
+          </select>
+        </div>
         <div className="text-white">
           Всего: {filteredArtifacts.length}
         </div>
       </div>
 
       {/* Список артефактов */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
         {filteredArtifacts.map((artifact) => (
           <Card key={artifact.id} className="bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 transition-colors rounded-xl min-h-[240px] flex flex-col justify-between p-4">
             <div className="flex items-start space-x-3 mb-2">
@@ -117,16 +139,42 @@ export default function ArtifactsAdminPage() {
                 variant="view" 
                 icon={<Eye />} 
                 title="Просмотр"
+                onClick={() => {
+                  // Открываем модальное окно с информацией об артефакте
+                  // Пока что просто показываем alert
+                  alert(`Артефакт: ${artifact.name}\nРедкость: ${artifact.rarity.join(', ')}★\nБонус 2 предмета: ${artifact.bonus1 || 'Не указано'}\nБонус 4 предмета: ${artifact.bonus2 || 'Не указано'}`);
+                }}
               />
               <IconActionButton 
                 variant="edit" 
                 icon={<Pencil />} 
                 title="Редактировать"
+                onClick={() => window.location.href = `/admin/artifacts/${artifact.id}/edit`}
               />
               <IconActionButton 
                 variant="delete" 
                 icon={<Trash />} 
                 title="Удалить"
+                onClick={async () => {
+                  if (confirm(`Вы уверены, что хотите удалить артефакт "${artifact.name}"?`)) {
+                    try {
+                      const response = await fetch(`/api/artifacts/${artifact.id}`, {
+                        method: 'DELETE'
+                      });
+                      
+                      if (response.ok) {
+                        alert('Артефакт успешно удален!');
+                        fetchArtifacts(); // Обновляем список
+                      } else {
+                        const errorData = await response.json();
+                        alert(`Ошибка удаления: ${errorData.error || 'Неизвестная ошибка'}`);
+                      }
+                    } catch (error) {
+                      console.error('Error deleting artifact:', error);
+                      alert('Произошла ошибка при удалении артефакта');
+                    }
+                  }
+                }}
               />
             </div>
           </Card>

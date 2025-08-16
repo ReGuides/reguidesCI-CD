@@ -138,12 +138,14 @@ export interface Artifact {
   id: string;
   name: string;
   rarity: number[];
-  bonus1?: string;
-  bonus2?: string;
-  bonus4?: string;
-  pieces: number;
+  bonus1?: string; // Бонус за 1 предмет (если pieces >= 1)
+  bonus2?: string; // Бонус за 2 предмета (если pieces >= 2)
+  bonus4?: string; // Бонус за 4 предмета (если pieces >= 4)
+  pieces: number; // Количество предметов в сете: 1, 2, 4 или 5
   image?: string; // теперь опционально
   setType?: 'single';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ArtifactCombination {

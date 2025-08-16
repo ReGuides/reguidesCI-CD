@@ -38,8 +38,7 @@ const artifactSchema = new mongoose.Schema<IArtifact>({
   pieces: { 
     type: Number, 
     required: true,
-    min: 1,
-    max: 5,
+    enum: [1, 2, 4, 5], // Только допустимые значения
     default: 5
   },
   image: {
