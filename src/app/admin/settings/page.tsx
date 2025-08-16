@@ -13,7 +13,6 @@ import {
   Users,
   FileText,
   Bell,
-  Monitor,
   CheckCircle,
   XCircle
 } from 'lucide-react';
