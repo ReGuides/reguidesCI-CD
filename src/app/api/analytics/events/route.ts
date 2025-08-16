@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     
     // Получаем события с фильтрацией
     const events = await EventModel.aggregate([
-      { $match: { timestamp: dateFilter } },
+      { $match: query },
       {
         $addFields: {
           // Исключаем события на страницах админки

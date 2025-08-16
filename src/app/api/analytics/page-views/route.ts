@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
     
     // Получаем просмотры страниц с фильтрацией
     const pageViews = await PageViewModel.aggregate([
-      { $match: { timestamp: query.timestamp } },
+      { $match: query },
       {
         $addFields: {
           // Исключаем страницы админки

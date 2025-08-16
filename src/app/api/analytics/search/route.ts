@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     
     // Получаем поисковые запросы с фильтрацией
     const searchQueries = await SearchQueryModel.aggregate([
-      { $match: { timestamp: query.timestamp } },
+      { $match: query },
       {
         $addFields: {
           // Исключаем поиски на страницах админки
