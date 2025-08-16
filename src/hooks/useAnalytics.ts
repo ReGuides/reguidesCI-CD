@@ -110,12 +110,14 @@ export const trackSearch = async (query: string, resultsCount: number) => {
 export const useAnalytics = () => {
   const pathname = usePathname();
   
-  // Безопасно используем useSearchParams с fallback
+  // Всегда вызываем useSearchParams, но обрабатываем возможные ошибки
   let searchParams: URLSearchParams | null = null;
+  
+  // Используем try-catch для обработки ошибок, но не нарушаем порядок хуков
   try {
     searchParams = useSearchParams();
   } catch {
-    // Fallback для случаев, когда useSearchParams недоступен
+    // Если useSearchParams недоступен, используем null
     searchParams = null;
   }
   

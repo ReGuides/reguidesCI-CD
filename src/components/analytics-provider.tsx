@@ -9,7 +9,9 @@ function AnalyticsTracker() {
     return null;
   } catch (error) {
     // Игнорируем ошибки на сервере или при проблемах с хуками
-    console.warn('Analytics hook error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Analytics hook error:', error);
+    }
     return null;
   }
 }
