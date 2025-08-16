@@ -2,15 +2,13 @@
 
 import Link from 'next/link';
 import { Menu, X, Search } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
-import { useRouter } from 'next/navigation';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { settings } = useSiteSettings();
-  const router = useRouter();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
