@@ -60,6 +60,10 @@ export async function POST(request: NextRequest) {
         uploadDir = join(process.cwd(), 'public');
         fileName = 'favicon.ico';
         break;
+      case 'advertisement':
+        uploadDir = join(process.cwd(), 'public', 'images', 'adv');
+        fileName = `ad-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${getFileExtension(file.name)}`;
+        break;
       case 'weapon':
         uploadDir = join(process.cwd(), 'public', 'images', 'weapons');
         fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${getFileExtension(file.name)}`;
@@ -107,6 +111,8 @@ export async function POST(request: NextRequest) {
       fileUrl = `/images/logos/${fileName}`;
     } else if (type === 'favicon') {
       fileUrl = `/${fileName}`;
+    } else if (type === 'advertisement') {
+      fileUrl = `/images/adv/${fileName}`;
     } else {
       fileUrl = `/images/${type}s/${fileName}`;
     }

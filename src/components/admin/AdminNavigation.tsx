@@ -9,7 +9,8 @@ import {
   FileText, 
   Settings, 
   BarChart3,
-  Home
+  Home,
+  Megaphone
 } from 'lucide-react';
 
 interface AdminNavigationProps {
@@ -55,6 +56,11 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
       href: '/admin/settings',
       label: 'Настройки',
       icon: Settings
+    },
+    {
+      href: '/admin/advertisements',
+      label: 'Реклама',
+      icon: Megaphone
     }
   ];
 
@@ -116,6 +122,10 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
             <div className="flex justify-between text-xs">
               <span className="text-neutral-400">Статей:</span>
               <span className="text-white font-semibold">24</span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-neutral-400">Рекламы:</span>
+              <span className="text-white font-semibold">8</span>
             </div>
           </div>
         </div>
