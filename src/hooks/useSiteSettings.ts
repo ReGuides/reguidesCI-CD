@@ -16,12 +16,22 @@ export const useSiteSettings = () => {
 
   const fetchSettings = async () => {
     try {
+      console.log('useSiteSettings: Fetching settings...');
       const response = await fetch('/api/settings');
+      console.log('useSiteSettings: Response status:', response.status);
+      
       if (response.ok) {
         const result = await response.json();
+        console.log('useSiteSettings: Response result:', result);
+        
         if (result.success) {
+          console.log('useSiteSettings: Settings loaded:', result.data);
           setSettings(result.data);
+        } else {
+          console.warn('useSiteSettings: API returned success: false');
         }
+      } else {
+        console.error('useSiteSettings: Response not ok:', response.status);
       }
     } catch {
       // Тихо игнорируем ошибки, используем fallback значения

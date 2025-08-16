@@ -61,6 +61,8 @@ export default function SettingsPage() {
       setSaving(true);
       setMessage(null);
       
+      console.log('Settings: Saving settings:', settings);
+      
       const response = await fetch('/api/settings', {
         method: 'PUT',
         headers: {
@@ -69,15 +71,22 @@ export default function SettingsPage() {
         body: JSON.stringify(settings),
       });
       
+      console.log('Settings: Save response status:', response.status);
+      
       if (response.ok) {
         const result = await response.json();
+        console.log('Settings: Save response result:', result);
+        
         if (result.success) {
           setMessage({ type: 'success', text: 'Настройки успешно сохранены!' });
+          console.log('Settings: Successfully saved!');
         } else {
           setMessage({ type: 'error', text: 'Ошибка при сохранении настроек' });
+          console.error('Settings: API returned success: false');
         }
       } else {
         setMessage({ type: 'error', text: 'Ошибка при сохранении настроек' });
+        console.error('Settings: Save failed with status:', response.status);
       }
     } catch (error) {
       console.error('Error saving settings:', error);

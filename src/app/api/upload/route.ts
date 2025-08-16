@@ -101,7 +101,14 @@ export async function POST(request: NextRequest) {
     console.log('File saved successfully');
 
     // Возвращаем путь к файлу
-    const fileUrl = `/images/${type === 'logo' || type === 'favicon' ? 'logos' : type}s/${fileName}`;
+    let fileUrl: string;
+    
+    if (type === 'logo' || type === 'favicon') {
+      fileUrl = `/images/logos/${fileName}`;
+    } else {
+      fileUrl = `/images/${type}s/${fileName}`;
+    }
+    
     console.log('File URL:', fileUrl);
 
     return NextResponse.json({ 
