@@ -9,22 +9,8 @@ import { useRouter } from 'next/navigation';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { settings, refreshSettings } = useSiteSettings();
+  const { settings } = useSiteSettings();
   const router = useRouter();
-
-  // Debug logging
-  console.log('Header render - settings:', settings);
-  console.log('Header render - logoUrl:', settings?.logo);
-
-  // Обновляем настройки каждые 30 секунд для синхронизации
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('Header: Refreshing settings...');
-      refreshSettings();
-    }, 30000); // 30 секунд
-
-    return () => clearInterval(interval);
-  }, [refreshSettings]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -33,8 +19,6 @@ export function Header() {
   // Fallback значения на случай ошибки загрузки настроек
   const siteName = settings?.siteName || 'ReGuides';
   const logoUrl = settings?.logo || '/images/logos/logo.png';
-  
-  console.log('Header: Final logoUrl:', logoUrl);
 
   return (
     <header className="bg-header text-text shadow-lg overflow-hidden">
@@ -45,11 +29,8 @@ export function Header() {
             <Link 
               href="/" 
               className="flex items-center space-x-2 sm:space-x-3 group relative z-10"
-              onClick={(e) => {
+              onClick={() => {
                 console.log('Header: Logo/Title clicked, navigating to /');
-                // Fallback: если Link не работает, используем router
-                e.preventDefault();
-                router.push('/');
               }}
             >
               {/* Логотип сайта */}

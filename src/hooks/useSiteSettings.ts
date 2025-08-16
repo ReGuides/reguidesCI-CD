@@ -13,11 +13,28 @@ interface SiteSettings {
 
 export const useSiteSettings = () => {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchSettings = async () => {
+    // Предотвращаем повторные запросы
+    if (isLoading) {
+      console.log('useSiteSettings: Already loading, skipping request');
+      return;
+    }
+
     try {
+      setIsLoading(true);
       console.log('useSiteSettings: Fetching settings...');
-      const response = await fetch('/api/settings');
+      
+      const response = await fetch('/api/settings', {
+        // Добавляем кэширование для предотвращения лишних запросов
+        cache: 'default',
+        // Добавляем заголовки для предотвращения кэширования браузером
+        headers: {
+          'Cache-Control': 'no-cache',
+        }
+      });
+      
       console.log('useSiteSettings: Response status:', response.status);
       
       if (response.ok) {
@@ -26,18 +43,17 @@ export const useSiteSettings = () => {
         
         if (result.success) {
           console.log('useSiteSettings: Settings loaded:', result.data);
-          console.log('useSiteSettings: Previous settings:', settings);
           setSettings(result.data);
-          console.log('useSiteSettings: Settings state updated');
         } else {
           console.warn('useSiteSettings: API returned success: false');
         }
       } else {
         console.error('useSiteSettings: Response not ok:', response.status);
       }
-    } catch {
-      // Тихо игнорируем ошибки, используем fallback значения
-      console.warn('Site settings not loaded, using defaults');
+    } catch (error) {
+      console.error('useSiteSettings: Error fetching settings:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -46,8 +62,9 @@ export const useSiteSettings = () => {
   };
 
   useEffect(() => {
+    // Загружаем настройки только один раз при монтировании
     fetchSettings();
-  }, []);
+  }, []); // Пустой массив зависимостей
 
-  return { settings, refreshSettings };
+  return { settings, refreshSettings, isLoading };
 };
