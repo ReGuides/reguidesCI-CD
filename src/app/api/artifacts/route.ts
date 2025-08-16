@@ -1,6 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
-import { ArtifactModel } from '@/models/Artifact';
 import mongoose from 'mongoose';
 
 export async function GET() {
