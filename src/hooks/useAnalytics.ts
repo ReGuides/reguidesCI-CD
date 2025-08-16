@@ -110,13 +110,13 @@ export const trackSearch = async (query: string, resultsCount: number) => {
 export const useAnalytics = () => {
   const pathname = usePathname();
   
-  // Всегда вызываем useSearchParams, но обрабатываем ошибки
+  // Безопасно используем useSearchParams с fallback
   let searchParams: URLSearchParams | null = null;
   try {
     searchParams = useSearchParams();
   } catch {
-    // Игнорируем ошибки на сервере
-    console.warn('useSearchParams not available on server');
+    // Fallback для случаев, когда useSearchParams недоступен
+    searchParams = null;
   }
   
   const trackCurrentPage = useCallback(() => {

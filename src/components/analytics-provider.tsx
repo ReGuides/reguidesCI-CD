@@ -4,8 +4,14 @@ import { Suspense } from 'react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 
 function AnalyticsTracker() {
-  useAnalytics();
-  return null;
+  try {
+    useAnalytics();
+    return null;
+  } catch (error) {
+    // Игнорируем ошибки на сервере или при проблемах с хуками
+    console.warn('Analytics hook error:', error);
+    return null;
+  }
 }
 
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
