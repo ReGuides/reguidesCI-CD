@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import { AdvertisementModel } from '@/models/Advertisement';
 
 interface RouteParams {
@@ -11,7 +11,7 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     const { id } = await params;
     const advertisement = await AdvertisementModel.findById(id).lean();
@@ -41,7 +41,7 @@ export async function PUT(
   { params }: RouteParams
 ) {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     const { id } = await params;
     const body = await request.json();
@@ -98,7 +98,7 @@ export async function DELETE(
   { params }: RouteParams
 ) {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     const { id } = await params;
     const advertisement = await AdvertisementModel.findByIdAndDelete(id);

@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import { AdvertisementModel } from '@/models/Advertisement';
 
 export async function GET() {
   try {
-    await connectToDatabase();
-    
+    await connectDB();
+
     const advertisements = await AdvertisementModel.find()
       .sort({ order: 1, createdAt: -1 })
       .lean();
-    
-    return NextResponse.json({ 
-      success: true, 
-      data: advertisements 
+
+    return NextResponse.json({
+      success: true,
+      data: advertisements
     });
   } catch (error) {
     console.error('Error fetching advertisements:', error);
@@ -25,11 +25,11 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await connectToDatabase();
-    
+    await connectDB();
+
     const body = await request.json();
     const { title, description, cta, url, type, isActive, order, backgroundImage, erid } = body;
-    
+
     // Валидация обязательных полей
     if (!title || !description || !cta || !url || !type) {
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     // Создаем новую рекламу
     const advertisement = new AdvertisementModel({
       title,
@@ -50,13 +50,13 @@ export async function POST(request: NextRequest) {
       backgroundImage,
       erid
     });
-    
+
     await advertisement.save();
-    
-    return NextResponse.json({ 
-      success: true, 
+
+    return NextResponse.json({
+      success: true,
       data: advertisement,
-      message: 'Advertisement created successfully' 
+      message: 'Advertisement created successfully'
     });
   } catch (error) {
     console.error('Error creating advertisement:', error);
