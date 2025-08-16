@@ -69,11 +69,23 @@ export async function GET(request: NextRequest) {
       };
     }
     
-    const pageViews = await PageViewModel
-      .find(query)
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .lean();
+    // Получаем просмотры страниц с фильтрацией
+    const pageViews = await PageViewModel.aggregate([
+      { $match: { timestamp: query.timestamp } },
+      {
+        $addFields: {
+          // Исключаем страницы админки
+          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+        }
+      },
+      { $match: { isAdminPage: false } },
+      {
+        $sort: { timestamp: -1 }
+      },
+      {
+        $limit: limit
+      }
+    ]);
     
     return NextResponse.json({ 
       success: true, 

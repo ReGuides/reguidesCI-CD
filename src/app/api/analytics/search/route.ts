@@ -68,11 +68,23 @@ export async function GET(request: NextRequest) {
       };
     }
     
-    const searchQueries = await SearchQueryModel
-      .find(query)
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .lean();
+    // Получаем поисковые запросы с фильтрацией
+    const searchQueries = await SearchQueryModel.aggregate([
+      { $match: { timestamp: query.timestamp } },
+      {
+        $addFields: {
+          // Исключаем поиски на страницах админки
+          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+        }
+      },
+      { $match: { isAdminPage: false } },
+      {
+        $sort: { timestamp: -1 }
+      },
+      {
+        $limit: limit
+      }
+    ]);
     
     return NextResponse.json({ 
       success: true, 

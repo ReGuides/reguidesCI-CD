@@ -117,9 +117,12 @@ export default function AnalyticsPage() {
 
   return (
     <div className="p-6">
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold text-white mb-2">Аналитика</h1>
-        <p className="text-gray-400">Обзор статистики и активности сайта</p>
+        <p className="text-gray-400">
+          Статистика по пользовательской активности. 
+          <span className="text-yellow-400 ml-1">Страницы админки исключены из аналитики.</span>
+        </p>
       </div>
 
       {/* Фильтры по датам */}

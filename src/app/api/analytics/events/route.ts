@@ -76,11 +76,23 @@ export async function GET(request: NextRequest) {
       query.eventType = eventType;
     }
     
-    const events = await EventModel
-      .find(query)
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .lean();
+    // Получаем события с фильтрацией
+    const events = await EventModel.aggregate([
+      { $match: { timestamp: dateFilter } },
+      {
+        $addFields: {
+          // Исключаем события на страницах админки
+          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+        }
+      },
+      { $match: { isAdminPage: false } },
+      {
+        $sort: { timestamp: -1 }
+      },
+      {
+        $limit: limit
+      }
+    ]);
     
     return NextResponse.json({ 
       success: true, 
