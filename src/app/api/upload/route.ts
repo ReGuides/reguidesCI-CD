@@ -57,8 +57,8 @@ export async function POST(request: NextRequest) {
         fileName = `logo-${Date.now()}.${getFileExtension(file.name)}`;
         break;
       case 'favicon':
-        uploadDir = join(process.cwd(), 'public', 'images', 'logos');
-        fileName = `favicon-${Date.now()}.${getFileExtension(file.name)}`;
+        uploadDir = join(process.cwd(), 'public');
+        fileName = 'favicon.ico';
         break;
       case 'weapon':
         uploadDir = join(process.cwd(), 'public', 'images', 'weapons');
@@ -103,8 +103,10 @@ export async function POST(request: NextRequest) {
     // Возвращаем путь к файлу
     let fileUrl: string;
     
-    if (type === 'logo' || type === 'favicon') {
+    if (type === 'logo') {
       fileUrl = `/images/logos/${fileName}`;
+    } else if (type === 'favicon') {
+      fileUrl = `/${fileName}`;
     } else {
       fileUrl = `/images/${type}s/${fileName}`;
     }
