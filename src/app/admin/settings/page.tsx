@@ -34,6 +34,22 @@ export default function SettingsPage() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
 
+  // Функция для принудительного обновления настроек
+  const refreshSettingsAfterUpload = async () => {
+    try {
+      const response = await fetch('/api/settings');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setSettings(result.data);
+          console.log('Settings refreshed after upload:', result.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing settings:', error);
+    }
+  };
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -80,6 +96,7 @@ export default function SettingsPage() {
         if (result.success) {
           setMessage({ type: 'success', text: 'Настройки успешно сохранены!' });
           console.log('Settings: Successfully saved!');
+          refreshSettingsAfterUpload(); // Обновляем настройки после успешного сохранения
         } else {
           setMessage({ type: 'error', text: 'Ошибка при сохранении настроек' });
           console.error('Settings: API returned success: false');
@@ -124,19 +141,23 @@ export default function SettingsPage() {
           
           // Автоматически сохраняем настройки в базу данных
           try {
+            const updatedSettings = {
+              ...settings,
+              [type]: result.url
+            };
+            
             const saveResponse = await fetch('/api/settings', {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({
-                ...settings,
-                [type]: result.url
-              }),
+              body: JSON.stringify(updatedSettings),
             });
             
             if (saveResponse.ok) {
               setMessage({ type: 'success', text: `${type === 'logo' ? 'Логотип' : 'Favicon'} успешно загружен и сохранен!` });
+              console.log('Settings saved successfully with new favicon:', updatedSettings);
+              refreshSettingsAfterUpload(); // Обновляем настройки после успешного сохранения
             } else {
               setMessage({ type: 'error', text: 'Изображение загружено, но настройки не сохранены' });
             }

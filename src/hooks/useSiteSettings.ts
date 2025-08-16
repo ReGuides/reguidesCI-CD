@@ -26,7 +26,9 @@ export const useSiteSettings = () => {
         
         if (result.success) {
           console.log('useSiteSettings: Settings loaded:', result.data);
+          console.log('useSiteSettings: Previous settings:', settings);
           setSettings(result.data);
+          console.log('useSiteSettings: Settings state updated');
         } else {
           console.warn('useSiteSettings: API returned success: false');
         }
