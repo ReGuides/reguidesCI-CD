@@ -7,12 +7,9 @@ import { Input } from '@/components/ui/input';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { 
   Plus, 
-  Search, 
   Filter,
-  Eye,
   Edit,
   Trash2,
-  ExternalLink,
   Image as ImageIcon
 } from 'lucide-react';
 import Link from 'next/link';
