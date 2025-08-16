@@ -84,9 +84,16 @@ export default function AnalyticsPage() {
     return num.toLocaleString();
   };
 
-  const getDayName = (day: number) => {
+  // Функция для получения названия дня недели
+  const getDayName = (dayNumber: number): string => {
     const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-    return days[day - 1] || 'Неизвестно';
+    return days[dayNumber - 1] || 'Неизвестно';
+  };
+
+  // Функция для форматирования московского времени
+  const formatMoscowHour = (hour: number): string => {
+    // hour уже в московском времени (UTC+3)
+    return `${hour.toString().padStart(2, '0')}:00`;
   };
 
   if (loading) {
@@ -195,13 +202,14 @@ export default function AnalyticsPage() {
             <CardTitle className="text-white flex items-center gap-2">
               <BarChart3 className="w-5 h-5" />
               Почасовая активность
+              <span className="text-xs text-gray-400 font-normal">(Московское время UTC+3)</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               {analytics.hourlyStats.map((stat) => (
                 <div key={stat.hour} className="flex items-center gap-3">
-                  <span className="text-sm text-gray-400 w-8">{stat.hour}:00</span>
+                  <span className="text-sm text-gray-400 w-8">{formatMoscowHour(stat.hour)}</span>
                   <div className="flex-1 bg-neutral-700 rounded-full h-2">
                     <div 
                       className="bg-blue-500 h-2 rounded-full transition-all duration-300"
@@ -223,6 +231,7 @@ export default function AnalyticsPage() {
             <CardTitle className="text-white flex items-center gap-2">
               <PieChart className="w-5 h-5" />
               Активность по дням недели
+              <span className="text-xs text-gray-400 font-normal">(Московское время UTC+3)</span>
             </CardTitle>
           </CardHeader>
           <CardContent>

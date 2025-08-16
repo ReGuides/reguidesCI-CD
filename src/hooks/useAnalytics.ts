@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 
 // Генерируем уникальный session ID
@@ -34,6 +34,11 @@ const trackPageView = async (url: string, title: string) => {
     const sessionId = generateSessionId();
     const visitorId = generateVisitorId();
     
+    // Добавляем логирование для отладки
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 Tracking page view:', { url, title, sessionId, visitorId });
+    }
+    
     await fetch('/api/analytics/page-views', {
       method: 'POST',
       headers: {
@@ -48,8 +53,12 @@ const trackPageView = async (url: string, title: string) => {
         referrer: document.referrer
       }),
     });
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Page view tracked successfully');
+    }
   } catch (error) {
-    console.error('Failed to track page view:', error);
+    console.error('❌ Failed to track page view:', error);
   }
 };
 
@@ -110,11 +119,37 @@ export const trackSearch = async (query: string, resultsCount: number) => {
 export const useAnalytics = () => {
   const pathname = usePathname();
   
+  // Используем useRef для отслеживания последней отслеженной страницы
+  const lastTrackedPage = useRef<string>('');
+  const trackingTimeout = useRef<NodeJS.Timeout | null>(null);
+  
   const trackCurrentPage = useCallback(() => {
     if (typeof window !== 'undefined') {
       const url = window.location.href;
       const title = document.title || 'Unknown Page';
-      trackPageView(url, title);
+      
+      // Проверяем, не отслеживали ли мы уже эту страницу
+      if (lastTrackedPage.current === url) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔄 Page already tracked, skipping:', url);
+        }
+        return;
+      }
+      
+      // Очищаем предыдущий таймаут
+      if (trackingTimeout.current) {
+        clearTimeout(trackingTimeout.current);
+      }
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🚀 Scheduling page view tracking:', url);
+      }
+      
+      // Добавляем небольшую задержку для предотвращения дублирования
+      trackingTimeout.current = setTimeout(() => {
+        trackPageView(url, title);
+        lastTrackedPage.current = url;
+      }, 100);
     }
   }, []);
 
@@ -123,6 +158,13 @@ export const useAnalytics = () => {
     if (typeof window !== 'undefined') {
       trackCurrentPage();
     }
+    
+    // Cleanup при размонтировании
+    return () => {
+      if (trackingTimeout.current) {
+        clearTimeout(trackingTimeout.current);
+      }
+    };
   }, [pathname, trackCurrentPage]);
 
   // Отслеживаем время на странице

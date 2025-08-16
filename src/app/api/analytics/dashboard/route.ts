@@ -147,8 +147,19 @@ export async function GET(request: NextRequest) {
     const hourlyStats = await PageViewModel.aggregate([
       { $match: { timestamp: dateFilter } },
       {
+        $addFields: {
+          // Конвертируем время в московское (UTC+3)
+          moscowTime: {
+            $add: [
+              '$timestamp',
+              3 * 60 * 60 * 1000 // +3 часа в миллисекундах
+            ]
+          }
+        }
+      },
+      {
         $group: {
-          _id: { $hour: '$timestamp' },
+          _id: { $hour: '$moscowTime' },
           count: { $sum: 1 }
         }
       },
@@ -159,8 +170,19 @@ export async function GET(request: NextRequest) {
     const weeklyStats = await PageViewModel.aggregate([
       { $match: { timestamp: dateFilter } },
       {
+        $addFields: {
+          // Конвертируем время в московское (UTC+3)
+          moscowTime: {
+            $add: [
+              '$timestamp',
+              3 * 60 * 60 * 1000 // +3 часа в миллисекундах
+            ]
+          }
+        }
+      },
+      {
         $group: {
-          _id: { $dayOfWeek: '$timestamp' },
+          _id: { $dayOfWeek: '$moscowTime' },
           count: { $sum: 1 }
         }
       },
