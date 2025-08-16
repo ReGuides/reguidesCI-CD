@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { AnalyticsProvider } from '@/components/analytics-provider';
 import { SiteSettingsProvider } from '@/components/site-settings-provider';
+import { Header } from '@/components/layout/header';
+import SidebarWrapper from '@/components/sidebar-wrapper';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,7 +30,13 @@ export default function RootLayout({
         <AnalyticsProvider>
           <SiteSettingsProvider />
           <div className="min-h-screen bg-neutral-900 text-white">
-            {children}
+            <Header />
+            <div className="flex min-h-screen">
+              <main className="flex-1 min-w-0">
+                {children}
+              </main>
+              <SidebarWrapper />
+            </div>
           </div>
         </AnalyticsProvider>
       </body>

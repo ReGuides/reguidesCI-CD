@@ -8,11 +8,23 @@ import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { settings } = useSiteSettings();
+  const { settings, loading, error } = useSiteSettings();
+
+  // Debug logging
+  console.log('Header render:', { settings, loading, error });
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  // Fallback значения на случай ошибки загрузки настроек
+  const siteName = settings?.siteName || 'ReGuides';
+  const logoUrl = settings?.logo || '/images/logos/logo.png';
+
+  // Если есть ошибка, показываем её в консоли
+  if (error) {
+    console.error('Header settings error:', error);
+  }
 
   return (
     <header className="bg-header text-text shadow-lg overflow-hidden">
@@ -24,7 +36,7 @@ export function Header() {
               {/* Логотип сайта */}
               <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                 <Image 
-                  src={settings?.logo || '/images/logos/logo.png'} 
+                  src={logoUrl} 
                   alt="Site Logo" 
                   width={40}
                   height={40}
@@ -39,7 +51,7 @@ export function Header() {
               {/* Название сайта и игры */}
               <div className="flex flex-col min-w-0">
                 <span className="text-lg sm:text-2xl font-bold text-accent group-hover:text-accent-dark transition-colors truncate">
-                  {settings?.siteName || 'ReGuides'}
+                  {loading ? 'Загрузка...' : siteName}
                 </span>
                 <span className="text-xs sm:text-sm text-text-secondary font-medium truncate">
                   Genshin Impact

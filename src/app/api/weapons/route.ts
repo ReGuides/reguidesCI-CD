@@ -1,19 +1,19 @@
-import { NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import mongoose from 'mongoose';
+import { NextRequest, NextResponse } from 'next/server';
+import { connectToDatabase } from '@/lib/db/mongodb';
+import { WeaponModel } from '@/models/Weapon';
 
 export async function GET() {
   try {
-    await connectDB();
+    await connectToDatabase();
     
-    if (!mongoose.connection.db) {
+    if (!WeaponModel) {
       return NextResponse.json(
         { error: 'Database connection failed' },
         { status: 500 }
       );
     }
 
-    const weaponsCollection = mongoose.connection.db.collection('weapons');
+    const weaponsCollection = WeaponModel.collection;
     const weapons = await weaponsCollection.find({}).project({
       id: 1,
       name: 1,
@@ -41,9 +41,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
-    if (!mongoose.connection.db) {
+    if (!WeaponModel) {
       return NextResponse.json(
         { error: 'Database connection failed' },
         { status: 500 }
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const weaponsCollection = mongoose.connection.db.collection('weapons');
+    const weaponsCollection = WeaponModel.collection;
     
     // Проверяем, не существует ли уже оружие с таким ID
     const existingWeapon = await weaponsCollection.findOne({ id: weaponData.id });

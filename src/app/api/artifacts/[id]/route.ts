@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import mongoose from 'mongoose';
+import { connectToDatabase } from '@/lib/db/mongodb';
+import { ArtifactModel } from '@/models/Artifact';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
-    if (!mongoose.connection.db) {
+    if (!ArtifactModel) {
       return NextResponse.json(
         { error: 'Database connection failed' },
         { status: 500 }
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const { id } = await params;
-    const artifactsCollection = mongoose.connection.db.collection('artifacts');
+    const artifactsCollection = ArtifactModel.collection;
     
     const artifact = await artifactsCollection.findOne({ id });
     
@@ -40,9 +40,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
-    if (!mongoose.connection.db) {
+    if (!ArtifactModel) {
       return NextResponse.json(
         { error: 'Database connection failed' },
         { status: 500 }
@@ -69,7 +69,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
-    const artifactsCollection = mongoose.connection.db.collection('artifacts');
+    const artifactsCollection = ArtifactModel.collection;
     
     // Проверяем, существует ли артефакт
     const existingArtifact = await artifactsCollection.findOne({ id });
@@ -116,9 +116,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
-    if (!mongoose.connection.db) {
+    if (!ArtifactModel) {
       return NextResponse.json(
         { error: 'Database connection failed' },
         { status: 500 }
@@ -126,7 +126,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     const { id } = await params;
-    const artifactsCollection = mongoose.connection.db.collection('artifacts');
+    const artifactsCollection = ArtifactModel.collection;
     
     // Проверяем, существует ли артефакт
     const existingArtifact = await artifactsCollection.findOne({ id });

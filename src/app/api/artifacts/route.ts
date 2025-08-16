@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
+import { NextRequest, NextResponse } from 'next/server';
+import { connectToDatabase } from '@/lib/db/mongodb';
+import { ArtifactModel } from '@/models/Artifact';
 import mongoose from 'mongoose';
 
 export async function GET() {
   try {
-    await connectDB();
+    await connectToDatabase();
     
     if (!mongoose.connection.db) {
       return NextResponse.json(
@@ -49,7 +50,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
     if (!mongoose.connection.db) {
       return NextResponse.json(

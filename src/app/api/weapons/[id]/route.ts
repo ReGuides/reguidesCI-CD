@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import mongoose from 'mongoose';
+import { connectToDatabase } from '@/lib/db/mongodb';
+import { WeaponModel } from '@/models/Weapon';
 
 // GET - получить оружие по ID
 export async function GET(
@@ -8,18 +8,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
-    if (!mongoose.connection.db) {
-      return NextResponse.json(
-        { error: 'Database connection failed' },
-        { status: 500 }
-      );
-    }
-
     const { id } = await params;
-    const weaponsCollection = mongoose.connection.db.collection('weapons');
-    const weapon = await weaponsCollection.findOne({ id });
+    const weapon = await WeaponModel.findOne({ id });
 
     if (!weapon) {
       return NextResponse.json(
@@ -44,15 +36,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
-    if (!mongoose.connection.db) {
-      return NextResponse.json(
-        { error: 'Database connection failed' },
-        { status: 500 }
-      );
-    }
-
     const { id } = await params;
     const weaponData = await request.json();
     
@@ -64,10 +49,8 @@ export async function PUT(
       );
     }
 
-    const weaponsCollection = mongoose.connection.db.collection('weapons');
-    
     // Проверяем, существует ли оружие
-    const existingWeapon = await weaponsCollection.findOne({ id });
+    const existingWeapon = await WeaponModel.findOne({ id });
     if (!existingWeapon) {
       return NextResponse.json(
         { error: 'Weapon not found' },
@@ -81,7 +64,7 @@ export async function PUT(
       updatedAt: new Date()
     };
 
-    const result = await weaponsCollection.updateOne(
+    const result = await WeaponModel.updateOne(
       { id },
       { $set: updatedWeapon }
     );
@@ -112,19 +95,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
-    if (!mongoose.connection.db) {
-      return NextResponse.json(
-        { error: 'Database connection failed' },
-        { status: 500 }
-      );
-    }
-
     const { id } = await params;
-    const weaponsCollection = mongoose.connection.db.collection('weapons');
     
-    const result = await weaponsCollection.deleteOne({ id });
+    const result = await WeaponModel.deleteOne({ id });
     
     if (result.deletedCount === 0) {
       return NextResponse.json(

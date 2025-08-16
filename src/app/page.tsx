@@ -162,15 +162,15 @@ export default function HomePage() {
   }
 
   return (
-            <div className="w-full min-h-[400px]">
+    <div className="w-full min-h-[400px] p-4">
       {/* Баннер дней рождения */}
-      <div className="w-full max-w-7xl mx-auto px-4">
+      <div className="w-full">
         <BirthdayBanner />
       </div>
 
       {/* Character Carousel */}
       {bannerCharacters.length > 0 && (
-        <div className="w-full max-w-7xl mx-auto px-4">
+        <div className="w-full">
           <CharacterCarousel 
             characters={bannerCharacters}
             autoPlay={true}
@@ -180,7 +180,7 @@ export default function HomePage() {
       )}
 
       {/* Основной контент */}
-      <div className="w-full max-w-7xl mx-auto px-4">
+      <div className="w-full">
         <div className="flex-1 min-w-0">
             {/* Новые персонажи */}
             <div className="mt-12 sm:mt-16">
