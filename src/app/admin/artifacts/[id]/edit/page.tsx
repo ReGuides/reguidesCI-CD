@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Upload, X } from 'lucide-react';
 import Image from 'next/image';
-import { Artifact } from '@/types';
 
 interface ArtifactFormData {
   id: string;
@@ -56,13 +55,7 @@ export default function EditArtifactPage() {
     { value: 5, label: '5 предметов' }
   ];
 
-  useEffect(() => {
-    if (artifactId) {
-      fetchArtifact();
-    }
-  }, [artifactId]);
-
-  const fetchArtifact = async () => {
+  const fetchArtifact = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/artifacts/${artifactId}`);
@@ -94,7 +87,13 @@ export default function EditArtifactPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [artifactId]);
+
+  useEffect(() => {
+    if (artifactId) {
+      fetchArtifact();
+    }
+  }, [artifactId, fetchArtifact]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -353,7 +352,7 @@ export default function EditArtifactPage() {
                 </label>
                 <Textarea
                   value={formData.bonus1}
-                  onChange={(e) => handleInputChange('bonus1', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bonus1', e.target.value)}
                   placeholder="Описание бонуса за 1 предмет"
                   className="bg-neutral-700 border-neutral-600 text-white min-h-[80px]"
                 />
@@ -367,7 +366,7 @@ export default function EditArtifactPage() {
                 </label>
                 <Textarea
                   value={formData.bonus2}
-                  onChange={(e) => handleInputChange('bonus2', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bonus2', e.target.value)}
                   placeholder="Описание бонуса за 2 предмета"
                   className="bg-neutral-700 border-neutral-600 text-white min-h-[80px]"
                 />
@@ -381,7 +380,7 @@ export default function EditArtifactPage() {
                 </label>
                 <Textarea
                   value={formData.bonus4}
-                  onChange={(e) => handleInputChange('bonus4', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bonus4', e.target.value)}
                   placeholder="Описание бонуса за 4 предмета"
                   className="bg-neutral-700 border-neutral-600 text-white min-h-[80px]"
                 />

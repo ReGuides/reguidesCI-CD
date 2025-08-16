@@ -282,7 +282,7 @@ export default function AddArtifactPage() {
                 </label>
                 <Textarea
                   value={formData.bonus1}
-                  onChange={(e) => handleInputChange('bonus1', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bonus1', e.target.value)}
                   placeholder="Описание бонуса за 1 предмет"
                   className="bg-neutral-700 border-neutral-600 text-white min-h-[80px]"
                 />
@@ -296,7 +296,7 @@ export default function AddArtifactPage() {
                 </label>
                 <Textarea
                   value={formData.bonus2}
-                  onChange={(e) => handleInputChange('bonus2', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bonus2', e.target.value)}
                   placeholder="Описание бонуса за 2 предмета"
                   className="bg-neutral-700 border-neutral-600 text-white min-h-[80px]"
                 />
@@ -310,7 +310,7 @@ export default function AddArtifactPage() {
                 </label>
                 <Textarea
                   value={formData.bonus4}
-                  onChange={(e) => handleInputChange('bonus4', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bonus4', e.target.value)}
                   placeholder="Описание бонуса за 4 предмета"
                   className="bg-neutral-700 border-neutral-600 text-white min-h-[80px]"
                 />

@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // Очищаем от служебных полей MongoDB
-    const { _id, __v, ...cleanArtifact } = artifact;
+    const { ...cleanArtifact } = artifact;
     
     return NextResponse.json({ data: cleanArtifact });
   } catch (error) {
