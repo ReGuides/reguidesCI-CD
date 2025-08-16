@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db/mongodb';
-import { PageViewModel, EventModel, DailyStatsModel } from '@/models/Analytics';
-import mongoose from 'mongoose';
+import { connectToDatabase } from '@/lib/db/mongodb';
+import { PageViewModel, EventModel } from '@/models/Analytics';
 
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
     const { searchParams } = new URL(request.url);
     const from = searchParams.get('from');
     const to = searchParams.get('to');
     
-    let dateFilter: any = {};
+    let dateFilter: { $gte?: Date; $lte?: Date } = {};
     if (from && to) {
       dateFilter = {
         $gte: new Date(from),

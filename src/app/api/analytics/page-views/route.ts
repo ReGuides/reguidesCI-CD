@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db/mongodb';
+import { connectToDatabase } from '@/lib/db/mongodb';
 import { PageViewModel } from '@/models/Analytics';
 import { getClientIP } from '@/lib/utils/ip';
 
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
     const body = await request.json();
     const { url, title, sessionId, userId, userAgent, referrer } = body;
@@ -47,14 +47,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
+    await connectToDatabase();
     
     const { searchParams } = new URL(request.url);
     const from = searchParams.get('from');
     const to = searchParams.get('to');
     const limit = parseInt(searchParams.get('limit') || '100');
     
-    let query: any = {};
+    const query: { timestamp?: { $gte: Date; $lte: Date } } = {};
     
     if (from && to) {
       query.timestamp = {
