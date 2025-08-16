@@ -1,0 +1,194 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { connectDB } from '@/lib/db/mongodb';
+import { PageViewModel, EventModel, DailyStatsModel } from '@/models/Analytics';
+import mongoose from 'mongoose';
+
+export async function GET(request: NextRequest) {
+  try {
+    await connectDB();
+    
+    const { searchParams } = new URL(request.url);
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    
+    let dateFilter: any = {};
+    if (from && to) {
+      dateFilter = {
+        $gte: new Date(from),
+        $lte: new Date(to)
+      };
+    } else {
+      // По умолчанию последние 30 дней
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      dateFilter = { $gte: thirtyDaysAgo };
+    }
+
+    // Получаем статистику просмотров страниц
+    const pageViewsStats = await PageViewModel.aggregate([
+      { $match: { timestamp: dateFilter } },
+      {
+        $group: {
+          _id: null,
+          totalPageViews: { $sum: 1 },
+          uniqueVisitors: { $addToSet: '$ip' },
+          uniqueSessions: { $addToSet: '$sessionId' }
+        }
+      }
+    ]);
+
+    // Получаем топ страниц
+    const topPages = await PageViewModel.aggregate([
+      { $match: { timestamp: dateFilter } },
+      {
+        $group: {
+          _id: '$url',
+          views: { $sum: 1 },
+          title: { $first: '$title' }
+        }
+      },
+      { $sort: { views: -1 } },
+      { $limit: 10 }
+    ]);
+
+    // Получаем статистику по устройствам
+    const deviceStats = await PageViewModel.aggregate([
+      { $match: { timestamp: dateFilter } },
+      {
+        $addFields: {
+          deviceType: {
+            $cond: {
+              if: { $regexMatch: { input: '$userAgent', regex: /Mobile|Android|iPhone/i } },
+              then: 'mobile',
+              else: {
+                $cond: {
+                  if: { $regexMatch: { input: '$userAgent', regex: /Tablet|iPad/i } },
+                  then: 'tablet',
+                  else: 'desktop'
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: '$deviceType',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Получаем статистику по браузерам
+    const browserStats = await PageViewModel.aggregate([
+      { $match: { timestamp: dateFilter } },
+      {
+        $addFields: {
+          browser: {
+            $cond: {
+              if: { $regexMatch: { input: '$userAgent', regex: /Chrome/i } },
+              then: 'Chrome',
+              else: {
+                $cond: {
+                  if: { $regexMatch: { input: '$userAgent', regex: /Firefox/i } },
+                  then: 'Firefox',
+                  else: {
+                    $cond: {
+                      if: { $regexMatch: { input: '$userAgent', regex: /Safari/i } },
+                      then: 'Safari',
+                      else: {
+                        $cond: {
+                          if: { $regexMatch: { input: '$userAgent', regex: /Edge/i } },
+                          then: 'Edge',
+                          else: 'Other'
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: '$browser',
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
+    // Получаем статистику событий
+    const eventStats = await EventModel.aggregate([
+      { $match: { timestamp: dateFilter } },
+      {
+        $group: {
+          _id: '$eventType',
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
+    // Получаем почасовую статистику
+    const hourlyStats = await PageViewModel.aggregate([
+      { $match: { timestamp: dateFilter } },
+      {
+        $group: {
+          _id: { $hour: '$timestamp' },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id': 1 } }
+    ]);
+
+    // Получаем статистику по дням недели
+    const weeklyStats = await PageViewModel.aggregate([
+      { $match: { timestamp: dateFilter } },
+      {
+        $group: {
+          _id: { $dayOfWeek: '$timestamp' },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id': 1 } }
+    ]);
+
+    const stats = {
+      overview: {
+        totalPageViews: pageViewsStats[0]?.totalPageViews || 0,
+        uniqueVisitors: pageViewsStats[0]?.uniqueVisitors?.length || 0,
+        uniqueSessions: pageViewsStats[0]?.uniqueSessions?.length || 0,
+        averageViewsPerSession: pageViewsStats[0]?.totalPageViews / (pageViewsStats[0]?.uniqueSessions?.length || 1) || 0
+      },
+      topPages,
+      deviceStats: deviceStats.reduce((acc, stat) => {
+        acc[stat._id] = stat.count;
+        return acc;
+      }, {} as Record<string, number>),
+      browserStats,
+      eventStats,
+      hourlyStats: hourlyStats.map(stat => ({
+        hour: stat._id,
+        count: stat.count
+      })),
+      weeklyStats: weeklyStats.map(stat => ({
+        day: stat._id,
+        count: stat.count
+      }))
+    };
+
+    return NextResponse.json({ 
+      success: true, 
+      data: stats 
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch dashboard stats' },
+      { status: 500 }
+    );
+  }
+}

@@ -4,6 +4,7 @@ import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import SidebarWrapper from '@/components/sidebar-wrapper';
+import { AnalyticsProvider } from '@/components/analytics-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,21 +21,23 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={`${inter.className} overflow-x-hidden`}>
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          
-          {/* Main Content */}
-          <main className="flex-1 bg-neutral-900">
-            <div className="flex w-full">
-              <div className="flex-1 min-w-0">
-                {children}
+        <AnalyticsProvider>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            
+            {/* Main Content */}
+            <main className="flex-1 bg-neutral-900">
+              <div className="flex w-full">
+                <div className="flex-1 min-w-0">
+                  {children}
+                </div>
+                <SidebarWrapper />
               </div>
-              <SidebarWrapper />
-            </div>
-          </main>
-          
-          <Footer />
-        </div>
+            </main>
+            
+            <Footer />
+          </div>
+        </AnalyticsProvider>
       </body>
     </html>
   );
