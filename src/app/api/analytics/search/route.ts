@@ -56,9 +56,15 @@ export async function GET(request: NextRequest) {
     const query: { timestamp?: { $gte: Date; $lte: Date } } = {};
     
     if (from && to) {
+      // Устанавливаем начало дня для from в московском времени (00:00:00)
+      const fromDate = new Date(from + 'T00:00:00+03:00');
+      
+      // Устанавливаем конец дня для to в московском времени (23:59:59.999)
+      const toDate = new Date(to + 'T23:59:59.999+03:00');
+      
       query.timestamp = {
-        $gte: new Date(from),
-        $lte: new Date(to)
+        $gte: fromDate,
+        $lte: toDate
       };
     }
     

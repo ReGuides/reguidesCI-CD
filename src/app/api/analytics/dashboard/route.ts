@@ -12,14 +12,26 @@ export async function GET(request: NextRequest) {
     
     let dateFilter: { $gte?: Date; $lte?: Date } = {};
     if (from && to) {
+      // Устанавливаем начало дня для from в московском времени (00:00:00)
+      const fromDate = new Date(from + 'T00:00:00+03:00');
+      
+      // Устанавливаем конец дня для to в московском времени (23:59:59.999)
+      const toDate = new Date(to + 'T23:59:59.999+03:00');
+      
       dateFilter = {
-        $gte: new Date(from),
-        $lte: new Date(to)
+        $gte: fromDate,
+        $lte: toDate
       };
     } else {
-      // По умолчанию последние 30 дней
-      const thirtyDaysAgo = new Date();
+      // По умолчанию последние 30 дней в московском времени
+      const now = new Date();
+      const moscowOffset = 3 * 60 * 60 * 1000; // UTC+3 в миллисекундах
+      const moscowTime = new Date(now.getTime() + moscowOffset);
+      
+      const thirtyDaysAgo = new Date(moscowTime);
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      thirtyDaysAgo.setHours(0, 0, 0, 0);
+      
       dateFilter = { $gte: thirtyDaysAgo };
     }
 
