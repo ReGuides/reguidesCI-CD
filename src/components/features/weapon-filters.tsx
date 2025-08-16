@@ -58,8 +58,8 @@ export function WeaponFilters({ filters, onFiltersChange }: WeaponFiltersProps) 
           >
             <option value="all">Все типы</option>
             <option value="Sword">Меч</option>
-            <option value="Claymore">Двуручное</option>
-            <option value="Polearm">Древковое</option>
+            <option value="Claymore">Двуручное оружие</option>
+            <option value="Polearm">Древковое оружие</option>
             <option value="Bow">Лук</option>
             <option value="Catalyst">Катализатор</option>
           </select>
