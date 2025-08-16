@@ -4,11 +4,15 @@ import { join } from 'path';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Upload API called');
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const type = formData.get('type') as string;
 
+    console.log('Upload request:', { type, fileName: file?.name, fileSize: file?.size, fileType: file?.type });
+
     if (!file) {
+      console.log('No file provided');
       return NextResponse.json(
         { error: 'No file provided' },
         { status: 400 }
@@ -16,6 +20,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!type) {
+      console.log('No type specified');
       return NextResponse.json(
         { error: 'No type specified' },
         { status: 400 }
@@ -25,6 +30,7 @@ export async function POST(request: NextRequest) {
     // Проверяем тип файла
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/x-icon'];
     if (!allowedTypes.includes(file.type)) {
+      console.log('Invalid file type:', file.type);
       return NextResponse.json(
         { error: 'Invalid file type. Only JPEG, PNG, WebP, SVG, and ICO files are allowed.' },
         { status: 400 }
@@ -34,6 +40,7 @@ export async function POST(request: NextRequest) {
     // Проверяем размер файла (максимум 5MB)
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
+      console.log('File too large:', file.size);
       return NextResponse.json(
         { error: 'File size too large. Maximum size is 5MB.' },
         { status: 400 }
@@ -66,15 +73,20 @@ export async function POST(request: NextRequest) {
         fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${getFileExtension(file.name)}`;
         break;
       default:
+        console.log('Invalid upload type:', type);
         return NextResponse.json(
           { error: 'Invalid upload type' },
           { status: 400 }
         );
     }
 
+    console.log('Upload directory:', uploadDir);
+    console.log('File name:', fileName);
+
     // Создаем директорию, если она не существует
     try {
       await mkdir(uploadDir, { recursive: true });
+      console.log('Directory created/verified:', uploadDir);
     } catch (error) {
       console.error('Error creating directory:', error);
     }
@@ -84,10 +96,13 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     const filePath = join(uploadDir, fileName);
     
+    console.log('Saving file to:', filePath);
     await writeFile(filePath, buffer);
+    console.log('File saved successfully');
 
     // Возвращаем путь к файлу
     const fileUrl = `/images/${type === 'logo' || type === 'favicon' ? 'logos' : type}s/${fileName}`;
+    console.log('File URL:', fileUrl);
 
     return NextResponse.json({ 
       success: true, 

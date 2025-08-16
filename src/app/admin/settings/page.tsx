@@ -89,17 +89,23 @@ export default function SettingsPage() {
 
   const handleImageUpload = async (type: 'logo' | 'favicon', file: File) => {
     try {
+      console.log('Starting upload for:', type, file.name);
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', type);
+
+      console.log('FormData created:', formData);
 
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
 
+      console.log('Upload response status:', response.status);
+
       if (response.ok) {
         const result = await response.json();
+        console.log('Upload result:', result);
         if (result.success) {
           setSettings(prev => ({
             ...prev,
@@ -110,6 +116,8 @@ export default function SettingsPage() {
           setMessage({ type: 'error', text: 'Ошибка при загрузке изображения' });
         }
       } else {
+        const errorText = await response.text();
+        console.error('Upload failed:', errorText);
         setMessage({ type: 'error', text: 'Ошибка при загрузке изображения' });
       }
     } catch (error) {
@@ -119,8 +127,10 @@ export default function SettingsPage() {
   };
 
   const handleFileSelect = (type: 'logo' | 'favicon', event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File select triggered:', type, event.target.files);
     const file = event.target.files?.[0];
     if (file) {
+      console.log('File selected:', file.name, file.type, file.size);
       if (type === 'logo') {
         setUploadingLogo(true);
       } else {
@@ -134,6 +144,8 @@ export default function SettingsPage() {
           setUploadingFavicon(false);
         }
       });
+    } else {
+      console.log('No file selected');
     }
   };
 
@@ -240,18 +252,16 @@ export default function SettingsPage() {
                       onChange={(e) => handleFileSelect('logo', e)}
                       className="hidden"
                     />
-                    <label htmlFor="logo-upload">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={uploadingLogo}
-                        className="cursor-pointer"
-                      >
-                        <Upload className="w-4 h-4 mr-2" />
-                        {uploadingLogo ? 'Загрузка...' : 'Загрузить'}
-                      </Button>
-                    </label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={uploadingLogo}
+                      onClick={() => document.getElementById('logo-upload')?.click()}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploadingLogo ? 'Загрузка...' : 'Загрузить'}
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -298,18 +308,16 @@ export default function SettingsPage() {
                       onChange={(e) => handleFileSelect('favicon', e)}
                       className="hidden"
                     />
-                    <label htmlFor="favicon-upload">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={uploadingFavicon}
-                        className="cursor-pointer"
-                      >
-                        <Upload className="w-4 h-4 mr-2" />
-                        {uploadingFavicon ? 'Загрузка...' : 'Загрузить'}
-                      </Button>
-                    </label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={uploadingFavicon}
+                      onClick={() => document.getElementById('favicon-upload')?.click()}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploadingFavicon ? 'Загрузка...' : 'Загрузить'}
+                    </Button>
                   </div>
                 </div>
               </div>
