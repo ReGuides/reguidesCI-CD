@@ -56,7 +56,7 @@ const trackPageView = async (url: string, title: string) => {
 export const trackEvent = async (
   eventType: string,
   eventName: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, string | number | boolean>
 ) => {
   try {
     const sessionId = generateSessionId();

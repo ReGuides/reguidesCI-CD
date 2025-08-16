@@ -1,23 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { 
   Users, 
-  Sword, 
-  Shield, 
-  FileText, 
   Eye, 
-  TrendingUp, 
-  Calendar,
   Activity,
   BarChart3,
   PieChart,
-  Clock,
-  Globe
+  Clock
 } from 'lucide-react';
 
 interface AnalyticsData {
@@ -59,11 +53,7 @@ export default function AnalyticsPage() {
     to: new Date().toISOString().split('T')[0]
   });
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [dateRange]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -82,7 +72,11 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange.from, dateRange.to]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
