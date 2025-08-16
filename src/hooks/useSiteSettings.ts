@@ -27,7 +27,7 @@ export const useSiteSettings = () => {
           setSettings(result.data);
         }
       }
-    } catch (_err) {
+    } catch {
       // Тихо игнорируем ошибки, используем fallback значения
       console.warn('Site settings not loaded, using defaults');
     }
