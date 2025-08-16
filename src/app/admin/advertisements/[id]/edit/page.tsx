@@ -56,6 +56,7 @@ export default function EditAdvertisementPage({ params }: PageProps) {
       try {
         const { id } = await params;
         setAdvertisementId(id);
+        console.log('EditAdvertisementPage: Loaded ID:', id);
         fetchAdvertisement(id);
       } catch (error) {
         console.error('Error loading params:', error);
@@ -69,9 +70,14 @@ export default function EditAdvertisementPage({ params }: PageProps) {
   const fetchAdvertisement = async (id: string) => {
     try {
       setLoading(true);
+      console.log('EditAdvertisementPage: Fetching advertisement with ID:', id);
       const response = await fetch(`/api/advertisements/${id}`);
+      console.log('EditAdvertisementPage: Response status:', response.status);
+      
       if (response.ok) {
         const result = await response.json();
+        console.log('EditAdvertisementPage: Response result:', result);
+        
         if (result.success) {
           setForm(result.data);
         } else {
@@ -197,6 +203,7 @@ export default function EditAdvertisementPage({ params }: PageProps) {
         <div>
           <h1 className="text-3xl font-bold text-white">Редактировать рекламу</h1>
           <p className="text-gray-400">Изменение существующего рекламного блока</p>
+          <p className="text-sm text-gray-500">ID: {advertisementId}</p>
         </div>
       </div>
 
