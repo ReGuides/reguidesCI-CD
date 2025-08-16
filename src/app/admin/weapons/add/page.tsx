@@ -30,11 +30,11 @@ export default function AddWeaponPage() {
   const [previewImage, setPreviewImage] = useState<string>('');
 
   const weaponTypes = [
-    { value: 'Sword', label: 'Меч' },
-    { value: 'Claymore', label: 'Двуручное оружие' },
-    { value: 'Polearm', label: 'Древковое оружие' },
-    { value: 'Bow', label: 'Лук' },
-    { value: 'Catalyst', label: 'Катализатор' }
+    { value: 'Одноручный меч', label: 'Одноручный меч' },
+    { value: 'Двуручный меч', label: 'Двуручный меч' },
+    { value: 'Копьё', label: 'Копьё' },
+    { value: 'Стрелковое', label: 'Стрелковое' },
+    { value: 'Катализатор', label: 'Катализатор' }
   ];
 
   const rarityOptions = [

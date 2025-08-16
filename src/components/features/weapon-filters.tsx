@@ -57,11 +57,11 @@ export function WeaponFilters({ filters, onFiltersChange }: WeaponFiltersProps) 
             className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-text focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <option value="all">Все типы</option>
-            <option value="Sword">Меч</option>
-            <option value="Claymore">Двуручное оружие</option>
-            <option value="Polearm">Древковое оружие</option>
-            <option value="Bow">Лук</option>
-            <option value="Catalyst">Катализатор</option>
+            <option value="Одноручный меч">Одноручный меч</option>
+            <option value="Двуручный меч">Двуручный меч</option>
+            <option value="Копьё">Копьё</option>
+            <option value="Стрелковое">Стрелковое</option>
+            <option value="Катализатор">Катализатор</option>
           </select>
         </div>
 

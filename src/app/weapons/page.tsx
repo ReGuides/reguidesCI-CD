@@ -36,8 +36,6 @@ export default function WeaponsPage() {
         // Исправляем извлечение данных из ответа API
         const weaponsData = data.data || data.weapons || data || [];
         const weaponsArray = Array.isArray(weaponsData) ? weaponsData : [];
-        console.log('Loaded weapons:', weaponsArray.length);
-        console.log('Weapon types in database:', [...new Set(weaponsArray.map(w => w.type))]);
         setWeapons(weaponsArray);
       } catch (err) {
         console.error('Error fetching weapons:', err);
@@ -64,12 +62,7 @@ export default function WeaponsPage() {
 
     // Фильтрация по типу
     if (filters.type !== 'all') {
-      console.log('Filtering by type:', filters.type);
-      console.log('Available weapon types:', [...new Set(weapons.map(w => w.type))]);
-      result = result.filter(weapon => {
-        console.log(`Weapon ${weapon.name} has type: ${weapon.type}`);
-        return weapon.type === filters.type;
-      });
+      result = result.filter(weapon => weapon.type === filters.type);
     }
 
     // Сортировка

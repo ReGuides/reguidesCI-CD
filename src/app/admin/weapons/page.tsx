@@ -35,8 +35,6 @@ export default function WeaponsAdminPage() {
         // Гарантируем, что всегда массив
         const weaponsData = data.data || data.weapons || data || [];
         const weaponsArray = Array.isArray(weaponsData) ? weaponsData : [];
-        console.log('Admin: Loaded weapons:', weaponsArray.length);
-        console.log('Admin: Weapon types in database:', [...new Set(weaponsArray.map(w => w.type))]);
         setWeapons(weaponsArray);
       }
     } catch (error) {
@@ -49,9 +47,6 @@ export default function WeaponsAdminPage() {
   const filteredWeapons = weapons.filter(weapon => {
     const matchesSearch = weapon.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = filterType === 'all' || weapon.type === filterType;
-    if (filterType !== 'all') {
-      console.log(`Admin: Weapon ${weapon.name} has type: ${weapon.type}, filter: ${filterType}, matches: ${matchesType}`);
-    }
     return matchesSearch && matchesType;
   }).sort((a, b) => {
     if (sortBy === 'date') {
@@ -116,11 +111,11 @@ export default function WeaponsAdminPage() {
             className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-white"
           >
             <option value="all">Все типы</option>
-            <option value="Sword">Меч</option>
-            <option value="Claymore">Двуручное оружие</option>
-            <option value="Polearm">Древковое оружие</option>
-            <option value="Bow">Лук</option>
-            <option value="Catalyst">Катализатор</option>
+            <option value="Одноручный меч">Одноручный меч</option>
+            <option value="Двуручный меч">Двуручный меч</option>
+            <option value="Копьё">Копьё</option>
+            <option value="Стрелковое">Стрелковое</option>
+            <option value="Катализатор">Катализатор</option>
           </select>
         </div>
         <div>
