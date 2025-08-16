@@ -28,7 +28,11 @@ interface AdvertisementForm {
   erid?: string;
 }
 
-export default function EditAdvertisementPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default function EditAdvertisementPage({ params }: PageProps) {
   const router = useRouter();
   const [form, setForm] = useState<AdvertisementForm>({
     title: '',
@@ -45,15 +49,27 @@ export default function EditAdvertisementPage({ params }: { params: { id: string
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [advertisementId, setAdvertisementId] = useState<string>('');
 
   useEffect(() => {
-    fetchAdvertisement();
-  }, [params.id]);
+    const loadParams = async () => {
+      try {
+        const { id } = await params;
+        setAdvertisementId(id);
+        fetchAdvertisement(id);
+      } catch (error) {
+        console.error('Error loading params:', error);
+        setMessage({ type: 'error', text: 'Ошибка при загрузке параметров' });
+      }
+    };
+    
+    loadParams();
+  }, [params]);
 
-  const fetchAdvertisement = async () => {
+  const fetchAdvertisement = async (id: string) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/advertisements/${params.id}`);
+      const response = await fetch(`/api/advertisements/${id}`);
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
@@ -84,7 +100,7 @@ export default function EditAdvertisementPage({ params }: { params: { id: string
       setSaving(true);
       setMessage(null);
 
-      const response = await fetch(`/api/advertisements/${params.id}`, {
+      const response = await fetch(`/api/advertisements/${advertisementId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
