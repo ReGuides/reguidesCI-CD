@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useCallback } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
@@ -108,7 +109,17 @@ export const trackSearch = async (query: string, resultsCount: number) => {
 // Хук для автоматического отслеживания страниц
 export const useAnalytics = () => {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  
+  // Безопасно используем useSearchParams только на клиенте
+  let searchParams: URLSearchParams | null = null;
+  try {
+    if (typeof window !== 'undefined') {
+      searchParams = useSearchParams();
+    }
+  } catch (error) {
+    // Игнорируем ошибки на сервере
+    console.warn('useSearchParams not available on server');
+  }
   
   const trackCurrentPage = useCallback(() => {
     if (typeof window !== 'undefined') {
@@ -119,9 +130,11 @@ export const useAnalytics = () => {
   }, []);
 
   useEffect(() => {
-    // Отслеживаем при изменении страницы
-    trackCurrentPage();
-  }, [pathname, searchParams, trackCurrentPage]);
+    // Отслеживаем при изменении страницы только на клиенте
+    if (typeof window !== 'undefined') {
+      trackCurrentPage();
+    }
+  }, [pathname, trackCurrentPage]);
 
   // Отслеживаем время на странице
   useEffect(() => {
