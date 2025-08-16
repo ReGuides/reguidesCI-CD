@@ -5,10 +5,12 @@ import { Menu, X, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { useRouter } from 'next/navigation';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { settings, refreshSettings } = useSiteSettings();
+  const router = useRouter();
 
   // Debug logging
   console.log('Header render - settings:', settings);
@@ -39,16 +41,25 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
         <nav className="flex items-center justify-between min-w-0">
           {/* Логотип и название сайта слева */}
-          <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
+          <div className="flex-shrink-0 relative z-10">
+            <Link 
+              href="/" 
+              className="flex items-center space-x-2 sm:space-x-3 group relative z-10"
+              onClick={(e) => {
+                console.log('Header: Logo/Title clicked, navigating to /');
+                // Fallback: если Link не работает, используем router
+                e.preventDefault();
+                router.push('/');
+              }}
+            >
               {/* Логотип сайта */}
-              <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 pointer-events-none">
                 <Image 
                   src={logoUrl} 
                   alt="Site Logo" 
                   width={40}
                   height={40}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain cursor-pointer"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = '/images/logos/logo.png';
@@ -57,7 +68,7 @@ export function Header() {
               </div>
               
               {/* Название сайта и игры */}
-              <div className="flex flex-col min-w-0">
+              <div className="flex flex-col min-w-0 cursor-pointer pointer-events-none">
                 <span className="text-lg sm:text-2xl font-bold text-accent group-hover:text-accent-dark transition-colors truncate">
                   {siteName}
                 </span>
