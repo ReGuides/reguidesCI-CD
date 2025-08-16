@@ -110,13 +110,11 @@ export const trackSearch = async (query: string, resultsCount: number) => {
 export const useAnalytics = () => {
   const pathname = usePathname();
   
-  // Безопасно используем useSearchParams только на клиенте
+  // Всегда вызываем useSearchParams, но обрабатываем ошибки
   let searchParams: URLSearchParams | null = null;
   try {
-    if (typeof window !== 'undefined') {
-      searchParams = useSearchParams();
-    }
-  } catch (error) {
+    searchParams = useSearchParams();
+  } catch {
     // Игнорируем ошибки на сервере
     console.warn('useSearchParams not available on server');
   }
@@ -134,7 +132,7 @@ export const useAnalytics = () => {
     if (typeof window !== 'undefined') {
       trackCurrentPage();
     }
-  }, [pathname, trackCurrentPage]);
+  }, [pathname, searchParams, trackCurrentPage]);
 
   // Отслеживаем время на странице
   useEffect(() => {
