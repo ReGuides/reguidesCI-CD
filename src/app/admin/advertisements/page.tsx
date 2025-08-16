@@ -163,8 +163,11 @@ export default function AdvertisementsPage() {
                 className="w-full bg-neutral-700 border border-neutral-600 text-white rounded-md px-3 py-2"
               >
                 <option value="">Все типы</option>
-                <option value="sidebar">Сайдбар</option>
-                <option value="banner">Баннер</option>
+                <option value="sidebar-top">Сайдбар (верх)</option>
+                <option value="sidebar-middle">Сайдбар (середина)</option>
+                <option value="sidebar-bottom">Сайдбар (низ)</option>
+                <option value="banner-top">Баннер (верх страницы)</option>
+                <option value="banner-bottom">Баннер (низ страницы)</option>
                 <option value="popup">Всплывающее окно</option>
               </select>
             </div>
@@ -232,23 +235,24 @@ export default function AdvertisementsPage() {
                 <div className="flex-shrink-0 flex flex-col gap-2">
                   <Button
                     size="sm"
-                    variant="outline"
                     onClick={() => toggleStatus(ad._id, ad.isActive)}
-                    className={ad.isActive ? 'border-red-600 text-red-400 hover:bg-red-600/20' : 'border-green-600 text-green-400 hover:bg-green-600/20'}
+                    className={ad.isActive 
+                      ? 'bg-red-600 hover:bg-red-700 text-white' 
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                    }
                   >
                     {ad.isActive ? 'Деактивировать' : 'Активировать'}
                   </Button>
                   <div className="flex gap-2">
-                    <Link href={`/admin/advertisements/${ad._id}`}>
-                      <Button size="sm" variant="outline">
+                    <Link href={`/admin/advertisements/${ad._id}/edit`}>
+                      <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
                         <Edit className="w-4 h-4" />
                       </Button>
                     </Link>
                     <Button
                       size="sm"
-                      variant="outline"
                       onClick={() => handleDelete(ad._id)}
-                      className="border-red-600 text-red-400 hover:bg-red-600/20"
+                      className="bg-red-600 hover:bg-red-700 text-white"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

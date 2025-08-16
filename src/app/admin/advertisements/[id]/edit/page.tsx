@@ -39,7 +39,7 @@ export default function EditAdvertisementPage({ params }: PageProps) {
     description: '',
     cta: '',
     url: '',
-    type: 'sidebar',
+    type: 'sidebar-top',
     isActive: true,
     order: 0,
     backgroundImage: '',
@@ -279,8 +279,11 @@ export default function EditAdvertisementPage({ params }: PageProps) {
                   className="w-full bg-neutral-700 border border-neutral-600 text-white rounded-md px-3 py-2"
                   required
                 >
-                  <option value="sidebar">Сайдбар</option>
-                  <option value="banner">Баннер</option>
+                  <option value="sidebar-top">Сайдбар (верх)</option>
+                  <option value="sidebar-middle">Сайдбар (середина)</option>
+                  <option value="sidebar-bottom">Сайдбар (низ)</option>
+                  <option value="banner-top">Баннер (верх страницы)</option>
+                  <option value="banner-bottom">Баннер (низ страницы)</option>
                   <option value="popup">Всплывающее окно</option>
                 </select>
               </div>
