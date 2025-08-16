@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useCallback } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 // Генерируем уникальный session ID
 const generateSessionId = (): string => {
@@ -110,17 +110,6 @@ export const trackSearch = async (query: string, resultsCount: number) => {
 export const useAnalytics = () => {
   const pathname = usePathname();
   
-  // Всегда вызываем useSearchParams, но обрабатываем возможные ошибки
-  let searchParams: URLSearchParams | null = null;
-  
-  // Используем try-catch для обработки ошибок, но не нарушаем порядок хуков
-  try {
-    searchParams = useSearchParams();
-  } catch {
-    // Если useSearchParams недоступен, используем null
-    searchParams = null;
-  }
-  
   const trackCurrentPage = useCallback(() => {
     if (typeof window !== 'undefined') {
       const url = window.location.href;
@@ -134,7 +123,7 @@ export const useAnalytics = () => {
     if (typeof window !== 'undefined') {
       trackCurrentPage();
     }
-  }, [pathname, searchParams, trackCurrentPage]);
+  }, [pathname, trackCurrentPage]);
 
   // Отслеживаем время на странице
   useEffect(() => {
