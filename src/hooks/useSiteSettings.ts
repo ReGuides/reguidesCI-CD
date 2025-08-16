@@ -14,10 +14,6 @@ interface SiteSettings {
 export const useSiteSettings = () => {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
   const fetchSettings = async () => {
     try {
       const response = await fetch('/api/settings');
@@ -33,5 +29,13 @@ export const useSiteSettings = () => {
     }
   };
 
-  return { settings };
+  const refreshSettings = () => {
+    fetchSettings();
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  return { settings, refreshSettings };
 };

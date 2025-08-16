@@ -2,13 +2,22 @@
 
 import Link from 'next/link';
 import { Menu, X, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { settings } = useSiteSettings();
+  const { settings, refreshSettings } = useSiteSettings();
+
+  // Обновляем настройки каждые 30 секунд для синхронизации
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshSettings();
+    }, 30000); // 30 секунд
+
+    return () => clearInterval(interval);
+  }, [refreshSettings]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

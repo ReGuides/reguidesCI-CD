@@ -107,11 +107,34 @@ export default function SettingsPage() {
         const result = await response.json();
         console.log('Upload result:', result);
         if (result.success) {
+          // Обновляем локальное состояние
           setSettings(prev => ({
             ...prev,
             [type]: result.url
           }));
-          setMessage({ type: 'success', text: `${type === 'logo' ? 'Логотип' : 'Favicon'} успешно загружен!` });
+          
+          // Автоматически сохраняем настройки в базу данных
+          try {
+            const saveResponse = await fetch('/api/settings', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                ...settings,
+                [type]: result.url
+              }),
+            });
+            
+            if (saveResponse.ok) {
+              setMessage({ type: 'success', text: `${type === 'logo' ? 'Логотип' : 'Favicon'} успешно загружен и сохранен!` });
+            } else {
+              setMessage({ type: 'error', text: 'Изображение загружено, но настройки не сохранены' });
+            }
+          } catch (saveError) {
+            console.error('Error saving settings after upload:', saveError);
+            setMessage({ type: 'error', text: 'Изображение загружено, но настройки не сохранены' });
+          }
         } else {
           setMessage({ type: 'error', text: 'Ошибка при загрузке изображения' });
         }
