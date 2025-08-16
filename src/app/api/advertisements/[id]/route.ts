@@ -2,14 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { AdvertisementModel } from '@/models/Advertisement';
 
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteParams
 ) {
   try {
     await connectToDatabase();
     
-    const advertisement = await AdvertisementModel.findById(params.id).lean();
+    const { id } = await params;
+    const advertisement = await AdvertisementModel.findById(id).lean();
     
     if (!advertisement) {
       return NextResponse.json(
@@ -33,11 +38,12 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteParams
 ) {
   try {
     await connectToDatabase();
     
+    const { id } = await params;
     const body = await request.json();
     const { title, description, cta, url, type, isActive, order, backgroundImage, erid } = body;
     
@@ -51,7 +57,7 @@ export async function PUT(
     
     // Обновляем рекламу
     const advertisement = await AdvertisementModel.findByIdAndUpdate(
-      params.id,
+      id,
       {
         title,
         description,
@@ -69,7 +75,7 @@ export async function PUT(
     if (!advertisement) {
       return NextResponse.json(
         { success: false, error: 'Advertisement not found' },
-        { status: 404 }
+        { status: 400 }
       );
     }
     
@@ -89,12 +95,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteParams
 ) {
   try {
     await connectToDatabase();
     
-    const advertisement = await AdvertisementModel.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const advertisement = await AdvertisementModel.findByIdAndDelete(id);
     
     if (!advertisement) {
       return NextResponse.json(
