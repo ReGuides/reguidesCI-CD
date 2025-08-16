@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Upload, X } from 'lucide-react';
 import Image from 'next/image';
 
@@ -350,11 +349,11 @@ export default function EditArtifactPage() {
                 <label className="block text-sm font-medium text-text mb-2">
                   Бонус 1 предмета
                 </label>
-                <Textarea
+                <textarea
                   value={formData.bonus1}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bonus1', e.target.value)}
                   placeholder="Описание бонуса за 1 предмет"
-                  className="bg-neutral-700 border-neutral-600 text-white min-h-[80px]"
+                  className="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 rounded-md text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-accent min-h-[80px] resize-none"
                 />
               </div>
             )}
@@ -364,11 +363,11 @@ export default function EditArtifactPage() {
                 <label className="block text-sm font-medium text-text mb-2">
                   Бонус 2 предметов
                 </label>
-                <Textarea
+                <textarea
                   value={formData.bonus2}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bonus2', e.target.value)}
                   placeholder="Описание бонуса за 2 предмета"
-                  className="bg-neutral-700 border-neutral-600 text-white min-h-[80px]"
+                  className="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 rounded-md text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-accent min-h-[80px] resize-none"
                 />
               </div>
             )}
@@ -378,11 +377,11 @@ export default function EditArtifactPage() {
                 <label className="block text-sm font-medium text-text mb-2">
                   Бонус 4 предметов
                 </label>
-                <Textarea
+                <textarea
                   value={formData.bonus4}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bonus4', e.target.value)}
                   placeholder="Описание бонуса за 4 предмета"
-                  className="bg-neutral-700 border-neutral-600 text-white min-h-[80px]"
+                  className="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 rounded-md text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-accent min-h-[80px] resize-none"
                 />
               </div>
             )}
