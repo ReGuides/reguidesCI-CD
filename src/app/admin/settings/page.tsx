@@ -7,8 +7,11 @@ import { Input } from '@/components/ui/input';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { 
   Save, 
-  Globe
+  Globe,
+  Upload,
+  X
 } from 'lucide-react';
+import Image from 'next/image';
 
 interface SiteSettings {
   _id?: string;
@@ -28,6 +31,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -82,6 +87,63 @@ export default function SettingsPage() {
     }
   };
 
+  const handleImageUpload = async (type: 'logo' | 'favicon', file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setSettings(prev => ({
+            ...prev,
+            [type]: result.url
+          }));
+          setMessage({ type: 'success', text: `${type === 'logo' ? 'Логотип' : 'Favicon'} успешно загружен!` });
+        } else {
+          setMessage({ type: 'error', text: 'Ошибка при загрузке изображения' });
+        }
+      } else {
+        setMessage({ type: 'error', text: 'Ошибка при загрузке изображения' });
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setMessage({ type: 'error', text: 'Ошибка при загрузке изображения' });
+    }
+  };
+
+  const handleFileSelect = (type: 'logo' | 'favicon', event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (type === 'logo') {
+        setUploadingLogo(true);
+      } else {
+        setUploadingFavicon(true);
+      }
+      
+      handleImageUpload(type, file).finally(() => {
+        if (type === 'logo') {
+          setUploadingLogo(false);
+        } else {
+          setUploadingFavicon(false);
+        }
+      });
+    }
+  };
+
+  const removeImage = (type: 'logo' | 'favicon') => {
+    setSettings(prev => ({
+      ...prev,
+      [type]: type === 'logo' ? '/images/logos/logo.png' : '/favicon.ico'
+    }));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -127,7 +189,7 @@ export default function SettingsPage() {
               Основные настройки
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Название сайта</label>
               <Input
@@ -137,25 +199,121 @@ export default function SettingsPage() {
                 placeholder="Введите название сайта"
               />
             </div>
+
+            {/* Логотип */}
             <div>
-              <label className="text-sm text-gray-400 mb-2 block">Логотип URL</label>
-              <Input
-                value={settings.logo || ''}
-                onChange={(e) => setSettings(prev => ({ ...prev, logo: e.target.value }))}
-                className="bg-neutral-700 border-neutral-600 text-white"
-                placeholder="/images/logo.png"
-              />
-              <p className="text-xs text-gray-500 mt-1">Путь к изображению логотипа</p>
+              <label className="text-sm text-gray-400 mb-2 block">Логотип</label>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Image
+                    src={settings.logo || '/images/logos/logo.png'}
+                    alt="Логотип"
+                    width={80}
+                    height={80}
+                    className="rounded-lg object-contain bg-neutral-700"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/logos/logo.png';
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="absolute -top-2 -right-2 h-6 w-6 p-0 bg-red-600 hover:bg-red-700 border-red-600"
+                    onClick={() => removeImage('logo')}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <Input
+                    value={settings.logo || ''}
+                    onChange={(e) => setSettings(prev => ({ ...prev, logo: e.target.value }))}
+                    className="bg-neutral-700 border-neutral-600 text-white mb-2"
+                    placeholder="/images/logo.png"
+                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="file"
+                      id="logo-upload"
+                      accept="image/*"
+                      onChange={(e) => handleFileSelect('logo', e)}
+                      className="hidden"
+                    />
+                    <label htmlFor="logo-upload">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={uploadingLogo}
+                        className="cursor-pointer"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        {uploadingLogo ? 'Загрузка...' : 'Загрузить'}
+                      </Button>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Поддерживаемые форматы: JPEG, PNG, WebP, SVG</p>
             </div>
+
+            {/* Favicon */}
             <div>
-              <label className="text-sm text-gray-400 mb-2 block">Favicon URL</label>
-              <Input
-                value={settings.favicon || ''}
-                onChange={(e) => setSettings(prev => ({ ...prev, favicon: e.target.value }))}
-                className="bg-neutral-700 border-neutral-600 text-white"
-                placeholder="/favicon.ico"
-              />
-              <p className="text-xs text-gray-500 mt-1">Путь к иконке сайта</p>
+              <label className="text-sm text-gray-400 mb-2 block">Favicon</label>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Image
+                    src={settings.favicon || '/favicon.ico'}
+                    alt="Favicon"
+                    width={32}
+                    height={32}
+                    className="rounded object-contain bg-neutral-700"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/favicon.ico';
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="absolute -top-2 -right-2 h-6 w-6 p-0 bg-red-600 hover:bg-red-700 border-red-600"
+                    onClick={() => removeImage('favicon')}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <Input
+                    value={settings.favicon || ''}
+                    onChange={(e) => setSettings(prev => ({ ...prev, favicon: e.target.value }))}
+                    className="bg-neutral-700 border-neutral-600 text-white mb-2"
+                    placeholder="/favicon.ico"
+                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="file"
+                      id="favicon-upload"
+                      accept="image/*,.ico"
+                      onChange={(e) => handleFileSelect('favicon', e)}
+                      className="hidden"
+                    />
+                    <label htmlFor="favicon-upload">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={uploadingFavicon}
+                        className="cursor-pointer"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        {uploadingFavicon ? 'Загрузка...' : 'Загрузить'}
+                      </Button>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Поддерживаемые форматы: JPEG, PNG, WebP, SVG, ICO</p>
             </div>
           </CardContent>
         </Card>

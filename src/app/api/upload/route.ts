@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { existsSync } from 'fs';
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const type = formData.get('type') as string; // 'weapon', 'character', 'artifact', etc.
+    const type = formData.get('type') as string;
 
     if (!file) {
       return NextResponse.json(
@@ -24,10 +23,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Проверяем тип файла
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/x-icon'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG, PNG and WebP are allowed' },
+        { error: 'Invalid file type. Only JPEG, PNG, WebP, SVG, and ICO files are allowed.' },
         { status: 400 }
       );
     }
@@ -36,49 +35,75 @@ export async function POST(request: NextRequest) {
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: 'File too large. Maximum size is 5MB' },
+        { error: 'File size too large. Maximum size is 5MB.' },
         { status: 400 }
       );
     }
 
-    // Создаем уникальное имя файла
-    const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 8);
-    const extension = file.name.split('.').pop();
-    const fileName = `${timestamp}-${randomString}.${extension}`;
+    // Определяем директорию для загрузки
+    let uploadDir: string;
+    let fileName: string;
 
-    // Определяем путь для сохранения - используем images вместо uploads
-    const uploadDir = join(process.cwd(), 'public', 'images', type);
-    
-    // Создаем директорию, если её нет
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
+    switch (type) {
+      case 'logo':
+        uploadDir = join(process.cwd(), 'public', 'images', 'logos');
+        fileName = `logo-${Date.now()}.${getFileExtension(file.name)}`;
+        break;
+      case 'favicon':
+        uploadDir = join(process.cwd(), 'public', 'images', 'logos');
+        fileName = `favicon-${Date.now()}.${getFileExtension(file.name)}`;
+        break;
+      case 'weapon':
+        uploadDir = join(process.cwd(), 'public', 'images', 'weapons');
+        fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${getFileExtension(file.name)}`;
+        break;
+      case 'artifact':
+        uploadDir = join(process.cwd(), 'public', 'images', 'artifacts');
+        fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${getFileExtension(file.name)}`;
+        break;
+      case 'character':
+        uploadDir = join(process.cwd(), 'public', 'images', 'characters');
+        fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${getFileExtension(file.name)}`;
+        break;
+      default:
+        return NextResponse.json(
+          { error: 'Invalid upload type' },
+          { status: 400 }
+        );
     }
 
-    const filePath = join(uploadDir, fileName);
-    
-    // Конвертируем File в Buffer и сохраняем
+    // Создаем директорию, если она не существует
+    try {
+      await mkdir(uploadDir, { recursive: true });
+    } catch (error) {
+      console.error('Error creating directory:', error);
+    }
+
+    // Сохраняем файл
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const filePath = join(uploadDir, fileName);
     
     await writeFile(filePath, buffer);
 
-    // Возвращаем URL для доступа к файлу
-    const fileUrl = `/images/${type}/${fileName}`;
+    // Возвращаем путь к файлу
+    const fileUrl = `/images/${type === 'logo' || type === 'favicon' ? 'logos' : type}s/${fileName}`;
 
-    return NextResponse.json({
-      message: 'File uploaded successfully',
-      fileName,
-      fileUrl,
-      size: file.size,
-      type: file.type
+    return NextResponse.json({ 
+      success: true, 
+      url: fileUrl,
+      fileName: fileName
     });
 
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('Upload error:', error);
     return NextResponse.json(
       { error: 'Failed to upload file' },
       { status: 500 }
     );
   }
+}
+
+function getFileExtension(filename: string): string {
+  return filename.split('.').pop()?.toLowerCase() || 'png';
 } 

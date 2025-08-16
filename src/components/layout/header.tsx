@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { Menu, X, Search } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { settings } = useSiteSettings();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -19,21 +21,25 @@ export function Header() {
           {/* Логотип и название сайта слева */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
-              {/* Логотип Genshin Impact */}
+              {/* Логотип сайта */}
               <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                 <Image 
-                  src="/images/logos/logo.png" 
-                  alt="Genshin Impact Logo" 
+                  src={settings?.logo || '/images/logos/logo.png'} 
+                  alt="Site Logo" 
                   width={40}
                   height={40}
                   className="w-full h-full object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/images/logos/logo.png';
+                  }}
                 />
               </div>
               
               {/* Название сайта и игры */}
               <div className="flex flex-col min-w-0">
                 <span className="text-lg sm:text-2xl font-bold text-accent group-hover:text-accent-dark transition-colors truncate">
-                  ReGuides
+                  {settings?.siteName || 'ReGuides'}
                 </span>
                 <span className="text-xs sm:text-sm text-text-secondary font-medium truncate">
                   Genshin Impact

@@ -1,16 +1,17 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
-import SidebarWrapper from '@/components/sidebar-wrapper';
 import { AnalyticsProvider } from '@/components/analytics-provider';
+import { SiteSettingsProvider } from '@/components/site-settings-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'ReGuides - Genshin Impact Database',
-  description: 'Comprehensive database for Genshin Impact characters, weapons, and artifacts',
+  title: 'ReGuides',
+  description: 'Лучшие гайды по Genshin Impact',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
@@ -20,22 +21,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className={`${inter.className} overflow-x-hidden`}>
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+      </head>
+      <body className={inter.className}>
         <AnalyticsProvider>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            
-            {/* Main Content */}
-            <main className="flex-1 bg-neutral-900">
-              <div className="flex w-full">
-                <div className="flex-1 min-w-0">
-                  {children}
-                </div>
-                <SidebarWrapper />
-              </div>
-            </main>
-            
-            <Footer />
+          <SiteSettingsProvider />
+          <div className="min-h-screen bg-neutral-900 text-white">
+            {children}
           </div>
         </AnalyticsProvider>
       </body>
