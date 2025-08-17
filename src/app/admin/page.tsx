@@ -12,9 +12,6 @@ import {
   MousePointer, 
   TrendingUp, 
   BarChart3,
-  Calendar,
-  ArrowUpRight,
-  ArrowDownRight,
   FileText
 } from 'lucide-react';
 import Link from 'next/link';
@@ -33,6 +30,13 @@ interface DashboardStats {
 interface ChartData {
   labels: string[];
   data: number[];
+}
+
+interface Advertisement {
+  _id: string;
+  isActive: boolean;
+  impressions: number;
+  clicks: number;
 }
 
 export default function AdminDashboard() {
@@ -61,10 +65,10 @@ export default function AdminDashboard() {
       if (adsResponse.ok) {
         const adsData = await adsResponse.json();
         if (adsData.success) {
-          const advertisements = adsData.data;
-          const activeAds = advertisements.filter((ad: any) => ad.isActive);
-          const totalImpressions = advertisements.reduce((sum: number, ad: any) => sum + (ad.impressions || 0), 0);
-          const totalClicks = advertisements.reduce((sum: number, ad: any) => sum + (ad.clicks || 0), 0);
+          const advertisements: Advertisement[] = adsData.data;
+          const activeAds = advertisements.filter((ad: Advertisement) => ad.isActive);
+          const totalImpressions = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.impressions || 0), 0);
+          const totalClicks = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.clicks || 0), 0);
           const averageCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
 
           setStats(prev => ({
