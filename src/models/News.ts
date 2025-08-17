@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface INews extends Document {
   title: string;
@@ -13,6 +13,12 @@ export interface INews extends Document {
   tags: string[];
   views: number;
   author: string;
+}
+
+// Интерфейс для статических методов
+export interface INewsModel extends Model<INews> {
+  createBirthdayNews(characterId: string, characterName: string): Promise<INews>;
+  hasBirthdayNews(characterId: string, date: Date): Promise<boolean>;
 }
 
 const NewsSchema = new Schema<INews>({
@@ -107,4 +113,4 @@ NewsSchema.statics.hasBirthdayNews = async function(characterId: string, date: D
   });
 };
 
-export default mongoose.models.News || mongoose.model<INews>('News', NewsSchema); 
+export default mongoose.models.News || mongoose.model<INews, INewsModel>('News', NewsSchema); 

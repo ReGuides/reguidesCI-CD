@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import News from '@/models/News';
+import News, { INewsModel } from '@/models/News';
 
 // Интерфейс для query параметров
 interface NewsQuery {

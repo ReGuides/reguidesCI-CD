@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import News from '@/models/News';
+import News, { INewsModel } from '@/models/News';
 import { CharacterModel as Character } from '@/models/Character';
 
 // POST - генерация новостей о днях рождения
@@ -35,11 +35,11 @@ export async function POST() {
 
     for (const character of charactersWithBirthday) {
       // Проверяем, не создана ли уже новость для этого персонажа сегодня
-      const existingNews = await News.hasBirthdayNews(character._id.toString(), today);
+      const existingNews = await (News as INewsModel).hasBirthdayNews(character._id.toString(), today);
       
       if (!existingNews) {
         try {
-          const birthdayNews = await News.createBirthdayNews(
+          const birthdayNews = await (News as INewsModel).createBirthdayNews(
             character._id.toString(),
             character.name
           );
