@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import News from '@/models/News';
-import Character from '@/models/Character';
+import { CharacterModel as Character } from '@/models/Character';
 
 // POST - генерация новостей о днях рождения
 export async function POST() {
