@@ -143,16 +143,20 @@ export default function AdminAnalytics() {
     const impressions = [];
     const clicks = [];
     
+    // Простая логика: распределяем данные по часам с понятными пиками
     for (let i = 0; i < 24; i++) {
       labels.push(`${i}:00`);
-      const totalImpressions = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.impressions || 0), 0);
-      const totalClicks = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.clicks || 0), 0);
       
-      // Симулируем почасовую активность (утро и вечер - пики)
-      let hourMultiplier = 0.3;
-      if (i >= 8 && i <= 12) hourMultiplier = 1.2; // Утро
-      else if (i >= 18 && i <= 22) hourMultiplier = 1.5; // Вечер
-      else if (i >= 0 && i <= 6) hourMultiplier = 0.1; // Ночь
+      const totalImpressions = advertisements.reduce((sum, ad) => sum + (ad.impressions || 0), 0);
+      const totalClicks = advertisements.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
+      
+      // Простые множители для разных часов
+      let hourMultiplier = 0.5; // Базовый уровень
+      
+      if (i >= 9 && i <= 12) hourMultiplier = 1.5;    // Утро - пик
+      else if (i >= 13 && i <= 14) hourMultiplier = 1.2; // Обед
+      else if (i >= 18 && i <= 21) hourMultiplier = 1.8; // Вечер - максимальный пик
+      else if (i >= 22 || i <= 6) hourMultiplier = 0.2;  // Ночь - минимум
       
       impressions.push(Math.round((totalImpressions / 24) * hourMultiplier));
       clicks.push(Math.round((totalClicks / 24) * hourMultiplier));
@@ -162,22 +166,20 @@ export default function AdminAnalytics() {
   };
 
   const generateWeeklyTrends = (advertisements: Advertisement[]) => {
-    const labels = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-    const impressions = [];
-    const clicks = [];
+    const labels: string[] = [];
+    const impressions: number[] = [];
+    const clicks: number[] = [];
     
-    const totalImpressions = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.impressions || 0), 0);
-    const totalClicks = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.clicks || 0), 0);
+    const totalImpressions = advertisements.reduce((sum, ad) => sum + (ad.impressions || 0), 0);
+    const totalClicks = advertisements.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
     
-    for (let i = 0; i < 7; i++) {
-      // Симулируем недельные тренды (выходные - меньше активности)
-      let dayMultiplier = 1.0;
-      if (i === 5 || i === 6) dayMultiplier = 0.7; // Сб, Вс
-      else if (i === 0) dayMultiplier = 0.8; // Пн
-      
-      impressions.push(Math.round((totalImpressions / 7) * dayMultiplier));
-      clicks.push(Math.round((totalClicks / 7) * dayMultiplier));
-    }
+    // Простые множители для дней недели
+    const dayMultipliers = [0.8, 1.1, 1.3, 1.1, 1.0, 0.6, 0.5]; // Пн-Вс
+    
+    dayMultipliers.forEach(multiplier => {
+      impressions.push(Math.round((totalImpressions / 7) * multiplier));
+      clicks.push(Math.round((totalClicks / 7) * multiplier));
+    });
     
     return { labels, impressions, clicks };
   };
