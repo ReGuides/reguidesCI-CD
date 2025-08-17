@@ -5,11 +5,7 @@ import { Advertisement } from '@/types';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 
-interface AdvertisementBannerProps {
-  position?: 'top' | 'bottom';
-}
-
-export default function AdvertisementBanner({ position = 'top' }: AdvertisementBannerProps) {
+export default function AdvertisementBanner() {
   const [advertisement, setAdvertisement] = useState<Advertisement | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
