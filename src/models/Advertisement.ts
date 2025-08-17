@@ -5,7 +5,7 @@ export interface IAdvertisement extends mongoose.Document {
   description: string;
   cta: string;
   url: string;
-  type: string;
+  type: 'sidebar' | 'banner' | 'popup';
   isActive: boolean;
   order: number;
   backgroundImage?: string;
@@ -19,7 +19,12 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>({
   description: { type: String, required: true },
   cta: { type: String, required: true },
   url: { type: String, required: true },
-  type: { type: String, required: true },
+  type: { 
+    type: String, 
+    required: true,
+    enum: ['sidebar', 'banner', 'popup'],
+    default: 'sidebar'
+  },
   isActive: { type: Boolean, default: true },
   order: { type: Number, default: 0 },
   backgroundImage: { type: String },

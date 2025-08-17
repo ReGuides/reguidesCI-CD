@@ -46,7 +46,7 @@ export interface Advertisement {
   url: string;
   backgroundImage?: string;
   cta: string;
-  type: string;
+  type: 'sidebar' | 'banner' | 'popup';
   erid?: string;
   isActive: boolean;
   order: number;

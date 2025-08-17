@@ -102,6 +102,34 @@ export default function AdvertisementsPage() {
     }
   };
 
+  // Функция для отображения типа рекламы
+  const getTypeDisplay = (type: string) => {
+    switch (type) {
+      case 'sidebar':
+        return 'Сайдбар';
+      case 'banner':
+        return 'Баннер';
+      case 'popup':
+        return 'Всплывающее окно';
+      default:
+        return type; // Для старых записей
+    }
+  };
+
+  // Функция для получения цвета типа
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'sidebar':
+        return 'bg-blue-600/20 text-blue-400 border-blue-500/30';
+      case 'banner':
+        return 'bg-green-600/20 text-green-400 border-green-500/30';
+      case 'popup':
+        return 'bg-purple-600/20 text-purple-400 border-purple-500/30';
+      default:
+        return 'bg-neutral-600/20 text-neutral-400 border-neutral-500/30';
+    }
+  };
+
   const filteredAdvertisements = advertisements.filter(ad => {
     const matchesSearch = ad.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ad.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -217,7 +245,9 @@ export default function AdvertisementsPage() {
                       <h3 className="text-lg font-semibold text-white mb-2">{ad.title}</h3>
                       <p className="text-gray-300 text-sm mb-2 line-clamp-2">{ad.description}</p>
                       <div className="flex items-center gap-4 text-sm text-gray-400">
-                        <span>Тип: {ad.type}</span>
+                        <span className={`px-2 py-1 rounded text-xs border ${getTypeColor(ad.type)}`}>
+                          {getTypeDisplay(ad.type)}
+                        </span>
                         <span>Порядок: {ad.order}</span>
                         <span className={`px-2 py-1 rounded text-xs ${
                           ad.isActive 
