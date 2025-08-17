@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { AnalyticsProvider } from '@/components/analytics-provider';
 import { SiteSettingsProvider } from '@/components/site-settings-provider';
@@ -8,8 +7,6 @@ import { Footer } from '@/components/layout/footer';
 import SidebarWrapper from '@/components/sidebar-wrapper';
 import AdvertisementBanner from '@/components/advertisement-banner';
 import AdvertisementPopup from '@/components/advertisement-popup';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'ReGuides',

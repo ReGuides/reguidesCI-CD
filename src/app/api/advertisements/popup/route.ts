@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { AdvertisementModel } from '@/models/Advertisement';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Получаем активную всплывающую рекламу с наивысшим приоритетом
     const advertisement = await AdvertisementModel.findOne({
