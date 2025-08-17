@@ -25,18 +25,17 @@ export default function RootLayout({
     <html lang="ru">
       <body className="bg-neutral-900 text-white min-h-screen flex flex-col">
         <AnalyticsProvider>
-          <SiteSettingsProvider>
-            <AdvertisementBanner />
-            <Header />
-            <div className="flex flex-1">
-              <SidebarWrapper />
-              <main className="flex-1 flex flex-col py-4">
-                {children}
-              </main>
-            </div>
-            <Footer />
-            <AdvertisementPopup />
-          </SiteSettingsProvider>
+          <SiteSettingsProvider />
+          <AdvertisementBanner />
+          <Header />
+          <div className="flex flex-1">
+            <SidebarWrapper />
+            <main className="flex-1 flex flex-col py-4">
+              {children}
+            </main>
+          </div>
+          <Footer />
+          <AdvertisementPopup />
         </AnalyticsProvider>
       </body>
     </html>
