@@ -26,8 +26,8 @@ export default function RootLayout({
       <body className="bg-neutral-900 text-white min-h-screen flex flex-col">
         <AnalyticsProvider>
           <SiteSettingsProvider />
-          <AdvertisementBanner />
           <Header />
+          <AdvertisementBanner />
           <div className="flex flex-1">
             <main className="flex-1 flex flex-col py-4">
               {children}

@@ -57,7 +57,7 @@ export default function AdvertisementBanner({ position = 'top' }: AdvertisementB
   }
 
   return (
-    <div className={`fixed ${position === 'top' ? 'top-0' : 'bottom-0'} left-0 right-0 z-50 bg-neutral-900 border-b border-neutral-700 shadow-lg`}>
+    <div className="w-full bg-neutral-900 border-b border-neutral-700 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 flex-1">

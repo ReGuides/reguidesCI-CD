@@ -39,7 +39,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
         }
 
         // Загружаем рекламу
-        const adsResponse = await fetch('/api/advertisements/active');
+        const adsResponse = await fetch('/api/advertisements/sidebar');
         if (adsResponse.ok) {
           const adsData = await adsResponse.json();
           setAdvertisements(adsData || []);
@@ -219,7 +219,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
                   href={ad.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded transition-colors"
+                  className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-xs font-bold rounded transition-all duration-200 shadow-md hover:shadow-purple-500/25"
                 >
                   {ad.cta}
                 </a>
