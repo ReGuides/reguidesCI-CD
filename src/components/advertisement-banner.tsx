@@ -12,11 +12,6 @@ export default function AdvertisementBanner() {
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
 
-  // Не показываем рекламу в админке
-  if (pathname.startsWith('/admin')) {
-    return null;
-  }
-
   useEffect(() => {
     // Определяем тип устройства
     const checkDevice = () => {
@@ -54,6 +49,11 @@ export default function AdvertisementBanner() {
       window.removeEventListener('resize', checkDevice);
     };
   }, [isMobile]);
+
+  // Не показываем рекламу в админке
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
 
   if (!advertisement || !isVisible) {
     return null;

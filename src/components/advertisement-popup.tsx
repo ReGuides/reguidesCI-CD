@@ -12,11 +12,6 @@ export default function AdvertisementPopup() {
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
 
-  // Не показываем рекламу в админке
-  if (pathname.startsWith('/admin')) {
-    return null;
-  }
-
   useEffect(() => {
     // Определяем тип устройства
     const checkDevice = () => {
@@ -26,7 +21,7 @@ export default function AdvertisementPopup() {
     checkDevice();
     window.addEventListener('resize', checkDevice);
 
-    // Загружаем рекламу и показываем через 3 секунды
+    // Загружаем рекламу
     const fetchPopupAd = async () => {
       try {
         const response = await fetch('/api/advertisements/popup');
@@ -40,8 +35,6 @@ export default function AdvertisementPopup() {
                 (ad.deviceTargeting === 'mobile' && isMobile) ||
                 (ad.deviceTargeting === 'desktop' && !isMobile)) {
               setAdvertisement(ad);
-              
-              // Показываем рекламу через 3 секунды
               setTimeout(() => {
                 setIsVisible(true);
               }, 3000);
@@ -59,6 +52,11 @@ export default function AdvertisementPopup() {
       window.removeEventListener('resize', checkDevice);
     };
   }, [isMobile]);
+
+  // Не показываем рекламу в админке
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
 
   if (!advertisement || !isVisible) {
     return null;
