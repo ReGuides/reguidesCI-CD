@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Plus, 
-  Calendar, 
   Eye, 
   Edit, 
   Trash2, 
@@ -17,6 +16,7 @@ import {
   Settings
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { News } from '@/types';
 
 interface BirthdayCharacter {
@@ -184,9 +184,11 @@ export default function NewsPage() {
               {birthdayCharacters.map((character) => (
                 <div key={character._id} className="flex items-center space-x-3 p-3 bg-neutral-800/50 rounded-lg">
                   {character.image && (
-                    <img 
+                    <Image 
                       src={character.image} 
                       alt={character.name}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded-full object-cover"
                     />
                   )}

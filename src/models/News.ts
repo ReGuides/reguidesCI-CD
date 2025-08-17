@@ -79,7 +79,6 @@ NewsSchema.pre('save', function(next) {
 
 // Статический метод для создания новости о дне рождения
 NewsSchema.statics.createBirthdayNews = async function(characterId: string, characterName: string) {
-  const today = new Date();
   const birthdayNews = {
     title: `🎉 День рождения ${characterName}!`,
     content: `Сегодня празднует свой день рождения ${characterName}! 🎂\n\nПоздравляем всех поклонников этого персонажа и желаем удачи в игре! 🎮✨`,
