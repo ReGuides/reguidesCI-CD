@@ -59,7 +59,16 @@ export default function AdvertisementPopup() {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
-      <div className="bg-neutral-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl">
+      <div className="bg-neutral-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl relative">
+        {/* Кнопка закрытия - перемещена в правый верхний угол изображения */}
+        <button
+          onClick={() => setIsVisible(false)}
+          className="absolute top-3 right-3 z-10 w-8 h-8 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors backdrop-blur-sm"
+          aria-label="Закрыть рекламу"
+        >
+          <X className="w-4 h-4" />
+        </button>
+        
         {/* Изображение */}
         {advertisement.backgroundImage && (
           <div className="relative h-48">
@@ -75,33 +84,25 @@ export default function AdvertisementPopup() {
         
         {/* Контент */}
         <div className="p-6">
-          <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-bold text-white">{advertisement.title}</h2>
-            <button
-              onClick={() => setIsVisible(false)}
-              className="text-gray-400 hover:text-white transition-colors p-1"
-              aria-label="Закрыть рекламу"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-white mb-2">{advertisement.title}</h2>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              {advertisement.description}
+            </p>
           </div>
-          
-          <p className="text-gray-300 text-sm leading-relaxed mb-6">
-            {advertisement.description}
-          </p>
           
           <div className="flex gap-3">
             <a
               href={advertisement.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors text-center"
+              className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold rounded-lg transition-all duration-200 text-center shadow-lg hover:shadow-purple-500/25 transform hover:scale-105"
             >
               {advertisement.cta}
             </a>
             <button
               onClick={() => setIsVisible(false)}
-              className="px-4 py-3 bg-neutral-700 hover:bg-neutral-600 text-gray-300 font-medium rounded-lg transition-colors"
+              className="px-6 py-4 bg-neutral-700 hover:bg-neutral-600 text-gray-300 hover:text-white font-medium rounded-lg transition-colors border border-neutral-600 hover:border-neutral-500"
             >
               Позже
             </button>

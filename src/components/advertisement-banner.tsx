@@ -87,13 +87,13 @@ export default function AdvertisementBanner({ position = 'top' }: AdvertisementB
               href={advertisement.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded transition-colors whitespace-nowrap"
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-xs font-bold rounded transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-purple-500/25"
             >
               {advertisement.cta}
             </a>
             <button
               onClick={() => setIsVisible(false)}
-              className="text-gray-400 hover:text-white transition-colors p-1"
+              className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
               aria-label="Закрыть рекламу"
             >
               <X className="w-4 h-4" />

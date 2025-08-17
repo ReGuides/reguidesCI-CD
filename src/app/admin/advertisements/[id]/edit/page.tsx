@@ -40,7 +40,7 @@ export default function EditAdvertisementPage({ params }: PageProps) {
     description: '',
     cta: '',
     url: '',
-    type: 'sidebar-top',
+    type: 'sidebar',
     isActive: true,
     order: 0,
     backgroundImage: '',
@@ -81,6 +81,7 @@ export default function EditAdvertisementPage({ params }: PageProps) {
         console.log('EditAdvertisementPage: Response result:', result);
         
         if (result.success) {
+          console.log('EditAdvertisementPage: Setting form data:', result.data);
           setForm(result.data);
         } else {
           setMessage({ type: 'error', text: 'Ошибка при загрузке рекламы' });

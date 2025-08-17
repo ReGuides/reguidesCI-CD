@@ -29,10 +29,10 @@ export default function RootLayout({
           <AdvertisementBanner />
           <Header />
           <div className="flex flex-1">
-            <SidebarWrapper />
             <main className="flex-1 flex flex-col py-4">
               {children}
             </main>
+            <SidebarWrapper />
           </div>
           <Footer />
           <AdvertisementPopup />
