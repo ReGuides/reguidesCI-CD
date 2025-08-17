@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import News, { INewsModel } from '@/models/News';
-import { CharacterModel as Character, ICharacter } from '@/models/Character';
+import { CharacterModel as Character } from '@/models/Character';
 
 // POST - генерация новостей о днях рождения
 export async function POST() {
@@ -35,17 +35,17 @@ export async function POST() {
 
     for (const character of charactersWithBirthday) {
       // Проверяем, не создана ли уже новость для этого персонажа сегодня
-      const existingNews = await (News as INewsModel).hasBirthdayNews((character._id as any).toString(), today);
+      const existingNews = await (News as INewsModel).hasBirthdayNews(character._id.toString(), today);
       
       if (!existingNews) {
         try {
           const birthdayNews = await (News as INewsModel).createBirthdayNews(
-            (character._id as any).toString(),
+            character._id.toString(),
             character.name
           );
           
           results.push({
-            character: character.name as string,
+            character: character.name,
             newsId: birthdayNews._id,
             status: 'created'
           });
@@ -54,14 +54,14 @@ export async function POST() {
         } catch (error) {
           console.error(`Error creating birthday news for ${character.name}:`, error);
           results.push({
-            character: character.name as string,
+            character: character.name,
             status: 'error',
             error: error instanceof Error ? error.message : 'Unknown error'
           });
         }
       } else {
         results.push({
-          character: character.name as string,
+          character: character.name,
           status: 'already_exists'
         });
       }
@@ -116,7 +116,7 @@ export async function GET() {
 
     const result = charactersWithBirthday.map(character => ({
       ...character,
-      hasNews: existingCharacterIds.includes((character._id as any).toString())
+      hasNews: existingCharacterIds.includes(character._id.toString())
     }));
 
     return NextResponse.json({
