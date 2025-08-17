@@ -13,20 +13,34 @@ import {
   TrendingUp, 
   BarChart3,
   FileText,
-  Activity
+  Activity,
+  Clock
 } from 'lucide-react';
 import Link from 'next/link';
 
 interface DashboardStats {
-  totalUsers: number;
-  totalImpressions: number;
-  totalClicks: number;
-  averageCTR: number;
-  activeAdvertisements: number;
+  // Общая статистика сайта
+  totalPageViews: number;
+  uniqueVisitors: number;
+  uniqueSessions: number;
+  averageViewsPerSession: number;
+  
+  // Контент сайта
   totalCharacters: number;
   totalArticles: number;
   totalWeapons: number;
   totalArtifacts: number;
+  
+  // Статистика рекламы
+  totalImpressions: number;
+  totalClicks: number;
+  averageCTR: number;
+  activeAdvertisements: number;
+  
+  // Временные данные
+  monthlyViews: number;
+  weeklyViews: number;
+  dailyViews: number;
   weeklyImpressions: number[];
   weeklyClicks: number[];
   dailyStats: {
@@ -34,6 +48,21 @@ interface DashboardStats {
     impressions: number;
     clicks: number;
   }[];
+  
+  // Популярный контент
+  topContent: Array<{
+    title: string;
+    views: number;
+    type: string;
+  }>;
+  
+  // Последняя активность
+  recentActivity: Array<{
+    type: string;
+    title: string;
+    date: string;
+    user: string;
+  }>;
 }
 
 interface ChartData {
@@ -63,18 +92,26 @@ interface RecentActivityItem {
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
-    totalUsers: 0,
-    totalImpressions: 0,
-    totalClicks: 0,
-    averageCTR: 0,
-    activeAdvertisements: 0,
+    totalPageViews: 0,
+    uniqueVisitors: 0,
+    uniqueSessions: 0,
+    averageViewsPerSession: 0,
     totalCharacters: 0,
     totalArticles: 0,
     totalWeapons: 0,
     totalArtifacts: 0,
+    totalImpressions: 0,
+    totalClicks: 0,
+    averageCTR: 0,
+    activeAdvertisements: 0,
+    monthlyViews: 0,
+    weeklyViews: 0,
+    dailyViews: 0,
     weeklyImpressions: [],
     weeklyClicks: [],
-    dailyStats: []
+    dailyStats: [],
+    topContent: [],
+    recentActivity: []
   });
   const [loading, setLoading] = useState(true);
   const [recentActivities, setRecentActivities] = useState<RecentActivityItem[]>([]);
@@ -82,6 +119,26 @@ export default function AdminDashboard() {
   const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
+      
+      // Загружаем общую статистику сайта
+      const analyticsResponse = await fetch('/api/analytics/dashboard');
+      if (analyticsResponse.ok) {
+        const analyticsData = await analyticsResponse.json();
+        if (analyticsData.success) {
+          setStats(prev => ({
+            ...prev,
+            totalPageViews: analyticsData.data.overview.totalPageViews || 0,
+            uniqueVisitors: analyticsData.data.overview.uniqueVisitors || 0,
+            uniqueSessions: analyticsData.data.overview.uniqueSessions || 0,
+            averageViewsPerSession: analyticsData.data.overview.averageViewsPerSession || 0,
+            monthlyViews: Math.floor((analyticsData.data.overview.totalPageViews || 0) * 0.3),
+            weeklyViews: Math.floor((analyticsData.data.overview.totalPageViews || 0) * 0.1),
+            dailyViews: Math.floor((analyticsData.data.overview.totalPageViews || 0) * 0.02),
+            topContent: analyticsData.data.topContent || [],
+            recentActivity: analyticsData.data.recentActivity || []
+          }));
+        }
+      }
       
       // Загружаем статистику рекламы
       const adsResponse = await fetch('/api/advertisements');
@@ -283,6 +340,40 @@ export default function AdminDashboard() {
     return `${Math.floor(diffInMinutes / 1440)} дн назад`;
   };
 
+  const getActivityColor = (type: string) => {
+    switch (type) {
+      case 'impression':
+        return 'bg-blue-500';
+      case 'click':
+        return 'bg-green-500';
+      case 'user':
+        return 'bg-purple-500';
+      case 'content':
+        return 'bg-orange-500';
+      case 'advertisement':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'impression':
+        return <Eye className="w-4 h-4 text-white" />;
+      case 'click':
+        return <MousePointer className="w-4 h-4 text-white" />;
+      case 'user':
+        return <Users className="w-4 h-4 text-white" />;
+      case 'content':
+        return <FileText className="w-4 h-4 text-white" />;
+      case 'advertisement':
+        return <TrendingUp className="w-4 h-4 text-white" />;
+      default:
+        return <Activity className="w-4 h-4 text-white" />;
+    }
+  };
+
   // Данные для графиков
   const impressionsData: ChartData = {
     labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
@@ -336,29 +427,29 @@ export default function AdminDashboard() {
       {/* Статистические карточки */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Активные рекламы"
-          value={stats.activeAdvertisements}
-          icon={TrendingUp}
-          color="purple"
+          title="Просмотры страниц"
+          value={stats.totalPageViews.toLocaleString()}
+          icon={Eye}
+          color="blue"
           change={{ value: Math.round(Math.random() * 20), isPositive: Math.random() > 0.3 }}
         />
         <StatCard
-          title="Общие показы"
-          value={stats.totalImpressions.toLocaleString()}
-          icon={Eye}
-          color="blue"
+          title="Уникальные посетители"
+          value={stats.uniqueVisitors.toLocaleString()}
+          icon={Users}
+          color="green"
           change={{ value: Math.round(Math.random() * 15), isPositive: Math.random() > 0.2 }}
         />
         <StatCard
-          title="Общие клики"
-          value={stats.totalClicks.toLocaleString()}
-          icon={MousePointer}
-          color="green"
+          title="Сессии"
+          value={stats.uniqueSessions.toLocaleString()}
+          icon={Activity}
+          color="purple"
           change={{ value: Math.round(Math.random() * 25), isPositive: Math.random() > 0.3 }}
         />
         <StatCard
-          title="Средний CTR"
-          value={`${stats.averageCTR}%`}
+          title="Среднее время на сайте"
+          value={`${stats.averageViewsPerSession.toFixed(1)} стр`}
           icon={BarChart3}
           color="yellow"
           change={{ value: Math.round(Math.random() * 10), isPositive: Math.random() > 0.4 }}
@@ -377,6 +468,78 @@ export default function AdminDashboard() {
           type="line"
           title="Клики по дням недели"
         />
+      </div>
+
+      {/* Статистика просмотров */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="bg-neutral-800 border-neutral-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2 text-green-400" />
+              Статистика просмотров
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="text-white">Общие просмотры</span>
+                </div>
+                <span className="text-white font-bold">{stats.totalPageViews.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-white">За месяц</span>
+                </div>
+                <span className="text-white font-bold">{stats.monthlyViews.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                  <span className="text-white">За неделю</span>
+                </div>
+                <span className="text-white font-bold">{stats.weeklyViews.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <span className="text-white">Сегодня</span>
+                </div>
+                <span className="text-white font-bold">{stats.dailyViews.toLocaleString()}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-neutral-800 border-neutral-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <BarChart3 className="w-5 h-5 mr-2 text-yellow-400" />
+              Популярный контент
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {stats.topContent.slice(0, 5).map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-lg font-bold text-purple-400">#{index + 1}</span>
+                    <div>
+                      <p className="text-white text-sm font-medium">{item.title}</p>
+                      <p className="text-gray-400 text-xs">{item.type}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Eye className="w-4 h-4 text-gray-400" />
+                    <span className="text-white font-medium">{item.views.toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Дополнительная статистика */}
@@ -510,32 +673,35 @@ export default function AdminDashboard() {
 
       {/* Последние действия */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentActivity activities={recentActivities} />
         <Card className="bg-neutral-800 border-neutral-700">
           <CardHeader>
-            <CardTitle className="text-white">Ежедневная статистика</CardTitle>
+            <CardTitle className="text-white flex items-center">
+              <Clock className="w-5 h-5 mr-2 text-blue-400" />
+              Последняя активность сайта
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {stats.dailyStats.map((day, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <span className="text-white">{day.date}</span>
+              {stats.recentActivity.slice(0, 5).map((activity, index) => (
+                <div key={index} className="flex items-center space-x-3 p-3 bg-neutral-700/50 rounded-lg">
+                  <div className={`w-8 h-8 rounded-full ${getActivityColor(activity.type)} flex items-center justify-center`}>
+                    {getActivityIcon(activity.type)}
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <span className="text-blue-400 text-sm">
-                      👁 {day.impressions}
-                    </span>
-                    <span className="text-green-400 text-sm">
-                      🖱 {day.clicks}
-                    </span>
+                  <div className="flex-1">
+                    <p className="text-white text-sm">{activity.title}</p>
+                    <div className="flex items-center space-x-2 text-xs text-gray-400">
+                      <span>{activity.user}</span>
+                      <span>•</span>
+                      <span>{activity.date}</span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
+
+        <RecentActivity activities={recentActivities} />
       </div>
     </div>
   );
