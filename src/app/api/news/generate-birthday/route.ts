@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import News, { INewsModel } from '@/models/News';
-import { CharacterModel as Character } from '@/models/Character';
+import { CharacterModel as Character, ICharacter } from '@/models/Character';
 
 // POST - генерация новостей о днях рождения
 export async function POST() {
@@ -20,7 +20,7 @@ export async function POST() {
           { $eq: [{ $dayOfMonth: '$birthday' }, currentDay] }
         ]
       }
-    }).lean();
+    });
 
     if (charactersWithBirthday.length === 0) {
       return NextResponse.json({
@@ -35,17 +35,17 @@ export async function POST() {
 
     for (const character of charactersWithBirthday) {
       // Проверяем, не создана ли уже новость для этого персонажа сегодня
-      const existingNews = await (News as INewsModel).hasBirthdayNews(character._id.toString(), today);
+      const existingNews = await (News as INewsModel).hasBirthdayNews((character._id as any).toString(), today);
       
       if (!existingNews) {
         try {
           const birthdayNews = await (News as INewsModel).createBirthdayNews(
-            character._id.toString(),
+            (character._id as any).toString(),
             character.name
           );
           
           results.push({
-            character: character.name,
+            character: character.name as string,
             newsId: birthdayNews._id,
             status: 'created'
           });
@@ -54,14 +54,14 @@ export async function POST() {
         } catch (error) {
           console.error(`Error creating birthday news for ${character.name}:`, error);
           results.push({
-            character: character.name,
+            character: character.name as string,
             status: 'error',
             error: error instanceof Error ? error.message : 'Unknown error'
           });
         }
       } else {
         results.push({
-          character: character.name,
+          character: character.name as string,
           status: 'already_exists'
         });
       }
@@ -101,7 +101,7 @@ export async function GET() {
           { $eq: [{ $dayOfMonth: '$birthday' }, currentDay] }
         ]
       }
-    }).select('name birthday image').lean();
+    }).select('name birthday image');
 
     // Проверяем, какие новости уже созданы
     const existingNews = await News.find({
@@ -110,13 +110,13 @@ export async function GET() {
         $gte: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
         $lt: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
       }
-    }).select('characterId').lean();
+    }).select('characterId');
 
     const existingCharacterIds = existingNews.map(n => n.characterId?.toString());
 
     const result = charactersWithBirthday.map(character => ({
       ...character,
-      hasNews: existingCharacterIds.includes(character._id.toString())
+      hasNews: existingCharacterIds.includes((character._id as any).toString())
     }));
 
     return NextResponse.json({
