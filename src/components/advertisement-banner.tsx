@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { Advertisement } from '@/types';
 import Image from 'next/image';
 import { X } from 'lucide-react';
@@ -9,6 +10,12 @@ export default function AdvertisementBanner() {
   const [advertisement, setAdvertisement] = useState<Advertisement | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
+
+  // Не показываем рекламу в админке
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
 
   useEffect(() => {
     // Определяем тип устройства

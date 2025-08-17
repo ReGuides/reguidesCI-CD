@@ -28,10 +28,10 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { title, description, cta, url, type, isActive, order, backgroundImage, erid } = body;
+    const { title, description, cta, url, type, isActive, order, backgroundImage, erid, deviceTargeting } = body;
 
     // Валидация обязательных полей
-    if (!title || !description || !cta || !url || !type) {
+    if (!title || !description || !cta || !url || !type || !deviceTargeting) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
@@ -48,7 +48,8 @@ export async function POST(request: NextRequest) {
       isActive: isActive ?? true,
       order: order ?? 0,
       backgroundImage,
-      erid
+      erid,
+      deviceTargeting
     });
 
     await advertisement.save();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Character, News, Advertisement, About } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import Image from 'next/image';
@@ -12,11 +12,15 @@ interface SidebarProps {
 
 export default function Sidebar({ onNewsSelect }: SidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [characters, setCharacters] = useState<Character[]>([]);
   const [news, setNews] = useState<News[]>([]);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [about, setAbout] = useState<About | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Не показываем рекламу в админке
+  const isAdminPage = pathname.startsWith('/admin');
 
   // Загружаем данные
   useEffect(() => {
@@ -39,10 +43,12 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
         }
 
         // Загружаем рекламу
-        const adsResponse = await fetch('/api/advertisements/sidebar');
-        if (adsResponse.ok) {
-          const adsData = await adsResponse.json();
-          setAdvertisements(adsData || []);
+        if (!isAdminPage) {
+          const adsResponse = await fetch('/api/advertisements/sidebar');
+          if (adsResponse.ok) {
+            const adsData = await adsResponse.json();
+            setAdvertisements(adsData.data || []);
+          }
         }
 
         // Загружаем информацию о поддержке
@@ -196,7 +202,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
       </div>
 
       {/* Реклама */}
-      {advertisements.length > 0 ? (
+      {advertisements.length > 0 && !isAdminPage ? (
         <div className="bg-neutral-800 rounded-lg shadow-lg overflow-hidden">
           {advertisements.map((ad, index) => (
             <div key={ad._id || index} className="relative">
@@ -234,7 +240,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
       )}
 
       {/* Кнопка поддержки */}
-      {supportUrl ? (
+      {supportUrl && !isAdminPage ? (
         <div className="bg-neutral-800 rounded-lg shadow-lg p-4">
           <h3 className="text-lg font-bold mb-3 text-white">Поддержать проект</h3>
           <button

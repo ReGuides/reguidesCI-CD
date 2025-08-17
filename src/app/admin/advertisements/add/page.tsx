@@ -35,7 +35,7 @@ export default function AddAdvertisementPage() {
     description: '',
     cta: '',
     url: '',
-    type: 'sidebar-top',
+    type: 'sidebar',
     isActive: true,
     order: 0,
     backgroundImage: '',
@@ -49,7 +49,7 @@ export default function AddAdvertisementPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!form.title || !form.description || !form.cta || !form.url || !form.type) {
+    if (!form.title || !form.description || !form.cta || !form.url || !form.type || !form.deviceTargeting) {
       setMessage({ type: 'error', text: 'Пожалуйста, заполните все обязательные поля' });
       return;
     }
