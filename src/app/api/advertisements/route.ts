@@ -28,7 +28,11 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { title, description, cta, url, type, isActive, order, backgroundImage, erid, deviceTargeting } = body;
+    const { 
+      title, description, cta, url, type, isActive, order, 
+      backgroundImage, erid, deviceTargeting, adService, 
+      adServiceCode, adServiceId, maxImpressions, startDate, endDate 
+    } = body;
 
     // Валидация обязательных полей
     if (!title || !description || !cta || !url || !type || !deviceTargeting) {
@@ -49,7 +53,16 @@ export async function POST(request: NextRequest) {
       order: order ?? 0,
       backgroundImage,
       erid,
-      deviceTargeting
+      deviceTargeting,
+      adService: adService ?? 'custom',
+      adServiceCode,
+      adServiceId,
+      maxImpressions,
+      startDate: startDate ? new Date(startDate) : undefined,
+      endDate: endDate ? new Date(endDate) : undefined,
+      impressions: 0,
+      clicks: 0,
+      ctr: 0
     });
 
     await advertisement.save();

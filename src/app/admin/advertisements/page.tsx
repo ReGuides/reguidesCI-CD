@@ -29,6 +29,10 @@ interface Advertisement {
   deviceTargeting: string;
   createdAt: string;
   updatedAt: string;
+  impressions?: number;
+  clicks?: number;
+  ctr?: number;
+  lastShown?: string;
 }
 
 export default function AdvertisementsPage() {
@@ -288,6 +292,30 @@ export default function AdvertisementsPage() {
                         }`}>
                           {ad.isActive ? 'Активна' : 'Неактивна'}
                         </span>
+                      </div>
+                      
+                      {/* Статистика */}
+                      <div className="mt-3 grid grid-cols-4 gap-4 text-xs">
+                        <div className="bg-neutral-700/50 rounded p-2">
+                          <div className="text-gray-400">Показы</div>
+                          <div className="text-white font-semibold">{ad.impressions || 0}</div>
+                        </div>
+                        <div className="bg-neutral-700/50 rounded p-2">
+                          <div className="text-gray-400">Клики</div>
+                          <div className="text-white font-semibold">{ad.clicks || 0}</div>
+                        </div>
+                        <div className="bg-neutral-700/50 rounded p-2">
+                          <div className="text-gray-400">CTR</div>
+                          <div className="text-white font-semibold">
+                            {ad.ctr ? `${ad.ctr.toFixed(2)}%` : '0%'}
+                          </div>
+                        </div>
+                        <div className="bg-neutral-700/50 rounded p-2">
+                          <div className="text-gray-400">Последний показ</div>
+                          <div className="text-white font-semibold">
+                            {ad.lastShown ? new Date(ad.lastShown).toLocaleDateString('ru-RU') : 'Нет'}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

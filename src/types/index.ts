@@ -43,14 +43,27 @@ export interface Advertisement {
   _id: string;
   title: string;
   description: string;
-  url: string;
-  backgroundImage?: string;
   cta: string;
+  url: string;
   type: 'sidebar' | 'banner' | 'popup';
-  erid?: string;
   isActive: boolean;
   order: number;
+  backgroundImage?: string;
+  erid?: string;
   deviceTargeting: 'all' | 'desktop' | 'mobile';
+  // Новые поля для внешних рекламных сервисов
+  adService?: 'yandex_direct' | 'google_ads' | 'custom';
+  adServiceCode?: string;
+  adServiceId?: string;
+  // Статистика показов
+  impressions: number;
+  clicks: number;
+  ctr: number;
+  lastShown?: string;
+  // Дополнительные настройки
+  maxImpressions?: number;
+  startDate?: string;
+  endDate?: string;
   createdAt?: string;
   updatedAt?: string;
 }

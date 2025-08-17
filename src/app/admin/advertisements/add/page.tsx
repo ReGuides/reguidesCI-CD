@@ -26,6 +26,14 @@ interface AdvertisementForm {
   backgroundImage?: string;
   erid?: string;
   deviceTargeting: string;
+  // Новые поля для внешних рекламных сервисов
+  adService: 'yandex_direct' | 'google_ads' | 'custom';
+  adServiceCode?: string;
+  adServiceId?: string;
+  // Дополнительные настройки
+  maxImpressions?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 export default function AddAdvertisementPage() {
@@ -40,7 +48,13 @@ export default function AddAdvertisementPage() {
     order: 0,
     backgroundImage: '',
     erid: '',
-    deviceTargeting: 'all'
+    deviceTargeting: 'all',
+    adService: 'custom',
+    adServiceCode: '',
+    adServiceId: '',
+    maxImpressions: undefined,
+    startDate: '',
+    endDate: ''
   });
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -282,6 +296,93 @@ export default function AddAdvertisementPage() {
                 <label htmlFor="isActive" className="text-sm text-gray-400">
                   Активна
                 </label>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Внешние рекламные сервисы */}
+          <Card className="bg-neutral-800 border-neutral-700">
+            <CardHeader>
+              <CardTitle className="text-white">Внешние рекламные сервисы</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Сервис</label>
+                <select
+                  value={form.adService}
+                  onChange={(e) => setForm(prev => ({ ...prev, adService: e.target.value as 'yandex_direct' | 'google_ads' | 'custom' }))}
+                  className="w-full bg-neutral-700 border border-neutral-600 text-white rounded-md px-3 py-2"
+                >
+                  <option value="custom">Собственная реклама</option>
+                  <option value="yandex_direct">Яндекс.Директ</option>
+                  <option value="google_ads">Google Ads</option>
+                </select>
+              </div>
+
+              {form.adService !== 'custom' && (
+                <>
+                  <div>
+                    <label className="text-sm text-gray-400 mb-2 block">ID рекламы в сервисе</label>
+                    <Input
+                      value={form.adServiceId || ''}
+                      onChange={(e) => setForm(prev => ({ ...prev, adServiceId: e.target.value }))}
+                      className="bg-neutral-700 border-neutral-600 text-white"
+                      placeholder="Введите ID рекламы"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-gray-400 mb-2 block">HTML код от сервиса</label>
+                    <textarea
+                      value={form.adServiceCode || ''}
+                      onChange={(e) => setForm(prev => ({ ...prev, adServiceCode: e.target.value }))}
+                      className="w-full bg-neutral-700 border border-neutral-600 text-white rounded-md px-3 py-2 h-32 resize-none"
+                      placeholder="Вставьте HTML код от рекламного сервиса"
+                    />
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Дополнительные настройки */}
+          <Card className="bg-neutral-800 border-neutral-700">
+            <CardHeader>
+              <CardTitle className="text-white">Дополнительные настройки</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Максимальное количество показов</label>
+                <Input
+                  type="number"
+                  value={form.maxImpressions || ''}
+                  onChange={(e) => setForm(prev => ({ ...prev, maxImpressions: e.target.value ? parseInt(e.target.value) : undefined }))}
+                  className="bg-neutral-700 border-neutral-600 text-white"
+                  placeholder="Неограниченно"
+                  min="1"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Дата начала показа</label>
+                  <Input
+                    type="date"
+                    value={form.startDate || ''}
+                    onChange={(e) => setForm(prev => ({ ...prev, startDate: e.target.value }))}
+                    className="bg-neutral-700 border-neutral-600 text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Дата окончания показа</label>
+                  <Input
+                    type="date"
+                    value={form.endDate || ''}
+                    onChange={(e) => setForm(prev => ({ ...prev, endDate: e.target.value }))}
+                    className="bg-neutral-700 border-neutral-600 text-white"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -42,48 +42,45 @@ export async function PUT(
 ) {
   try {
     await connectDB();
-    
-    const { id } = await params;
+    const { id } = params;
     const body = await request.json();
-    const { title, description, cta, url, type, isActive, order, backgroundImage, erid, deviceTargeting } = body;
-    
-    // Валидация обязательных полей
+
+    const { 
+      title, description, cta, url, type, isActive, order, 
+      backgroundImage, erid, deviceTargeting, adService, 
+      adServiceCode, adServiceId, maxImpressions, startDate, endDate 
+    } = body;
+
     if (!title || !description || !cta || !url || !type || !deviceTargeting) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
       );
     }
-    
-    // Обновляем рекламу
+
     const advertisement = await AdvertisementModel.findByIdAndUpdate(
       id,
-      {
-        title,
-        description,
-        cta,
-        url,
-        type,
-        isActive,
-        order,
-        backgroundImage,
-        erid,
-        deviceTargeting
+      { 
+        title, description, cta, url, type, isActive, order, 
+        backgroundImage, erid, deviceTargeting, adService, 
+        adServiceCode, adServiceId, maxImpressions,
+        startDate: startDate ? new Date(startDate) : undefined,
+        endDate: endDate ? new Date(endDate) : undefined
       },
       { new: true, runValidators: true }
     );
-    
+
     if (!advertisement) {
       return NextResponse.json(
         { success: false, error: 'Advertisement not found' },
-        { status: 400 }
+        { status: 404 }
       );
     }
-    
-    return NextResponse.json({ 
-      success: true, 
+
+    return NextResponse.json({
+      success: true,
       data: advertisement,
-      message: 'Advertisement updated successfully' 
+      message: 'Advertisement updated successfully'
     });
   } catch (error) {
     console.error('Error updating advertisement:', error);

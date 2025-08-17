@@ -35,6 +35,15 @@ export default function AdvertisementBanner() {
                 (ad.deviceTargeting === 'mobile' && isMobile) ||
                 (ad.deviceTargeting === 'desktop' && !isMobile)) {
               setAdvertisement(ad);
+              
+              // Отслеживаем показ рекламы
+              if (ad._id) {
+                fetch(`/api/advertisements/${ad._id}/impression`, {
+                  method: 'POST'
+                }).catch(error => {
+                  console.error('Error tracking impression:', error);
+                });
+              }
             }
           }
         }
@@ -91,6 +100,18 @@ export default function AdvertisementBanner() {
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-xs font-bold rounded transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-purple-500/25"
+              onClick={async () => {
+                // Отслеживаем клик по рекламе
+                if (advertisement._id) {
+                  try {
+                    await fetch(`/api/advertisements/${advertisement._id}/click`, {
+                      method: 'POST'
+                    });
+                  } catch (error) {
+                    console.error('Error tracking click:', error);
+                  }
+                }
+              }}
             >
               {advertisement.cta}
             </a>
