@@ -1,0 +1,149 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { connectToDatabase } from '@/lib/mongodb';
+import News from '@/models/News';
+import Character from '@/models/Character';
+import { auth } from '@/lib/auth';
+
+// POST - генерация новостей о днях рождения
+export async function POST(request: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session?.user?.isAdmin) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    await connectToDatabase();
+    
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1; // getMonth() возвращает 0-11
+    const currentDay = today.getDate();
+
+    // Находим персонажей с днем рождения сегодня
+    const charactersWithBirthday = await Character.find({
+      $expr: {
+        $and: [
+          { $eq: [{ $month: '$birthday' }, currentMonth] },
+          { $eq: [{ $dayOfMonth: '$birthday' }, currentDay] }
+        ]
+      }
+    }).lean();
+
+    if (charactersWithBirthday.length === 0) {
+      return NextResponse.json({
+        success: true,
+        message: 'No characters have birthdays today',
+        generated: 0
+      });
+    }
+
+    let generatedCount = 0;
+    const results = [];
+
+    for (const character of charactersWithBirthday) {
+      // Проверяем, не создана ли уже новость для этого персонажа сегодня
+      const existingNews = await News.hasBirthdayNews(character._id.toString(), today);
+      
+      if (!existingNews) {
+        try {
+          const birthdayNews = await News.createBirthdayNews(
+            character._id.toString(),
+            character.name
+          );
+          
+          results.push({
+            character: character.name,
+            newsId: birthdayNews._id,
+            status: 'created'
+          });
+          
+          generatedCount++;
+        } catch (error) {
+          console.error(`Error creating birthday news for ${character.name}:`, error);
+          results.push({
+            character: character.name,
+            status: 'error',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      } else {
+        results.push({
+          character: character.name,
+          status: 'already_exists'
+        });
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Generated ${generatedCount} birthday news`,
+      generated: generatedCount,
+      total: charactersWithBirthday.length,
+      results
+    });
+
+  } catch (error) {
+    console.error('Error generating birthday news:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to generate birthday news' },
+      { status: 500 }
+    );
+  }
+}
+
+// GET - проверка персонажей с днем рождения сегодня
+export async function GET() {
+  try {
+    await connectToDatabase();
+    
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1;
+    const currentDay = today.getDate();
+
+    // Находим персонажей с днем рождения сегодня
+    const charactersWithBirthday = await Character.find({
+      $expr: {
+        $and: [
+          { $eq: [{ $month: '$birthday' }, currentMonth] },
+          { $eq: [{ $dayOfMonth: '$birthday' }, currentDay] }
+        ]
+      }
+    }).select('name birthday image').lean();
+
+    // Проверяем, какие новости уже созданы
+    const existingNews = await News.find({
+      type: 'birthday',
+      createdAt: {
+        $gte: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
+        $lt: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
+      }
+    }).select('characterId').lean();
+
+    const existingCharacterIds = existingNews.map(n => n.characterId?.toString());
+
+    const result = charactersWithBirthday.map(character => ({
+      ...character,
+      hasNews: existingCharacterIds.includes(character._id.toString())
+    }));
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        today: today.toISOString().split('T')[0],
+        characters: result,
+        total: result.length,
+        withNews: result.filter(c => c.hasNews).length,
+        withoutNews: result.filter(c => !c.hasNews).length
+      }
+    });
+
+  } catch (error) {
+    console.error('Error checking birthday characters:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to check birthday characters' },
+      { status: 500 }
+    );
+  }
+}

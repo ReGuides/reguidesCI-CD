@@ -24,18 +24,16 @@ export interface News {
   _id: string;
   title: string;
   content: string;
-  summary: string;
-  preview?: string;
-  date?: string;
-  author?: string;
-  type?: 'genshin' | 'general';
+  type: 'manual' | 'birthday' | 'update' | 'event';
   image?: string;
-  featured?: boolean;
+  isPublished: boolean;
   publishedAt?: string;
-  isPublished?: boolean;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  characterId?: string;
+  tags: string[];
+  views: number;
+  author: string;
 }
 
 // Advertisement types
