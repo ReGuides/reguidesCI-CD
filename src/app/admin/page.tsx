@@ -441,137 +441,47 @@ export default function AdminDashboard() {
           change={{ value: Math.round(Math.random() * 15), isPositive: Math.random() > 0.2 }}
         />
         <StatCard
-          title="Сессии"
-          value={stats.uniqueSessions.toLocaleString()}
-          icon={Activity}
+          title="Активные рекламы"
+          value={stats.activeAdvertisements}
+          icon={TrendingUp}
           color="purple"
           change={{ value: Math.round(Math.random() * 25), isPositive: Math.random() > 0.3 }}
         />
         <StatCard
-          title="Среднее время на сайте"
-          value={`${stats.averageViewsPerSession.toFixed(1)} стр`}
-          icon={BarChart3}
+          title="Контент сайта"
+          value={stats.totalCharacters + stats.totalArticles + stats.totalWeapons + stats.totalArtifacts}
+          icon={FileText}
           color="yellow"
           change={{ value: Math.round(Math.random() * 10), isPositive: Math.random() > 0.4 }}
         />
       </div>
 
-      {/* Графики */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <DashboardChart
-          data={impressionsData}
-          type="bar"
-          title="Показы по дням недели"
-        />
-        <DashboardChart
-          data={clicksData}
-          type="line"
-          title="Клики по дням недели"
-        />
-      </div>
-
-      {/* Статистика просмотров */}
+      {/* Быстрый обзор */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-neutral-800 border-neutral-700">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2 text-green-400" />
-              Статистика просмотров
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span className="text-white">Общие просмотры</span>
-                </div>
-                <span className="text-white font-bold">{stats.totalPageViews.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-white">За месяц</span>
-                </div>
-                <span className="text-white font-bold">{stats.monthlyViews.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                  <span className="text-white">За неделю</span>
-                </div>
-                <span className="text-white font-bold">{stats.weeklyViews.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                  <span className="text-white">Сегодня</span>
-                </div>
-                <span className="text-white font-bold">{stats.dailyViews.toLocaleString()}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-neutral-800 border-neutral-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <BarChart3 className="w-5 h-5 mr-2 text-yellow-400" />
-              Популярный контент
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {stats.topContent.slice(0, 5).map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-lg font-bold text-purple-400">#{index + 1}</span>
-                    <div>
-                      <p className="text-white text-sm font-medium">{item.title}</p>
-                      <p className="text-gray-400 text-xs">{item.type}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Eye className="w-4 h-4 text-gray-400" />
-                    <span className="text-white font-medium">{item.views.toLocaleString()}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Дополнительная статистика */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <DashboardChart
-          data={ctrData}
-          type="progress"
-          title="Средний CTR"
-        />
-        <Card className="bg-neutral-800 border-neutral-700">
-          <CardHeader>
-            <CardTitle className="text-white">Контент сайта</CardTitle>
+            <CardTitle className="text-white">Сегодняшняя активность</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-gray-400">Персонажи</span>
-              <span className="text-white font-semibold">{stats.totalCharacters}</span>
+              <span className="text-gray-400">Просмотры</span>
+              <span className="text-white font-semibold">{stats.dailyViews.toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-400">Статьи</span>
-              <span className="text-white font-semibold">{stats.totalArticles}</span>
+              <span className="text-gray-400">Показы рекламы</span>
+              <span className="text-white font-semibold">
+                {stats.dailyStats.length > 0 ? stats.dailyStats[0].impressions.toLocaleString() : '0'}
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-400">Оружие</span>
-              <span className="text-white font-semibold">{stats.totalWeapons}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">Артефакты</span>
-              <span className="text-white font-semibold">{stats.totalArtifacts}</span>
+              <span className="text-gray-400">Клики по рекламе</span>
+              <span className="text-white font-semibold">
+                {stats.dailyStats.length > 0 ? stats.dailyStats[0].clicks.toLocaleString() : '0'}
+              </span>
             </div>
           </CardContent>
         </Card>
+
         <Card className="bg-neutral-800 border-neutral-700">
           <CardHeader>
             <CardTitle className="text-white">Быстрые действия</CardTitle>
@@ -595,78 +505,12 @@ export default function AdminDashboard() {
                 Добавить статью
               </Button>
             </Link>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Простые метрики */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-neutral-800 border-neutral-700">
-          <CardHeader>
-            <CardTitle className="text-white">Эффективность рекламы</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span className="text-white">Показы сегодня</span>
-              </div>
-              <span className="text-white font-bold">
-                {stats.dailyStats.length > 0 ? stats.dailyStats[0].impressions.toLocaleString() : '0'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-white">Клики сегодня</span>
-              </div>
-              <span className="text-white font-bold">
-                {stats.dailyStats.length > 0 ? stats.dailyStats[0].clicks.toLocaleString() : '0'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                <span className="text-white">CTR сегодня</span>
-              </div>
-              <span className="text-white font-bold">
-                {stats.dailyStats.length > 0 && stats.dailyStats[0].impressions > 0 
-                  ? `${((stats.dailyStats[0].clicks / stats.dailyStats[0].impressions) * 100).toFixed(2)}%`
-                  : '0%'
-                }
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-neutral-800 border-neutral-700">
-          <CardHeader>
-            <CardTitle className="text-white">Недельная активность</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-2">
-                  {stats.weeklyImpressions.reduce((sum, val) => sum + val, 0).toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-400">Показов за неделю</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-2">
-                  {stats.weeklyClicks.reduce((sum, val) => sum + val, 0).toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-400">Кликов за неделю</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-2">
-                  {stats.weeklyImpressions.reduce((sum, val) => sum + val, 0) > 0 
-                    ? `${((stats.weeklyClicks.reduce((sum, val) => sum + val, 0) / stats.weeklyImpressions.reduce((sum, val) => sum + val, 0)) * 100).toFixed(2)}%`
-                    : '0%'
-                  }
-                </div>
-                <div className="text-sm text-gray-400">Недельный CTR</div>
-              </div>
-            </div>
+            <Link href="/admin/analytics">
+              <Button variant="outline" className="w-full">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Подробная аналитика
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -675,14 +519,11 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-neutral-800 border-neutral-700">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-blue-400" />
-              Последняя активность сайта
-            </CardTitle>
+            <CardTitle className="text-white">Последняя активность сайта</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {stats.recentActivity.slice(0, 5).map((activity, index) => (
+            <div className="space-y-3">
+              {stats.recentActivity.slice(0, 4).map((activity, index) => (
                 <div key={index} className="flex items-center space-x-3 p-3 bg-neutral-700/50 rounded-lg">
                   <div className={`w-8 h-8 rounded-full ${getActivityColor(activity.type)} flex items-center justify-center`}>
                     {getActivityIcon(activity.type)}
@@ -701,7 +542,30 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <RecentActivity activities={recentActivities} />
+        <Card className="bg-neutral-800 border-neutral-700">
+          <CardHeader>
+            <CardTitle className="text-white">Популярный контент</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {stats.topContent.slice(0, 4).map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-lg font-bold text-purple-400">#{index + 1}</span>
+                    <div>
+                      <p className="text-white text-sm font-medium">{item.title}</p>
+                      <p className="text-gray-400 text-xs">{item.type}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Eye className="w-4 h-4 text-gray-400" />
+                    <span className="text-white font-medium">{item.views.toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

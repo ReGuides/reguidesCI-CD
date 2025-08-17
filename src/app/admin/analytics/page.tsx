@@ -14,25 +14,52 @@ import {
 import Link from 'next/link';
 
 interface AnalyticsData {
+  // Общая статистика сайта
+  totalPageViews: number;
+  uniqueVisitors: number;
+  uniqueSessions: number;
+  averageViewsPerSession: number;
+  
+  // Статистика рекламы
   totalImpressions: number;
   totalClicks: number;
   averageCTR: number;
+  
+  // Временные данные
+  monthlyViews: number;
+  weeklyViews: number;
+  dailyViews: number;
+  
+  // Популярный контент
+  topContent: Array<{
+    title: string;
+    views: number;
+    type: string;
+  }>;
+  
+  // Статистика рекламы
   topAdvertisements: Array<{
     title: string;
     impressions: number;
     clicks: number;
     ctr: number;
   }>;
+  
+  // Почасовые и недельные данные
   hourlyData: {
     labels: string[];
     impressions: number[];
     clicks: number[];
+    pageViews: number[];
   };
   weeklyTrends: {
     labels: string[];
     impressions: number[];
     clicks: number[];
+    pageViews: number[];
   };
+  
+  // Дополнительная статистика
   deviceStats: {
     desktop: number;
     mobile: number;
@@ -56,12 +83,20 @@ interface Advertisement {
 
 export default function AdminAnalytics() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
+    totalPageViews: 0,
+    uniqueVisitors: 0,
+    uniqueSessions: 0,
+    averageViewsPerSession: 0,
     totalImpressions: 0,
     totalClicks: 0,
     averageCTR: 0,
+    monthlyViews: 0,
+    weeklyViews: 0,
+    dailyViews: 0,
+    topContent: [],
     topAdvertisements: [],
-    hourlyData: { labels: [], impressions: [], clicks: [] },
-    weeklyTrends: { labels: [], impressions: [], clicks: [] },
+    hourlyData: { labels: [], impressions: [], clicks: [], pageViews: [] },
+    weeklyTrends: { labels: [], impressions: [], clicks: [], pageViews: [] },
     deviceStats: { desktop: 0, mobile: 0 },
     typeStats: { sidebar: 0, banner: 0, popup: 0 }
   });
@@ -116,9 +151,17 @@ export default function AdminAnalytics() {
           };
 
           setAnalyticsData({
+            totalPageViews: 0, // Placeholder, needs actual data fetching
+            uniqueVisitors: 0, // Placeholder, needs actual data fetching
+            uniqueSessions: 0, // Placeholder, needs actual data fetching
+            averageViewsPerSession: 0, // Placeholder, needs actual data fetching
             totalImpressions,
             totalClicks,
             averageCTR: Math.round(averageCTR * 100) / 100,
+            monthlyViews: 0, // Placeholder, needs actual data fetching
+            weeklyViews: 0, // Placeholder, needs actual data fetching
+            dailyViews: 0, // Placeholder, needs actual data fetching
+            topContent: [], // Placeholder, needs actual data fetching
             topAdvertisements: topAds,
             hourlyData,
             weeklyTrends,
@@ -139,9 +182,10 @@ export default function AdminAnalytics() {
   }, [fetchAnalyticsData, timeRange]);
 
   const generateHourlyData = (advertisements: Advertisement[]) => {
-    const labels = [];
-    const impressions = [];
-    const clicks = [];
+    const labels: string[] = [];
+    const impressions: number[] = [];
+    const clicks: number[] = [];
+    const pageViews: number[] = [];
     
     // Простая логика: распределяем данные по часам с понятными пиками
     for (let i = 0; i < 24; i++) {
@@ -160,15 +204,17 @@ export default function AdminAnalytics() {
       
       impressions.push(Math.round((totalImpressions / 24) * hourMultiplier));
       clicks.push(Math.round((totalClicks / 24) * hourMultiplier));
+      pageViews.push(Math.round((totalImpressions * 10 / 24) * hourMultiplier)); // Симулируем просмотры страниц
     }
     
-    return { labels, impressions, clicks };
+    return { labels, impressions, clicks, pageViews };
   };
 
   const generateWeeklyTrends = (advertisements: Advertisement[]) => {
     const labels: string[] = [];
     const impressions: number[] = [];
     const clicks: number[] = [];
+    const pageViews: number[] = [];
     
     const totalImpressions = advertisements.reduce((sum, ad) => sum + (ad.impressions || 0), 0);
     const totalClicks = advertisements.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
@@ -179,9 +225,10 @@ export default function AdminAnalytics() {
     dayMultipliers.forEach(multiplier => {
       impressions.push(Math.round((totalImpressions / 7) * multiplier));
       clicks.push(Math.round((totalClicks / 7) * multiplier));
+      pageViews.push(Math.round((totalImpressions * 10 / 7) * multiplier)); // Симулируем просмотры страниц
     });
     
-    return { labels, impressions, clicks };
+    return { labels, impressions, clicks, pageViews };
   };
 
   const exportData = () => {
