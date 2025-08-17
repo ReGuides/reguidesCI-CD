@@ -319,7 +319,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
-                <Button className="bg-blue-600 hover:bg-blue-700 h-12">
+                <Button className="bg-purple-600 hover:bg-purple-700 h-12">
                   <Users className="w-4 h-4 mr-2" />
                   Добавить персонажа
                 </Button>

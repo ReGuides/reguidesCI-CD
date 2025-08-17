@@ -219,7 +219,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
                   href={ad.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded transition-colors"
+                  className="inline-block px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded transition-colors"
                 >
                   {ad.cta}
                 </a>
