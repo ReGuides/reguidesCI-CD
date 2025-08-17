@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import News, { INewsModel } from '@/models/News';
 import { CharacterModel as Character } from '@/models/Character';
+import { isBirthdayToday } from '@/lib/utils/dateUtils';
 
 // POST - генерация новостей о днях рождения
 export async function POST() {
@@ -9,18 +10,12 @@ export async function POST() {
     await connectDB();
     
     const today = new Date();
-    const currentMonth = today.getMonth() + 1; // getMonth() возвращает 0-11
-    const currentDay = today.getDate();
-
-    // Находим персонажей с днем рождения сегодня
-    const charactersWithBirthday = await Character.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $month: '$birthday' }, currentMonth] },
-          { $eq: [{ $dayOfMonth: '$birthday' }, currentDay] }
-        ]
-      }
-    });
+    
+    // Находим всех персонажей и фильтруем по дню рождения
+    const allCharacters = await Character.find({});
+    const charactersWithBirthday = allCharacters.filter(char => 
+      char.birthday && isBirthdayToday(char.birthday)
+    );
 
     if (charactersWithBirthday.length === 0) {
       return NextResponse.json({
@@ -90,18 +85,12 @@ export async function GET() {
     await connectDB();
     
     const today = new Date();
-    const currentMonth = today.getMonth() + 1;
-    const currentDay = today.getDate();
-
-    // Находим персонажей с днем рождения сегодня
-    const charactersWithBirthday = await Character.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $month: '$birthday' }, currentMonth] },
-          { $eq: [{ $dayOfMonth: '$birthday' }, currentDay] }
-        ]
-      }
-    }).select('name birthday image');
+    
+    // Находим всех персонажей и фильтруем по дню рождения
+    const allCharacters = await Character.find({}).select('name birthday image');
+    const charactersWithBirthday = allCharacters.filter(char => 
+      char.birthday && isBirthdayToday(char.birthday)
+    );
 
     // Проверяем, какие новости уже созданы
     const existingNews = await News.find({

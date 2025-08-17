@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Character, News, Advertisement, About } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
+import { isBirthdayToday } from '@/lib/utils/dateUtils';
 import Image from 'next/image';
 
 interface SidebarProps {
@@ -77,10 +78,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
     // Ищем персонажа с днем рождения сегодня
     const birthdayCharacter = characters.find(char => {
       if (!char.birthday) return false;
-      const birthday = new Date(char.birthday);
-      const birthdayString = `${birthday.getMonth() + 1}/${birthday.getDate()}`;
-      const todayBirthdayString = `${today.getMonth() + 1}/${today.getDate()}`;
-      return birthdayString === todayBirthdayString;
+      return isBirthdayToday(char.birthday);
     });
 
     if (birthdayCharacter) {
