@@ -39,7 +39,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
         const newsResponse = await fetch('/api/news');
         if (newsResponse.ok) {
           const newsData = await newsResponse.json();
-          setNews(newsData || []);
+          setNews(newsData.data || []);
         }
 
         // Загружаем рекламу
@@ -69,7 +69,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
 
   // Получаем персонажа дня (с днем рождения или случайного)
   const characterOfTheDay = useMemo(() => {
-    if (characters.length === 0) return null;
+    if (!Array.isArray(characters) || characters.length === 0) return null;
 
     const today = new Date();
     const todayString = today.toDateString(); // Используем полную дату для стабильности
@@ -96,6 +96,8 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
 
   // Получаем последние новости
   const latestNews = useMemo(() => {
+    if (!Array.isArray(news)) return [];
+    
     return news
       .sort((a, b) => {
         const dateA = a.publishedAt ? new Date(a.publishedAt) : new Date(0);
@@ -202,7 +204,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
       </div>
 
       {/* Реклама */}
-      {advertisements.length > 0 && !isAdminPage ? (
+      {Array.isArray(advertisements) && advertisements.length > 0 && !isAdminPage ? (
         <div className="bg-neutral-800 rounded-lg shadow-lg overflow-hidden">
           {advertisements.map((ad, index) => (
             <div key={ad._id || index} className="relative">

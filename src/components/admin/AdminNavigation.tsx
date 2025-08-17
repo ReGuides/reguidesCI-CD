@@ -10,7 +10,8 @@ import {
   Settings, 
   BarChart3,
   Home,
-  Megaphone
+  Megaphone,
+  Newspaper
 } from 'lucide-react';
 
 interface AdminNavigationProps {
@@ -51,6 +52,11 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
       href: '/admin/articles',
       label: 'Статьи',
       icon: FileText
+    },
+    {
+      href: '/admin/news',
+      label: 'Новости',
+      icon: Newspaper
     },
     {
       href: '/admin/settings',
