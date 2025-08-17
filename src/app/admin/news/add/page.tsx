@@ -5,9 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, Save, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -108,7 +105,7 @@ export default function AddNewsPage() {
     }));
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       addTag();
@@ -139,7 +136,9 @@ export default function AddNewsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="title" className="text-white">Заголовок *</Label>
+              <label htmlFor="title" className="block text-sm font-medium text-white mb-2">
+                Заголовок *
+              </label>
               <Input
                 id="title"
                 value={form.title}
@@ -151,61 +150,62 @@ export default function AddNewsPage() {
             </div>
 
             <div>
-              <Label htmlFor="content" className="text-white">Содержание *</Label>
-              <Textarea
+              <label htmlFor="content" className="block text-sm font-medium text-white mb-2">
+                Содержание *
+              </label>
+              <textarea
                 id="content"
                 value={form.content}
                 onChange={(e) => setForm(prev => ({ ...prev, content: e.target.value }))}
                 placeholder="Введите содержание новости"
-                className="bg-neutral-700 border-neutral-600 text-white min-h-[200px]"
+                className="w-full min-h-[200px] rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="type" className="text-white">Тип новости *</Label>
-                <Select
+                <label htmlFor="type" className="block text-sm font-medium text-white mb-2">
+                  Тип новости *
+                </label>
+                <select
+                  id="type"
                   value={form.type}
-                  onValueChange={(value: 'manual' | 'birthday' | 'update' | 'event') => 
-                    setForm(prev => ({ ...prev, type: value }))
-                  }
+                  onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value as 'manual' | 'birthday' | 'update' | 'event' }))}
+                  className="w-full h-10 rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  required
                 >
-                  <SelectTrigger className="bg-neutral-700 border-neutral-600 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-neutral-700 border-neutral-600">
-                    <SelectItem value="manual">Ручная</SelectItem>
-                    <SelectItem value="birthday">День рождения</SelectItem>
-                    <SelectItem value="update">Обновление</SelectItem>
-                    <SelectItem value="event">Событие</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <option value="manual">Ручная</option>
+                  <option value="birthday">День рождения</option>
+                  <option value="update">Обновление</option>
+                  <option value="event">Событие</option>
+                </select>
               </div>
 
               <div>
-                <Label htmlFor="characterId" className="text-white">Персонаж (опционально)</Label>
-                <Select
+                <label htmlFor="characterId" className="block text-sm font-medium text-white mb-2">
+                  Персонаж (опционально)
+                </label>
+                <select
+                  id="characterId"
                   value={form.characterId}
-                  onValueChange={(value) => setForm(prev => ({ ...prev, characterId: value }))}
+                  onChange={(e) => setForm(prev => ({ ...prev, characterId: e.target.value }))}
+                  className="w-full h-10 rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
-                  <SelectTrigger className="bg-neutral-700 border-neutral-600 text-white">
-                    <SelectValue placeholder="Выберите персонажа" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-neutral-700 border-neutral-600">
-                    <SelectItem value="">Без персонажа</SelectItem>
-                    {characters.map((character) => (
-                      <SelectItem key={character._id} value={character._id}>
-                        {character.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <option value="">Без персонажа</option>
+                  {characters.map((character) => (
+                    <option key={character._id} value={character._id}>
+                      {character.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
             <div>
-              <Label htmlFor="image" className="text-white">URL изображения</Label>
+              <label htmlFor="image" className="block text-sm font-medium text-white mb-2">
+                URL изображения
+              </label>
               <Input
                 id="image"
                 type="url"
@@ -224,7 +224,9 @@ export default function AddNewsPage() {
                 onChange={(e) => setForm(prev => ({ ...prev, isPublished: e.target.checked }))}
                 className="rounded border-neutral-600 bg-neutral-700"
               />
-              <Label htmlFor="isPublished" className="text-white">Опубликовать сразу</Label>
+              <label htmlFor="isPublished" className="text-white">
+                Опубликовать сразу
+              </label>
             </div>
           </CardContent>
         </Card>

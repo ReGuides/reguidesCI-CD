@@ -1,20 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import News from '@/models/News';
 import Character from '@/models/Character';
-import { auth } from '@/lib/auth';
 
 // POST - генерация новостей о днях рождения
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.isAdmin) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     await connectToDatabase();
     
     const today = new Date();
@@ -96,7 +87,7 @@ export async function POST(request: NextRequest) {
 // GET - проверка персонажей с днем рождения сегодня
 export async function GET() {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     const today = new Date();
     const currentMonth = today.getMonth() + 1;

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import News from '@/models/News';
-import { auth } from '@/lib/auth';
 
 // GET - получение всех новостей
 export async function GET(request: NextRequest) {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
@@ -58,15 +57,7 @@ export async function GET(request: NextRequest) {
 // POST - создание новой новости
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.isAdmin) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    await connectToDatabase();
+    await connectDB();
     
     const body = await request.json();
     const { title, content, type, image, isPublished, characterId, tags } = body;
@@ -94,7 +85,7 @@ export async function POST(request: NextRequest) {
       isPublished: isPublished || false,
       characterId: characterId || undefined,
       tags: tags || [],
-      author: session.user.name || 'Администратор'
+      author: 'Администратор'
     });
 
     await news.save();

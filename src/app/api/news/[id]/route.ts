@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import News from '@/models/News';
-import { auth } from '@/lib/auth';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -11,7 +10,7 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    await connectToDatabase();
+    await connectDB();
     
     const news = await News.findById(id)
       .populate('characterId', 'name image')
@@ -45,16 +44,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const session = await auth();
-    
-    if (!session?.user?.isAdmin) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    await connectToDatabase();
+    await connectDB();
     
     const body = await request.json();
     const { title, content, type, image, isPublished, characterId, tags } = body;
@@ -115,16 +105,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const session = await auth();
-    
-    if (!session?.user?.isAdmin) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    await connectToDatabase();
+    await connectDB();
     
     const deletedNews = await News.findByIdAndDelete(id);
 
