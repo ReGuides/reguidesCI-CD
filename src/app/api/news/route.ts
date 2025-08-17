@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const skip = (page - 1) * limit;
 
-    let query: any = {};
+    const query: Record<string, any> = {};
     
     if (type) {
       query.type = type;

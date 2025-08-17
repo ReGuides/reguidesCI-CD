@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import News from '@/models/News';
 import Character from '@/models/Character';
 
 // POST - генерация новостей о днях рождения
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     const today = new Date();
     const currentMonth = today.getMonth() + 1; // getMonth() возвращает 0-11
