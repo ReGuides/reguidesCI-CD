@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/admin/stat-card';
@@ -13,7 +13,6 @@ import {
   TrendingUp, 
   BarChart3,
   FileText,
-  Clock,
   Activity
 } from 'lucide-react';
 import Link from 'next/link';
@@ -80,14 +79,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [recentActivities, setRecentActivities] = useState<RecentActivityItem[]>([]);
 
-  useEffect(() => {
-    fetchDashboardData();
-    // Обновляем данные каждые 5 минут
-    const interval = setInterval(fetchDashboardData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -178,10 +170,16 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+    // Обновляем данные каждые 5 минут
+    const interval = setInterval(fetchDashboardData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchDashboardData]);
 
   const generateWeeklyData = (advertisements: Advertisement[], field: 'impressions' | 'clicks'): number[] => {
-    const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     const today = new Date();
     const weekData: number[] = [];
 
@@ -227,7 +225,6 @@ export default function AdminDashboard() {
 
   const generateRecentActivities = (advertisements: Advertisement[]) => {
     const activities: RecentActivityItem[] = [];
-    const now = new Date();
 
     // Добавляем реальные действия на основе данных
     advertisements.forEach((ad, index) => {

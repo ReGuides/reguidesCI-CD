@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import DashboardChart from '@/components/admin/dashboard-chart';
@@ -9,8 +9,6 @@ import {
   TrendingUp,
   Eye,
   MousePointer,
-  Calendar,
-  Filter,
   Download
 } from 'lucide-react';
 import Link from 'next/link';
@@ -46,6 +44,16 @@ interface AnalyticsData {
   };
 }
 
+interface Advertisement {
+  _id: string;
+  title: string;
+  type: string;
+  isActive: boolean;
+  impressions: number;
+  clicks: number;
+  createdAt: string;
+}
+
 export default function AdminAnalytics() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
     totalImpressions: 0,
@@ -60,11 +68,7 @@ export default function AdminAnalytics() {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
 
-  useEffect(() => {
-    fetchAnalyticsData();
-  }, [timeRange]);
-
-  const fetchAnalyticsData = async () => {
+  const fetchAnalyticsData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -73,23 +77,23 @@ export default function AdminAnalytics() {
       if (adsResponse.ok) {
         const adsData = await adsResponse.json();
         if (adsData.success) {
-          const advertisements = adsData.data;
+          const advertisements: Advertisement[] = adsData.data;
           
           // Подсчитываем общую статистику
-          const totalImpressions = advertisements.reduce((sum: number, ad: any) => sum + (ad.impressions || 0), 0);
-          const totalClicks = advertisements.reduce((sum: number, ad: any) => sum + (ad.clicks || 0), 0);
+          const totalImpressions = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.impressions || 0), 0);
+          const totalClicks = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.clicks || 0), 0);
           const averageCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
 
           // Топ рекламы по CTR
           const topAds = advertisements
-            .filter((ad: any) => ad.impressions > 0)
-            .map((ad: any) => ({
+            .filter((ad: Advertisement) => ad.impressions > 0)
+            .map((ad: Advertisement) => ({
               title: ad.title,
               impressions: ad.impressions,
               clicks: ad.clicks,
               ctr: ad.impressions > 0 ? (ad.clicks / ad.impressions) * 100 : 0
             }))
-            .sort((a: any, b: any) => b.ctr - a.ctr)
+            .sort((a, b) => b.ctr - a.ctr)
             .slice(0, 10);
 
           // Генерируем почасовые данные
@@ -106,9 +110,9 @@ export default function AdminAnalytics() {
 
           // Статистика по типам рекламы
           const typeStats = {
-            sidebar: advertisements.filter((ad: any) => ad.type === 'sidebar').length,
-            banner: advertisements.filter((ad: any) => ad.type === 'banner').length,
-            popup: advertisements.filter((ad: any) => ad.type === 'popup').length
+            sidebar: advertisements.filter((ad: Advertisement) => ad.type === 'sidebar').length,
+            banner: advertisements.filter((ad: Advertisement) => ad.type === 'banner').length,
+            popup: advertisements.filter((ad: Advertisement) => ad.type === 'popup').length
           };
 
           setAnalyticsData({
@@ -128,17 +132,21 @@ export default function AdminAnalytics() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const generateHourlyData = (advertisements: any[]) => {
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [fetchAnalyticsData, timeRange]);
+
+  const generateHourlyData = (advertisements: Advertisement[]) => {
     const labels = [];
     const impressions = [];
     const clicks = [];
     
     for (let i = 0; i < 24; i++) {
       labels.push(`${i}:00`);
-      const totalImpressions = advertisements.reduce((sum: number, ad: any) => sum + (ad.impressions || 0), 0);
-      const totalClicks = advertisements.reduce((sum: number, ad: any) => sum + (ad.clicks || 0), 0);
+      const totalImpressions = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.impressions || 0), 0);
+      const totalClicks = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.clicks || 0), 0);
       
       // Симулируем почасовую активность (утро и вечер - пики)
       let hourMultiplier = 0.3;
@@ -153,13 +161,13 @@ export default function AdminAnalytics() {
     return { labels, impressions, clicks };
   };
 
-  const generateWeeklyTrends = (advertisements: any[]) => {
+  const generateWeeklyTrends = (advertisements: Advertisement[]) => {
     const labels = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     const impressions = [];
     const clicks = [];
     
-    const totalImpressions = advertisements.reduce((sum: number, ad: any) => sum + (ad.impressions || 0), 0);
-    const totalClicks = advertisements.reduce((sum: number, ad: any) => sum + (ad.clicks || 0), 0);
+    const totalImpressions = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.impressions || 0), 0);
+    const totalClicks = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.clicks || 0), 0);
     
     for (let i = 0; i < 7; i++) {
       // Симулируем недельные тренды (выходные - меньше активности)
