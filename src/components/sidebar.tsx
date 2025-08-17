@@ -180,7 +180,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
                   onClick={() => onNewsSelect(item)}
                 >
                 <div className="flex items-start gap-3">
-                  <div className={`w-1 h-8 rounded ${item.type === 'genshin' ? 'bg-blue-400' : 'bg-yellow-400'}`} />
+                  <div className={`w-1 h-8 rounded ${item.type === 'birthday' ? 'bg-pink-400' : 'bg-blue-400'}`} />
                   <div className="flex-1 min-w-0">
                     <div className="text-xs text-gray-400 mb-1">
                       {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}
@@ -189,7 +189,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
                       {item.title}
                     </h4>
                     <p className="text-gray-300 text-xs line-clamp-2">
-                      {item.summary}
+                      {item.content}
                     </p>
                   </div>
                 </div>
