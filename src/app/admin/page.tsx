@@ -4,17 +4,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/admin/stat-card';
-import DashboardChart from '@/components/admin/dashboard-chart';
-import RecentActivity from '@/components/admin/recent-activity';
 import { 
   Users, 
   Eye, 
-  MousePointer, 
+  MousePointer,
   TrendingUp, 
   BarChart3,
   FileText,
-  Activity,
-  Clock
+  Activity
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -65,11 +62,6 @@ interface DashboardStats {
   }>;
 }
 
-interface ChartData {
-  labels: string[];
-  data: number[];
-}
-
 interface Advertisement {
   _id: string;
   title: string;
@@ -78,16 +70,6 @@ interface Advertisement {
   impressions: number;
   clicks: number;
   createdAt: string;
-}
-
-interface RecentActivityItem {
-  id: string;
-  type: 'impression' | 'click' | 'user' | 'content' | 'advertisement';
-  title: string;
-  description: string;
-  time: string;
-  value?: number;
-  timestamp: Date;
 }
 
 export default function AdminDashboard() {
@@ -114,7 +96,6 @@ export default function AdminDashboard() {
     recentActivity: []
   });
   const [loading, setLoading] = useState(true);
-  const [recentActivities, setRecentActivities] = useState<RecentActivityItem[]>([]);
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -151,26 +132,13 @@ export default function AdminDashboard() {
           const totalClicks = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.clicks || 0), 0);
           const averageCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
 
-          // Генерируем недельную статистику
-          const weeklyImpressions = generateWeeklyData(advertisements, 'impressions');
-          const weeklyClicks = generateWeeklyData(advertisements, 'clicks');
-          
-          // Генерируем ежедневную статистику
-          const dailyStats = generateDailyStats(advertisements);
-
           setStats(prev => ({
             ...prev,
             totalImpressions,
             totalClicks,
             averageCTR: Math.round(averageCTR * 100) / 100,
-            activeAdvertisements: activeAds.length,
-            weeklyImpressions,
-            weeklyClicks,
-            dailyStats
+            activeAdvertisements: activeAds.length
           }));
-
-          // Генерируем реальные последние действия
-          generateRecentActivities(advertisements);
         }
       }
 
@@ -236,99 +204,6 @@ export default function AdminDashboard() {
     return () => clearInterval(interval);
   }, [fetchDashboardData]);
 
-  const generateWeeklyData = (advertisements: Advertisement[], field: 'impressions' | 'clicks'): number[] => {
-    // Простая логика: распределяем общие данные по дням недели
-    const totalValue = advertisements.reduce((sum, ad) => sum + (ad[field] || 0), 0);
-    const dailyAverage = Math.round(totalValue / 7);
-    
-    // Создаем реалистичные данные с небольшими колебаниями
-    return [
-      Math.round(dailyAverage * 0.8),  // Пн - меньше активности
-      Math.round(dailyAverage * 1.1),  // Вт - рост
-      Math.round(dailyAverage * 1.2),  // Ср - пик недели
-      Math.round(dailyAverage * 1.1),  // Чт - стабильно
-      Math.round(dailyAverage * 1.0),  // Пт - обычный день
-      Math.round(dailyAverage * 0.7),  // Сб - выходной
-      Math.round(dailyAverage * 0.6)   // Вс - выходной
-    ];
-  };
-
-  const generateDailyStats = (advertisements: Advertisement[]) => {
-    const totalImpressions = advertisements.reduce((sum, ad) => sum + (ad.impressions || 0), 0);
-    const totalClicks = advertisements.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
-    
-    // Простая логика: распределяем по дням с понятными названиями
-    const days = ['Сегодня', 'Вчера', '2 дня назад', '3 дня назад', '4 дня назад', '5 дней назад', 'Неделю назад'];
-    
-    return days.map((day, index) => {
-      // Чем дальше в прошлое, тем меньше данных
-      const multiplier = Math.max(0.3, 1 - (index * 0.1));
-      
-      return {
-        date: day,
-        impressions: Math.round(totalImpressions * multiplier / 7),
-        clicks: Math.round(totalClicks * multiplier / 7)
-      };
-    });
-  };
-
-  const generateRecentActivities = (advertisements: Advertisement[]) => {
-    const activities: RecentActivityItem[] = [];
-
-    // Создаем понятные действия на основе реальных данных
-    advertisements.forEach((ad, index) => {
-      if (ad.impressions > 0) {
-        activities.push({
-          id: `impression-${index}`,
-          type: 'impression',
-          title: 'Показ рекламы',
-          description: `"${ad.title}" - ${ad.impressions} показов`,
-          time: getTimeAgo(ad.createdAt),
-          value: ad.impressions,
-          timestamp: new Date(ad.createdAt)
-        });
-      }
-
-      if (ad.clicks > 0) {
-        activities.push({
-          id: `click-${index}`,
-          type: 'click',
-          title: 'Клик по рекламе',
-          description: `"${ad.title}" - ${ad.clicks} кликов`,
-          time: getTimeAgo(ad.createdAt),
-          value: ad.clicks,
-          timestamp: new Date(ad.createdAt)
-        });
-      }
-    });
-
-    // Добавляем несколько стандартных действий для демонстрации
-    if (activities.length === 0) {
-      activities.push(
-        {
-          id: 'demo-1',
-          type: 'content',
-          title: 'Обновлен контент',
-          description: 'Добавлен новый персонаж',
-          time: '2 часа назад',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000)
-        },
-        {
-          id: 'demo-2',
-          type: 'advertisement',
-          title: 'Новая реклама',
-          description: 'Создано рекламное объявление',
-          time: '5 часов назад',
-          timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000)
-        }
-      );
-    }
-
-    // Сортируем по времени и берем последние 5
-    activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-    setRecentActivities(activities.slice(0, 5));
-  };
-
   const getTimeAgo = (dateString: string): string => {
     const date = new Date(dateString);
     const now = new Date();
@@ -374,22 +249,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Данные для графиков
-  const impressionsData: ChartData = {
-    labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
-    data: stats.weeklyImpressions.length > 0 ? stats.weeklyImpressions : [0, 0, 0, 0, 0, 0, 0]
-  };
-
-  const clicksData: ChartData = {
-    labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
-    data: stats.weeklyClicks.length > 0 ? stats.weeklyClicks : [0, 0, 0, 0, 0, 0, 0]
-  };
-
-  const ctrData: ChartData = {
-    labels: ['CTR'],
-    data: [stats.averageCTR]
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -431,28 +290,24 @@ export default function AdminDashboard() {
           value={stats.totalPageViews.toLocaleString()}
           icon={Eye}
           color="blue"
-          change={{ value: Math.round(Math.random() * 20), isPositive: Math.random() > 0.3 }}
         />
         <StatCard
           title="Уникальные посетители"
           value={stats.uniqueVisitors.toLocaleString()}
           icon={Users}
           color="green"
-          change={{ value: Math.round(Math.random() * 15), isPositive: Math.random() > 0.2 }}
         />
         <StatCard
           title="Активные рекламы"
           value={stats.activeAdvertisements}
           icon={TrendingUp}
           color="purple"
-          change={{ value: Math.round(Math.random() * 25), isPositive: Math.random() > 0.3 }}
         />
         <StatCard
           title="Контент сайта"
           value={stats.totalCharacters + stats.totalArticles + stats.totalWeapons + stats.totalArtifacts}
           icon={FileText}
           color="yellow"
-          change={{ value: Math.round(Math.random() * 10), isPositive: Math.random() > 0.4 }}
         />
       </div>
 
@@ -460,24 +315,20 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-neutral-800 border-neutral-700">
           <CardHeader>
-            <CardTitle className="text-white">Сегодняшняя активность</CardTitle>
+            <CardTitle className="text-white">Статистика рекламы</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-gray-400">Просмотры</span>
-              <span className="text-white font-semibold">{stats.dailyViews.toLocaleString()}</span>
+              <span className="text-gray-400">Общие показы</span>
+              <span className="text-white font-semibold">{stats.totalImpressions.toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-400">Показы рекламы</span>
-              <span className="text-white font-semibold">
-                {stats.dailyStats.length > 0 ? stats.dailyStats[0].impressions.toLocaleString() : '0'}
-              </span>
+              <span className="text-gray-400">Общие клики</span>
+              <span className="text-white font-semibold">{stats.totalClicks.toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-400">Клики по рекламе</span>
-              <span className="text-white font-semibold">
-                {stats.dailyStats.length > 0 ? stats.dailyStats[0].clicks.toLocaleString() : '0'}
-              </span>
+              <span className="text-gray-400">Средний CTR</span>
+              <span className="text-white font-semibold">{stats.averageCTR}%</span>
             </div>
           </CardContent>
         </Card>
@@ -523,21 +374,28 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {stats.recentActivity.slice(0, 4).map((activity, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-neutral-700/50 rounded-lg">
-                  <div className={`w-8 h-8 rounded-full ${getActivityColor(activity.type)} flex items-center justify-center`}>
-                    {getActivityIcon(activity.type)}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-white text-sm">{activity.title}</p>
-                    <div className="flex items-center space-x-2 text-xs text-gray-400">
-                      <span>{activity.user}</span>
-                      <span>•</span>
-                      <span>{activity.date}</span>
+              {stats.recentActivity.length > 0 ? (
+                stats.recentActivity.slice(0, 4).map((activity, index) => (
+                  <div key={index} className="flex items-center space-x-3 p-3 bg-neutral-700/50 rounded-lg">
+                    <div className={`w-8 h-8 rounded-full ${getActivityColor(activity.type)} flex items-center justify-center`}>
+                      {getActivityIcon(activity.type)}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white text-sm">{activity.title}</p>
+                      <div className="flex items-center space-x-2 text-xs text-gray-400">
+                        <span>{activity.user}</span>
+                        <span>•</span>
+                        <span>{activity.date}</span>
+                      </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-400 py-8">
+                  <p>Нет данных об активности</p>
+                  <p className="text-sm">Данные появятся после настройки аналитики</p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
@@ -548,21 +406,28 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {stats.topContent.slice(0, 4).map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-lg font-bold text-purple-400">#{index + 1}</span>
-                    <div>
-                      <p className="text-white text-sm font-medium">{item.title}</p>
-                      <p className="text-gray-400 text-xs">{item.type}</p>
+              {stats.topContent.length > 0 ? (
+                stats.topContent.slice(0, 4).map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-lg font-bold text-purple-400">#{index + 1}</span>
+                      <div>
+                        <p className="text-white text-sm font-medium">{item.title}</p>
+                        <p className="text-gray-400 text-xs">{item.type}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Eye className="w-4 h-4 text-gray-400" />
+                      <span className="text-white font-medium">{item.views.toLocaleString()}</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Eye className="w-4 h-4 text-gray-400" />
-                    <span className="text-white font-medium">{item.views.toLocaleString()}</span>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-400 py-8">
+                  <p>Нет данных о популярном контенте</p>
+                  <p className="text-sm">Данные появятся после настройки аналитики</p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
