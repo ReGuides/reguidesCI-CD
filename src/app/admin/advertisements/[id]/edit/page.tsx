@@ -26,6 +26,7 @@ interface AdvertisementForm {
   order: number;
   backgroundImage?: string;
   erid?: string;
+  deviceTargeting: string;
 }
 
 interface PageProps {
@@ -43,7 +44,8 @@ export default function EditAdvertisementPage({ params }: PageProps) {
     isActive: true,
     order: 0,
     backgroundImage: '',
-    erid: ''
+    erid: '',
+    deviceTargeting: 'all'
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -289,6 +291,20 @@ export default function EditAdvertisementPage({ params }: PageProps) {
                   <option value="sidebar">Сайдбар</option>
                   <option value="banner">Баннер</option>
                   <option value="popup">Всплывающее окно</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Устройства *</label>
+                <select
+                  value={form.deviceTargeting}
+                  onChange={(e) => setForm(prev => ({ ...prev, deviceTargeting: e.target.value }))}
+                  className="w-full bg-neutral-700 border border-neutral-600 text-white rounded-md px-3 py-2"
+                  required
+                >
+                  <option value="all">Все устройства</option>
+                  <option value="desktop">Только ПК</option>
+                  <option value="mobile">Только мобильные</option>
                 </select>
               </div>
 

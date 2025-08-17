@@ -50,6 +50,7 @@ export interface Advertisement {
   erid?: string;
   isActive: boolean;
   order: number;
+  deviceTargeting: 'all' | 'desktop' | 'mobile';
   createdAt?: string;
   updatedAt?: string;
 }

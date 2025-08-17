@@ -10,6 +10,7 @@ export interface IAdvertisement extends mongoose.Document {
   order: number;
   backgroundImage?: string;
   erid?: string;
+  deviceTargeting: 'all' | 'desktop' | 'mobile';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,7 +29,13 @@ const advertisementSchema = new mongoose.Schema<IAdvertisement>({
   isActive: { type: Boolean, default: true },
   order: { type: Number, default: 0 },
   backgroundImage: { type: String },
-  erid: { type: String }
+  erid: { type: String },
+  deviceTargeting: { 
+    type: String, 
+    required: true,
+    enum: ['all', 'desktop', 'mobile'],
+    default: 'all'
+  }
 }, {
   timestamps: true
 });

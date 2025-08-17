@@ -26,6 +26,7 @@ interface Advertisement {
   order: number;
   backgroundImage?: string;
   erid?: string;
+  deviceTargeting: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -124,6 +125,34 @@ export default function AdvertisementsPage() {
       case 'banner':
         return 'bg-green-600/20 text-green-400 border-green-500/30';
       case 'popup':
+        return 'bg-purple-600/20 text-purple-400 border-purple-500/30';
+      default:
+        return 'bg-neutral-600/20 text-neutral-400 border-neutral-500/30';
+    }
+  };
+
+  // Функция для отображения целевой аудитории
+  const getDeviceDisplay = (device: string) => {
+    switch (device) {
+      case 'desktop':
+        return 'ПК';
+      case 'mobile':
+        return 'Мобильный';
+      case 'all':
+        return 'Все';
+      default:
+        return device; // Для старых записей
+    }
+  };
+
+  // Функция для получения цвета целевой аудитории
+  const getDeviceColor = (device: string) => {
+    switch (device) {
+      case 'desktop':
+        return 'bg-blue-600/20 text-blue-400 border-blue-500/30';
+      case 'mobile':
+        return 'bg-green-600/20 text-green-400 border-green-500/30';
+      case 'all':
         return 'bg-purple-600/20 text-purple-400 border-purple-500/30';
       default:
         return 'bg-neutral-600/20 text-neutral-400 border-neutral-500/30';
@@ -247,6 +276,9 @@ export default function AdvertisementsPage() {
                       <div className="flex items-center gap-4 text-sm text-gray-400">
                         <span className={`px-2 py-1 rounded text-xs border ${getTypeColor(ad.type)}`}>
                           {getTypeDisplay(ad.type)}
+                        </span>
+                        <span className={`px-2 py-1 rounded text-xs border ${getDeviceColor(ad.deviceTargeting)}`}>
+                          {getDeviceDisplay(ad.deviceTargeting)}
                         </span>
                         <span>Порядок: {ad.order}</span>
                         <span className={`px-2 py-1 rounded text-xs ${

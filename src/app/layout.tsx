@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { AnalyticsProvider } from '@/components/analytics-provider';
+import { SiteSettingsProvider } from '@/components/site-settings-provider';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import SidebarWrapper from '@/components/sidebar-wrapper';
-import { SiteSettingsProvider } from '@/components/site-settings-provider';
+import AdvertisementBanner from '@/components/advertisement-banner';
+import AdvertisementPopup from '@/components/advertisement-popup';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,18 +26,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className={inter.className}>
-        <SiteSettingsProvider />
-        <div className="min-h-screen bg-neutral-900 text-white">
-          <Header />
-          <div className="flex min-h-screen">
-            <main className="flex-1 min-w-0 py-4">
-              {children}
-            </main>
-            <SidebarWrapper />
-          </div>
-          <Footer />
-        </div>
+      <body className="bg-neutral-900 text-white min-h-screen flex flex-col">
+        <AnalyticsProvider>
+          <SiteSettingsProvider>
+            <AdvertisementBanner />
+            <Header />
+            <div className="flex flex-1">
+              <SidebarWrapper />
+              <main className="flex-1 flex flex-col py-4">
+                {children}
+              </main>
+            </div>
+            <Footer />
+            <AdvertisementPopup />
+          </SiteSettingsProvider>
+        </AnalyticsProvider>
       </body>
     </html>
   );
