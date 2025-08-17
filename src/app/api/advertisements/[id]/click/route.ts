@@ -2,13 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { AdvertisementModel } from '@/models/Advertisement';
 
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
+
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteParams
 ) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
 
     // Увеличиваем счетчик кликов
     const advertisement = await AdvertisementModel.findByIdAndUpdate(
