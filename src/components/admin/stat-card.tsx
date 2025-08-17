@@ -14,14 +14,6 @@ interface StatCardProps {
 }
 
 export default function StatCard({ title, value, change, icon: Icon, color }: StatCardProps) {
-  const colorClasses = {
-    blue: 'bg-blue-600/20 border-blue-500/30 text-blue-400',
-    green: 'bg-green-600/20 border-green-500/30 text-green-400',
-    purple: 'bg-purple-600/20 border-purple-500/30 text-purple-400',
-    red: 'bg-red-600/20 border-red-500/30 text-red-400',
-    yellow: 'bg-yellow-600/20 border-yellow-500/30 text-yellow-400'
-  };
-
   const iconColorClasses = {
     blue: 'bg-blue-600/20 text-blue-400',
     green: 'bg-green-600/20 text-green-400',

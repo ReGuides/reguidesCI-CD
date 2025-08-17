@@ -10,10 +10,9 @@ interface DashboardChartProps {
   data: ChartData;
   type: 'bar' | 'line' | 'progress';
   title: string;
-  height?: number;
 }
 
-export default function DashboardChart({ data, type, title, height = 200 }: DashboardChartProps) {
+export default function DashboardChart({ data, type, title }: DashboardChartProps) {
   const maxValue = Math.max(...data.data, 1);
   
   if (type === 'bar') {
