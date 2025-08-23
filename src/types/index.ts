@@ -31,6 +31,7 @@ export interface News {
   createdAt: string;
   updatedAt: string;
   characterId?: string;
+  characterName?: string;
   tags: string[];
   views: number;
   author: string;

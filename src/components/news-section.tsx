@@ -5,21 +5,7 @@ import { X } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import Image from 'next/image';
 import { getNewsImage, getNewsImageAlt } from '@/lib/utils/newsImageUtils';
-
-interface News {
-  _id: string;
-  title: string;
-  content: string;
-  image?: string;
-  author: string;
-  publishedAt: string;
-  isPublished: boolean;
-  tags: string[];
-  type?: 'manual' | 'birthday' | 'update' | 'event';
-  characterId?: string;
-  characterName?: string;
-  views: number;
-}
+import { News } from '@/types';
 
 export default function NewsSection() {
   const [news, setNews] = useState<News[]>([]);

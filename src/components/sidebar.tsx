@@ -2,37 +2,21 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Character, Advertisement, About } from '@/types';
-
-// Расширенный интерфейс для новостей в sidebar
-interface NewsItem {
-  _id: string;
-  title: string;
-  content: string;
-  image?: string;
-  author: string;
-  publishedAt: string;
-  isPublished: boolean;
-  tags: string[];
-  type?: 'manual' | 'birthday' | 'update' | 'event';
-  characterId?: string;
-  characterName?: string;
-  views: number;
-}
+import { Character, News, Advertisement, About } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import { isBirthdayToday } from '@/lib/utils/dateUtils';
 import { getNewsImage, getNewsImageAlt } from '@/lib/utils/newsImageUtils';
 import Image from 'next/image';
 
 interface SidebarProps {
-  onNewsSelect: (news: NewsItem | null) => void;
+  onNewsSelect: (news: News | null) => void;
 }
 
 export default function Sidebar({ onNewsSelect }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [news, setNews] = useState<NewsItem[]>([]);
+  const [news, setNews] = useState<News[]>([]);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [about, setAbout] = useState<About | null>(null);
   const [loading, setLoading] = useState(true);
