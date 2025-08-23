@@ -199,9 +199,12 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
                     <h4 className="text-white font-semibold text-sm leading-tight mb-1">
                       {item.title}
                     </h4>
-                    <p className="text-gray-300 text-xs line-clamp-2">
-                      {item.content}
-                    </p>
+                                         <p className="text-gray-300 text-xs line-clamp-2">
+                       {item.content ? 
+                         item.content.replace(/<[^>]*>/g, '').substring(0, 80) + '...' : 
+                         'Описание недоступно'
+                       }
+                     </p>
                   </div>
                 </div>
               </div>

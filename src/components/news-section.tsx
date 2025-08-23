@@ -8,15 +8,14 @@ interface News {
   _id: string;
   title: string;
   content: string;
-  summary: string;
   image?: string;
   author: string;
   publishedAt: string;
   isPublished: boolean;
   tags: string[];
-  type?: 'genshin' | 'other';
-  date?: string;
-  preview?: string;
+  type?: 'manual' | 'birthday' | 'update' | 'event';
+  characterId?: string;
+  views: number;
 }
 
 export default function NewsSection() {
@@ -76,13 +75,18 @@ export default function NewsSection() {
               className="bg-neutral-800 rounded-xl p-4 flex items-center gap-4 shadow text-left hover:bg-neutral-700 transition"
               onClick={() => setSelectedNews(item)}
             >
-              <div className={`w-2 h-8 rounded ${item.type === 'genshin' ? 'bg-blue-400' : 'bg-yellow-400'}`} />
+                             <div className={`w-2 h-8 rounded ${item.type === 'birthday' ? 'bg-pink-400' : 'bg-blue-400'}`} />
               <div className="flex-1 min-w-0">
                 <div className="text-sm text-gray-400 mb-1">
                   {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}
                 </div>
                 <div className="text-white font-semibold text-base sm:text-lg line-clamp-2">{item.title}</div>
-                <div className="text-gray-300 mt-1 text-sm line-clamp-2">{item.summary}</div>
+                                 <div className="text-gray-300 mt-1 text-sm line-clamp-2">
+                   {item.content ? 
+                     item.content.replace(/<[^>]*>/g, '').substring(0, 100) + '...' : 
+                     'Описание недоступно'
+                   }
+                 </div>
               </div>
             </button>
           );
@@ -119,9 +123,10 @@ export default function NewsSection() {
               <hr className="my-2 border-neutral-700" />
               
               {/* Контент */}
-              <div className="text-sm sm:text-base text-gray-200 mt-2">
-                {selectedNews.content}
-              </div>
+              <div 
+                className="text-sm sm:text-base text-gray-200 mt-2 prose prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: selectedNews.content || 'Контент недоступен' }}
+              />
             </div>
 
             {/* Кнопка закрытия */}
