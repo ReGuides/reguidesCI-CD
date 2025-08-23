@@ -33,14 +33,14 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
         const charactersResponse = await fetch('/api/characters');
         if (charactersResponse.ok) {
           const charactersData = await charactersResponse.json();
-          setCharacters(charactersData.data || []);
+          setCharacters(Array.isArray(charactersData.data) ? charactersData.data : []);
         }
 
         // Загружаем новости
         const newsResponse = await fetch('/api/news');
         if (newsResponse.ok) {
           const newsData = await newsResponse.json();
-          setNews(newsData.data || []);
+          setNews(Array.isArray(newsData.data) ? newsData.data : []);
         }
 
         // Загружаем рекламу
@@ -48,7 +48,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
           const adsResponse = await fetch('/api/advertisements/sidebar');
           if (adsResponse.ok) {
             const adsData = await adsResponse.json();
-            setAdvertisements(adsData.data || []);
+            setAdvertisements(Array.isArray(adsData.data) ? adsData.data : []);
           }
         }
 
@@ -70,39 +70,50 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
 
   // Получаем персонажа дня (с днем рождения или случайного)
   const characterOfTheDay = useMemo(() => {
-    if (!Array.isArray(characters) || characters.length === 0) return null;
+    if (!Array.isArray(characters) || !characters || characters.length === 0) return null;
 
-    const today = new Date();
-    const todayString = today.toDateString(); // Используем полную дату для стабильности
-    
-    // Ищем персонажа с днем рождения сегодня
-    const birthdayCharacter = characters.find(char => {
-      if (!char.birthday) return false;
-      return isBirthdayToday(char.birthday);
-    });
+    try {
+      const today = new Date();
+      const todayString = today.toDateString(); // Используем полную дату для стабильности
+      
+      // Ищем персонажа с днем рождения сегодня
+      const birthdayCharacter = characters.find(char => {
+        if (!char || !char.birthday) return false;
+        return isBirthdayToday(char.birthday);
+      });
 
-    if (birthdayCharacter) {
-      return { character: birthdayCharacter, isBirthday: true };
+      if (birthdayCharacter) {
+        return { character: birthdayCharacter, isBirthday: true };
+      }
+
+      // Если нет именинника, берем случайного персонажа на основе даты
+      // Используем дату как seed для генератора случайных чисел
+      const seed = todayString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const randomIndex = seed % characters.length;
+      return { character: characters[randomIndex], isBirthday: false };
+    } catch (error) {
+      console.error('Error processing characters:', error);
+      return null;
     }
-
-    // Если нет именинника, берем случайного персонажа на основе даты
-    // Используем дату как seed для генератора случайных чисел
-    const seed = todayString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const randomIndex = seed % characters.length;
-    return { character: characters[randomIndex], isBirthday: false };
   }, [characters]);
 
   // Получаем последние новости
   const latestNews = useMemo(() => {
-    if (!Array.isArray(news)) return [];
+    if (!Array.isArray(news) || !news || news.length === 0) return [];
     
-    return news
-      .sort((a, b) => {
-        const dateA = a.publishedAt ? new Date(a.publishedAt) : new Date(0);
-        const dateB = b.publishedAt ? new Date(b.publishedAt) : new Date(0);
-        return dateB.getTime() - dateA.getTime();
-      })
-      .slice(0, 3);
+    try {
+      return news
+        .filter(item => item && typeof item === 'object')
+        .sort((a, b) => {
+          const dateA = a.publishedAt ? new Date(a.publishedAt) : new Date(0);
+          const dateB = b.publishedAt ? new Date(b.publishedAt) : new Date(0);
+          return dateB.getTime() - dateA.getTime();
+        })
+        .slice(0, 3);
+    } catch (error) {
+      console.error('Error processing news:', error);
+      return [];
+    }
   }, [news]);
 
   // Получаем URL поддержки
@@ -174,11 +185,11 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
         {latestNews.length > 0 ? (
           <div className="space-y-3">
             {latestNews.map((item, index) => (
-                              <div
-                  key={item._id || index}
-                  className="cursor-pointer hover:bg-neutral-700 rounded-lg p-3 transition-colors"
-                  onClick={() => onNewsSelect(item)}
-                >
+              <div
+                key={item._id || index}
+                className="cursor-pointer hover:bg-neutral-700 rounded-lg p-3 transition-colors"
+                onClick={() => onNewsSelect(item)}
+              >
                 <div className="flex items-start gap-3">
                   <div className={`w-1 h-8 rounded ${item.type === 'birthday' ? 'bg-pink-400' : 'bg-blue-400'}`} />
                   <div className="flex-1 min-w-0">
