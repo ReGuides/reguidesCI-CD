@@ -190,23 +190,37 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
                 className="cursor-pointer hover:bg-neutral-700 rounded-lg p-3 transition-colors"
                 onClick={() => onNewsSelect(item)}
               >
-                <div className="flex items-start gap-3">
-                  <div className={`w-1 h-8 rounded ${item.type === 'birthday' ? 'bg-pink-400' : 'bg-blue-400'}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs text-gray-400 mb-1">
-                      {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}
-                    </div>
-                    <h4 className="text-white font-semibold text-sm leading-tight mb-1">
-                      {item.title}
-                    </h4>
-                                         <p className="text-gray-300 text-xs line-clamp-2">
+                                 <div className="flex items-start gap-3">
+                   <div className={`w-1 h-8 rounded ${item.type === 'birthday' ? 'bg-pink-400' : 'bg-blue-400'}`} />
+                   
+                   {/* Изображение новости */}
+                   {item.image && (
+                     <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden">
+                       <Image 
+                         src={item.image} 
+                         alt={item.title}
+                         width={48}
+                         height={48}
+                         className="w-full h-full object-cover"
+                       />
+                     </div>
+                   )}
+                   
+                   <div className="flex-1 min-w-0">
+                     <div className="text-xs text-gray-400 mb-1">
+                       {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}
+                     </div>
+                     <h4 className="text-white font-semibold text-sm leading-tight mb-1">
+                       {item.title}
+                     </h4>
+                     <p className="text-gray-300 text-xs line-clamp-2">
                        {item.content ? 
                          item.content.replace(/<[^>]*>/g, '').substring(0, 80) + '...' : 
                          'Описание недоступно'
                        }
                      </p>
-                  </div>
-                </div>
+                   </div>
+                 </div>
               </div>
             ))}
           </div>

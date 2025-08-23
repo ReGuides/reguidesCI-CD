@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import Image from 'next/image';
 
 interface News {
   _id: string;
@@ -70,25 +71,39 @@ export default function NewsSection() {
           if (!item || typeof item !== 'object') return null;
           
           return (
-            <button
-              key={`news-${item._id || index}`}
-              className="bg-neutral-800 rounded-xl p-4 flex items-center gap-4 shadow text-left hover:bg-neutral-700 transition"
-              onClick={() => setSelectedNews(item)}
-            >
-                             <div className={`w-2 h-8 rounded ${item.type === 'birthday' ? 'bg-pink-400' : 'bg-blue-400'}`} />
-              <div className="flex-1 min-w-0">
-                <div className="text-sm text-gray-400 mb-1">
-                  {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}
-                </div>
-                <div className="text-white font-semibold text-base sm:text-lg line-clamp-2">{item.title}</div>
-                                 <div className="text-gray-300 mt-1 text-sm line-clamp-2">
+                         <button
+               key={`news-${item._id || index}`}
+               className="bg-neutral-800 rounded-xl p-4 flex items-center gap-4 shadow text-left hover:bg-neutral-700 transition"
+               onClick={() => setSelectedNews(item)}
+             >
+               <div className={`w-2 h-8 rounded ${item.type === 'birthday' ? 'bg-pink-400' : 'bg-blue-400'}`} />
+               
+               {/* Изображение новости */}
+               {item.image && (
+                 <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
+                   <Image 
+                     src={item.image} 
+                     alt={item.title}
+                     width={64}
+                     height={64}
+                     className="w-full h-full object-cover"
+                   />
+                 </div>
+               )}
+               
+               <div className="flex-1 min-w-0">
+                 <div className="text-sm text-gray-400 mb-1">
+                   {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}
+                 </div>
+                 <div className="text-white font-semibold text-base sm:text-lg line-clamp-2">{item.title}</div>
+                 <div className="text-gray-300 mt-1 text-sm line-clamp-2">
                    {item.content ? 
                      item.content.replace(/<[^>]*>/g, '').substring(0, 100) + '...' : 
                      'Описание недоступно'
                    }
                  </div>
-              </div>
-            </button>
+               </div>
+             </button>
           );
         })}
       </div>
@@ -118,6 +133,22 @@ export default function NewsSection() {
               <div className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">
                 {selectedNews.title}
               </div>
+              
+              {/* Изображение */}
+              {selectedNews.image && (
+                <div className="my-4">
+                  <Image 
+                    src={selectedNews.image} 
+                    alt={selectedNews.title}
+                    width={800}
+                    height={400}
+                    className="w-full h-auto max-h-96 object-cover rounded-lg shadow-lg"
+                    onError={() => {
+                      // Next.js Image автоматически обрабатывает ошибки
+                    }}
+                  />
+                </div>
+              )}
               
               {/* Разделитель */}
               <hr className="my-2 border-neutral-700" />
