@@ -35,7 +35,7 @@ export default function NewsSection() {
         }
         
         const data = await response.json();
-        setNews(data);
+        setNews(Array.isArray(data.data) ? data.data : []);
       } catch (error) {
         console.error('Error fetching news:', error);
         setNews([]); // Устанавливаем пустой массив в случае ошибки
@@ -48,7 +48,7 @@ export default function NewsSection() {
   }, []);
 
   // Если новостей нет, не показываем секцию
-  if (!loading && news.length === 0) {
+  if (!loading && (!Array.isArray(news) || news.length === 0)) {
     return null;
   }
 
@@ -67,22 +67,26 @@ export default function NewsSection() {
     <div className="w-full max-w-7xl mx-auto mt-12 sm:mt-16 px-4">
       <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Новости</h2>
       <div className="flex flex-col gap-4">
-        {news.map((item, index) => (
-          <button
-            key={`news-${item._id || index}`}
-            className="bg-neutral-800 rounded-xl p-4 flex items-center gap-4 shadow text-left hover:bg-neutral-700 transition"
-            onClick={() => setSelectedNews(item)}
-          >
-            <div className={`w-2 h-8 rounded ${item.type === 'genshin' ? 'bg-blue-400' : 'bg-yellow-400'}`} />
-            <div className="flex-1 min-w-0">
-              <div className="text-sm text-gray-400 mb-1">
-                {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}
+        {Array.isArray(news) && news.map((item, index) => {
+          if (!item || typeof item !== 'object') return null;
+          
+          return (
+            <button
+              key={`news-${item._id || index}`}
+              className="bg-neutral-800 rounded-xl p-4 flex items-center gap-4 shadow text-left hover:bg-neutral-700 transition"
+              onClick={() => setSelectedNews(item)}
+            >
+              <div className={`w-2 h-8 rounded ${item.type === 'genshin' ? 'bg-blue-400' : 'bg-yellow-400'}`} />
+              <div className="flex-1 min-w-0">
+                <div className="text-sm text-gray-400 mb-1">
+                  {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}
+                </div>
+                <div className="text-white font-semibold text-base sm:text-lg line-clamp-2">{item.title}</div>
+                <div className="text-gray-300 mt-1 text-sm line-clamp-2">{item.summary}</div>
               </div>
-              <div className="text-white font-semibold text-base sm:text-lg line-clamp-2">{item.title}</div>
-              <div className="text-gray-300 mt-1 text-sm line-clamp-2">{item.summary}</div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
 
       {/* Модальное окно для новости */}

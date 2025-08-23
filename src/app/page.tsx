@@ -32,9 +32,9 @@ export default function HomePage() {
 
   // Для баннера — 3 самых новых
   const newest3Characters = useMemo(() => {
-    if (!characters) return [];
+    if (!Array.isArray(characters) || !characters) return [];
     const withPatch = [...characters]
-      .filter(char => char.patchNumber) // Только персонажи с patchNumber
+      .filter(char => char && char.patchNumber) // Только персонажи с patchNumber
       .sort(sortByPatchNumber)
       .slice(0, 3);
     
@@ -48,19 +48,19 @@ export default function HomePage() {
 
   // Для блока — 6 самых новых
   const newest6Characters = useMemo(() => {
-    if (!characters) return [];
+    if (!Array.isArray(characters) || !characters) return [];
     return [...characters]
-      .filter(char => char.patchNumber) // Только персонажи с patchNumber
+      .filter(char => char && char.patchNumber) // Только персонажи с patchNumber
       .sort(sortByPatchNumber)
       .slice(0, 6);
   }, [characters]);
 
   // 4 самых просматриваемых (исключая новых)
   const top4Viewed = useMemo(() => {
-    if (!characters || allStats.length === 0) return [];
+    if (!Array.isArray(characters) || !characters || !Array.isArray(allStats) || allStats.length === 0) return [];
     const newIds = new Set(newest3Characters.map(c => c.id));
     return [...allStats]
-      .filter(v => v.views > 0 && !newIds.has(v._id))
+      .filter(v => v && v.views > 0 && !newIds.has(v._id))
       .sort((a, b) => b.views - a.views)
       .slice(0, 4)
       .map(v => v._id);
@@ -68,17 +68,17 @@ export default function HomePage() {
 
   // Баннер: 3 новых + 4 самых просматриваемых
   const bannerCharacters = useMemo(() => {
-    if (!characters) return [];
+    if (!Array.isArray(characters) || !characters) return [];
     const result: Character[] = [];
     
     // Добавляем 3 новых персонажа
     for (const char of newest3Characters) {
-      result.push(char);
+      if (char) result.push(char);
     }
     
     // Добавляем 4 самых просматриваемых
     for (const id of top4Viewed) {
-      const char = characters.find(c => c.id === id);
+      const char = characters.find(c => c && c.id === id);
       if (char && !result.some(c => c.id === char.id)) {
         result.push(char);
       }
@@ -86,7 +86,7 @@ export default function HomePage() {
     
     // Если нет просматриваемых, добавляем еще персонажей до 7
     if (result.length < 7) {
-      const remaining = characters.filter(c => !result.some(r => r.id === c.id));
+      const remaining = characters.filter(c => c && !result.some(r => r.id === c.id));
       for (const char of remaining.slice(0, 7 - result.length)) {
         result.push(char);
       }
@@ -97,9 +97,9 @@ export default function HomePage() {
 
   // Рандомные персонажи (без повторов с баннера и новых)
   const randomBlockCharacters = useMemo(() => {
-    if (!characters) return [];
-    const excludeIds = new Set([...bannerCharacters, ...newest6Characters].map(c => c.id));
-    const pool = characters.filter(c => !excludeIds.has(c.id));
+    if (!Array.isArray(characters) || !characters) return [];
+    const excludeIds = new Set([...bannerCharacters, ...newest6Characters].map(c => c && c.id).filter(Boolean));
+    const pool = characters.filter(c => c && !excludeIds.has(c.id));
     // Перемешать
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -169,7 +169,7 @@ export default function HomePage() {
       </div>
 
       {/* Character Carousel */}
-      {bannerCharacters.length > 0 && (
+      {Array.isArray(bannerCharacters) && bannerCharacters.length > 0 && (
         <div className="w-full max-w-7xl mx-auto px-4">
           <CharacterCarousel 
             characters={bannerCharacters}
@@ -183,24 +183,29 @@ export default function HomePage() {
       <div className="w-full max-w-7xl mx-auto px-4">
         <div className="flex-1 min-w-0">
             {/* Новые персонажи */}
-            <div className="mt-12 sm:mt-16">
-              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Новые персонажи</h2>
-              <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                {newest6Characters.map(character => (
-                  <div key={`new-${character.id}`} onClick={() => router.push(`/characters/${character.id}`)} className="cursor-pointer">
-                    <CharacterCard character={character} />
-                  </div>
-                ))}
+            {Array.isArray(newest6Characters) && newest6Characters.length > 0 && (
+              <div className="mt-12 sm:mt-16">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Новые персонажи</h2>
+                <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                  {newest6Characters.map(character => {
+                    if (!character || typeof character !== 'object') return null;
+                    return (
+                      <div key={`new-${character.id}`} onClick={() => router.push(`/characters/${character.id}`)} className="cursor-pointer">
+                        <CharacterCard character={character} />
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-4 text-center">
+                  <button 
+                    className="px-6 py-2 bg-accent hover:bg-accent/80 text-white rounded-lg font-semibold transition" 
+                    onClick={() => router.push('/characters')}
+                  >
+                    Все персонажи
+                  </button>
+                </div>
               </div>
-              <div className="mt-4 text-center">
-                <button 
-                  className="px-6 py-2 bg-accent hover:bg-accent/80 text-white rounded-lg font-semibold transition" 
-                  onClick={() => router.push('/characters')}
-                >
-                  Все персонажи
-                </button>
-              </div>
-            </div>
+            )}
 
             {/* Мобильная версия сайдбара */}
             <div className="w-full my-4 lg:hidden">
@@ -214,11 +219,14 @@ export default function HomePage() {
             <div className="mt-12 sm:mt-16">
               <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Случайные персонажи</h2>
               <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                {randomBlockCharacters.map(character => (
-                  <div key={`random-${character.id}`} onClick={() => router.push(`/characters/${character.id}`)} className="cursor-pointer">
-                    <CharacterCard character={character} />
-                  </div>
-                ))}
+                {Array.isArray(randomBlockCharacters) && randomBlockCharacters.map(character => {
+                  if (!character || typeof character !== 'object') return null;
+                  return (
+                    <div key={`random-${character.id}`} onClick={() => router.push(`/characters/${character.id}`)} className="cursor-pointer">
+                      <CharacterCard character={character} />
+                    </div>
+                  );
+                })}
               </div>
               <div className="mt-4 text-center">
                 <button 

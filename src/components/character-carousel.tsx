@@ -46,7 +46,7 @@ export default function CharacterCarousel({
     setCurrentIndex((prev) => (prev - 1 + characters.length) % characters.length);
   };
 
-  if (characters.length === 0) return null;
+  if (!Array.isArray(characters) || characters.length === 0) return null;
 
   return (
     <div className={`relative group ${className}`}>
@@ -67,7 +67,8 @@ export default function CharacterCarousel({
         >
           <ChevronRight className="w-6 h-6" />
         </button>
-        {characters.map((character, idx) => {
+        {Array.isArray(characters) && characters.map((character, idx) => {
+          if (!character || typeof character !== 'object') return null;
           const isActive = idx === currentIndex;
           const isLeft2 = idx === (currentIndex - 2 + characters.length) % characters.length;
           const isLeft1 = idx === (currentIndex - 1 + characters.length) % characters.length;
