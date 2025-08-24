@@ -258,8 +258,8 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Цитата"
           >
-            <Quote className="w-3 h-3 mr-1" />
-            "
+                         <Quote className="w-3 h-3 mr-1" />
+             &quot;
           </Button>
           <Button
             type="button"
