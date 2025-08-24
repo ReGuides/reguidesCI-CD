@@ -1,0 +1,129 @@
+/* Стили для HTML контента новостей */
+.news-content {
+  line-height: 1.6;
+  color: #e5e7eb;
+}
+
+.news-content h1,
+.news-content h2,
+.news-content h3,
+.news-content h4,
+.news-content h5,
+.news-content h6 {
+  color: #ffffff;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.news-content h1 { font-size: 2rem; }
+.news-content h2 { font-size: 1.75rem; }
+.news-content h3 { font-size: 1.5rem; }
+.news-content h4 { font-size: 1.25rem; }
+.news-content h5 { font-size: 1.125rem; }
+.news-content h6 { font-size: 1rem; }
+
+.news-content p {
+  margin-bottom: 1rem;
+}
+
+.news-content strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.news-content em {
+  font-style: italic;
+}
+
+.news-content u {
+  text-decoration: underline;
+}
+
+.news-content s {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.news-content blockquote {
+  border-left: 4px solid #8b5cf6;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  background-color: rgba(139, 92, 246, 0.1);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.news-content ul,
+.news-content ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.news-content li {
+  margin-bottom: 0.5rem;
+}
+
+.news-content ul li {
+  list-style-type: disc;
+}
+
+.news-content ol li {
+  list-style-type: decimal;
+}
+
+.news-content hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
+  margin: 2rem 0;
+}
+
+.news-content a {
+  color: #8b5cf6;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.news-content a:hover {
+  color: #a855f7;
+}
+
+/* Стили для цветного текста */
+.news-content [style*="color"] {
+  font-weight: 500;
+}
+
+/* Стили для выравнивания */
+.news-content [style*="text-align: center"] {
+  text-align: center;
+}
+
+.news-content [style*="text-align: right"] {
+  text-align: right;
+}
+
+.news-content [style*="text-align: left"] {
+  text-align: left;
+}
+
+/* Стили для размеров шрифта */
+.news-content [style*="font-size"] {
+  line-height: 1.4;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .news-content h1 { font-size: 1.75rem; }
+  .news-content h2 { font-size: 1.5rem; }
+  .news-content h3 { font-size: 1.25rem; }
+  .news-content h4 { font-size: 1.125rem; }
+  .news-content h5 { font-size: 1rem; }
+  .news-content h6 { font-size: 0.875rem; }
+  
+  .news-content ul,
+  .news-content ol {
+    padding-left: 1.5rem;
+  }
+}

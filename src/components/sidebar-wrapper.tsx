@@ -55,7 +55,7 @@ export default function SidebarWrapper() {
                   
                   {/* Контент */}
                   <div 
-                    className="text-gray-300 leading-relaxed prose prose-invert max-w-none"
+                    className="text-gray-300 leading-relaxed news-content"
                     dangerouslySetInnerHTML={{ __html: selectedNews.content }}
                   />
                 </div>

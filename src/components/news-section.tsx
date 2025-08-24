@@ -137,7 +137,7 @@ export default function NewsSection() {
                   
                   {/* Контент */}
                   <div 
-                    className="text-sm sm:text-base text-gray-200 prose prose-invert max-w-none"
+                    className="text-sm sm:text-base news-content"
                     dangerouslySetInnerHTML={{ __html: selectedNews.content || 'Контент недоступен' }}
                   />
                 </div>

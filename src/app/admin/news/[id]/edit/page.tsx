@@ -10,6 +10,7 @@ import { X, Plus, Save, ArrowLeft, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { Character, News } from '@/types';
 import Image from 'next/image';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 
 export default function EditNewsPage() {
   const router = useRouter();
@@ -244,13 +245,11 @@ export default function EditNewsPage() {
               <label htmlFor="content" className="block text-sm font-medium text-white mb-2">
                 Содержание *
               </label>
-              <textarea
-                id="content"
+              <RichTextEditor
                 value={form.content}
-                onChange={(e) => setForm(prev => ({ ...prev, content: e.target.value }))}
-                placeholder="Введите содержание новости"
-                className="w-full min-h-[200px] rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                required
+                onChange={(value) => setForm(prev => ({ ...prev, content: value }))}
+                placeholder="Введите содержание новости..."
+                className="min-h-[400px]"
               />
             </div>
 
