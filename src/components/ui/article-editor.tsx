@@ -197,7 +197,7 @@ export default function ArticleEditor({
       data-modal-type="character"
       data-modal-id="${character._id}"
       style="border: 1px solid #3b82f6; display: inline-flex; align-items: center; gap: 4px;">
-      <img src="${character.image}" alt="${character.name}" class="w-4 h-4 rounded-full object-cover" />
+             <img src="${character.image}" alt="${character.name}" class="w-4 h-4 rounded-full object-cover" onerror="this.style.opacity='0.2';" />
       <strong>${character.name}</strong>
       <span class="text-xs text-gray-400">${character.element} ${character.rarity}⭐</span>
     </span>`;

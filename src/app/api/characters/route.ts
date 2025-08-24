@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
           rarity: Number(cleanCharacter.rarity) || 1,
           region: cleanCharacter.region?.toString() || '',
           description: cleanCharacter.description?.toString() || '',
-          image: cleanCharacter.image?.toString() || '',
+          image: cleanCharacter.image ? `/images/characters/${cleanCharacter.image}` : '',
           gender: cleanCharacter.gender?.toString() || '',
           birthday: cleanCharacter.birthday?.toString() || '',
           patchNumber: cleanCharacter.patchNumber?.toString() || '',

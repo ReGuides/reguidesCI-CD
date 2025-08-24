@@ -231,11 +231,16 @@ export default function GameToolbar({
                   }}
                   className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
                 >
-                  <img
-                    src={character.image}
-                    alt={character.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
+                                     <img
+                     src={character.image}
+                     alt={character.name}
+                     className="w-8 h-8 rounded-full object-cover"
+                     onError={(e) => {
+                       const target = e.target as HTMLImageElement;
+                       target.style.opacity = '0.2';
+                       console.error(`Failed to load image: ${character.image}`);
+                     }}
+                   />
                   <div>
                     <div className="font-medium text-white">{character.name}</div>
                     <div className="text-sm text-gray-400">{character.element} • {character.rarity}⭐</div>

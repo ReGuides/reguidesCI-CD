@@ -12,7 +12,9 @@ interface NewsQuery {
 interface CreateNewsRequest {
   title: string;
   content: string;
-  type: 'manual' | 'birthday' | 'update' | 'event';
+  type: 'manual' | 'birthday' | 'update' | 'event' | 'article';
+  category?: 'news' | 'guide' | 'review' | 'tutorial' | 'event';
+  excerpt?: string;
   image?: string;
   isPublished?: boolean;
   characterId?: string;
@@ -77,7 +79,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body: CreateNewsRequest = await request.json();
-    const { title, content, type, image, isPublished, characterId, tags } = body;
+    const { title, content, type, category, excerpt, image, isPublished, characterId, tags } = body;
 
     // Валидация
     if (!title || !content || !type) {
@@ -93,6 +95,8 @@ export async function POST(request: NextRequest) {
       title,
       content,
       type,
+      category: category || 'news',
+      excerpt: excerpt || '',
       image,
       isPublished: isPublished || false,
       characterId: characterId || undefined,
