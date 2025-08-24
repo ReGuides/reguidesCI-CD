@@ -1,21 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, Save, ArrowLeft, Upload } from 'lucide-react';
 import Link from 'next/link';
-import { Character } from '@/types';
+import { Character, News } from '@/types';
 import Image from 'next/image';
 
-export default function AddNewsPage() {
+export default function EditNewsPage() {
   const router = useRouter();
+  const params = useParams();
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [news, setNews] = useState<News | null>(null);
   const [form, setForm] = useState({
     title: '',
     content: '',
@@ -28,8 +30,36 @@ export default function AddNewsPage() {
   });
 
   useEffect(() => {
-    fetchCharacters();
-  }, []);
+    if (params.id) {
+      fetchNews();
+      fetchCharacters();
+    }
+  }, [params.id]);
+
+  const fetchNews = async () => {
+    try {
+      const response = await fetch(`/api/news/${params.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const newsData = data.data;
+          setNews(newsData);
+          setForm({
+            title: newsData.title || '',
+            content: newsData.content || '',
+            type: newsData.type || 'manual',
+            image: newsData.image || '',
+            isPublished: newsData.isPublished || false,
+            characterId: newsData.characterId || '',
+            tags: newsData.tags || [],
+            newTag: ''
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching news:', error);
+    }
+  };
 
   const fetchCharacters = async () => {
     try {
@@ -56,8 +86,8 @@ export default function AddNewsPage() {
     try {
       setLoading(true);
       
-      const response = await fetch('/api/news', {
-        method: 'POST',
+      const response = await fetch(`/api/news/${params.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -75,7 +105,7 @@ export default function AddNewsPage() {
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          alert('Новость успешно создана!');
+          alert('Новость успешно обновлена!');
           router.push('/admin/news');
         }
       } else {
@@ -83,8 +113,8 @@ export default function AddNewsPage() {
         alert(`Ошибка: ${error.error}`);
       }
     } catch (error) {
-      console.error('Error creating news:', error);
-      alert('Ошибка при создании новости');
+      console.error('Error updating news:', error);
+      alert('Ошибка при обновлении новости');
     } finally {
       setLoading(false);
     }
@@ -155,6 +185,24 @@ export default function AddNewsPage() {
     setForm(prev => ({ ...prev, image: '' }));
   };
 
+  if (!news) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center space-x-4">
+          <Link href="/admin/news">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Назад
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold text-white">Загрузка...</h1>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Заголовок */}
@@ -166,8 +214,8 @@ export default function AddNewsPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-white">Добавить новость</h1>
-          <p className="text-gray-400">Создание новой новости для сайта</p>
+          <h1 className="text-3xl font-bold text-white">Редактировать новость</h1>
+          <p className="text-gray-400">Редактирование существующей новости</p>
         </div>
       </div>
 
@@ -354,7 +402,7 @@ export default function AddNewsPage() {
                       onClick={() => removeTag(tag)}
                       className="ml-2 hover:text-red-400"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3 w-3" />
                     </button>
                   </Badge>
                 ))}
@@ -380,7 +428,7 @@ export default function AddNewsPage() {
             ) : (
               <Save className="w-4 h-4 mr-2" />
             )}
-            {loading ? 'Создаем...' : 'Создать новость'}
+            {loading ? 'Обновляем...' : 'Обновить новость'}
           </Button>
         </div>
       </form>

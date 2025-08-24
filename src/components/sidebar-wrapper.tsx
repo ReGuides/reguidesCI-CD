@@ -46,32 +46,38 @@ export default function SidebarWrapper() {
                 </button>
               </div>
               
-              {/* Изображение */}
-              {(() => {
-                const imageUrl = getNewsImage(selectedNews.image, selectedNews.characterId, selectedNews.characterName);
-                if (!imageUrl) return null;
+              {/* Контент и изображение в две колонки */}
+              <div className="flex flex-col lg:flex-row gap-6 mt-4">
+                {/* Основной контент */}
+                <div className="flex-1 min-w-0 order-2 lg:order-1">
+                  {/* Разделитель */}
+                  <hr className="mb-4 border-neutral-700" />
+                  
+                  {/* Контент */}
+                  <div 
+                    className="text-gray-300 leading-relaxed prose prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: selectedNews.content }}
+                  />
+                </div>
                 
-                return (
-                  <div className="mb-4">
-                    <Image 
-                      src={imageUrl} 
-                      alt={getNewsImageAlt(selectedNews.title, selectedNews.characterName)}
-                      width={800}
-                      height={400}
-                      className="w-full h-auto max-h-96 object-cover rounded-lg shadow-lg"
-                    />
-                  </div>
-                );
-              })()}
-              
-              {/* Разделитель */}
-              <hr className="my-4 border-neutral-700" />
-              
-              {/* Контент */}
-              <div 
-                className="text-gray-300 leading-relaxed prose prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: selectedNews.content }}
-              />
+                {/* Изображение справа (сверху на мобильных) */}
+                {(() => {
+                  const imageUrl = getNewsImage(selectedNews.image, selectedNews.characterId, selectedNews.characterName);
+                  if (!imageUrl) return null;
+                  
+                  return (
+                    <div className="flex-shrink-0 w-full lg:w-80 order-1 lg:order-2">
+                      <Image 
+                        src={imageUrl} 
+                        alt={getNewsImageAlt(selectedNews.title, selectedNews.characterName)}
+                        width={320}
+                        height={400}
+                        className="w-full h-auto max-h-96 object-cover rounded-lg shadow-lg"
+                      />
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
           </div>
         </div>

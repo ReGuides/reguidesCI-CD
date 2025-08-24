@@ -64,6 +64,10 @@ export async function POST(request: NextRequest) {
         uploadDir = join(process.cwd(), 'public', 'images', 'adv');
         fileName = `ad-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${getFileExtension(file.name)}`;
         break;
+      case 'news':
+        uploadDir = join(process.cwd(), 'public', 'images', 'news');
+        fileName = `news-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${getFileExtension(file.name)}`;
+        break;
       case 'weapon':
         uploadDir = join(process.cwd(), 'public', 'images', 'weapons');
         fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${getFileExtension(file.name)}`;
@@ -113,6 +117,8 @@ export async function POST(request: NextRequest) {
       fileUrl = `/${fileName}`;
     } else if (type === 'advertisement') {
       fileUrl = `/images/adv/${fileName}`;
+    } else if (type === 'news') {
+      fileUrl = `/images/news/${fileName}`;
     } else {
       fileUrl = `/images/${type}s/${fileName}`;
     }
