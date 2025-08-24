@@ -17,7 +17,7 @@ interface GameToolbarProps {
   onInsertTalent: (talent: { id: string; name: string; type: string; description: string }) => void;
   onInsertArtifact: (artifact: { id: string; name: string; rarity: number; bonus: string }) => void;
   onInsertWeapon: (weapon: { id: string; name: string; type: string; rarity: number; passive: string }) => void;
-  onInsertElement: (element: string) => void;
+  onInsertElement: (element: { name: string; value: string; color: string; icon: string }) => void;
 }
 
 const elementColors = [
@@ -91,11 +91,8 @@ export default function GameToolbar({
     closeDropdowns();
   };
 
-  const insertElement = (element: any) => {
-    const html = `<span class="element-badge" style="color: ${element.color}">
-      ${element.icon} <strong>${element.name}</strong>
-    </span>`;
-    onInsertElement(element.value);
+  const insertElement = (element: { name: string; value: string; color: string; icon: string }) => {
+    onInsertElement(element);
     closeDropdowns();
   };
 

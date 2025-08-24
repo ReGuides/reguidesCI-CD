@@ -189,22 +189,11 @@ export default function ArticleEditor({
     insertText(html, '');
   }, [insertText]);
 
-  const handleInsertElement = useCallback((element: string) => {
-    const elementData = {
-      pyro: { name: 'Пиро', color: '#ff6b35', icon: '🔥' },
-      hydro: { name: 'Гидро', color: '#4fc3f7', icon: '💧' },
-      cryo: { name: 'Крио', color: '#81d4fa', icon: '❄️' },
-      anemo: { name: 'Анемо', color: '#81c784', icon: '💨' },
-      dendro: { name: 'Дендро', color: '#8bc34a', icon: '🌱' },
-      geo: { name: 'Гео', color: '#ffb74d', icon: '🪨' },
-    }[element];
-
-    if (elementData) {
-      const html = `<span class="element-badge" style="color: ${elementData.color}">
-        ${elementData.icon} <strong>${elementData.name}</strong>
-      </span>`;
-      insertText(html, '');
-    }
+  const handleInsertElement = useCallback((element: { name: string; value: string; color: string; icon: string }) => {
+    const html = `<span class="element-badge" style="color: ${element.color}">
+      ${element.icon} <strong>${element.name}</strong>
+    </span>`;
+    insertText(html, '');
   }, [insertText]);
 
   return (
