@@ -63,6 +63,9 @@ export default function ArticleEditor({
       const gameElement = target.closest('[data-modal-type]') as HTMLElement;
       
       if (gameElement) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const modalType = gameElement.dataset.modalType;
         const modalId = gameElement.dataset.modalId;
         
@@ -77,10 +80,10 @@ export default function ArticleEditor({
     };
 
     // Добавляем обработчик кликов на документ
-    document.addEventListener('click', handleGameElementClick);
+    document.addEventListener('click', handleGameElementClick, true);
 
     return () => {
-      document.removeEventListener('click', handleGameElementClick);
+      document.removeEventListener('click', handleGameElementClick, true);
     };
   }, []);
 
@@ -248,7 +251,7 @@ export default function ArticleEditor({
   }, [insertText]);
 
   return (
-    <div className={`space-y-3 ${className}`}>
+    <div className={`space-y-3 ${className}`} onSubmit={(e) => e.preventDefault()}>
       {/* Игровая панель для статей */}
       {showGameToolbar && (
         <GameToolbar
@@ -559,7 +562,18 @@ export default function ArticleEditor({
       <textarea
         ref={textareaRef}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          e.preventDefault();
+          onChange(e.target.value);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+          }
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+          }
+        }}
         placeholder={placeholder}
         className="w-full min-h-[400px] rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none font-mono"
       />

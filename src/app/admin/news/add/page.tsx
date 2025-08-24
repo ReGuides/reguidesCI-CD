@@ -176,7 +176,11 @@ export default function AddNewsPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" onKeyDown={(e) => {
+        if (e.key === 'Enter' && e.ctrlKey) {
+          e.preventDefault();
+        }
+      }}>
         {/* Основная информация */}
         <Card className="bg-neutral-800 border-neutral-700">
           <CardHeader>
@@ -201,13 +205,15 @@ export default function AddNewsPage() {
               <label htmlFor="content" className="block text-sm font-medium text-white mb-2">
                 Содержание *
               </label>
-              <ArticleEditor
-                value={form.content}
-                onChange={(value) => setForm(prev => ({ ...prev, content: value }))}
-                placeholder="Введите содержание новости..."
-                className="min-h-[400px]"
-                showGameToolbar={form.type === 'article'}
-              />
+              <div onSubmit={(e) => e.preventDefault()}>
+                <ArticleEditor
+                  value={form.content}
+                  onChange={(value) => setForm(prev => ({ ...prev, content: value }))}
+                  placeholder="Введите содержание новости..."
+                  className="min-h-[400px]"
+                  showGameToolbar={form.type === 'article'}
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

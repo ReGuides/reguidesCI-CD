@@ -167,6 +167,12 @@ export default function GameToolbar({
     closeDropdowns();
   };
 
+  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
+    e.preventDefault();
+    e.stopPropagation();
+    action();
+  };
+
   const filteredCharacters = characters.filter(char => 
     char.name.toLowerCase().includes(searchCharacters.toLowerCase())
   );
@@ -188,10 +194,11 @@ export default function GameToolbar({
       {/* Персонажи */}
       <div className="relative">
         <Button
-          onClick={() => toggleDropdown('characters')}
+          onClick={(e) => handleButtonClick(e, () => toggleDropdown('characters'))}
           variant="outline"
           size="sm"
           className="flex items-center gap-2"
+          type="button"
         >
           <Users className="w-4 h-4" />
           Персонажи
@@ -216,7 +223,12 @@ export default function GameToolbar({
               {filteredCharacters.map((character) => (
                 <button
                   key={character._id}
-                  onClick={() => insertCharacter(character)}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    insertCharacter(character);
+                  }}
                   className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
                 >
                   <img
@@ -238,10 +250,11 @@ export default function GameToolbar({
       {/* Таланты */}
       <div className="relative">
         <Button
-          onClick={() => toggleDropdown('talents')}
+          onClick={(e) => handleButtonClick(e, () => toggleDropdown('talents'))}
           variant="outline"
           size="sm"
           className="flex items-center gap-2"
+          type="button"
         >
           <Star className="w-4 h-4" />
           Таланты
@@ -287,11 +300,16 @@ export default function GameToolbar({
             {selectedCharacter && (
               <div className="max-h-60 overflow-y-auto">
                 {filteredTalents.map((talent) => (
-                  <button
-                    key={talent._id}
-                    onClick={() => insertTalent(talent)}
-                    className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
-                  >
+                                  <button
+                  key={talent._id}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    insertTalent(talent);
+                  }}
+                  className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
+                >
                     <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
                       <Star className="w-4 h-4 text-yellow-900" />
                     </div>
@@ -310,10 +328,11 @@ export default function GameToolbar({
       {/* Артефакты */}
       <div className="relative">
         <Button
-          onClick={() => toggleDropdown('artifacts')}
+          onClick={(e) => handleButtonClick(e, () => toggleDropdown('artifacts'))}
           variant="outline"
           size="sm"
           className="flex items-center gap-2"
+          type="button"
         >
           <Gem className="w-4 h-4" />
           Артефакты
@@ -338,7 +357,12 @@ export default function GameToolbar({
               {filteredArtifacts.map((artifact) => (
                 <button
                   key={artifact._id}
-                  onClick={() => insertArtifact(artifact)}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    insertArtifact(artifact);
+                  }}
                   className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
                 >
                   <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
@@ -358,10 +382,11 @@ export default function GameToolbar({
       {/* Оружия */}
       <div className="relative">
         <Button
-          onClick={() => toggleDropdown('weapons')}
+          onClick={(e) => handleButtonClick(e, () => toggleDropdown('weapons'))}
           variant="outline"
           size="sm"
           className="flex items-center gap-2"
+          type="button"
         >
           <Sword className="w-4 h-4" />
           Оружия
@@ -386,7 +411,12 @@ export default function GameToolbar({
               {filteredWeapons.map((weapon) => (
                 <button
                   key={weapon._id}
-                  onClick={() => insertWeapon(weapon)}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    insertWeapon(weapon);
+                  }}
                   className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
                 >
                   <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
@@ -406,10 +436,11 @@ export default function GameToolbar({
       {/* Элементы */}
       <div className="relative">
         <Button
-          onClick={() => toggleDropdown('elements')}
+          onClick={(e) => handleButtonClick(e, () => toggleDropdown('elements'))}
           variant="outline"
           size="sm"
           className="flex items-center gap-2"
+          type="button"
         >
           <Palette className="w-4 h-4" />
           Элементы
@@ -422,7 +453,12 @@ export default function GameToolbar({
               {elementColors.map((element) => (
                 <button
                   key={element.value}
-                  onClick={() => insertElement(element)}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    insertElement(element);
+                  }}
                   className="w-full p-2 hover:bg-neutral-700 flex items-center gap-2 text-left transition-colors rounded"
                 >
                   <span className="text-lg">{element.icon}</span>
