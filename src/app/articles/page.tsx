@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { News } from '@/types';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { Calendar, Eye, Tag, User } from 'lucide-react';
+import { Calendar, Eye, Tag, User, X, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
+import { getNewsImage, getNewsImageAlt } from '@/lib/utils/newsImageUtils';
 
 interface NewsFilters {
   type?: string;
@@ -29,6 +31,7 @@ export default function ArticlesPage() {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<NewsFilters>({});
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedNews, setSelectedNews] = useState<News | null>(null);
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     limit: 12,
@@ -80,6 +83,31 @@ export default function ArticlesPage() {
   useEffect(() => {
     loadNews(1, filters);
   }, [filters, loadNews]);
+
+  // Обработчик кликов на персонажей в контенте
+  useEffect(() => {
+    const handleGameElementClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const gameElement = target.closest('[data-modal-type]') as HTMLElement;
+      
+      if (gameElement) {
+        const modalType = gameElement.dataset.modalType;
+        const modalId = gameElement.dataset.modalId;
+        
+        if (modalType && modalId) {
+          console.log(`Opening modal for ${modalType} with id: ${modalId}`);
+          window.dispatchEvent(new CustomEvent('openModal', { 
+            detail: { type: modalType, id: modalId } 
+          }));
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleGameElementClick);
+    return () => {
+      document.removeEventListener('click', handleGameElementClick);
+    };
+  }, []);
 
   const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
@@ -252,10 +280,18 @@ export default function ArticlesPage() {
         {/* News Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {news.map((item) => (
-            <Link 
+            <div 
               key={item._id} 
-              href={item.type === 'article' ? `/articles/${item._id}` : `/news/${item._id}`}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg p-6 hover:bg-neutral-750 transition-colors block"
+              className="bg-neutral-800 border border-neutral-700 rounded-lg p-6 hover:bg-neutral-750 transition-colors cursor-pointer"
+              onClick={() => {
+                if (item.type === 'article') {
+                  // Для статей переходим на отдельную страницу
+                  window.location.href = `/articles/${item._id}`;
+                } else {
+                  // Для новостей открываем модальное окно
+                  setSelectedNews(item);
+                }
+              }}
             >
               {item.image && (
                 <img
@@ -316,7 +352,15 @@ export default function ArticlesPage() {
                   )}
                 </div>
               )}
-            </Link>
+              
+              {/* Индикатор для статей */}
+              {item.type === 'article' && (
+                <div className="mt-3 flex items-center gap-2 text-orange-400 text-sm">
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Откроется на отдельной странице</span>
+                </div>
+              )}
+            </div>
           ))}
         </div>
         {/* No Results */}
@@ -346,6 +390,125 @@ export default function ArticlesPage() {
           </button>
                 </div>
       </main>
+      
+      {/* Модальное окно для новостей */}
+      {selectedNews && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedNews(null);
+          }}
+        >
+          <div className="relative bg-neutral-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-neutral-700">
+            {/* Основной контент */}
+            <div className="p-4 sm:p-6">
+              {/* Дата и автор */}
+              <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
+                {selectedNews.author && (
+                  <span>
+                    Автор: <span className="font-semibold text-white">{selectedNews.author}</span>
+                  </span>
+                )}
+              </div>
+              
+              {/* Заголовок */}
+              <div className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">
+                {selectedNews.title}
+              </div>
+              
+              {/* Контент и изображение в две колонки */}
+              <div className="flex flex-col lg:flex-row gap-6 mt-4">
+                {/* Основной контент */}
+                <div className="flex-1 min-w-0 order-2 lg:order-1">
+                  {/* Разделитель */}
+                  <hr className="mb-4 border-neutral-700" />
+                  
+                  {/* Контент */}
+                  <div 
+                    className="text-sm sm:text-base news-content"
+                    dangerouslySetInnerHTML={{ __html: selectedNews.content || 'Контент недоступен' }}
+                  />
+                  
+                  {/* Стили для интерактивных элементов */}
+                  <style jsx>{`
+                    .character-card {
+                      cursor: pointer;
+                      transition: all 0.2s ease;
+                      border-radius: 4px;
+                      padding: 2px 4px;
+                    }
+                    .character-card:hover {
+                      background-color: rgba(59, 130, 246, 0.2);
+                      transform: translateY(-1px);
+                    }
+                    .artifact-info {
+                      cursor: pointer;
+                      transition: all 0.2s ease;
+                      border-radius: 4px;
+                      padding: 2px 4px;
+                    }
+                    .artifact-info:hover {
+                      background-color: rgba(34, 197, 94, 0.2);
+                      transform: translateY(-1px);
+                    }
+                    .weapon-info {
+                      cursor: pointer;
+                      transition: all 0.2s ease;
+                      border-radius: 4px;
+                      padding: 2px 4px;
+                    }
+                    .weapon-info:hover {
+                      background-color: rgba(168, 85, 247, 0.2);
+                      transform: translateY(-1px);
+                    }
+                    .element-badge {
+                      cursor: pointer;
+                      transition: all 0.2s ease;
+                      border-radius: 4px;
+                      padding: 2px 4px;
+                    }
+                    .element-badge:hover {
+                      background-color: rgba(251, 191, 36, 0.2);
+                      transform: translateY(-1px);
+                    }
+                  `}</style>
+                </div>
+                
+                {/* Изображение справа (сверху на мобильных) */}
+                {(() => {
+                  const imageUrl = getNewsImage(selectedNews.image, selectedNews.characterId, selectedNews.characterName);
+                  if (!imageUrl) return null;
+                  
+                  return (
+                    <div className="flex-shrink-0 w-full lg:w-80 order-1 lg:order-2">
+                      <Image 
+                        src={imageUrl} 
+                        alt={getNewsImageAlt(selectedNews.title, selectedNews.characterName)}
+                        width={320}
+                        height={400}
+                        className="w-full h-auto max-h-96 object-cover rounded-lg shadow-lg"
+                        onError={() => {
+                          // Next.js Image автоматически обрабатывает ошибки
+                        }}
+                      />
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Кнопка закрытия */}
+            <button
+              onClick={() => setSelectedNews(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+              aria-label="Закрыть"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );
