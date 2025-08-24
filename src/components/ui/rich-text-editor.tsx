@@ -137,6 +137,20 @@ export default function RichTextEditor({ value, onChange, placeholder, className
     }
   }, [value]);
 
+  // Закрытие выпадающих списков при клике вне их области
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.color-picker') && !target.closest('.font-size-picker')) {
+        setShowColorPicker(false);
+        setShowFontSize(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <div className={`space-y-3 ${className}`}>
       {/* Панель инструментов */}
@@ -349,7 +363,7 @@ export default function RichTextEditor({ value, onChange, placeholder, className
         </div>
 
         {/* Цвет текста */}
-        <div className="relative">
+        <div className="relative color-picker">
           <Button
             type="button"
             variant="outline"
@@ -362,26 +376,35 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             🎨
           </Button>
           
-          {showColorPicker && (
-            <div className="absolute top-full left-0 mt-1 bg-neutral-800 border border-neutral-600 rounded-lg p-2 z-10 shadow-lg">
-              <div className="grid grid-cols-4 gap-2">
-                {colorOptions.map((color) => (
-                  <button
-                    key={color.value}
-                    type="button"
-                    onClick={() => setColor(color.value)}
-                    className={`w-8 h-8 rounded border-2 border-neutral-600 hover:border-white transition-colors ${color.class}`}
-                    style={{ backgroundColor: color.value === '#ffffff' ? '#374151' : 'transparent' }}
-                    title={color.name}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+                     {showColorPicker && (
+             <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-20 shadow-xl">
+               <div className="grid grid-cols-4 gap-2">
+                 {colorOptions.map((color) => (
+                   <button
+                     key={color.value}
+                     type="button"
+                     onClick={() => setColor(color.value)}
+                     className={`w-10 h-10 rounded-lg border-2 border-neutral-600 hover:border-white hover:scale-110 transition-all duration-200 ${color.class}`}
+                     style={{ backgroundColor: color.value === '#ffffff' ? '#374151' : 'transparent' }}
+                     title={color.name}
+                   />
+                 ))}
+               </div>
+               <div className="mt-2 pt-2 border-t border-neutral-600">
+                 <button
+                   type="button"
+                   onClick={() => setShowColorPicker(false)}
+                   className="w-full px-2 py-1 text-xs text-gray-400 hover:text-white bg-neutral-700 hover:bg-neutral-600 rounded transition-colors"
+                 >
+                   Закрыть
+                 </button>
+               </div>
+             </div>
+           )}
         </div>
 
         {/* Размер шрифта */}
-        <div className="relative">
+        <div className="relative font-size-picker">
           <Button
             type="button"
             variant="outline"
@@ -394,22 +417,31 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             Aa
           </Button>
           
-          {showFontSize && (
-            <div className="absolute top-full left-0 mt-1 bg-neutral-800 border border-neutral-600 rounded-lg p-2 z-10 shadow-lg">
-              <div className="grid grid-cols-2 gap-1">
-                {fontSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => setFontSize(size)}
-                    className="px-2 py-1 text-xs bg-neutral-700 hover:bg-neutral-600 rounded text-white transition-colors"
-                  >
-                    {size}px
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+                     {showFontSize && (
+             <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-20 shadow-xl">
+               <div className="grid grid-cols-2 gap-2">
+                 {fontSizes.map((size) => (
+                   <button
+                     key={size}
+                     type="button"
+                     onClick={() => setFontSize(size)}
+                     className="px-3 py-2 text-sm bg-neutral-700 hover:bg-neutral-600 rounded-lg text-white transition-all duration-200 hover:scale-105"
+                   >
+                     {size}px
+                   </button>
+                 ))}
+               </div>
+               <div className="mt-2 pt-2 border-t border-neutral-600">
+                 <button
+                   type="button"
+                   onClick={() => setShowFontSize(false)}
+                   className="w-full px-2 py-1 text-xs text-gray-400 hover:text-white bg-neutral-700 hover:bg-neutral-600 rounded transition-colors"
+                 >
+                   Закрыть
+                 </button>
+               </div>
+             </div>
+           )}
         </div>
 
         {/* Кнопка помощи */}
