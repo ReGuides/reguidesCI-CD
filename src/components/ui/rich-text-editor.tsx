@@ -392,6 +392,9 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             </div>
           )}
         </div>
+
+        {/* Кнопка помощи */}
+        <EditorHelp />
       </div>
 
       {/* Текстовое поле */}
