@@ -94,7 +94,9 @@ export function Header() {
             <Link href="/artifacts" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
               Артефакты
             </Link>
-            {/* Ссылка на статьи временно скрыта */}
+            <Link href="/articles" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
+              Новости и статьи
+            </Link>
             <Link href="/about" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
               О проекте
             </Link>
@@ -139,7 +141,13 @@ export function Header() {
               >
                 Артефакты
               </Link>
-              {/* Ссылка на статьи временно скрыта */}
+              <Link 
+                href="/articles" 
+                className="block px-4 py-3 text-text hover:text-highlight hover:bg-neutral-700 rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Новости и статьи
+              </Link>
               <Link 
                 href="/about" 
                 className="block px-4 py-3 text-text hover:text-highlight hover:bg-neutral-700 rounded-lg transition-colors"

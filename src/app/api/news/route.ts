@@ -4,8 +4,11 @@ import News from '@/models/News';
 
 // Интерфейс для query параметров
 interface NewsQuery {
-  type?: 'manual' | 'birthday' | 'update' | 'event';
+  type?: 'manual' | 'birthday' | 'update' | 'event' | 'article';
+  category?: 'news' | 'guide' | 'review' | 'tutorial' | 'event';
   isPublished?: boolean;
+  $or?: Array<{ [key: string]: any }>;
+  tags?: { $in: string[] };
 }
 
 // Интерфейс для тела запроса при создании новости
@@ -28,24 +31,60 @@ export async function GET(request: NextRequest) {
     
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
+    const category = searchParams.get('category');
     const isPublished = searchParams.get('isPublished');
+    const search = searchParams.get('search');
+    const tags = searchParams.get('tags');
+    const sortBy = searchParams.get('sortBy') || 'newest';
     const limit = parseInt(searchParams.get('limit') || '50');
     const page = parseInt(searchParams.get('page') || '1');
     const skip = (page - 1) * limit;
 
     const query: NewsQuery = {};
     
-    if (type && ['manual', 'birthday', 'update', 'event'].includes(type)) {
-      query.type = type as 'manual' | 'birthday' | 'update' | 'event';
+    if (type && ['manual', 'birthday', 'update', 'event', 'article'].includes(type)) {
+      query.type = type as 'manual' | 'birthday' | 'update' | 'event' | 'article';
+    }
+    
+    if (category && ['news', 'guide', 'review', 'tutorial', 'event'].includes(category)) {
+      query.category = category as 'news' | 'guide' | 'review' | 'tutorial' | 'event';
     }
     
     if (isPublished !== null) {
       query.isPublished = isPublished === 'true';
     }
 
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { content: { $regex: search, $options: 'i' } },
+        { excerpt: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    if (tags) {
+      const tagArray = tags.split(',').map(tag => tag.trim());
+      query.tags = { $in: tagArray };
+    }
+
+    // Определяем сортировку
+    let sortOptions: any = {};
+    switch (sortBy) {
+      case 'oldest':
+        sortOptions = { createdAt: 1 };
+        break;
+      case 'popular':
+        sortOptions = { views: -1 };
+        break;
+      case 'newest':
+      default:
+        sortOptions = { createdAt: -1 };
+        break;
+    }
+
     const [news, total] = await Promise.all([
       News.find(query)
-        .sort({ createdAt: -1 })
+        .sort(sortOptions)
         .skip(skip)
         .limit(limit)
         .populate('characterId', 'name image')
@@ -53,14 +92,22 @@ export async function GET(request: NextRequest) {
       News.countDocuments(query)
     ]);
 
+    // Добавляем информацию о персонаже
+    const newsWithCharacter = news.map(item => ({
+      ...item,
+      characterName: item.characterId ? (item.characterId as any).name : undefined
+    }));
+
     return NextResponse.json({
       success: true,
-      data: news,
+      data: newsWithCharacter,
       pagination: {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
       }
     });
 

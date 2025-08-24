@@ -43,7 +43,7 @@ export default function NewsSection() {
   if (loading) {
     return (
       <div className="w-full max-w-7xl mx-auto mt-12 sm:mt-16 px-4">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Новости</h2>
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Новости и статьи</h2>
         <div className="flex justify-center">
           <LoadingSpinner size="md" className="text-accent" />
         </div>
@@ -84,16 +84,24 @@ export default function NewsSection() {
                
                <div className="flex-1 min-w-0">
                  {/* Цветная полоска сверху */}
-                 <div className={`w-full h-1 rounded mb-2 ${item.type === 'birthday' ? 'bg-pink-400' : 'bg-blue-400'}`} />
+                 <div className={`w-full h-1 rounded mb-2 ${
+                   item.type === 'birthday' ? 'bg-pink-400' : 
+                   item.type === 'article' ? 'bg-orange-400' : 
+                   item.type === 'update' ? 'bg-green-400' : 
+                   item.type === 'event' ? 'bg-purple-400' : 
+                   'bg-blue-400'
+                 }`} />
                  
                  <div className="text-sm text-gray-400 mb-1">
                    {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}
                  </div>
                  <div className="text-white font-semibold text-base sm:text-lg line-clamp-2">{item.title}</div>
                  <div className="text-gray-300 mt-1 text-sm line-clamp-2">
-                   {item.content ? 
-                     item.content.replace(/<[^>]*>/g, '').substring(0, 100) + '...' : 
-                     'Описание недоступно'
+                   {item.type === 'article' && item.excerpt ? 
+                     item.excerpt : 
+                     item.content ? 
+                       item.content.replace(/<[^>]*>/g, '').substring(0, 100) + '...' : 
+                       'Описание недоступно'
                    }
                  </div>
                </div>
@@ -140,6 +148,18 @@ export default function NewsSection() {
                     className="text-sm sm:text-base news-content"
                     dangerouslySetInnerHTML={{ __html: selectedNews.content || 'Контент недоступен' }}
                   />
+                  
+                  {/* Кнопка для статей */}
+                  {selectedNews.type === 'article' && (
+                    <div className="mt-6">
+                      <a 
+                        href={`/articles/${selectedNews._id}`}
+                        className="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors"
+                      >
+                        Читать полностью
+                      </a>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Изображение справа (сверху на мобильных) */}
