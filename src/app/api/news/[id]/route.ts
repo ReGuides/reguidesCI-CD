@@ -47,7 +47,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     await connectDB();
     
     const body = await request.json();
-    const { title, content, type, image, isPublished, characterId, tags } = body;
+    const { title, content, type, category, excerpt, image, isPublished, characterId, tags } = body;
 
     // Валидация
     if (!title || !content || !type) {
@@ -57,7 +57,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    if (!['manual', 'birthday', 'update', 'event'].includes(type)) {
+    if (!['manual', 'birthday', 'update', 'event', 'article'].includes(type)) {
       return NextResponse.json(
         { success: false, error: 'Invalid news type' },
         { status: 400 }
@@ -70,6 +70,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         title,
         content,
         type,
+        category: category || 'news',
+        excerpt: excerpt || '',
         image,
         isPublished,
         characterId: characterId || undefined,

@@ -10,7 +10,7 @@ import { X, Plus, Save, ArrowLeft, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { Character, News } from '@/types';
 import Image from 'next/image';
-import RichTextEditor from '@/components/ui/rich-text-editor';
+import ArticleEditor from '@/components/ui/article-editor';
 
 export default function EditNewsPage() {
   const router = useRouter();
@@ -22,7 +22,9 @@ export default function EditNewsPage() {
   const [form, setForm] = useState({
     title: '',
     content: '',
-    type: 'manual' as 'manual' | 'birthday' | 'update' | 'event',
+    type: 'manual' as 'manual' | 'birthday' | 'update' | 'event' | 'article',
+    category: 'news' as 'news' | 'guide' | 'review' | 'tutorial' | 'event',
+    excerpt: '',
     image: '',
     isPublished: false,
     characterId: '',
@@ -49,6 +51,8 @@ export default function EditNewsPage() {
             title: newsData.title || '',
             content: newsData.content || '',
             type: newsData.type || 'manual',
+            category: newsData.category || 'news',
+            excerpt: newsData.excerpt || '',
             image: newsData.image || '',
             isPublished: newsData.isPublished || false,
             characterId: newsData.characterId || '',
@@ -96,6 +100,8 @@ export default function EditNewsPage() {
           title: form.title,
           content: form.content,
           type: form.type,
+          category: form.type === 'article' ? form.category : undefined,
+          excerpt: form.type === 'article' ? form.excerpt : undefined,
           image: form.image || undefined,
           isPublished: form.isPublished,
           characterId: form.characterId || undefined,
@@ -245,11 +251,12 @@ export default function EditNewsPage() {
               <label htmlFor="content" className="block text-sm font-medium text-white mb-2">
                 Содержание *
               </label>
-              <RichTextEditor
+              <ArticleEditor
                 value={form.content}
                 onChange={(value) => setForm(prev => ({ ...prev, content: value }))}
                 placeholder="Введите содержание новости..."
                 className="min-h-[400px]"
+                showGameToolbar={form.type === 'article'}
               />
             </div>
 
@@ -261,14 +268,15 @@ export default function EditNewsPage() {
                 <select
                   id="type"
                   value={form.type}
-                  onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value as 'manual' | 'birthday' | 'update' | 'event' }))}
+                  onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value as 'manual' | 'birthday' | 'update' | 'event' | 'article' }))}
                   className="w-full h-10 rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   required
                 >
-                  <option value="manual">Ручная</option>
+                  <option value="manual">Новость</option>
                   <option value="birthday">День рождения</option>
                   <option value="update">Обновление</option>
                   <option value="event">Событие</option>
+                  <option value="article">Статья</option>
                 </select>
               </div>
 
@@ -291,6 +299,42 @@ export default function EditNewsPage() {
                 </select>
               </div>
             </div>
+
+            {/* Дополнительные поля для статей */}
+            {form.type === 'article' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-white mb-2">
+                    Категория статьи
+                  </label>
+                  <select
+                    id="category"
+                    value={form.category}
+                    onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value as 'news' | 'guide' | 'review' | 'tutorial' | 'event' }))}
+                    className="w-full h-10 rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="news">Новости</option>
+                    <option value="guide">Гайд</option>
+                    <option value="review">Обзор</option>
+                    <option value="tutorial">Туториал</option>
+                    <option value="event">Событие</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="excerpt" className="block text-sm font-medium text-white mb-2">
+                    Краткое описание
+                  </label>
+                  <textarea
+                    id="excerpt"
+                    value={form.excerpt}
+                    onChange={(e) => setForm(prev => ({ ...prev, excerpt: e.target.value }))}
+                    placeholder="Краткое описание статьи для предварительного просмотра..."
+                    className="w-full h-20 rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Изображение */}
             <div>
