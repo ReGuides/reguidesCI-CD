@@ -14,9 +14,16 @@ import {
   Quote,
   Minus,
   Palette,
-  Type
+  Type,
+  Heading1,
+  Heading2,
+  Link,
+  Code,
+  Table,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Button } from './button';
+import EditorHelp from './editor-help';
 
 interface RichTextEditorProps {
   value: string;
@@ -72,6 +79,12 @@ export default function RichTextEditor({ value, onChange, placeholder, className
       list: { before: '<ul><li>', after: '</li></ul>' },
       orderedList: { before: '<ol><li>', after: '</li></ol>' },
       divider: { before: '<hr>', after: '' },
+      heading1: { before: '<h1>', after: '</h1>' },
+      heading2: { before: '<h2>', after: '</h2>' },
+      code: { before: '<code>', after: '</code>' },
+      link: { before: '<a href="">', after: '</a>' },
+      table: { before: '<table><tr><td>', after: '</td></tr></table>' },
+      image: { before: '<img src="" alt="" />', after: '' },
     };
 
     const format = tagMap[tag];
@@ -250,6 +263,74 @@ export default function RichTextEditor({ value, onChange, placeholder, className
           </Button>
         </div>
 
+        {/* Заголовки и код */}
+        <div className="flex gap-1">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => formatText('heading1')}
+            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            title="Заголовок 1"
+          >
+            <Heading1 className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => formatText('heading2')}
+            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            title="Заголовок 2"
+          >
+            <Heading2 className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => formatText('code')}
+            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            title="Код"
+          >
+            <Code className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => formatText('link')}
+            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            title="Ссылка"
+          >
+            <Link className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Таблица и изображение */}
+        <div className="flex gap-1">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => formatText('table')}
+            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            title="Таблица"
+          >
+            <Table className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => formatText('image')}
+            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            title="Изображение"
+          >
+            <ImageIcon className="w-4 h-4" />
+          </Button>
+        </div>
+
         {/* Цвет текста */}
         <div className="relative">
           <Button
@@ -326,6 +407,8 @@ export default function RichTextEditor({ value, onChange, placeholder, className
       <div className="text-xs text-gray-400 space-y-1">
         <p><strong>Горячие клавиши:</strong> Ctrl+B (жирный), Ctrl+I (курсив), Ctrl+U (подчеркнутый)</p>
         <p><strong>Подсказка:</strong> Выделите текст и нажмите кнопку форматирования, или вставьте тег в нужное место</p>
+        <p><strong>Доступные теги:</strong> Заголовки, списки, цитаты, ссылки, код, таблицы, изображения, разделители</p>
+        <p><strong>Наведение:</strong> Наведите курсор на кнопку, чтобы увидеть подсказку о её функции</p>
       </div>
     </div>
   );
