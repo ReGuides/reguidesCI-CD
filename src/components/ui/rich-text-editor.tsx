@@ -33,14 +33,14 @@ interface RichTextEditorProps {
 }
 
 const colorOptions = [
-  { name: 'Красный', value: '#ef4444', class: 'text-red-500' },
-  { name: 'Оранжевый', value: '#f97316', class: 'text-orange-500' },
-  { name: 'Желтый', value: '#eab308', class: 'text-yellow-500' },
-  { name: 'Зеленый', value: '#22c55e', class: 'text-green-500' },
-  { name: 'Синий', value: '#3b82f6', class: 'text-blue-500' },
-  { name: 'Фиолетовый', value: '#8b5cf6', class: 'text-purple-500' },
-  { name: 'Розовый', value: '#ec4899', class: 'text-pink-500' },
-  { name: 'Белый', value: '#ffffff', class: 'text-white' },
+  { name: 'Красный', value: '#ef4444' },
+  { name: 'Оранжевый', value: '#f97316' },
+  { name: 'Желтый', value: '#eab308' },
+  { name: 'Зеленый', value: '#22c55e' },
+  { name: 'Синий', value: '#3b82f6' },
+  { name: 'Фиолетовый', value: '#8b5cf6' },
+  { name: 'Розовый', value: '#ec4899' },
+  { name: 'Белый', value: '#ffffff' },
 ];
 
 export default function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
@@ -377,15 +377,15 @@ export default function RichTextEditor({ value, onChange, placeholder, className
           </Button>
           
                      {showColorPicker && (
-             <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-20 shadow-xl">
+             <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-20 shadow-xl min-w-[200px] max-w-[280px]">
                <div className="grid grid-cols-4 gap-2">
                  {colorOptions.map((color) => (
                    <button
                      key={color.value}
                      type="button"
                      onClick={() => setColor(color.value)}
-                     className={`w-10 h-10 rounded-lg border-2 border-neutral-600 hover:border-white hover:scale-110 transition-all duration-200 ${color.class}`}
-                     style={{ backgroundColor: color.value === '#ffffff' ? '#374151' : 'transparent' }}
+                     className="w-10 h-10 rounded-lg border-2 border-neutral-600 hover:border-white hover:scale-110 transition-all duration-200"
+                     style={{ backgroundColor: color.value }}
                      title={color.name}
                    />
                  ))}
@@ -418,7 +418,7 @@ export default function RichTextEditor({ value, onChange, placeholder, className
           </Button>
           
                      {showFontSize && (
-             <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-20 shadow-xl">
+             <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-20 shadow-xl min-w-[150px] max-w-[200px]">
                <div className="grid grid-cols-2 gap-2">
                  {fontSizes.map((size) => (
                    <button
