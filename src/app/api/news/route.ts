@@ -2,12 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import News from '@/models/News';
 
+// Интерфейс для персонажа
+interface Character {
+  name: string;
+  image: string;
+}
+
 // Интерфейс для query параметров
 interface NewsQuery {
   type?: 'manual' | 'birthday' | 'update' | 'event' | 'article';
   category?: 'news' | 'guide' | 'review' | 'tutorial' | 'event';
   isPublished?: boolean;
-  $or?: Array<{ [key: string]: any }>;
+  $or?: Array<{ 
+    title?: { $regex: string; $options: string };
+    content?: { $regex: string; $options: string };
+    excerpt?: { $regex: string; $options: string };
+  }>;
   tags?: { $in: string[] };
 }
 
@@ -68,7 +78,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Определяем сортировку
-    let sortOptions: any = {};
+    let sortOptions: { createdAt?: 1 | -1; views?: 1 | -1 } = {};
     switch (sortBy) {
       case 'oldest':
         sortOptions = { createdAt: 1 };
@@ -95,7 +105,7 @@ export async function GET(request: NextRequest) {
     // Добавляем информацию о персонаже
     const newsWithCharacter = news.map(item => ({
       ...item,
-      characterName: item.characterId ? (item.characterId as any).name : undefined
+      characterName: item.characterId ? (item.characterId as Character).name : undefined
     }));
 
     return NextResponse.json({
