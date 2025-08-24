@@ -59,7 +59,7 @@ export default function EditorHelp() {
                   <ul className="space-y-1 ml-4">
                     <li><strong>•</strong> - Маркированный список</li>
                     <li><strong>1.</strong> - Нумерованный список</li>
-                    <li><strong>"</strong> - Цитата</li>
+                                         <li><strong>&quot;</strong> - Цитата</li>
                     <li><strong>─</strong> - Разделительная линия</li>
                   </ul>
                 </div>
