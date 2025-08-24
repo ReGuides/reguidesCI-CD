@@ -148,40 +148,44 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             variant="outline"
             size="sm"
             onClick={() => formatText('bold')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Жирный (Ctrl+B)"
           >
-            <Bold className="w-4 h-4" />
+            <Bold className="w-3 h-3 mr-1" />
+            B
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('italic')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Курсив (Ctrl+I)"
           >
-            <Italic className="w-4 h-4" />
+            <Italic className="w-3 h-3 mr-1" />
+            I
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('underline')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Подчеркнутый (Ctrl+U)"
           >
-            <Underline className="w-4 h-4" />
+            <Underline className="w-3 h-3 mr-1" />
+            U
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('strikethrough')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Зачеркнутый"
           >
-            <Strikethrough className="w-4 h-4" />
+            <Strikethrough className="w-3 h-3 mr-1" />
+            S
           </Button>
         </div>
 
@@ -192,30 +196,33 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             variant="outline"
             size="sm"
             onClick={() => alignText('left')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Выровнять по левому краю"
           >
-            <AlignLeft className="w-4 h-4" />
+            <AlignLeft className="w-3 h-3 mr-1" />
+            ←
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => alignText('center')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Выровнять по центру"
           >
-            <AlignCenter className="w-4 h-4" />
+            <AlignCenter className="w-3 h-3 mr-1" />
+            ↔
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => alignText('right')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Выровнять по правому краю"
           >
-            <AlignRight className="w-4 h-4" />
+            <AlignRight className="w-3 h-3 mr-1" />
+            →
           </Button>
         </div>
 
@@ -226,40 +233,44 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             variant="outline"
             size="sm"
             onClick={() => formatText('list')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Маркированный список"
           >
-            <List className="w-4 h-4" />
+            <List className="w-3 h-3 mr-1" />
+            •
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('orderedList')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Нумерованный список"
           >
-            <ListOrdered className="w-4 h-4" />
+            <ListOrdered className="w-3 h-3 mr-1" />
+            1.
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('quote')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Цитата"
           >
-            <Quote className="w-4 h-4" />
+            <Quote className="w-3 h-3 mr-1" />
+            "
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('divider')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Разделительная линия"
           >
-            <Minus className="w-4 h-4" />
+            <Minus className="w-3 h-3 mr-1" />
+            ─
           </Button>
         </div>
 
@@ -270,40 +281,44 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             variant="outline"
             size="sm"
             onClick={() => formatText('heading1')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Заголовок 1"
           >
-            <Heading1 className="w-4 h-4" />
+            <Heading1 className="w-3 h-3 mr-1" />
+            H1
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('heading2')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Заголовок 2"
           >
-            <Heading2 className="w-4 h-4" />
+            <Heading2 className="w-3 h-3 mr-1" />
+            H2
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('code')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Код"
           >
-            <Code className="w-4 h-4" />
+            <Code className="w-3 h-3 mr-1" />
+            {'</>'}
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('link')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Ссылка"
           >
-            <Link className="w-4 h-4" />
+            <Link className="w-3 h-3 mr-1" />
+            🔗
           </Button>
         </div>
 
@@ -314,20 +329,22 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             variant="outline"
             size="sm"
             onClick={() => formatText('table')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Таблица"
           >
-            <Table className="w-4 h-4" />
+            <Table className="w-3 h-3 mr-1" />
+            ⊞
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => formatText('image')}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Изображение"
           >
-            <ImageIcon className="w-4 h-4" />
+            <ImageIcon className="w-3 h-3 mr-1" />
+            🖼️
           </Button>
         </div>
 
@@ -338,10 +355,11 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             variant="outline"
             size="sm"
             onClick={() => setShowColorPicker(!showColorPicker)}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Цвет текста"
           >
-            <Palette className="w-4 h-4" />
+            <Palette className="w-3 h-3 mr-1" />
+            🎨
           </Button>
           
           {showColorPicker && (
@@ -369,10 +387,11 @@ export default function RichTextEditor({ value, onChange, placeholder, className
             variant="outline"
             size="sm"
             onClick={() => setShowFontSize(!showFontSize)}
-            className="h-8 w-8 p-0 border-neutral-600 hover:bg-neutral-600"
+            className="h-8 px-2 border-neutral-600 hover:bg-neutral-600"
             title="Размер шрифта"
           >
-            <Type className="w-4 h-4" />
+            <Type className="w-3 h-3 mr-1" />
+            Aa
           </Button>
           
           {showFontSize && (
