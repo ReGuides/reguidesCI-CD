@@ -192,12 +192,13 @@ export default function ArticlesPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Заголовок страницы */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white mb-4">Новости и статьи</h1>
-        <p className="text-gray-300 text-lg">
-          Здесь вы найдете все последние новости, обновления и подробные статьи о мире игры
-        </p>
-      </div>
+             <div className="mb-8">
+         <h1 className="text-4xl font-bold text-white mb-4">Новости и статьи</h1>
+         <p className="text-gray-300 text-lg">
+           Здесь вы найдете все последние новости, обновления и подробные статьи о мире игры. 
+           <span className="text-orange-400 font-medium">Статьи</span> выделены оранжевым цветом и содержат подробную информацию.
+         </p>
+       </div>
       
       <div className="flex flex-col md:flex-row gap-6">
       <aside className="w-full md:w-64 flex-shrink-0">
@@ -279,19 +280,18 @@ export default function ArticlesPage() {
         {/* News Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {news.map((item) => (
-            <div 
-              key={item._id} 
-              className="bg-neutral-800 border border-neutral-700 rounded-lg p-6 hover:bg-neutral-750 transition-colors cursor-pointer"
-              onClick={() => {
-                if (item.type === 'article') {
-                  // Для статей переходим на отдельную страницу
-                  window.location.href = `/articles/${item._id}`;
-                } else {
-                  // Для новостей открываем модальное окно
-                  setSelectedNews(item);
-                }
-              }}
-            >
+                         <div 
+               key={item._id} 
+               className={`rounded-lg p-6 transition-all duration-200 cursor-pointer ${
+                 item.type === 'article' 
+                   ? 'bg-gradient-to-br from-orange-900/20 to-orange-800/30 border border-orange-700/50 hover:from-orange-900/30 hover:to-orange-800/40 hover:border-orange-600/70 hover:shadow-lg hover:shadow-orange-500/10' 
+                   : 'bg-neutral-800 border border-neutral-700 hover:bg-neutral-750'
+               }`}
+               onClick={() => {
+                 // Все элементы открываются в модальном окне
+                 setSelectedNews(item);
+               }}
+             >
               {item.image && (
                 <img
                   src={item.image}
@@ -302,15 +302,22 @@ export default function ArticlesPage() {
                   }}
                 />
               )}
-              <div className="flex items-center gap-2 mb-3">
-                <span className={`px-2 py-1 rounded text-xs font-semibold ${getTypeColor(item.type)}`}>
-                  {getTypeLabel(item.type)}
-                </span>
-                {item.type === 'article' && item.category && (
-                  <span className={`px-2 py-1 rounded text-xs font-semibold ${getCategoryColor(item.category)}`}>
-                    {getCategoryLabel(item.category)}
-                  </span>
-                )}
+                             <div className="flex items-center gap-2 mb-3">
+                 <span className={`px-2 py-1 rounded text-xs font-semibold ${getTypeColor(item.type)}`}>
+                   {getTypeLabel(item.type)}
+                 </span>
+                 {item.type === 'article' && item.category && (
+                   <span className={`px-2 py-1 rounded text-xs font-semibold ${getCategoryColor(item.category)}`}>
+                     {getCategoryLabel(item.category)}
+                   </span>
+                 )}
+                 {item.type === 'article' && (
+                   <span className="ml-auto text-orange-400">
+                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                       <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                     </svg>
+                   </span>
+                 )}
                 <span className="text-xs text-gray-400 ml-auto flex items-center gap-1">
                   <Eye className="w-3 h-3" />
                   {item.views}
@@ -352,13 +359,7 @@ export default function ArticlesPage() {
                 </div>
               )}
               
-              {/* Индикатор для статей */}
-              {item.type === 'article' && (
-                <div className="mt-3 flex items-center gap-2 text-orange-400 text-sm">
-                  <ExternalLink className="w-4 h-4" />
-                  <span>Откроется на отдельной странице</span>
-                </div>
-              )}
+              
             </div>
           ))}
         </div>
