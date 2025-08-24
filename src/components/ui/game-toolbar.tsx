@@ -13,10 +13,10 @@ import {
 import { Button } from './button';
 
 interface GameToolbarProps {
-  onInsertCharacter: (character: any) => void;
-  onInsertTalent: (talent: any) => void;
-  onInsertArtifact: (artifact: any) => void;
-  onInsertWeapon: (weapon: any) => void;
+  onInsertCharacter: (character: { id: string; name: string; image: string; element: string; rarity: number }) => void;
+  onInsertTalent: (talent: { id: string; name: string; type: string; description: string }) => void;
+  onInsertArtifact: (artifact: { id: string; name: string; rarity: number; bonus: string }) => void;
+  onInsertWeapon: (weapon: { id: string; name: string; type: string; rarity: number; passive: string }) => void;
   onInsertElement: (element: string) => void;
 }
 
@@ -71,35 +71,22 @@ export default function GameToolbar({
     { id: 'staff', name: 'Посох Хомы', type: 'polearm', rarity: 5, passive: 'Увеличивает HP' },
   ];
 
-  const insertCharacter = (character: any) => {
-    const html = `<span class="character-card" data-character-id="${character.id}">
-      <img src="${character.image}" alt="${character.name}" class="w-6 h-6 rounded-full inline-block mr-2" />
-      <strong>${character.name}</strong>
-    </span>`;
+  const insertCharacter = (character: { id: string; name: string; image: string; element: string; rarity: number }) => {
     onInsertCharacter(character);
     closeDropdowns();
   };
 
-  const insertTalent = (talent: any) => {
-    const html = `<span class="talent-info" data-talent-id="${talent.id}">
-      <span class="talent-icon">⭐</span> <strong>${talent.name}</strong> (${talent.type})
-    </span>`;
+  const insertTalent = (talent: { id: string; name: string; type: string; description: string }) => {
     onInsertTalent(talent);
     closeDropdowns();
   };
 
-  const insertArtifact = (artifact: any) => {
-    const html = `<span class="artifact-info" data-artifact-id="${artifact.id}">
-      <span class="artifact-icon">💎</span> <strong>${artifact.name}</strong> - ${artifact.bonus}
-    </span>`;
+  const insertArtifact = (artifact: { id: string; name: string; rarity: number; bonus: string }) => {
     onInsertArtifact(artifact);
     closeDropdowns();
   };
 
-  const insertWeapon = (weapon: any) => {
-    const html = `<span class="weapon-info" data-weapon-id="${weapon.id}">
-      <span class="weapon-icon">⚔️</span> <strong>${weapon.name}</strong> (${weapon.type})
-    </span>`;
+  const insertWeapon = (weapon: { id: string; name: string; type: string; rarity: number; passive: string }) => {
     onInsertWeapon(weapon);
     closeDropdowns();
   };

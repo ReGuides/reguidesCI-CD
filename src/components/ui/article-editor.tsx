@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   Bold, 
   Italic, 
@@ -56,7 +56,7 @@ export default function ArticleEditor({
   const [showFontSize, setShowFontSize] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const insertText = (before: string, after: string = '') => {
+  const insertText = useCallback((before: string, after: string = '') => {
     if (!textareaRef.current) return;
     
     const textarea = textareaRef.current;
@@ -75,9 +75,9 @@ export default function ArticleEditor({
         textareaRef.current.focus();
       }
     }, 0);
-  };
+  }, [value, onChange]);
 
-  const formatText = (tag: string) => {
+  const formatText = useCallback((tag: string) => {
     const tagMap: Record<string, { before: string; after: string }> = {
       bold: { before: '<strong>', after: '</strong>' },
       italic: { before: '<em>', after: '</em>' },
@@ -99,21 +99,21 @@ export default function ArticleEditor({
     if (format) {
       insertText(format.before, format.after);
     }
-  };
+  }, [insertText]);
 
-  const setColor = (color: string) => {
+  const setColor = useCallback((color: string) => {
     insertText(`<span style="color: ${color}">`, '</span>');
     setShowColorPicker(false);
-  };
+  }, [insertText]);
 
-  const setFontSize = (size: string) => {
+  const setFontSize = useCallback((size: string) => {
     insertText(`<span style="font-size: ${size}px">`, '</span>');
     setShowFontSize(false);
-  };
+  }, [insertText]);
 
-  const alignText = (alignment: string) => {
+  const alignText = useCallback((alignment: string) => {
     insertText(`<div style="text-align: ${alignment}">`, '</div>');
-  };
+  }, [insertText]);
 
   const fontSizes = ['12', '14', '16', '18', '20', '24', '28', '32', '36', '48'];
 
@@ -143,7 +143,7 @@ export default function ArticleEditor({
       textarea.addEventListener('keydown', handleKeyDown);
       return () => textarea.removeEventListener('keydown', handleKeyDown);
     }
-  }, [value]);
+  }, [value, formatText]);
 
   // Закрытие выпадающих списков при клике вне их области
   useEffect(() => {
@@ -160,36 +160,36 @@ export default function ArticleEditor({
   }, []);
 
   // Обработчики для игровой панели
-  const handleInsertCharacter = (character: any) => {
+  const handleInsertCharacter = useCallback((character: { id: string; name: string; image: string }) => {
     const html = `<span class="character-card" data-character-id="${character.id}">
       <img src="${character.image}" alt="${character.name}" class="w-6 h-6 rounded-full inline-block mr-2" />
       <strong>${character.name}</strong>
     </span>`;
     insertText(html, '');
-  };
+  }, [insertText]);
 
-  const handleInsertTalent = (talent: any) => {
+  const handleInsertTalent = useCallback((talent: { id: string; name: string; type: string }) => {
     const html = `<span class="talent-info" data-talent-id="${talent.id}">
       <span class="talent-icon">⭐</span> <strong>${talent.name}</strong> (${talent.type})
     </span>`;
     insertText(html, '');
-  };
+  }, [insertText]);
 
-  const handleInsertArtifact = (artifact: any) => {
+  const handleInsertArtifact = useCallback((artifact: { id: string; name: string; bonus: string }) => {
     const html = `<span class="artifact-info" data-artifact-id="${artifact.id}">
       <span class="artifact-icon">💎</span> <strong>${artifact.name}</strong> - ${artifact.bonus}
     </span>`;
     insertText(html, '');
-  };
+  }, [insertText]);
 
-  const handleInsertWeapon = (weapon: any) => {
+  const handleInsertWeapon = useCallback((weapon: { id: string; name: string; type: string }) => {
     const html = `<span class="weapon-info" data-weapon-id="${weapon.id}">
       <span class="weapon-icon">⚔️</span> <strong>${weapon.name}</strong> (${weapon.type})
     </span>`;
     insertText(html, '');
-  };
+  }, [insertText]);
 
-  const handleInsertElement = (element: string) => {
+  const handleInsertElement = useCallback((element: string) => {
     const elementData = {
       pyro: { name: 'Пиро', color: '#ff6b35', icon: '🔥' },
       hydro: { name: 'Гидро', color: '#4fc3f7', icon: '💧' },
@@ -205,7 +205,7 @@ export default function ArticleEditor({
       </span>`;
       insertText(html, '');
     }
-  };
+  }, [insertText]);
 
   return (
     <div className={`space-y-3 ${className}`}>
