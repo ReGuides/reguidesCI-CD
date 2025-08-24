@@ -3,8 +3,10 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface INews extends Document {
   title: string;
   content: string;
-  type: 'manual' | 'birthday' | 'update' | 'event';
+  type: 'manual' | 'birthday' | 'update' | 'event' | 'article';
+  category: 'news' | 'guide' | 'review' | 'tutorial' | 'event';
   image?: string;
+  excerpt?: string;
   isPublished: boolean;
   publishedAt?: Date;
   createdAt: Date;
@@ -35,12 +37,22 @@ const NewsSchema = new Schema<INews>({
   },
   type: {
     type: String,
-    enum: ['manual', 'birthday', 'update', 'event'],
+    enum: ['manual', 'birthday', 'update', 'event', 'article'],
     default: 'manual'
+  },
+  category: {
+    type: String,
+    enum: ['news', 'guide', 'review', 'tutorial', 'event'],
+    default: 'news'
   },
   image: {
     type: String,
     trim: true
+  },
+  excerpt: {
+    type: String,
+    trim: true,
+    maxlength: 300
   },
   isPublished: {
     type: Boolean,

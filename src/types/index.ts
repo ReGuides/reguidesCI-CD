@@ -24,8 +24,10 @@ export interface News {
   _id: string;
   title: string;
   content: string;
-  type: 'manual' | 'birthday' | 'update' | 'event';
+  type: 'manual' | 'birthday' | 'update' | 'event' | 'article';
+  category: 'news' | 'guide' | 'review' | 'tutorial' | 'event';
   image?: string;
+  excerpt?: string;
   isPublished: boolean;
   publishedAt?: string;
   createdAt: string;

@@ -10,7 +10,7 @@ import { X, Plus, Save, ArrowLeft, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { Character } from '@/types';
 import Image from 'next/image';
-import RichTextEditor from '@/components/ui/rich-text-editor';
+import ArticleEditor from '@/components/ui/article-editor';
 
 export default function AddNewsPage() {
   const router = useRouter();
@@ -20,8 +20,10 @@ export default function AddNewsPage() {
   const [form, setForm] = useState({
     title: '',
     content: '',
-    type: 'manual' as 'manual' | 'birthday' | 'update' | 'event',
+    type: 'manual' as 'manual' | 'birthday' | 'update' | 'event' | 'article',
+    category: 'news' as 'news' | 'guide' | 'review' | 'tutorial' | 'event',
     image: '',
+    excerpt: '',
     isPublished: false,
     characterId: '',
     tags: [] as string[],
@@ -66,6 +68,8 @@ export default function AddNewsPage() {
           title: form.title,
           content: form.content,
           type: form.type,
+          category: form.type === 'article' ? form.category : undefined,
+          excerpt: form.type === 'article' ? form.excerpt : undefined,
           image: form.image || undefined,
           isPublished: form.isPublished,
           characterId: form.characterId || undefined,
@@ -197,11 +201,12 @@ export default function AddNewsPage() {
               <label htmlFor="content" className="block text-sm font-medium text-white mb-2">
                 Содержание *
               </label>
-              <RichTextEditor
+              <ArticleEditor
                 value={form.content}
                 onChange={(value) => setForm(prev => ({ ...prev, content: value }))}
                 placeholder="Введите содержание новости..."
                 className="min-h-[400px]"
+                showGameToolbar={form.type === 'article'}
               />
             </div>
 
@@ -213,16 +218,39 @@ export default function AddNewsPage() {
                 <select
                   id="type"
                   value={form.type}
-                  onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value as 'manual' | 'birthday' | 'update' | 'event' }))}
+                  onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value as 'manual' | 'birthday' | 'update' | 'event' | 'article' }))}
                   className="w-full h-10 rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   required
                 >
-                  <option value="manual">Ручная</option>
+                  <option value="manual">Новость</option>
+                  <option value="article">Статья</option>
                   <option value="birthday">День рождения</option>
                   <option value="update">Обновление</option>
                   <option value="event">Событие</option>
                 </select>
               </div>
+
+              {/* Категория (только для статей) */}
+              {form.type === 'article' && (
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-white mb-2">
+                    Категория статьи *
+                  </label>
+                  <select
+                    id="category"
+                    value={form.category}
+                    onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value as any }))}
+                    className="w-full h-10 rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="guide">Гайд</option>
+                    <option value="review">Обзор</option>
+                    <option value="tutorial">Туториал</option>
+                    <option value="news">Новость</option>
+                    <option value="event">Событие</option>
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label htmlFor="characterId" className="block text-sm font-medium text-white mb-2">
@@ -243,6 +271,22 @@ export default function AddNewsPage() {
                 </select>
               </div>
             </div>
+
+            {/* Краткое описание (только для статей) */}
+            {form.type === 'article' && (
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Краткое описание
+                </label>
+                <textarea
+                  value={form.excerpt}
+                  onChange={(e) => setForm(prev => ({ ...prev, excerpt: e.target.value }))}
+                  placeholder="Краткое описание статьи для предварительного просмотра..."
+                  className="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  rows={3}
+                />
+              </div>
+            )}
 
             {/* Изображение */}
             <div>
