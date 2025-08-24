@@ -52,9 +52,37 @@ export default function ArticleEditor({
   className, 
   showGameToolbar = false 
 }: ArticleEditorProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showFontSize, setShowFontSize] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Инициализируем обработчик кликов для игровых элементов
+  useEffect(() => {
+    const handleGameElementClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const gameElement = target.closest('[data-modal-type]') as HTMLElement;
+      
+      if (gameElement) {
+        const modalType = gameElement.dataset.modalType;
+        const modalId = gameElement.dataset.modalId;
+        
+        if (modalType && modalId) {
+          console.log(`Opening modal for ${modalType} with id: ${modalId}`);
+          // Отправляем событие для открытия модального окна
+          window.dispatchEvent(new CustomEvent('openModal', { 
+            detail: { type: modalType, id: modalId } 
+          }));
+        }
+      }
+    };
+
+    // Добавляем обработчик кликов на документ
+    document.addEventListener('click', handleGameElementClick);
+
+    return () => {
+      document.removeEventListener('click', handleGameElementClick);
+    };
+  }, []);
 
   const insertText = useCallback((before: string, after: string = '') => {
     if (!textareaRef.current) return;
@@ -160,37 +188,60 @@ export default function ArticleEditor({
   }, []);
 
   // Обработчики для игровой панели
-  const handleInsertCharacter = useCallback((character: { id: string; name: string; image: string }) => {
-    const html = `<span class="character-card" data-character-id="${character.id}">
-      <img src="${character.image}" alt="${character.name}" class="w-6 h-6 rounded-full inline-block mr-2" />
+  const handleInsertCharacter = useCallback((character: { _id: string; name: string; image: string; element: string; rarity: number }) => {
+    const html = `<span class="character-card cursor-pointer hover:bg-blue-500/20 transition-colors rounded px-2 py-1" 
+      data-character-id="${character._id}" 
+      data-modal-type="character"
+      data-modal-id="${character._id}"
+      style="border: 1px solid #3b82f6; display: inline-flex; align-items: center; gap: 4px;">
+      <img src="${character.image}" alt="${character.name}" class="w-4 h-4 rounded-full object-cover" />
       <strong>${character.name}</strong>
+      <span class="text-xs text-gray-400">${character.element} ${character.rarity}⭐</span>
     </span>`;
     insertText(html, '');
   }, [insertText]);
 
-  const handleInsertTalent = useCallback((talent: { id: string; name: string; type: string }) => {
-    const html = `<span class="talent-info" data-talent-id="${talent.id}">
-      <span class="talent-icon">⭐</span> <strong>${talent.name}</strong> (${talent.type})
+  const handleInsertTalent = useCallback((talent: { _id: string; name: string; type: string; description: string }) => {
+    const html = `<span class="talent-info cursor-pointer hover:bg-yellow-500/20 transition-colors rounded px-2 py-1" 
+      data-talent-id="${talent._id}" 
+      data-modal-type="talent"
+      data-modal-id="${talent._id}"
+      style="border: 1px solid #eab308; display: inline-flex; align-items: center; gap: 4px;">
+      <span class="talent-icon">⭐</span> 
+      <strong>${talent.name}</strong> 
+      <span class="text-xs text-gray-400">(${talent.type})</span>
     </span>`;
     insertText(html, '');
   }, [insertText]);
 
-  const handleInsertArtifact = useCallback((artifact: { id: string; name: string; bonus: string }) => {
-    const html = `<span class="artifact-info" data-artifact-id="${artifact.id}">
-      <span class="artifact-icon">💎</span> <strong>${artifact.name}</strong> - ${artifact.bonus}
+  const handleInsertArtifact = useCallback((artifact: { _id: string; name: string; rarity: number; bonus: string }) => {
+    const html = `<span class="artifact-info cursor-pointer hover:bg-purple-500/20 transition-colors rounded px-2 py-1" 
+      data-artifact-id="${artifact._id}" 
+      data-modal-type="artifact"
+      data-modal-id="${artifact._id}"
+      style="border: 1px solid #a855f7; display: inline-flex; align-items: center; gap: 4px;">
+      <span class="artifact-icon">💎</span> 
+      <strong>${artifact.name}</strong> 
+      <span class="text-xs text-gray-400">${artifact.rarity}⭐ • ${artifact.bonus}</span>
     </span>`;
     insertText(html, '');
   }, [insertText]);
 
-  const handleInsertWeapon = useCallback((weapon: { id: string; name: string; type: string }) => {
-    const html = `<span class="weapon-info" data-weapon-id="${weapon.id}">
-      <span class="weapon-icon">⚔️</span> <strong>${weapon.name}</strong> (${weapon.type})
+  const handleInsertWeapon = useCallback((weapon: { _id: string; name: string; type: string; rarity: number; passive: string }) => {
+    const html = `<span class="weapon-info cursor-pointer hover:bg-orange-500/20 transition-colors rounded px-2 py-1" 
+      data-weapon-id="${weapon._id}" 
+      data-modal-type="weapon"
+      data-modal-id="${weapon._id}"
+      style="border: 1px solid #f97316; display: inline-flex; align-items: center; gap: 4px;">
+      <span class="weapon-icon">⚔️</span> 
+      <strong>${weapon.name}</strong> 
+      <span class="text-xs text-gray-400">${weapon.type} ${weapon.rarity}⭐</span>
     </span>`;
     insertText(html, '');
   }, [insertText]);
 
   const handleInsertElement = useCallback((element: { name: string; value: string; color: string; icon: string }) => {
-    const html = `<span class="element-badge" style="color: ${element.color}">
+    const html = `<span class="element-badge" style="color: ${element.color}; border: 1px solid ${element.color}; display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; background: ${element.color}20;">
       ${element.icon} <strong>${element.name}</strong>
     </span>`;
     insertText(html, '');
@@ -523,6 +574,28 @@ export default function ArticleEditor({
         )}
         <p><strong>Наведение:</strong> Наведите курсор на кнопку, чтобы увидеть подсказку о её функции</p>
       </div>
+
+      {/* CSS стили для игровых элементов */}
+      <style jsx>{`
+        .character-card:hover {
+          background-color: rgba(59, 130, 246, 0.2);
+        }
+        .talent-info:hover {
+          background-color: rgba(234, 179, 8, 0.2);
+        }
+        .artifact-info:hover {
+          background-color: rgba(168, 85, 247, 0.2);
+        }
+        .weapon-info:hover {
+          background-color: rgba(249, 115, 22, 0.2);
+        }
+        .element-badge {
+          transition: all 0.2s ease;
+        }
+        .element-badge:hover {
+          transform: scale(1.05);
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,22 +1,43 @@
 'use client';
-
-import { useState } from 'react';
-import { 
-  Users, 
-  Star, 
-  Gem, 
-  Sword, 
-  Palette,
-  ChevronDown,
-  Search
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Users, Star, Gem, Sword, Palette, ChevronDown, Search } from 'lucide-react';
 import { Button } from './button';
 
+interface Character {
+  _id: string;
+  name: string;
+  image: string;
+  element: string;
+  rarity: number;
+}
+
+interface Talent {
+  _id: string;
+  name: string;
+  type: string;
+  description: string;
+}
+
+interface Artifact {
+  _id: string;
+  name: string;
+  rarity: number;
+  bonus: string;
+}
+
+interface Weapon {
+  _id: string;
+  name: string;
+  type: string;
+  rarity: number;
+  passive: string;
+}
+
 interface GameToolbarProps {
-  onInsertCharacter: (character: { id: string; name: string; image: string; element: string; rarity: number }) => void;
-  onInsertTalent: (talent: { id: string; name: string; type: string; description: string }) => void;
-  onInsertArtifact: (artifact: { id: string; name: string; rarity: number; bonus: string }) => void;
-  onInsertWeapon: (weapon: { id: string; name: string; type: string; rarity: number; passive: string }) => void;
+  onInsertCharacter: (character: Character) => void;
+  onInsertTalent: (talent: Talent) => void;
+  onInsertArtifact: (artifact: Artifact) => void;
+  onInsertWeapon: (weapon: Weapon) => void;
   onInsertElement: (element: { name: string; value: string; color: string; icon: string }) => void;
 }
 
@@ -27,6 +48,7 @@ const elementColors = [
   { name: 'Анемо', value: 'anemo', color: '#81c784', icon: '💨' },
   { name: 'Дендро', value: 'dendro', color: '#8bc34a', icon: '🌱' },
   { name: 'Гео', value: 'geo', color: '#ffb74d', icon: '🪨' },
+  { name: 'Электро', value: 'electro', color: '#ba68c8', icon: '⚡' }
 ];
 
 export default function GameToolbar({ 
@@ -36,57 +58,106 @@ export default function GameToolbar({
   onInsertWeapon, 
   onInsertElement 
 }: GameToolbarProps) {
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [showCharacters, setShowCharacters] = useState(false);
+  const [showTalents, setShowTalents] = useState(false);
+  const [showArtifacts, setShowArtifacts] = useState(false);
+  const [showWeapons, setShowWeapons] = useState(false);
+  const [showElements, setShowElements] = useState(false);
+  
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [talents, setTalents] = useState<Talent[]>([]);
+  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
+  const [weapons, setWeapons] = useState<Weapon[]>([]);
+  
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+  const [searchCharacters, setSearchCharacters] = useState('');
+  const [searchTalents, setSearchTalents] = useState('');
+  const [searchArtifacts, setSearchArtifacts] = useState('');
+  const [searchWeapons, setSearchWeapons] = useState('');
+
+  // Загружаем данные при монтировании
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Загружаем персонажей
+        const charactersResponse = await fetch('/api/characters');
+        if (charactersResponse.ok) {
+          const charactersData = await charactersResponse.json();
+          setCharacters(charactersData.data || charactersData || []);
+        }
+
+        // Загружаем артефакты
+        const artifactsResponse = await fetch('/api/artifacts');
+        if (artifactsResponse.ok) {
+          const artifactsData = await artifactsResponse.json();
+          setArtifacts(artifactsData.data || artifactsData || []);
+        }
+
+        // Загружаем оружия
+        const weaponsResponse = await fetch('/api/weapons');
+        if (weaponsResponse.ok) {
+          const weaponsData = await weaponsResponse.json();
+          setWeapons(weaponsData.data || weaponsData || []);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Загружаем таланты при выборе персонажа
+  useEffect(() => {
+    if (selectedCharacter) {
+      const fetchTalents = async () => {
+        try {
+          const response = await fetch(`/api/characters/${selectedCharacter._id}/talents`);
+          if (response.ok) {
+            const talentsData = await response.json();
+            setTalents(talentsData.talents || []);
+          }
+        } catch (error) {
+          console.error('Error fetching talents:', error);
+        }
+      };
+
+      fetchTalents();
+    }
+  }, [selectedCharacter]);
 
   const toggleDropdown = (dropdown: string) => {
-    setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
-    setSearchTerm('');
+    setShowCharacters(dropdown === 'characters' ? !showCharacters : false);
+    setShowTalents(dropdown === 'talents' ? !showTalents : false);
+    setShowArtifacts(dropdown === 'artifacts' ? !showArtifacts : false);
+    setShowWeapons(dropdown === 'weapons' ? !showWeapons : false);
+    setShowElements(dropdown === 'elements' ? !showElements : false);
   };
 
   const closeDropdowns = () => {
-    setActiveDropdown(null);
-    setSearchTerm('');
+    setShowCharacters(false);
+    setShowTalents(false);
+    setShowArtifacts(false);
+    setShowWeapons(false);
+    setShowElements(false);
   };
 
-  // Заглушки для данных (потом заменим на реальные API)
-  const mockCharacters = [
-    { id: 'raiden', name: 'Райден', element: 'electro', rarity: 5, image: '/characters/raiden.png' },
-    { id: 'zhongli', name: 'Чжун Ли', element: 'geo', rarity: 5, image: '/characters/zhongli.png' },
-    { id: 'venti', name: 'Венти', element: 'anemo', rarity: 5, image: '/characters/venti.png' },
-  ];
-
-  const mockTalents = [
-    { id: 'raiden-skill', name: 'Электро-глаз', type: 'skill', description: 'Создает Электро-глаз' },
-    { id: 'zhongli-burst', name: 'Планетарное разрушение', type: 'burst', description: 'Мощная атака' },
-  ];
-
-  const mockArtifacts = [
-    { id: 'emblem', name: 'Эмблема разбитой судьбы', rarity: 5, bonus: 'Энергия +20%' },
-    { id: 'archaic', name: 'Архаичный камень', rarity: 5, bonus: 'Гео урон +15%' },
-  ];
-
-  const mockWeapons = [
-    { id: 'engulfing', name: 'Поглощающая молния', type: 'polearm', rarity: 5, passive: 'Восстанавливает энергию' },
-    { id: 'staff', name: 'Посох Хомы', type: 'polearm', rarity: 5, passive: 'Увеличивает HP' },
-  ];
-
-  const insertCharacter = (character: { id: string; name: string; image: string; element: string; rarity: number }) => {
+  const insertCharacter = (character: Character) => {
     onInsertCharacter(character);
     closeDropdowns();
   };
 
-  const insertTalent = (talent: { id: string; name: string; type: string; description: string }) => {
+  const insertTalent = (talent: Talent) => {
     onInsertTalent(talent);
     closeDropdowns();
   };
 
-  const insertArtifact = (artifact: { id: string; name: string; rarity: number; bonus: string }) => {
+  const insertArtifact = (artifact: Artifact) => {
     onInsertArtifact(artifact);
     closeDropdowns();
   };
 
-  const insertWeapon = (weapon: { id: string; name: string; type: string; rarity: number; passive: string }) => {
+  const insertWeapon = (weapon: Weapon) => {
     onInsertWeapon(weapon);
     closeDropdowns();
   };
@@ -96,52 +167,69 @@ export default function GameToolbar({
     closeDropdowns();
   };
 
+  const filteredCharacters = characters.filter(char => 
+    char.name.toLowerCase().includes(searchCharacters.toLowerCase())
+  );
+
+  const filteredTalents = talents.filter(talent => 
+    talent.name.toLowerCase().includes(searchTalents.toLowerCase())
+  );
+
+  const filteredArtifacts = artifacts.filter(artifact => 
+    artifact.name.toLowerCase().includes(searchArtifacts.toLowerCase())
+  );
+
+  const filteredWeapons = weapons.filter(weapon => 
+    weapon.name.toLowerCase().includes(searchWeapons.toLowerCase())
+  );
+
   return (
     <div className="flex flex-wrap gap-2 p-3 bg-neutral-800 rounded-lg border border-neutral-600">
       {/* Персонажи */}
       <div className="relative">
         <Button
-          type="button"
+          onClick={() => toggleDropdown('characters')}
           variant="outline"
           size="sm"
-          onClick={() => toggleDropdown('characters')}
-          className="h-8 px-3 border-neutral-600 hover:bg-neutral-600"
+          className="flex items-center gap-2"
         >
-          <Users className="w-3 h-3 mr-1" />
+          <Users className="w-4 h-4" />
           Персонажи
-          <ChevronDown className="w-3 h-3 ml-1" />
+          <ChevronDown className="w-4 h-4" />
         </Button>
         
-        {activeDropdown === 'characters' && (
-          <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-30 shadow-xl min-w-[250px]">
-            <div className="mb-3">
+        {showCharacters && (
+          <div className="absolute top-full left-0 mt-1 w-80 bg-neutral-900 border border-neutral-600 rounded-lg shadow-lg z-50">
+            <div className="p-3 border-b border-neutral-600">
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Поиск персонажей..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded text-white text-sm"
+                  placeholder="Поиск персонажа..."
+                  value={searchCharacters}
+                  onChange={(e) => setSearchCharacters(e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 bg-neutral-800 border border-neutral-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {mockCharacters
-                .filter(char => char.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                .map(character => (
-                  <button
-                    key={character.id}
-                    onClick={() => insertCharacter(character)}
-                    className="w-full flex items-center p-2 hover:bg-neutral-700 rounded transition-colors"
-                  >
-                    <img src={character.image} alt={character.name} className="w-8 h-8 rounded-full mr-3" />
-                    <div className="text-left">
-                      <div className="text-white font-medium">{character.name}</div>
-                      <div className="text-xs text-gray-400">{character.element} • {character.rarity}⭐</div>
-                    </div>
-                  </button>
-                ))}
+            <div className="max-h-60 overflow-y-auto">
+              {filteredCharacters.map((character) => (
+                <button
+                  key={character._id}
+                  onClick={() => insertCharacter(character)}
+                  className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
+                >
+                  <img
+                    src={character.image}
+                    alt={character.name}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div>
+                    <div className="font-medium text-white">{character.name}</div>
+                    <div className="text-sm text-gray-400">{character.element} • {character.rarity}⭐</div>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -150,45 +238,71 @@ export default function GameToolbar({
       {/* Таланты */}
       <div className="relative">
         <Button
-          type="button"
+          onClick={() => toggleDropdown('talents')}
           variant="outline"
           size="sm"
-          onClick={() => toggleDropdown('talents')}
-          className="h-8 px-3 border-neutral-600 hover:bg-neutral-600"
+          className="flex items-center gap-2"
         >
-          <Star className="w-3 h-3 mr-1" />
+          <Star className="w-4 h-4" />
           Таланты
-          <ChevronDown className="w-3 h-3 ml-1" />
+          <ChevronDown className="w-4 h-4" />
         </Button>
         
-        {activeDropdown === 'talents' && (
-          <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-30 shadow-xl min-w-[250px]">
-            <div className="mb-3">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Поиск талантов..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded text-white text-sm"
-                />
+        {showTalents && (
+          <div className="absolute top-full left-0 mt-1 w-80 bg-neutral-900 border border-neutral-600 rounded-lg shadow-lg z-50">
+            <div className="p-3 border-b border-neutral-600">
+              <div className="mb-3">
+                <label className="block text-sm font-medium text-gray-300 mb-2">Выберите персонажа:</label>
+                <select
+                  value={selectedCharacter?._id || ''}
+                  onChange={(e) => {
+                    const character = characters.find(c => c._id === e.target.value);
+                    setSelectedCharacter(character || null);
+                  }}
+                  className="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="">Выберите персонажа...</option>
+                  {characters.map((character) => (
+                    <option key={character._id} value={character._id}>
+                      {character.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+              {selectedCharacter && (
+                <>
+                  <div className="relative">
+                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Поиск таланта..."
+                      value={searchTalents}
+                      onChange={(e) => setSearchTalents(e.target.value)}
+                      className="w-full pl-8 pr-3 py-2 bg-neutral-800 border border-neutral-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </>
+              )}
             </div>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {mockTalents
-                .filter(talent => talent.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                .map(talent => (
+            {selectedCharacter && (
+              <div className="max-h-60 overflow-y-auto">
+                {filteredTalents.map((talent) => (
                   <button
-                    key={talent.id}
+                    key={talent._id}
                     onClick={() => insertTalent(talent)}
-                    className="w-full text-left p-2 hover:bg-neutral-700 rounded transition-colors"
+                    className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
                   >
-                    <div className="text-white font-medium">{talent.name}</div>
-                    <div className="text-xs text-gray-400">{talent.type} • {talent.description}</div>
+                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                      <Star className="w-4 h-4 text-yellow-900" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">{talent.name}</div>
+                      <div className="text-sm text-gray-400">{talent.type}</div>
+                    </div>
                   </button>
                 ))}
-            </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -196,90 +310,94 @@ export default function GameToolbar({
       {/* Артефакты */}
       <div className="relative">
         <Button
-          type="button"
+          onClick={() => toggleDropdown('artifacts')}
           variant="outline"
           size="sm"
-          onClick={() => toggleDropdown('artifacts')}
-          className="h-8 px-3 border-neutral-600 hover:bg-neutral-600"
+          className="flex items-center gap-2"
         >
-          <Gem className="w-3 h-3 mr-1" />
+          <Gem className="w-4 h-4" />
           Артефакты
-          <ChevronDown className="w-3 h-3 ml-1" />
+          <ChevronDown className="w-4 h-4" />
         </Button>
         
-        {activeDropdown === 'artifacts' && (
-          <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-30 shadow-xl min-w-[250px]">
-            <div className="mb-3">
+        {showArtifacts && (
+          <div className="absolute top-full left-0 mt-1 w-80 bg-neutral-900 border border-neutral-600 rounded-lg shadow-lg z-50">
+            <div className="p-3 border-b border-neutral-600">
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Поиск артефактов..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded text-white text-sm"
+                  placeholder="Поиск артефакта..."
+                  value={searchArtifacts}
+                  onChange={(e) => setSearchArtifacts(e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 bg-neutral-800 border border-neutral-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {mockArtifacts
-                .filter(artifact => artifact.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                .map(artifact => (
-                  <button
-                    key={artifact.id}
-                    onClick={() => insertArtifact(artifact)}
-                    className="w-full text-left p-2 hover:bg-neutral-700 rounded transition-colors"
-                  >
-                    <div className="text-white font-medium">{artifact.name}</div>
-                    <div className="text-xs text-gray-400">{artifact.rarity}⭐ • {artifact.bonus}</div>
-                  </button>
-                ))}
+            <div className="max-h-60 overflow-y-auto">
+              {filteredArtifacts.map((artifact) => (
+                <button
+                  key={artifact._id}
+                  onClick={() => insertArtifact(artifact)}
+                  className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
+                >
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <Gem className="w-4 h-4 text-purple-900" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-white">{artifact.name}</div>
+                    <div className="text-sm text-gray-400">{artifact.rarity}⭐ • {artifact.bonus}</div>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         )}
       </div>
 
-      {/* Оружие */}
+      {/* Оружия */}
       <div className="relative">
         <Button
-          type="button"
+          onClick={() => toggleDropdown('weapons')}
           variant="outline"
           size="sm"
-          onClick={() => toggleDropdown('weapons')}
-          className="h-8 px-3 border-neutral-600 hover:bg-neutral-600"
+          className="flex items-center gap-2"
         >
-          <Sword className="w-3 h-3 mr-1" />
-          Оружие
-          <ChevronDown className="w-3 h-3 ml-1" />
+          <Sword className="w-4 h-4" />
+          Оружия
+          <ChevronDown className="w-4 h-4" />
         </Button>
         
-        {activeDropdown === 'weapons' && (
-          <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-30 shadow-xl min-w-[250px]">
-            <div className="mb-3">
+        {showWeapons && (
+          <div className="absolute top-full left-0 mt-1 w-80 bg-neutral-900 border border-neutral-600 rounded-lg shadow-lg z-50">
+            <div className="p-3 border-b border-neutral-600">
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Поиск оружия..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded text-white text-sm"
+                  value={searchWeapons}
+                  onChange={(e) => setSearchWeapons(e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 bg-neutral-800 border border-neutral-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {mockWeapons
-                .filter(weapon => weapon.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                .map(weapon => (
-                  <button
-                    key={weapon.id}
-                    onClick={() => insertWeapon(weapon)}
-                    className="w-full text-left p-2 hover:bg-neutral-700 rounded transition-colors"
-                  >
-                    <div className="text-white font-medium">{weapon.name}</div>
-                    <div className="text-xs text-gray-400">{weapon.type} • {weapon.rarity}⭐</div>
-                  </button>
-                ))}
+            <div className="max-h-60 overflow-y-auto">
+              {filteredWeapons.map((weapon) => (
+                <button
+                  key={weapon._id}
+                  onClick={() => insertWeapon(weapon)}
+                  className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
+                >
+                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                    <Sword className="w-4 h-4 text-orange-900" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-white">{weapon.name}</div>
+                    <div className="text-sm text-gray-400">{weapon.type} • {weapon.rarity}⭐</div>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -288,29 +406,27 @@ export default function GameToolbar({
       {/* Элементы */}
       <div className="relative">
         <Button
-          type="button"
+          onClick={() => toggleDropdown('elements')}
           variant="outline"
           size="sm"
-          onClick={() => toggleDropdown('elements')}
-          className="h-8 px-3 border-neutral-600 hover:bg-neutral-600"
+          className="flex items-center gap-2"
         >
-          <Palette className="w-3 h-3 mr-1" />
+          <Palette className="w-4 h-4" />
           Элементы
-          <ChevronDown className="w-3 h-3 ml-1" />
+          <ChevronDown className="w-4 h-4" />
         </Button>
         
-        {activeDropdown === 'elements' && (
-          <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-30 shadow-xl min-w-[200px]">
-            <div className="grid grid-cols-2 gap-2">
-              {elementColors.map(element => (
+        {showElements && (
+          <div className="absolute top-full left-0 mt-1 w-48 bg-neutral-900 border border-neutral-600 rounded-lg shadow-lg z-50">
+            <div className="p-2">
+              {elementColors.map((element) => (
                 <button
                   key={element.value}
                   onClick={() => insertElement(element)}
-                  className="p-2 hover:bg-neutral-700 rounded transition-colors text-center"
-                  style={{ color: element.color }}
+                  className="w-full p-2 hover:bg-neutral-700 flex items-center gap-2 text-left transition-colors rounded"
                 >
-                  <div className="text-lg">{element.icon}</div>
-                  <div className="text-xs font-medium">{element.name}</div>
+                  <span className="text-lg">{element.icon}</span>
+                  <span className="text-white">{element.name}</span>
                 </button>
               ))}
             </div>
