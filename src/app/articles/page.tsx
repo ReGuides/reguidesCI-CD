@@ -171,11 +171,11 @@ export default function ArticlesPage() {
       {/* Заголовок страницы */}
              <div className="mb-8">
          <h1 className="text-4xl font-bold text-white mb-4">Новости и статьи</h1>
-         <p className="text-gray-300 text-lg">
-           Здесь вы найдете все последние новости, обновления и подробные статьи о мире игры. 
-           <span className="text-orange-400 font-medium">Статьи</span> выделены оранжевым цветом и открываются на отдельной странице, 
-           а <span className="text-blue-400 font-medium">новости</span> открываются в модальном окне.
-         </p>
+                   <p className="text-gray-300 text-lg">
+            Здесь вы найдете все последние новости, обновления и подробные статьи о мире игры. 
+            <span className="text-orange-400 font-medium">Статьи</span> выделены оранжевым цветом и содержат подробную информацию, 
+            а <span className="text-blue-400 font-medium">новости</span> - краткие сообщения. Все открываются в модальном окне.
+          </p>
        </div>
       
       <div className="flex flex-col md:flex-row gap-6">
@@ -265,15 +265,15 @@ export default function ArticlesPage() {
                    ? 'bg-gradient-to-br from-orange-900/20 to-orange-800/30 border border-orange-700/50 hover:from-orange-900/30 hover:to-orange-800/40 hover:border-orange-600/70 hover:shadow-lg hover:shadow-orange-500/10' 
                    : 'bg-neutral-800 border border-neutral-700 hover:bg-neutral-750'
                }`}
-               onClick={() => {
-                 if (item.type === 'article') {
-                   // Статьи открываются на отдельной странице
-                   window.open(`/articles/${item._id}`, '_blank');
-                 } else {
-                   // Новости открываются в модальном окне
-                   setSelectedNews(item);
-                 }
-               }}
+                               onClick={() => {
+                  if (item.type === 'article') {
+                    // Статьи открываются на той же странице
+                    setSelectedNews(item);
+                  } else {
+                    // Новости открываются в модальном окне
+                    setSelectedNews(item);
+                  }
+                }}
              >
               {item.image && (
                 <img
@@ -294,12 +294,14 @@ export default function ArticlesPage() {
                      {getCategoryLabel(item.category)}
                    </span>
                  )}
-                 {item.type === 'article' && (
-                   <span className="ml-auto text-orange-400 flex items-center gap-1">
-                     <ExternalLink className="w-4 h-4" />
-                     <span className="text-xs">Откроется на отдельной странице</span>
-                   </span>
-                 )}
+                                   {item.type === 'article' && (
+                    <span className="ml-auto text-orange-400 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-xs">Статья</span>
+                    </span>
+                  )}
                 <span className="text-xs text-gray-400 ml-auto flex items-center gap-1">
                   <Eye className="w-3 h-3" />
                   {item.views}
@@ -394,10 +396,15 @@ export default function ArticlesPage() {
                 )}
               </div>
               
-              {/* Заголовок */}
-              <div className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">
-                {selectedNews.title}
-              </div>
+                             {/* Заголовок */}
+               <div className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">
+                 {selectedNews.title}
+                 {selectedNews.type === 'article' && (
+                   <span className="ml-3 text-sm font-normal text-orange-400">
+                     📄 Статья
+                   </span>
+                 )}
+               </div>
               
               {/* Контент и изображение в две колонки */}
               <div className="flex flex-col lg:flex-row gap-6 mt-4">
