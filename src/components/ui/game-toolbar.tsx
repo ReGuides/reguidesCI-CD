@@ -58,6 +58,7 @@ export default function GameToolbar({
   onInsertWeapon, 
   onInsertElement 
 }: GameToolbarProps) {
+  console.log('GameToolbar rendered with props:', { onInsertTalent });
   const [showCharacters, setShowCharacters] = useState(false);
   const [showTalents, setShowTalents] = useState(false);
   const [showArtifacts, setShowArtifacts] = useState(false);
@@ -83,7 +84,9 @@ export default function GameToolbar({
         const charactersResponse = await fetch('/api/characters');
         if (charactersResponse.ok) {
           const charactersData = await charactersResponse.json();
-          setCharacters(charactersData.data || charactersData || []);
+          const charactersList = charactersData.data || charactersData || [];
+          setCharacters(charactersList);
+          console.log('Characters loaded:', charactersList);
         }
 
         // Загружаем артефакты
@@ -109,13 +112,17 @@ export default function GameToolbar({
 
   // Загружаем таланты при выборе персонажа
   useEffect(() => {
+    console.log('useEffect for talents - selectedCharacter changed:', selectedCharacter);
+    
     if (selectedCharacter) {
       const fetchTalents = async () => {
         try {
+          console.log('Fetching talents for character:', selectedCharacter._id);
           const response = await fetch(`/api/characters/${selectedCharacter._id}/talents`);
           if (response.ok) {
             const talentsData = await response.json();
             setTalents(talentsData.talents || []);
+            console.log('Talents loaded:', talentsData.talents);
           }
         } catch (error) {
           console.error('Error fetching talents:', error);
@@ -123,6 +130,9 @@ export default function GameToolbar({
       };
 
       fetchTalents();
+    } else {
+      console.log('No character selected, clearing talents');
+      setTalents([]);
     }
   }, [selectedCharacter]);
 
@@ -140,6 +150,7 @@ export default function GameToolbar({
     setShowArtifacts(false);
     setShowWeapons(false);
     setShowElements(false);
+    // НЕ сбрасываем selectedCharacter, чтобы он сохранялся для талантов
   };
 
   const insertCharacter = (character: Character) => {
@@ -148,13 +159,15 @@ export default function GameToolbar({
   };
 
   const insertTalent = (talent: Talent) => {
-    if (selectedCharacter) {
-      onInsertTalent(talent, selectedCharacter._id);
-    } else {
-      // Если персонаж не выбран, показываем предупреждение
-      alert('Сначала выберите персонажа для вставки таланта');
+    console.log('insertTalent called with:', { talent, selectedCharacter });
+    
+    if (!selectedCharacter || !selectedCharacter._id) {
+      alert('Ошибка: не выбран персонаж для таланта');
       return;
     }
+    
+    console.log('Calling onInsertTalent with characterId:', selectedCharacter._id);
+    onInsertTalent(talent, selectedCharacter._id);
     closeDropdowns();
   };
 
@@ -267,10 +280,15 @@ export default function GameToolbar({
            className={`flex items-center gap-2 ${!selectedCharacter ? 'opacity-50 cursor-not-allowed' : ''}`}
            type="button"
            disabled={!selectedCharacter}
-           title={!selectedCharacter ? 'Сначала выберите персонажа' : 'Выберите талант для вставки'}
+           title={!selectedCharacter ? 'Сначала выберите персонажа' : `Выберите талант для ${selectedCharacter?.name}`}
          >
            <Star className="w-4 h-4" />
            Таланты
+           {selectedCharacter && (
+             <span className="text-xs text-blue-400 ml-1">
+               ({selectedCharacter.name})
+             </span>
+           )}
            <ChevronDown className="w-4 h-4" />
          </Button>
         
@@ -279,14 +297,16 @@ export default function GameToolbar({
             <div className="p-3 border-b border-neutral-600">
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-300 mb-2">Выберите персонажа:</label>
-                <select
-                  value={selectedCharacter?._id || ''}
-                  onChange={(e) => {
-                    const character = characters.find(c => c._id === e.target.value);
-                    setSelectedCharacter(character || null);
-                  }}
-                  className="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white focus:outline-none focus:border-blue-500"
-                >
+                                 <select
+                   value={selectedCharacter?._id || ''}
+                   onChange={(e) => {
+                     console.log('Character select changed, value:', e.target.value);
+                     const character = characters.find(c => c._id === e.target.value);
+                     console.log('Found character:', character);
+                     setSelectedCharacter(character || null);
+                   }}
+                   className="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white focus:outline-none focus:border-blue-500"
+                 >
                   <option value="">Выберите персонажа...</option>
                   {characters.map((character) => (
                     <option key={character._id} value={character._id}>
@@ -313,16 +333,24 @@ export default function GameToolbar({
             {selectedCharacter && (
               <div className="max-h-60 overflow-y-auto">
                 {filteredTalents.map((talent) => (
-                                  <button
-                  key={talent._id}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    insertTalent(talent);
-                  }}
-                  className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
-                >
+                  <button
+                    key={talent._id}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      
+                      // Дополнительная проверка перед вызовом
+                      if (!selectedCharacter || !selectedCharacter._id) {
+                        alert('Ошибка: персонаж не выбран. Попробуйте выбрать персонажа снова.');
+                        return;
+                      }
+                      
+                      console.log('Button click - selectedCharacter:', selectedCharacter);
+                      insertTalent(talent);
+                    }}
+                    className="w-full p-3 hover:bg-neutral-700 flex items-center gap-3 text-left transition-colors"
+                  >
                     <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
                       <Star className="w-4 h-4 text-yellow-900" />
                     </div>

@@ -172,11 +172,15 @@ export default function ArticleEditor({
   }, [insertText]);
 
   const handleInsertTalent = useCallback((talent: { _id: string; name: string; type: string; description: string }, characterId?: string) => {
-    if (!characterId) {
+    console.log('handleInsertTalent called with:', { talent, characterId });
+    
+    if (!characterId || characterId === 'undefined' || characterId === 'null') {
+      console.error('characterId is invalid:', characterId);
       alert('Ошибка: не выбран персонаж для таланта');
       return;
     }
     
+    console.log('Creating talent HTML with characterId:', characterId);
     const html = `<a href="/characters/${characterId}/talents" class="talent-info inline-flex items-center gap-2 px-2 py-1 rounded border border-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 transition-colors text-yellow-400 hover:text-yellow-300 no-underline">
       <span class="talent-icon">⭐</span> 
       <strong>${talent.name}</strong> 
