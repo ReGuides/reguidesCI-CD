@@ -196,10 +196,11 @@ export default function ArticleEditor({
       data-character-id="${character._id}" 
       data-modal-type="character"
       data-modal-id="${character._id}"
-      style="border: 1px solid #3b82f6; display: inline-flex; align-items: center; gap: 4px;">
+      style="border: 1px solid #3b82f6; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-decoration-color: #3b82f6; text-decoration-thickness: 1px;">
              <img src="${character.image}" alt="${character.name}" class="w-4 h-4 rounded-full object-cover" onerror="this.style.opacity='0.2';" />
       <strong>${character.name}</strong>
       <span class="text-xs text-gray-400">${character.element} ${character.rarity}⭐</span>
+
     </span>`;
     insertText(html, '');
   }, [insertText]);
@@ -209,10 +210,11 @@ export default function ArticleEditor({
       data-talent-id="${talent._id}" 
       data-modal-type="talent"
       data-modal-id="${talent._id}"
-      style="border: 1px solid #eab308; display: inline-flex; align-items: center; gap: 4px;">
+      style="border: 1px solid #eab308; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-decoration-color: #eab308; text-decoration-thickness: 1px;">
       <span class="talent-icon">⭐</span> 
       <strong>${talent.name}</strong> 
       <span class="text-xs text-gray-400">(${talent.type})</span>
+
     </span>`;
     insertText(html, '');
   }, [insertText]);
@@ -222,10 +224,11 @@ export default function ArticleEditor({
       data-artifact-id="${artifact._id}" 
       data-modal-type="artifact"
       data-modal-id="${artifact._id}"
-      style="border: 1px solid #a855f7; display: inline-flex; align-items: center; gap: 4px;">
+      style="border: 1px solid #a855f7; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-decoration-color: #a855f7; text-decoration-thickness: 1px;">
       <span class="artifact-icon">💎</span> 
       <strong>${artifact.name}</strong> 
       <span class="text-xs text-gray-400">${artifact.rarity}⭐ • ${artifact.bonus}</span>
+
     </span>`;
     insertText(html, '');
   }, [insertText]);
@@ -235,10 +238,11 @@ export default function ArticleEditor({
       data-weapon-id="${weapon._id}" 
       data-modal-type="weapon"
       data-modal-id="${weapon._id}"
-      style="border: 1px solid #f97316; display: inline-flex; align-items: center; gap: 4px;">
+      style="border: 1px solid #f97316; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-decoration-color: #f97316; text-decoration-thickness: 1px;">
       <span class="weapon-icon">⚔️</span> 
       <strong>${weapon.name}</strong> 
       <span class="text-xs text-gray-400">${weapon.type} ${weapon.rarity}⭐</span>
+
     </span>`;
     insertText(html, '');
   }, [insertText]);
