@@ -7,6 +7,15 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
+interface UserUpdateData {
+  name: string;
+  email: string;
+  role: string;
+  avatar?: string;
+  isActive: boolean;
+  password?: string;
+}
+
 // GET - получение пользователя по ID
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
@@ -71,7 +80,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const updateData: any = {
+    const updateData: UserUpdateData = {
       name,
       email,
       role,

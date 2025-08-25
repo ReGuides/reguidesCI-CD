@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { User } from '@/types';
 import { ArrowLeft, Save, Eye, EyeOff } from 'lucide-react';
@@ -8,6 +8,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import Link from 'next/link';
+
+interface UserFormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  role: 'user' | 'admin' | 'moderator';
+  avatar: string;
+  isActive: boolean;
+}
 
 export default function EditUserPage() {
   const params = useParams();
@@ -17,23 +27,17 @@ export default function EditUserPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<UserFormData>({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'user' as 'user' | 'admin' | 'moderator',
+    role: 'user',
     avatar: '',
     isActive: true
   });
 
-  useEffect(() => {
-    if (params.id) {
-      fetchUser();
-    }
-  }, [params.id]);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -67,7 +71,13 @@ export default function EditUserPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    if (params.id) {
+      fetchUser();
+    }
+  }, [params.id, fetchUser]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,7 +101,7 @@ export default function EditUserPage() {
       setSaving(true);
       setError(null);
 
-      const updateData: any = {
+      const updateData: Partial<UserFormData> = {
         name: form.name,
         email: form.email,
         role: form.role,

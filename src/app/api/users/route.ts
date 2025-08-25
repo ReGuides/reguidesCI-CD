@@ -3,6 +3,15 @@ import connectDB from '@/lib/mongodb';
 import { User } from '@/lib/db/models/User';
 import bcrypt from 'bcryptjs';
 
+interface UserQuery {
+  role?: string;
+  isActive?: boolean;
+  $or?: Array<{
+    name?: { $regex: string; $options: string };
+    email?: { $regex: string; $options: string };
+  }>;
+}
+
 // GET - получение всех пользователей
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +25,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const skip = (page - 1) * limit;
 
-    const query: any = {};
+    const query: UserQuery = {};
     
     if (role && ['user', 'admin', 'moderator'].includes(role)) {
       query.role = role;
