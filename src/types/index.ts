@@ -193,20 +193,15 @@ export interface User {
   email: string;
   role: 'user' | 'admin' | 'moderator';
   avatar?: string;
-  isActive?: boolean;
+  isActive: boolean;
   lastLogin?: string;
-  preferences: {
-    theme: 'light' | 'dark';
+  preferences?: {
+    theme: string;
     language: string;
     notifications: boolean;
   };
-  favorites: {
-    characters: string[];
-    weapons: string[];
-    artifacts: string[];
-  };
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Article types

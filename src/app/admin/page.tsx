@@ -335,6 +335,12 @@ export default function AdminDashboard() {
                 Добавить рекламу
               </Button>
             </Link>
+            <Link href="/admin/users">
+              <Button variant="outline" className="w-full">
+                <Users className="w-4 h-4 mr-2" />
+                Управление пользователями
+              </Button>
+            </Link>
             <Link href="/admin/characters/add">
               <Button variant="outline" className="w-full">
                 <Users className="w-4 h-4 mr-2" />
