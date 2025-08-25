@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { News } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { Calendar, Eye, Tag, User, X } from 'lucide-react';
+import { Calendar, Eye, Tag, User, X, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import { getNewsImage, getNewsImageAlt } from '@/lib/utils/newsImageUtils';
 
@@ -173,7 +173,8 @@ export default function ArticlesPage() {
          <h1 className="text-4xl font-bold text-white mb-4">Новости и статьи</h1>
          <p className="text-gray-300 text-lg">
            Здесь вы найдете все последние новости, обновления и подробные статьи о мире игры. 
-           <span className="text-orange-400 font-medium">Статьи</span> выделены оранжевым цветом и содержат подробную информацию.
+           <span className="text-orange-400 font-medium">Статьи</span> выделены оранжевым цветом и открываются на отдельной странице, 
+           а <span className="text-blue-400 font-medium">новости</span> открываются в модальном окне.
          </p>
        </div>
       
@@ -265,8 +266,13 @@ export default function ArticlesPage() {
                    : 'bg-neutral-800 border border-neutral-700 hover:bg-neutral-750'
                }`}
                onClick={() => {
-                 // Все элементы открываются в модальном окне
-                 setSelectedNews(item);
+                 if (item.type === 'article') {
+                   // Статьи открываются на отдельной странице
+                   window.open(`/articles/${item._id}`, '_blank');
+                 } else {
+                   // Новости открываются в модальном окне
+                   setSelectedNews(item);
+                 }
                }}
              >
               {item.image && (
@@ -289,10 +295,9 @@ export default function ArticlesPage() {
                    </span>
                  )}
                  {item.type === 'article' && (
-                   <span className="ml-auto text-orange-400">
-                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                       <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                     </svg>
+                   <span className="ml-auto text-orange-400 flex items-center gap-1">
+                     <ExternalLink className="w-4 h-4" />
+                     <span className="text-xs">Откроется на отдельной странице</span>
                    </span>
                  )}
                 <span className="text-xs text-gray-400 ml-auto flex items-center gap-1">

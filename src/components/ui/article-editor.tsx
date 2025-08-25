@@ -162,8 +162,9 @@ export default function ArticleEditor({
   }, []);
 
   // Обработчики для игровой панели
-  const handleInsertCharacter = useCallback((character: { _id: string; name: string; image: string; element: string; rarity: number }) => {
-    const html = `<a href="/characters/${character._id}" class="character-card inline-flex items-center gap-2 px-2 py-1 rounded border border-blue-500 bg-blue-500/10 hover:bg-blue-500/20 transition-colors text-blue-400 hover:text-blue-300 no-underline">
+  const handleInsertCharacter = useCallback((character: { _id: string; id: string; name: string; image: string; element: string; rarity: number }) => {
+    const characterId = character.id || character._id;
+    const html = `<a href="/characters/${characterId}" class="character-card inline-flex items-center gap-2 px-2 py-1 rounded border border-blue-500 bg-blue-500/10 hover:bg-blue-500/20 transition-colors text-blue-400 hover:text-blue-300 no-underline">
       <img src="${character.image}" alt="${character.name}" class="w-4 h-4 rounded-full object-cover" onerror="this.style.opacity='0.2';" />
       <strong>${character.name}</strong>
       <span class="text-xs text-gray-400">${character.element} ${character.rarity}⭐</span>
@@ -189,8 +190,9 @@ export default function ArticleEditor({
     insertText(html, '');
   }, [insertText]);
 
-  const handleInsertArtifact = useCallback((artifact: { _id: string; name: string; rarity: number; bonus: string }) => {
-    const html = `<a href="/artifacts/${artifact._id}" class="artifact-info inline-flex items-center gap-2 px-2 py-1 rounded border border-purple-500 bg-purple-500/10 hover:bg-purple-500/20 transition-colors text-purple-400 hover:text-purple-300 no-underline">
+  const handleInsertArtifact = useCallback((artifact: { _id: string; id: string; name: string; rarity: number; bonus: string }) => {
+    const artifactId = artifact.id || artifact._id;
+    const html = `<a href="/artifacts/${artifactId}" class="artifact-info inline-flex items-center gap-2 px-2 py-1 rounded border border-purple-500 bg-purple-500/10 hover:bg-purple-500/20 transition-colors text-purple-400 hover:text-purple-300 no-underline">
       <span class="artifact-icon">💎</span> 
       <strong>${artifact.name}</strong> 
       <span class="text-xs text-gray-400">${artifact.rarity}⭐ • ${artifact.bonus}</span>
@@ -198,8 +200,9 @@ export default function ArticleEditor({
     insertText(html, '');
   }, [insertText]);
 
-  const handleInsertWeapon = useCallback((weapon: { _id: string; name: string; type: string; rarity: number; passive: string }) => {
-    const html = `<a href="/weapons/${weapon._id}" class="weapon-info inline-flex items-center gap-2 px-2 py-1 rounded border border-orange-500 bg-orange-500/10 hover:bg-orange-500/20 transition-colors text-orange-400 hover:text-orange-300 no-underline">
+  const handleInsertWeapon = useCallback((weapon: { _id: string; id: string; name: string; type: string; rarity: number; passive: string }) => {
+    const weaponId = weapon.id || weapon._id;
+    const html = `<a href="/weapons/${weaponId}" class="weapon-info inline-flex items-center gap-2 px-2 py-1 rounded border border-orange-500 bg-orange-500/10 hover:bg-orange-500/20 transition-colors text-orange-400 hover:text-orange-300 no-underline">
       <span class="weapon-icon">⚔️</span> 
       <strong>${weapon.name}</strong> 
       <span class="text-xs text-gray-400">${weapon.type} ${weapon.rarity}⭐</span>

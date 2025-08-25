@@ -5,6 +5,7 @@ import { Button } from './button';
 
 interface Character {
   _id: string;
+  id: string;
   name: string;
   image: string;
   element: string;
@@ -20,6 +21,7 @@ interface Talent {
 
 interface Artifact {
   _id: string;
+  id: string;
   name: string;
   rarity: number;
   bonus: string;
@@ -27,6 +29,7 @@ interface Artifact {
 
 interface Weapon {
   _id: string;
+  id: string;
   name: string;
   type: string;
   rarity: number;
@@ -117,8 +120,8 @@ export default function GameToolbar({
     if (selectedCharacter) {
       const fetchTalents = async () => {
         try {
-          console.log('Fetching talents for character:', selectedCharacter._id);
-          const response = await fetch(`/api/characters/${selectedCharacter._id}/talents`);
+          console.log('Fetching talents for character:', selectedCharacter.id);
+          const response = await fetch(`/api/characters/${selectedCharacter.id}/talents`);
           if (response.ok) {
             const talentsData = await response.json();
             setTalents(talentsData.talents || []);
@@ -161,13 +164,13 @@ export default function GameToolbar({
   const insertTalent = (talent: Talent) => {
     console.log('insertTalent called with:', { talent, selectedCharacter });
     
-    if (!selectedCharacter || !selectedCharacter._id) {
+    if (!selectedCharacter || !selectedCharacter.id) {
       alert('Ошибка: не выбран персонаж для таланта');
       return;
     }
     
-    console.log('Calling onInsertTalent with characterId:', selectedCharacter._id);
-    onInsertTalent(talent, selectedCharacter._id);
+    console.log('Calling onInsertTalent with characterId:', selectedCharacter.id);
+    onInsertTalent(talent, selectedCharacter.id);
     closeDropdowns();
   };
 
@@ -297,23 +300,23 @@ export default function GameToolbar({
             <div className="p-3 border-b border-neutral-600">
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-300 mb-2">Выберите персонажа:</label>
-                                 <select
-                   value={selectedCharacter?._id || ''}
+                                                  <select
+                   value={selectedCharacter?.id || ''}
                    onChange={(e) => {
                      console.log('Character select changed, value:', e.target.value);
-                     const character = characters.find(c => c._id === e.target.value);
+                     const character = characters.find(c => c.id === e.target.value);
                      console.log('Found character:', character);
                      setSelectedCharacter(character || null);
                    }}
                    className="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white focus:outline-none focus:border-blue-500"
                  >
-                  <option value="">Выберите персонажа...</option>
-                  {characters.map((character) => (
-                    <option key={character._id} value={character._id}>
-                      {character.name}
-                    </option>
-                  ))}
-                </select>
+                   <option value="">Выберите персонажа...</option>
+                   {characters.map((character) => (
+                     <option key={character._id} value={character.id}>
+                       {character.name}
+                     </option>
+                   ))}
+                 </select>
               </div>
               {selectedCharacter && (
                 <>
@@ -340,11 +343,11 @@ export default function GameToolbar({
                       e.preventDefault();
                       e.stopPropagation();
                       
-                      // Дополнительная проверка перед вызовом
-                      if (!selectedCharacter || !selectedCharacter._id) {
-                        alert('Ошибка: персонаж не выбран. Попробуйте выбрать персонажа снова.');
-                        return;
-                      }
+                                             // Дополнительная проверка перед вызовом
+                       if (!selectedCharacter || !selectedCharacter.id) {
+                         alert('Ошибка: персонаж не выбран. Попробуйте выбрать персонажа снова.');
+                         return;
+                       }
                       
                       console.log('Button click - selectedCharacter:', selectedCharacter);
                       insertTalent(talent);
