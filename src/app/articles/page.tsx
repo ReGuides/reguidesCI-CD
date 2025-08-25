@@ -6,6 +6,7 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Calendar, Eye, Tag, User, X } from 'lucide-react';
 import Image from 'next/image';
 import { getNewsImage, getNewsImageAlt } from '@/lib/utils/newsImageUtils';
+import { useRouter } from 'next/navigation';
 
 interface NewsFilters {
   type?: string;
@@ -25,6 +26,7 @@ interface Pagination {
 }
 
 export default function ArticlesPage() {
+  const router = useRouter();
   const [news, setNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -171,11 +173,11 @@ export default function ArticlesPage() {
       {/* Заголовок страницы */}
              <div className="mb-8">
          <h1 className="text-4xl font-bold text-white mb-4">Новости и статьи</h1>
-                   <p className="text-gray-300 text-lg">
-            Здесь вы найдете все последние новости, обновления и подробные статьи о мире игры. 
-            <span className="text-orange-400 font-medium">Статьи</span> выделены оранжевым цветом и содержат подробную информацию, 
-            а <span className="text-blue-400 font-medium">новости</span> - краткие сообщения. Все открываются в модальном окне.
-          </p>
+                              <p className="text-gray-300 text-lg">
+             Здесь вы найдете все последние новости, обновления и подробные статьи о мире игры. 
+             <span className="text-orange-400 font-medium">Статьи</span> выделены оранжевым цветом и содержат подробную информацию, 
+             а <span className="text-blue-400 font-medium">новости</span> - краткие сообщения. Статьи открываются на отдельной странице, новости - в модальном окне.
+           </p>
        </div>
       
       <div className="flex flex-col md:flex-row gap-6">
@@ -267,8 +269,8 @@ export default function ArticlesPage() {
                }`}
                                onClick={() => {
                   if (item.type === 'article') {
-                    // Статьи открываются на той же странице
-                    setSelectedNews(item);
+                    // Статьи открываются на отдельной странице
+                    router.push(`/articles/${item._id}`);
                   } else {
                     // Новости открываются в модальном окне
                     setSelectedNews(item);
@@ -294,7 +296,7 @@ export default function ArticlesPage() {
                      {getCategoryLabel(item.category)}
                    </span>
                  )}
-                                   {item.type === 'article' && (
+                                                     {item.type === 'article' && (
                     <span className="ml-auto text-orange-400 flex items-center gap-1">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
@@ -302,10 +304,19 @@ export default function ArticlesPage() {
                       <span className="text-xs">Статья</span>
                     </span>
                   )}
-                <span className="text-xs text-gray-400 ml-auto flex items-center gap-1">
-                  <Eye className="w-3 h-3" />
-                  {item.views}
-                </span>
+                  {item.type !== 'article' && (
+                    <span className="ml-auto text-blue-400 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span className="text-xs">Модальное окно</span>
+                    </span>
+                  )}
+                  <span className="text-xs text-gray-400 ml-auto flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    {item.views}
+                  </span>
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
               {item.type === 'article' && item.excerpt ? (
