@@ -35,7 +35,7 @@ interface Weapon {
 
 interface GameToolbarProps {
   onInsertCharacter: (character: Character) => void;
-  onInsertTalent: (talent: Talent) => void;
+  onInsertTalent: (talent: Talent, characterId?: string) => void;
   onInsertArtifact: (artifact: Artifact) => void;
   onInsertWeapon: (weapon: Weapon) => void;
   onInsertElement: (element: { name: string; value: string; color: string; icon: string }) => void;
@@ -148,7 +148,9 @@ export default function GameToolbar({
   };
 
   const insertTalent = (talent: Talent) => {
-    onInsertTalent(talent);
+    if (selectedCharacter) {
+      onInsertTalent(talent, selectedCharacter._id);
+    }
     closeDropdowns();
   };
 

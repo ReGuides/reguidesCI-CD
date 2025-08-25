@@ -21,30 +21,7 @@ export default function ArticlePage() {
     }
   }, [params.id]);
 
-  // Обработчик кликов на персонажей в контенте
-  useEffect(() => {
-    const handleGameElementClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const gameElement = target.closest('[data-modal-type]') as HTMLElement;
-      
-      if (gameElement) {
-        const modalType = gameElement.dataset.modalType;
-        const modalId = gameElement.dataset.modalId;
-        
-        if (modalType && modalId) {
-          console.log(`Opening modal for ${modalType} with id: ${modalId}`);
-          window.dispatchEvent(new CustomEvent('openModal', { 
-            detail: { type: modalType, id: modalId } 
-          }));
-        }
-      }
-    };
-    
-    document.addEventListener('click', handleGameElementClick);
-    return () => {
-      document.removeEventListener('click', handleGameElementClick);
-    };
-  }, []);
+
 
   const fetchArticle = async () => {
     try {

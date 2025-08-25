@@ -164,22 +164,20 @@
 .news-content .talent-info,
 .news-content .artifact-info,
 .news-content .weapon-info {
-  position: relative;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 4px;
-  padding: 2px 4px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .news-content .character-card {
-  text-decoration-color: #3b82f6;
   border: 1px solid #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
 }
 
 .news-content .character-card:hover {
@@ -189,8 +187,9 @@
 }
 
 .news-content .talent-info {
-  text-decoration-color: #eab308;
   border: 1px solid #eab308;
+  background-color: rgba(234, 179, 8, 0.1);
+  color: #eab308;
 }
 
 .news-content .talent-info:hover {
@@ -200,8 +199,9 @@
 }
 
 .news-content .artifact-info {
-  text-decoration-color: #a855f7;
   border: 1px solid #a855f7;
+  background-color: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
 }
 
 .news-content .artifact-info:hover {
@@ -211,33 +211,15 @@
 }
 
 .news-content .weapon-info {
-  text-decoration-color: #f97316;
   border: 1px solid #f97316;
+  background-color: rgba(249, 115, 22, 0.1);
+  color: #f97316;
 }
 
 .news-content .weapon-info:hover {
   background-color: rgba(249, 115, 22, 0.2);
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(249, 115, 22, 0.3);
-}
-
-/* Анимация для иконки клика */
-.news-content .character-card::after,
-.news-content .talent-info::after,
-.news-content .artifact-info::after,
-.news-content .weapon-info::after {
-  content: "👆";
-  font-size: 0.75rem;
-  margin-left: 4px;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-.news-content .character-card:hover::after,
-.news-content .talent-info:hover::after,
-.news-content .artifact-info:hover::after,
-.news-content .weapon-info:hover::after {
-  opacity: 1;
 }
 
 /* Адаптивность */

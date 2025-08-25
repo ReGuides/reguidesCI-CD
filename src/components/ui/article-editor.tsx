@@ -56,36 +56,7 @@ export default function ArticleEditor({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showFontSize, setShowFontSize] = useState(false);
 
-  // Инициализируем обработчик кликов для игровых элементов
-  useEffect(() => {
-    const handleGameElementClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const gameElement = target.closest('[data-modal-type]') as HTMLElement;
-      
-      if (gameElement) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const modalType = gameElement.dataset.modalType;
-        const modalId = gameElement.dataset.modalId;
-        
-        if (modalType && modalId) {
-          console.log(`Opening modal for ${modalType} with id: ${modalId}`);
-          // Отправляем событие для открытия модального окна
-          window.dispatchEvent(new CustomEvent('openModal', { 
-            detail: { type: modalType, id: modalId } 
-          }));
-        }
-      }
-    };
 
-    // Добавляем обработчик кликов на документ
-    document.addEventListener('click', handleGameElementClick, true);
-
-    return () => {
-      document.removeEventListener('click', handleGameElementClick, true);
-    };
-  }, []);
 
   const insertText = useCallback((before: string, after: string = '') => {
     if (!textareaRef.current) return;
@@ -192,58 +163,38 @@ export default function ArticleEditor({
 
   // Обработчики для игровой панели
   const handleInsertCharacter = useCallback((character: { _id: string; name: string; image: string; element: string; rarity: number }) => {
-    const html = `<span class="character-card cursor-pointer hover:bg-blue-500/20 transition-colors rounded px-2 py-1" 
-      data-character-id="${character._id}" 
-      data-modal-type="character"
-      data-modal-id="${character._id}"
-      style="border: 1px solid #3b82f6; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-decoration-color: #3b82f6; text-decoration-thickness: 1px;">
-             <img src="${character.image}" alt="${character.name}" class="w-4 h-4 rounded-full object-cover" onerror="this.style.opacity='0.2';" />
+    const html = `<a href="/characters/${character._id}" class="character-card inline-flex items-center gap-2 px-2 py-1 rounded border border-blue-500 bg-blue-500/10 hover:bg-blue-500/20 transition-colors text-blue-400 hover:text-blue-300 no-underline">
+      <img src="${character.image}" alt="${character.name}" class="w-4 h-4 rounded-full object-cover" onerror="this.style.opacity='0.2';" />
       <strong>${character.name}</strong>
       <span class="text-xs text-gray-400">${character.element} ${character.rarity}⭐</span>
-
-    </span>`;
+    </a>`;
     insertText(html, '');
   }, [insertText]);
 
-  const handleInsertTalent = useCallback((talent: { _id: string; name: string; type: string; description: string }) => {
-    const html = `<span class="talent-info cursor-pointer hover:bg-yellow-500/20 transition-colors rounded px-2 py-1" 
-      data-talent-id="${talent._id}" 
-      data-modal-type="talent"
-      data-modal-id="${talent._id}"
-      style="border: 1px solid #eab308; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-decoration-color: #eab308; text-decoration-thickness: 1px;">
+  const handleInsertTalent = useCallback((talent: { _id: string; name: string; type: string; description: string }, characterId?: string) => {
+    const html = `<a href="/characters/${characterId || 'unknown'}/talents" class="talent-info inline-flex items-center gap-2 px-2 py-1 rounded border border-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 transition-colors text-yellow-400 hover:text-yellow-300 no-underline">
       <span class="talent-icon">⭐</span> 
       <strong>${talent.name}</strong> 
       <span class="text-xs text-gray-400">(${talent.type})</span>
-
-    </span>`;
+    </a>`;
     insertText(html, '');
   }, [insertText]);
 
   const handleInsertArtifact = useCallback((artifact: { _id: string; name: string; rarity: number; bonus: string }) => {
-    const html = `<span class="artifact-info cursor-pointer hover:bg-purple-500/20 transition-colors rounded px-2 py-1" 
-      data-artifact-id="${artifact._id}" 
-      data-modal-type="artifact"
-      data-modal-id="${artifact._id}"
-      style="border: 1px solid #a855f7; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-decoration-color: #a855f7; text-decoration-thickness: 1px;">
+    const html = `<a href="/artifacts/${artifact._id}" class="artifact-info inline-flex items-center gap-2 px-2 py-1 rounded border border-purple-500 bg-purple-500/10 hover:bg-purple-500/20 transition-colors text-purple-400 hover:text-purple-300 no-underline">
       <span class="artifact-icon">💎</span> 
       <strong>${artifact.name}</strong> 
       <span class="text-xs text-gray-400">${artifact.rarity}⭐ • ${artifact.bonus}</span>
-
-    </span>`;
+    </a>`;
     insertText(html, '');
   }, [insertText]);
 
   const handleInsertWeapon = useCallback((weapon: { _id: string; name: string; type: string; rarity: number; passive: string }) => {
-    const html = `<span class="weapon-info cursor-pointer hover:bg-orange-500/20 transition-colors rounded px-2 py-1" 
-      data-weapon-id="${weapon._id}" 
-      data-modal-type="weapon"
-      data-modal-id="${weapon._id}"
-      style="border: 1px solid #f97316; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-decoration-color: #f97316; text-decoration-thickness: 1px;">
+    const html = `<a href="/weapons/${weapon._id}" class="weapon-info inline-flex items-center gap-2 px-2 py-1 rounded border border-orange-500 bg-orange-500/10 hover:bg-orange-500/20 transition-colors text-orange-400 hover:text-orange-300 no-underline">
       <span class="weapon-icon">⚔️</span> 
       <strong>${weapon.name}</strong> 
       <span class="text-xs text-gray-400">${weapon.type} ${weapon.rarity}⭐</span>
-
-    </span>`;
+    </a>`;
     insertText(html, '');
   }, [insertText]);
 
@@ -260,7 +211,7 @@ export default function ArticleEditor({
       {showGameToolbar && (
         <GameToolbar
           onInsertCharacter={handleInsertCharacter}
-          onInsertTalent={handleInsertTalent}
+          onInsertTalent={(talent, characterId) => handleInsertTalent(talent, characterId)}
           onInsertArtifact={handleInsertArtifact}
           onInsertWeapon={handleInsertWeapon}
           onInsertElement={handleInsertElement}
@@ -593,27 +544,7 @@ export default function ArticleEditor({
         <p><strong>Наведение:</strong> Наведите курсор на кнопку, чтобы увидеть подсказку о её функции</p>
       </div>
 
-      {/* CSS стили для игровых элементов */}
-      <style jsx>{`
-        .character-card:hover {
-          background-color: rgba(59, 130, 246, 0.2);
-        }
-        .talent-info:hover {
-          background-color: rgba(234, 179, 8, 0.2);
-        }
-        .artifact-info:hover {
-          background-color: rgba(168, 85, 247, 0.2);
-        }
-        .weapon-info:hover {
-          background-color: rgba(249, 115, 22, 0.2);
-        }
-        .element-badge {
-          transition: all 0.2s ease;
-        }
-        .element-badge:hover {
-          transform: scale(1.05);
-        }
-      `}</style>
+      
     </div>
   );
 }

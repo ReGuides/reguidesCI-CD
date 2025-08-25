@@ -83,30 +83,7 @@ export default function ArticlesPage() {
     loadNews(1, filters);
   }, [filters, loadNews]);
 
-  // Обработчик кликов на персонажей в контенте
-  useEffect(() => {
-    const handleGameElementClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const gameElement = target.closest('[data-modal-type]') as HTMLElement;
-      
-      if (gameElement) {
-        const modalType = gameElement.dataset.modalType;
-        const modalId = gameElement.dataset.modalId;
-        
-        if (modalType && modalId) {
-          console.log(`Opening modal for ${modalType} with id: ${modalId}`);
-          window.dispatchEvent(new CustomEvent('openModal', { 
-            detail: { type: modalType, id: modalId } 
-          }));
-        }
-      }
-    };
-    
-    document.addEventListener('click', handleGameElementClick);
-    return () => {
-      document.removeEventListener('click', handleGameElementClick);
-    };
-  }, []);
+
 
   const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
@@ -430,49 +407,7 @@ export default function ArticlesPage() {
                     dangerouslySetInnerHTML={{ __html: selectedNews.content || 'Контент недоступен' }}
                   />
                   
-                  {/* Стили для интерактивных элементов */}
-                  <style jsx>{`
-                    .character-card {
-                      cursor: pointer;
-                      transition: all 0.2s ease;
-                      border-radius: 4px;
-                      padding: 2px 4px;
-                    }
-                    .character-card:hover {
-                      background-color: rgba(59, 130, 246, 0.2);
-                      transform: translateY(-1px);
-                    }
-                    .artifact-info {
-                      cursor: pointer;
-                      transition: all 0.2s ease;
-                      border-radius: 4px;
-                      padding: 2px 4px;
-                    }
-                    .artifact-info:hover {
-                      background-color: rgba(34, 197, 94, 0.2);
-                      transform: translateY(-1px);
-                    }
-                    .weapon-info {
-                      cursor: pointer;
-                      transition: all 0.2s ease;
-                      border-radius: 4px;
-                      padding: 2px 4px;
-                    }
-                    .weapon-info:hover {
-                      background-color: rgba(168, 85, 247, 0.2);
-                      transform: translateY(-1px);
-                    }
-                    .element-badge {
-                      cursor: pointer;
-                      transition: all 0.2s ease;
-                      border-radius: 4px;
-                      padding: 2px 4px;
-                    }
-                    .element-badge:hover {
-                      background-color: rgba(251, 191, 36, 0.2);
-                      transform: translateY(-1px);
-                    }
-                  `}</style>
+                  
                 </div>
                 
                 {/* Изображение справа (сверху на мобильных) */}
