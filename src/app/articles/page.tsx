@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { News } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { Calendar, Eye, Tag, User, X, ExternalLink } from 'lucide-react';
+import { Calendar, Eye, Tag, User, X } from 'lucide-react';
 import Image from 'next/image';
 import { getNewsImage, getNewsImageAlt } from '@/lib/utils/newsImageUtils';
 
