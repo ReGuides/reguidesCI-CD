@@ -11,9 +11,11 @@ import Link from 'next/link';
 import { Character } from '@/types';
 import Image from 'next/image';
 import ArticleEditor from '@/components/ui/article-editor';
+import { useAdminAuth } from '@/app/admin/AdminAuthContext';
 
 export default function AddNewsPage() {
   const router = useRouter();
+  const { user } = useAdminAuth();
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -27,12 +29,18 @@ export default function AddNewsPage() {
     isPublished: false,
     characterId: '',
     tags: [] as string[],
-    newTag: ''
+    newTag: '',
+    author: ''
   });
 
   useEffect(() => {
     fetchCharacters();
-  }, []);
+    // Автоматически заполняем поле author именем текущего пользователя
+    if (user) {
+      const authorName = user.name || user.username || user.login || 'Администратор';
+      setForm(prev => ({ ...prev, author: authorName }));
+    }
+  }, [user]);
 
   const fetchCharacters = async () => {
     try {
@@ -64,17 +72,18 @@ export default function AddNewsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          title: form.title,
-          content: form.content,
-          type: form.type,
-          category: form.type === 'article' ? form.category : undefined,
-          excerpt: form.type === 'article' ? form.excerpt : undefined,
-          image: form.image || undefined,
-          isPublished: form.isPublished,
-          characterId: form.characterId || undefined,
-          tags: form.tags
-        }),
+                 body: JSON.stringify({
+           title: form.title,
+           content: form.content,
+           type: form.type,
+           category: form.type === 'article' ? form.category : undefined,
+           excerpt: form.type === 'article' ? form.excerpt : undefined,
+           image: form.image || undefined,
+           isPublished: form.isPublished,
+           characterId: form.characterId || undefined,
+           tags: form.tags,
+           author: form.author
+         }),
       });
 
       if (response.ok) {
@@ -187,19 +196,33 @@ export default function AddNewsPage() {
             <CardTitle className="text-white">Основная информация</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-white mb-2">
-                Заголовок *
-              </label>
-              <Input
-                id="title"
-                value={form.title}
-                onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Введите заголовок новости"
-                className="bg-neutral-700 border-neutral-600 text-white"
-                required
-              />
-            </div>
+                         <div>
+               <label htmlFor="title" className="block text-sm font-medium text-white mb-2">
+                 Заголовок *
+               </label>
+               <Input
+                 id="title"
+                 value={form.title}
+                 onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
+                 placeholder="Введите заголовок новости"
+                 className="bg-neutral-700 border-neutral-600 text-white"
+                 required
+               />
+             </div>
+
+             <div>
+               <label htmlFor="author" className="block text-sm font-medium text-white mb-2">
+                 Автор
+               </label>
+               <Input
+                 id="author"
+                 value={form.author}
+                 onChange={(e) => setForm(prev => ({ ...prev, author: e.target.value }))}
+                 placeholder="Автор новости"
+                 className="bg-neutral-700 border-neutral-600 text-white"
+               />
+               <p className="text-xs text-gray-500 mt-1">Автоматически заполняется именем текущего пользователя</p>
+             </div>
 
             <div>
               <label htmlFor="content" className="block text-sm font-medium text-white mb-2">

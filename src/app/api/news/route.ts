@@ -32,6 +32,7 @@ interface CreateNewsRequest {
   isPublished?: boolean;
   characterId?: string;
   tags?: string[];
+  author?: string;
 }
 
 // GET - получение всех новостей
@@ -136,7 +137,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body: CreateNewsRequest = await request.json();
-    const { title, content, type, category, excerpt, image, isPublished, characterId, tags } = body;
+    const { title, content, type, category, excerpt, image, isPublished, characterId, tags, author } = body;
 
     // Валидация
     if (!title || !content || !type) {
@@ -158,7 +159,7 @@ export async function POST(request: NextRequest) {
       isPublished: isPublished || false,
       characterId: characterId || undefined,
       tags: tags || [],
-      author: 'Администратор'
+      author: author || 'Администратор'
     });
 
     await news.save();

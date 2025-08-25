@@ -369,8 +369,17 @@ export default function ArticlesPage() {
           }}
         >
           <div className="relative bg-neutral-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-neutral-700">
+            {/* Кнопка закрытия */}
+            <button
+              onClick={() => setSelectedNews(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10"
+              aria-label="Закрыть"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
             {/* Основной контент */}
-            <div className="p-4 sm:p-6">
+            <div className="p-4 sm:p-6 pr-16">
               {/* Дата и автор */}
               <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
                 <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
@@ -381,15 +390,15 @@ export default function ArticlesPage() {
                 )}
               </div>
               
-                             {/* Заголовок */}
-               <div className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">
-                 {selectedNews.title}
-                 {selectedNews.type === 'article' && (
-                   <span className="ml-3 text-sm font-normal text-orange-400">
-                     📄 Статья
-                   </span>
-                 )}
-               </div>
+              {/* Заголовок */}
+              <div className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">
+                {selectedNews.title}
+                {selectedNews.type === 'article' && (
+                  <span className="ml-3 text-sm font-normal text-orange-400">
+                    📄 Статья
+                  </span>
+                )}
+              </div>
               
               {/* Контент и изображение в две колонки */}
               <div className="flex flex-col lg:flex-row gap-6 mt-4">
@@ -429,15 +438,6 @@ export default function ArticlesPage() {
                 })()}
               </div>
             </div>
-
-            {/* Кнопка закрытия */}
-            <button
-              onClick={() => setSelectedNews(null)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-              aria-label="Закрыть"
-            >
-              <X className="w-6 h-6" />
-            </button>
           </div>
         </div>
       )}

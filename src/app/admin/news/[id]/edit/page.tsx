@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import ArticleEditor from '@/components/ui/article-editor';
 import Image from 'next/image';
+import { useAdminAuth } from '@/app/admin/AdminAuthContext';
 
 type NewsType = 'manual' | 'birthday' | 'update' | 'event' | 'article';
 type NewsCategory = 'news' | 'guide' | 'review' | 'tutorial' | 'event';
@@ -15,6 +16,7 @@ type NewsCategory = 'news' | 'guide' | 'review' | 'tutorial' | 'event';
 export default function EditNewsPage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAdminAuth();
   const [news, setNews] = useState<News | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -62,7 +64,7 @@ export default function EditNewsPage() {
           image: newsData.image || '',
           isPublished: newsData.isPublished || false,
           tags: newsData.tags || [],
-          author: newsData.author || ''
+          author: newsData.author || (user ? (user.name || user.username || user.login || 'Администратор') : 'Администратор')
         });
       } else {
         throw new Error('Новость не найдена');
@@ -284,6 +286,7 @@ export default function EditNewsPage() {
               className="w-full px-3 py-2 bg-neutral-800 border border-neutral-600 rounded-lg text-white focus:outline-none focus:border-accent"
               placeholder="Имя автора"
             />
+            <p className="text-xs text-gray-500 mt-1">Автоматически заполняется именем текущего пользователя</p>
           </div>
 
           <div className="flex items-center">

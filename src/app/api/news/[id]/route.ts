@@ -47,7 +47,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     await connectDB();
     
     const body = await request.json();
-    const { title, content, type, category, excerpt, image, isPublished, characterId, tags } = body;
+    const { title, content, type, category, excerpt, image, isPublished, characterId, tags, author } = body;
 
     // Валидация
     if (!title || !content || !type) {
@@ -76,6 +76,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         isPublished,
         characterId: characterId || undefined,
         tags: tags || [],
+        author: author || 'Администратор',
         updatedAt: new Date()
       },
       { new: true, runValidators: true }
