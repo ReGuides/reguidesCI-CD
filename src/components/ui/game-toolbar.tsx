@@ -150,6 +150,10 @@ export default function GameToolbar({
   const insertTalent = (talent: Talent) => {
     if (selectedCharacter) {
       onInsertTalent(talent, selectedCharacter._id);
+    } else {
+      // Если персонаж не выбран, показываем предупреждение
+      alert('Сначала выберите персонажа для вставки таланта');
+      return;
     }
     closeDropdowns();
   };
@@ -254,19 +258,21 @@ export default function GameToolbar({
         )}
       </div>
 
-      {/* Таланты */}
-      <div className="relative">
-        <Button
-          onClick={(e) => handleButtonClick(e, () => toggleDropdown('talents'))}
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2"
-          type="button"
-        >
-          <Star className="w-4 h-4" />
-          Таланты
-          <ChevronDown className="w-4 h-4" />
-        </Button>
+             {/* Таланты */}
+       <div className="relative">
+         <Button
+           onClick={(e) => handleButtonClick(e, () => toggleDropdown('talents'))}
+           variant="outline"
+           size="sm"
+           className={`flex items-center gap-2 ${!selectedCharacter ? 'opacity-50 cursor-not-allowed' : ''}`}
+           type="button"
+           disabled={!selectedCharacter}
+           title={!selectedCharacter ? 'Сначала выберите персонажа' : 'Выберите талант для вставки'}
+         >
+           <Star className="w-4 h-4" />
+           Таланты
+           <ChevronDown className="w-4 h-4" />
+         </Button>
         
         {showTalents && (
           <div className="absolute top-full left-0 mt-1 w-80 bg-neutral-900 border border-neutral-600 rounded-lg shadow-lg z-50">

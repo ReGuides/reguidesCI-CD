@@ -1,19 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { News } from '@/types';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import LoadingSpinner from '@/components/ui/loading-spinner';
 import ArticleEditor from '@/components/ui/article-editor';
 import Image from 'next/image';
 
-export default function EditNewsPage() {
-  const params = useParams();
+export default function AddArticlePage() {
   const router = useRouter();
-  const [news, setNews] = useState<News | null>(null);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -28,50 +23,6 @@ export default function EditNewsPage() {
     author: ''
   });
 
-  useEffect(() => {
-    if (params.id) {
-      fetchNews();
-    }
-  }, [params.id]);
-
-  const fetchNews = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(`/api/news/${params.id}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        const newsData = data.data;
-        setNews(newsData);
-        setForm({
-          title: newsData.title || '',
-          content: newsData.content || '',
-          type: newsData.type || 'manual',
-          category: newsData.category || 'news',
-          excerpt: newsData.excerpt || '',
-          image: newsData.image || '',
-          isPublished: newsData.isPublished || false,
-          tags: newsData.tags || [],
-          author: newsData.author || ''
-        });
-      } else {
-        throw new Error('Новость не найдена');
-      }
-    } catch (err) {
-      console.error('Error fetching news:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -84,8 +35,8 @@ export default function EditNewsPage() {
       setSaving(true);
       setError(null);
 
-      const response = await fetch(`/api/news/${params.id}`, {
-        method: 'PUT',
+      const response = await fetch('/api/news', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -109,13 +60,13 @@ export default function EditNewsPage() {
       const data = await response.json();
       
       if (data.success) {
-        alert('Новость успешно обновлена!');
+        alert('Новость успешно создана!');
         router.push('/admin/news');
       } else {
-        throw new Error(data.message || 'Ошибка при обновлении');
+        throw new Error(data.message || 'Ошибка при создании');
       }
     } catch (err) {
-      console.error('Error updating news:', err);
+      console.error('Error creating news:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setSaving(false);
@@ -148,34 +99,6 @@ export default function EditNewsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex justify-center items-center h-64">
-          <LoadingSpinner size="lg" className="text-accent" />
-          <span className="ml-3 text-neutral-400">Загрузка новости...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !news) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="text-center text-red-400">
-          <h2 className="text-2xl font-bold mb-4">Ошибка загрузки</h2>
-          <p>{error || 'Новость не найдена'}</p>
-          <Button 
-            onClick={() => router.push('/admin/news')}
-            className="mt-4"
-          >
-            Вернуться к списку
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Навигация */}
@@ -192,8 +115,8 @@ export default function EditNewsPage() {
 
       {/* Заголовок */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Редактировать новость</h1>
-        <p className="text-gray-400">Измените содержимое новости или статьи</p>
+        <h1 className="text-3xl font-bold text-white mb-2">Создать новость</h1>
+        <p className="text-gray-400">Добавьте новую новость или статью</p>
       </div>
 
       {/* Форма */}
@@ -291,7 +214,7 @@ export default function EditNewsPage() {
                 onChange={(e) => setForm(prev => ({ ...prev, isPublished: e.target.checked }))}
                 className="mr-2 w-4 h-4 text-accent bg-neutral-800 border-neutral-600 rounded focus:ring-accent focus:ring-2"
               />
-              <span className="text-sm text-gray-300">Опубликовать</span>
+              <span className="text-sm text-gray-300">Опубликовать сразу</span>
             </label>
           </div>
         </div>
@@ -360,11 +283,11 @@ export default function EditNewsPage() {
             className="flex items-center gap-2"
           >
             {saving ? (
-              <LoadingSpinner size="sm" />
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             ) : (
               <Save className="w-4 h-4" />
             )}
-            {saving ? 'Сохранение...' : 'Сохранить изменения'}
+            {saving ? 'Создание...' : 'Создать новость'}
           </Button>
 
           <Button
@@ -374,20 +297,15 @@ export default function EditNewsPage() {
           >
             Отмена
           </Button>
-
-          {news && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => window.open(`/articles/${news._id}`, '_blank')}
-              className="flex items-center gap-2"
-            >
-              <Eye className="w-4 h-4" />
-              Предварительный просмотр
-            </Button>
-          )}
         </div>
       </form>
+
+      {/* Error Display */}
+      {error && (
+        <div className="mt-6 p-4 bg-red-900/20 border border-red-700 rounded-lg">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      )}
     </div>
   );
 }
