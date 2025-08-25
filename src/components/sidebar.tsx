@@ -194,7 +194,7 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
                                  <div className="flex items-start gap-3">
                    {/* Изображение новости слева */}
                    {(() => {
-                     const imageUrl = getNewsImage(item.image, item.characterId, item.characterName);
+                     const imageUrl = getNewsImage(item.image, item.characterId, item.characterName, item.characterImage);
                      if (!imageUrl) return null;
                      
                      return (

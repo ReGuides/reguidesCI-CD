@@ -3,22 +3,32 @@ import { getImageWithFallback } from './imageUtils';
 /**
  * Получает правильное изображение для новости
  * Если у новости есть свое изображение - использует его
- * Если нет, но есть characterId - использует изображение персонажа
+ * Если нет, но есть characterImage - использует изображение персонажа
+ * Если нет, но есть characterId или characterName - использует fallback изображение персонажа
  * Иначе возвращает null
  */
 export function getNewsImage(
   newsImage?: string, 
   characterId?: string, 
-  characterName?: string
+  characterName?: string,
+  characterImage?: string
 ): string | null {
   // Если у новости есть свое изображение
   if (newsImage) {
     return newsImage;
   }
   
-  // Если нет изображения, но есть ID персонажа
-  if (characterId && characterName) {
-    return getImageWithFallback(undefined, characterName, 'character');
+  // Если есть изображение персонажа из базы данных
+  if (characterImage) {
+    return characterImage;
+  }
+  
+  // Если нет изображения, но есть ID персонажа или имя персонажа
+  if (characterId || characterName) {
+    // Для новостей дня рождения всегда показываем изображение персонажа
+    if (characterName) {
+      return getImageWithFallback(undefined, characterName, 'character');
+    }
   }
   
   return null;

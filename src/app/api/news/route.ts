@@ -104,10 +104,14 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Добавляем информацию о персонаже
-    const newsWithCharacter = news.map(item => ({
-      ...item,
-      characterName: item.characterId ? (item.characterId as Character).name : undefined
-    }));
+    const newsWithCharacter = news.map(item => {
+      const character = item.characterId as Character;
+      return {
+        ...item,
+        characterName: character ? character.name : undefined,
+        characterImage: character ? character.image : undefined
+      };
+    });
 
     return NextResponse.json({
       success: true,

@@ -408,7 +408,7 @@ export default function ArticlesPage() {
                 
                 {/* Изображение справа (сверху на мобильных) */}
                 {(() => {
-                  const imageUrl = getNewsImage(selectedNews.image, selectedNews.characterId, selectedNews.characterName);
+                  const imageUrl = getNewsImage(selectedNews.image, selectedNews.characterId, selectedNews.characterName, selectedNews.characterImage);
                   if (!imageUrl) return null;
                   
                   return (

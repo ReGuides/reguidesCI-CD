@@ -66,7 +66,7 @@ export default function NewsSection() {
              >
                {/* Изображение новости слева */}
                {(() => {
-                 const imageUrl = getNewsImage(item.image, item.characterId, item.characterName);
+                 const imageUrl = getNewsImage(item.image, item.characterId, item.characterName, item.characterImage);
                  if (!imageUrl) return null;
                  
                  return (
@@ -164,7 +164,7 @@ export default function NewsSection() {
                 
                 {/* Изображение справа (сверху на мобильных) */}
                 {(() => {
-                  const imageUrl = getNewsImage(selectedNews.image, selectedNews.characterId, selectedNews.characterName);
+                  const imageUrl = getNewsImage(selectedNews.image, selectedNews.characterId, selectedNews.characterName, selectedNews.characterImage);
                   if (!imageUrl) return null;
                   
                   return (
