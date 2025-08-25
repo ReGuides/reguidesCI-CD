@@ -164,11 +164,7 @@ export default function ArticlesPage() {
       {/* Заголовок страницы */}
              <div className="mb-8">
          <h1 className="text-4xl font-bold text-white mb-4">Новости и статьи</h1>
-                                        <p className="text-gray-300 text-lg">
-              Здесь вы найдете все последние новости, обновления и подробные статьи о мире игры. 
-              <span className="text-orange-400 font-medium">Статьи</span> выделены оранжевым цветом и содержат подробную информацию, 
-              а <span className="text-blue-400 font-medium">новости</span> - краткие сообщения. Статьи открываются на отдельной странице, новости - в быстром просмотре.
-            </p>
+                              
        </div>
       
       <div className="flex flex-col md:flex-row gap-6">

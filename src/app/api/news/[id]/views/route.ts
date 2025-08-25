@@ -4,12 +4,12 @@ import News from '@/models/News';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDatabase();
     
-    const { id } = params;
+    const { id } = await params;
     
     // Увеличиваем счетчик просмотров
     const updatedNews = await News.findByIdAndUpdate(
