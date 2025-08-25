@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, Eye } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ArticleEditor from '@/components/ui/article-editor';
 import Image from 'next/image';
+
+type NewsType = 'manual' | 'birthday' | 'update' | 'event' | 'article';
+type NewsCategory = 'news' | 'guide' | 'review' | 'tutorial' | 'event';
 
 export default function AddArticlePage() {
   const router = useRouter();
@@ -14,8 +17,8 @@ export default function AddArticlePage() {
   const [form, setForm] = useState({
     title: '',
     content: '',
-    type: 'manual' as 'manual' | 'birthday' | 'update' | 'event' | 'article',
-    category: 'news' as 'news' | 'guide' | 'review' | 'tutorial' | 'event',
+    type: 'manual' as NewsType,
+    category: 'news' as NewsCategory,
     excerpt: '',
     image: '',
     isPublished: false,
@@ -143,7 +146,7 @@ export default function AddArticlePage() {
             </label>
             <select
               value={form.type}
-              onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value as any }))}
+              onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value as NewsType }))}
               className="w-full px-3 py-2 bg-neutral-800 border border-neutral-600 rounded-lg text-white focus:outline-none focus:border-accent"
             >
               <option value="manual">Новость</option>
@@ -164,7 +167,7 @@ export default function AddArticlePage() {
               </label>
               <select
                 value={form.category}
-                onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value as any }))}
+                onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value as NewsCategory }))}
                 className="w-full px-3 py-2 bg-neutral-800 border border-neutral-600 rounded-lg text-white focus:outline-none focus:border-accent"
               >
                 <option value="news">Новости</option>
