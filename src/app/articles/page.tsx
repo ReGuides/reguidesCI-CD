@@ -368,7 +368,7 @@ export default function ArticlesPage() {
             if (e.target === e.currentTarget) setSelectedNews(null);
           }}
         >
-          <div className="relative bg-neutral-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-neutral-700">
+                     <div className="relative bg-neutral-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-neutral-700">
             {/* Кнопка закрытия */}
             <button
               onClick={() => setSelectedNews(null)}
@@ -429,17 +429,17 @@ export default function ArticlesPage() {
                                </div>
                </div>
                
-               {/* Дата и автор внизу */}
-               <div className="mt-6 pt-4 border-t border-neutral-700">
-                 <div className="flex items-center justify-between text-xs text-gray-400">
-                   <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
-                   {selectedNews.author && (
-                     <span>
-                       Автор: <span className="font-semibold text-white">{selectedNews.author}</span>
-                     </span>
-                   )}
-                 </div>
-               </div>
+                               {/* Дата и автор внизу */}
+                <div className="mt-6 pt-4 pb-6 px-4 border-t border-neutral-700">
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
+                    {selectedNews.author && (
+                      <span>
+                        Автор: <span className="font-semibold text-white">{selectedNews.author}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
              </div>
            </div>
       )}
