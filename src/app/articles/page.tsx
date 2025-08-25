@@ -378,30 +378,20 @@ export default function ArticlesPage() {
               <X className="w-6 h-6" />
             </button>
 
-            {/* Основной контент */}
-            <div className="p-4 sm:p-6 pr-16">
-              {/* Дата и автор */}
-              <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-                <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
-                {selectedNews.author && (
-                  <span>
-                    Автор: <span className="font-semibold text-white">{selectedNews.author}</span>
-                  </span>
-                )}
-              </div>
-              
-              {/* Заголовок */}
-              <div className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">
-                {selectedNews.title}
-                {selectedNews.type === 'article' && (
-                  <span className="ml-3 text-sm font-normal text-orange-400">
-                    📄 Статья
-                  </span>
-                )}
-              </div>
-              
-              {/* Контент и изображение в две колонки */}
-              <div className="flex flex-col lg:flex-row gap-6 mt-4">
+                         {/* Основной контент */}
+             <div className="p-4 sm:p-6 pr-16">
+               {/* Заголовок */}
+               <div className="text-xl sm:text-2xl font-bold text-white mb-4 leading-tight">
+                 {selectedNews.title}
+                 {selectedNews.type === 'article' && (
+                   <span className="ml-3 text-sm font-normal text-orange-400">
+                     📄 Статья
+                   </span>
+                 )}
+               </div>
+               
+               {/* Контент и изображение в две колонки */}
+               <div className="flex flex-col lg:flex-row gap-6">
                 {/* Основной контент */}
                 <div className="flex-1 min-w-0 order-2 lg:order-1">
                   {/* Разделитель */}
@@ -436,10 +426,22 @@ export default function ArticlesPage() {
                     </div>
                   );
                 })()}
-              </div>
-            </div>
-          </div>
-        </div>
+                               </div>
+               </div>
+               
+               {/* Дата и автор внизу */}
+               <div className="mt-6 pt-4 border-t border-neutral-700">
+                 <div className="flex items-center justify-between text-xs text-gray-400">
+                   <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
+                   {selectedNews.author && (
+                     <span>
+                       Автор: <span className="font-semibold text-white">{selectedNews.author}</span>
+                     </span>
+                   )}
+                 </div>
+               </div>
+             </div>
+           </div>
       )}
       </div>
     </div>
