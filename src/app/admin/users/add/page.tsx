@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import ImageUpload from '@/components/ui/image-upload';
 import { ArrowLeft, Save, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 
@@ -196,15 +197,13 @@ export default function AddUserPage() {
             </div>
 
             <div>
-              <label htmlFor="avatar" className="block text-sm font-medium text-white mb-2">
-                Аватар (URL)
+              <label className="block text-sm font-medium text-white mb-2">
+                Аватар
               </label>
-              <Input
-                id="avatar"
+              <ImageUpload
                 value={form.avatar}
-                onChange={(e) => setForm(prev => ({ ...prev, avatar: e.target.value }))}
-                placeholder="https://example.com/avatar.jpg"
-                className="bg-neutral-700 border-neutral-600 text-white"
+                onChange={(value) => setForm(prev => ({ ...prev, avatar: value }))}
+                placeholder="Загрузить аватар пользователя"
               />
             </div>
 
