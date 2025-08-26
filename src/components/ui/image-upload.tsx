@@ -112,19 +112,49 @@ export default function ImageUpload({
       />
 
       {value ? (
-        <div className="relative">
-          <img
-            src={value}
-            alt="Preview"
-            className="w-32 h-32 object-cover rounded-lg border border-neutral-600"
-          />
-          <button
-            type="button"
-            onClick={handleRemoveImage}
-            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
+        <div className="space-y-2">
+          <div 
+            className="relative"
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
           >
-            <X className="w-4 h-4" />
-          </button>
+            <img
+              src={value}
+              alt="Preview"
+              className="w-32 h-32 object-cover rounded-lg border border-neutral-600"
+            />
+            <div className={`absolute inset-0 bg-black/50 transition-opacity rounded-lg flex items-center justify-center ${
+              isDragging ? 'opacity-100' : 'opacity-0 hover:opacity-100'
+            }`}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={openFileDialog}
+                disabled={isUploading}
+                className="bg-white/90 hover:bg-white text-black border-white"
+              >
+                {isUploading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                ) : isDragging ? (
+                  'Отпустите для замены'
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Заменить
+                  </>
+                )}
+              </Button>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       ) : (
         <div
