@@ -25,16 +25,6 @@ export default function SidebarWrapper() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
           <div className="bg-neutral-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              {/* Дата и автор */}
-              <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-                <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
-                {selectedNews.author && (
-                  <span>
-                    Автор: <span className="font-semibold text-white">{selectedNews.author}</span>
-                  </span>
-                )}
-              </div>
-              
               {/* Заголовок */}
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-bold text-white pr-4">{selectedNews.title}</h2>
@@ -50,9 +40,6 @@ export default function SidebarWrapper() {
               <div className="flex flex-col lg:flex-row gap-6 mt-4">
                 {/* Основной контент */}
                 <div className="flex-1 min-w-0 order-2 lg:order-1">
-                  {/* Разделитель */}
-                  <hr className="mb-4 border-neutral-700" />
-                  
                   {/* Контент */}
                   <div 
                     className="text-gray-300 leading-relaxed news-content"
@@ -77,6 +64,18 @@ export default function SidebarWrapper() {
                     </div>
                   );
                 })()}
+              </div>
+              
+              {/* Дата и автор внизу */}
+              <div className="mt-6 pt-4 border-t border-neutral-700">
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                  <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
+                  {selectedNews.author && (
+                    <span>
+                      Автор: <span className="font-semibold text-white">{selectedNews.author}</span>
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

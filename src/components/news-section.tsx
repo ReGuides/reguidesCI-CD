@@ -118,21 +118,11 @@ export default function NewsSection() {
             if (e.target === e.currentTarget) setSelectedNews(null);
           }}
         >
-          <div className="relative bg-neutral-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-neutral-700">
+          <div className="relative bg-neutral-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-neutral-700">
             {/* Основной контент */}
             <div className="p-4 sm:p-6">
-              {/* Дата и автор */}
-              <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-                <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
-                {selectedNews.author && (
-                  <span>
-                    Автор: <span className="font-semibold text-white">{selectedNews.author}</span>
-                  </span>
-                )}
-              </div>
-              
               {/* Заголовок */}
-              <div className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">
+              <div className="text-xl sm:text-2xl font-bold text-white mb-4 leading-tight">
                 {selectedNews.title}
               </div>
               
@@ -140,9 +130,6 @@ export default function NewsSection() {
               <div className="flex flex-col lg:flex-row gap-6 mt-4">
                 {/* Основной контент */}
                 <div className="flex-1 min-w-0 order-2 lg:order-1">
-                  {/* Разделитель */}
-                  <hr className="mb-4 border-neutral-700" />
-                  
                   {/* Контент */}
                   <div 
                     className="text-sm sm:text-base news-content"
@@ -182,6 +169,18 @@ export default function NewsSection() {
                     </div>
                   );
                 })()}
+              </div>
+              
+              {/* Дата и автор внизу */}
+              <div className="mt-6 pt-4 border-t border-neutral-700">
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                  <span>{selectedNews.publishedAt ? new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU') : 'Дата не указана'}</span>
+                  {selectedNews.author && (
+                    <span>
+                      Автор: <span className="font-semibold text-white">{selectedNews.author}</span>
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
