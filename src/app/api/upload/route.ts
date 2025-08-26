@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const fileName = `${timestamp}-${randomString}.${extension}`;
 
     // Путь для сохранения файла
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
+    const uploadDir = join(process.cwd(), 'public', 'images', 'avatars');
     const filePath = join(uploadDir, fileName);
 
     // Создаем директорию, если она не существует
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     await writeFile(filePath, buffer);
 
     // Возвращаем URL файла
-    const fileUrl = `/uploads/${fileName}`;
+    const fileUrl = `/images/avatars/${fileName}`;
 
     return NextResponse.json({
       success: true,

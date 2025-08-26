@@ -78,6 +78,10 @@ export default function UsersPage() {
     loadUsers(1, filters);
   }, [filters, loadUsers]);
 
+  useEffect(() => {
+    loadUsers(pagination.page, filters);
+  }, [pagination.page, loadUsers]);
+
   const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
     if (query.trim()) {
@@ -242,23 +246,29 @@ export default function UsersPage() {
                 className="bg-neutral-800 border border-neutral-700 rounded-lg p-6 hover:bg-neutral-750 transition-colors"
               >
                 {/* Аватар и основная информация */}
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-neutral-700 rounded-full flex items-center justify-center">
-                    {user.avatar ? (
-                      <img 
-                        src={user.avatar} 
-                        alt={user.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <UserIcon className="w-6 h-6 text-gray-400" />
-                    )}
+                <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-700 flex items-center justify-center">
+                      {user.avatar ? (
+                        <img 
+                          src={user.avatar} 
+                          alt={user.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <span className={`text-sm font-medium text-neutral-400 ${user.avatar ? 'hidden' : ''}`}>
+                        {user.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-white">{user.name}</h3>
+                      <p className="text-sm text-gray-400">{user.login}</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white">{user.name}</h3>
-                    <p className="text-sm text-gray-400">{user.login}</p>
-                  </div>
-                </div>
 
                 {/* Роль и статус */}
                 <div className="flex items-center gap-2 mb-4">

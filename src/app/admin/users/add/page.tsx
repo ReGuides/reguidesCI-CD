@@ -205,6 +205,11 @@ export default function AddUserPage() {
                 onChange={(value) => setForm(prev => ({ ...prev, avatar: value }))}
                 placeholder="Загрузить аватар пользователя"
               />
+              {form.avatar && (
+                <p className="text-xs text-green-400 mt-2">
+                  Аватар загружен: {form.avatar}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center space-x-2">

@@ -50,21 +50,26 @@ export default function ImageUpload({
       });
 
       if (!response.ok) {
-        throw new Error('Ошибка загрузки изображения');
+        const errorData = await response.json();
+        throw new Error(`Ошибка загрузки: ${errorData.error || response.statusText}`);
       }
 
       const data = await response.json();
       
-      // Обновляем состояние с новым URL изображения
-      onChange(data.url);
-      
-      // Очищаем input для возможности повторной загрузки того же файла
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+      if (data.success && data.url) {
+        // Обновляем состояние с новым URL изображения
+        onChange(data.url);
+        
+        // Очищаем input для возможности повторной загрузки того же файла
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } else {
+        throw new Error('Неверный ответ от сервера');
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Ошибка при загрузке изображения');
+      alert(`Ошибка при загрузке изображения: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
     } finally {
       setIsUploading(false);
     }
