@@ -12,7 +12,7 @@ import Link from 'next/link';
 
 interface UserFormData {
   name: string;
-  email: string;
+  login: string;
   password: string;
   confirmPassword: string;
   role: 'user' | 'admin' | 'moderator';
@@ -30,7 +30,7 @@ export default function EditUserPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState<UserFormData>({
     name: '',
-    email: '',
+    login: '',
     password: '',
     confirmPassword: '',
     role: 'user',
@@ -56,7 +56,7 @@ export default function EditUserPage() {
         setUser(userData);
         setForm({
           name: userData.name || '',
-          email: userData.email || '',
+          login: userData.login || '',
           password: '',
           confirmPassword: '',
           role: userData.role || 'user',
@@ -83,7 +83,7 @@ export default function EditUserPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!form.name || !form.email || !form.role) {
+    if (!form.name || !form.login || !form.role) {
       alert('Заполните обязательные поля');
       return;
     }
@@ -104,7 +104,7 @@ export default function EditUserPage() {
 
       const updateData: Partial<UserFormData> = {
         name: form.name,
-        email: form.email,
+        login: form.login,
         role: form.role,
         avatar: form.avatar || undefined,
         isActive: form.isActive
@@ -207,15 +207,15 @@ export default function EditUserPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-                Email *
+              <label htmlFor="login" className="block text-sm font-medium text-white mb-2">
+                Логин *
               </label>
               <Input
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="user@example.com"
+                id="login"
+                type="text"
+                value={form.login}
+                onChange={(e) => setForm(prev => ({ ...prev, login: e.target.value }))}
+                placeholder="Введите логин пользователя"
                 className="bg-neutral-700 border-neutral-600 text-white"
                 required
               />

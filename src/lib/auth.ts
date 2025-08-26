@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 export interface User {
   id: string;
   name: string;
-  email: string;
+  login: string;
   isAdmin: boolean;
 }
 
@@ -28,7 +28,7 @@ export async function auth(): Promise<Session | null> {
         user: {
           id: '1',
           name: 'Администратор',
-          email: 'admin@reguides.com',
+          login: 'admin',
           isAdmin: true
         }
       };

@@ -190,7 +190,7 @@ export type ArtifactOrCombination = Artifact | ArtifactCombination | StatCombina
 export interface User {
   _id: string;
   name: string;
-  email: string;
+  login: string;
   role: 'user' | 'admin' | 'moderator';
   avatar?: string;
   isActive: boolean;
@@ -270,14 +270,14 @@ export interface ArtifactFilters {
 
 // Auth types
 export interface LoginCredentials {
-  email: string;
+  login: string;
   password: string;
 }
 
 export interface AuthUser {
   id: string;
   name: string;
-  email: string;
+  login: string;
   role: string;
   avatar?: string;
 }

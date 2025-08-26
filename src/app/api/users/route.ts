@@ -8,7 +8,7 @@ interface UserQuery {
   isActive?: boolean;
   $or?: Array<{
     name?: { $regex: string; $options: string };
-    email?: { $regex: string; $options: string };
+    login?: { $regex: string; $options: string };
   }>;
 }
 
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
+        { login: { $regex: search, $options: 'i' } }
       ];
     }
 
@@ -80,12 +80,12 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body = await request.json();
-    const { name, email, password, role, avatar, isActive } = body;
+    const { name, login, password, role, avatar, isActive } = body;
 
     // Валидация
-    if (!name || !email || !password || !role) {
+    if (!name || !login || !password || !role) {
       return NextResponse.json(
-        { success: false, error: 'Name, email, password and role are required' },
+        { success: false, error: 'Name, login, password and role are required' },
         { status: 400 }
       );
     }
@@ -97,11 +97,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Проверяем, что email уникален
-    const existingUser = await User.findOne({ email });
+    // Проверяем, что login уникален
+    const existingUser = await User.findOne({ login });
     if (existingUser) {
       return NextResponse.json(
-        { success: false, error: 'User with this email already exists' },
+        { success: false, error: 'User with this login already exists' },
         { status: 400 }
       );
     }
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
 
     const user = new User({
       name,
-      email,
+      login,
       password: hashedPassword,
       role,
       avatar,

@@ -9,7 +9,7 @@ interface RouteParams {
 
 interface UserUpdateData {
   name: string;
-  email: string;
+  login: string;
   role: string;
   avatar?: string;
   isActive: boolean;
@@ -54,12 +54,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     await connectDB();
     
     const body = await request.json();
-    const { name, email, password, role, avatar, isActive } = body;
+    const { name, login, password, role, avatar, isActive } = body;
 
     // Валидация
-    if (!name || !email || !role) {
+    if (!name || !login || !role) {
       return NextResponse.json(
-        { success: false, error: 'Name, email and role are required' },
+        { success: false, error: 'Name, login and role are required' },
         { status: 400 }
       );
     }
@@ -71,18 +71,18 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Проверяем, что email уникален (исключая текущего пользователя)
-    const existingUser = await User.findOne({ email, _id: { $ne: id } });
+    // Проверяем, что login уникален (исключая текущего пользователя)
+    const existingUser = await User.findOne({ login, _id: { $ne: id } });
     if (existingUser) {
       return NextResponse.json(
-        { success: false, error: 'User with this email already exists' },
+        { success: false, error: 'User with this login already exists' },
         { status: 400 }
       );
     }
 
     const updateData: UserUpdateData = {
       name,
-      email,
+      login,
       role,
       avatar,
       isActive

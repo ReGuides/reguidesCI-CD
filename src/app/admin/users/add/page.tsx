@@ -15,7 +15,7 @@ export default function AddUserPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     name: '',
-    email: '',
+    login: '',
     password: '',
     confirmPassword: '',
     role: 'user' as 'user' | 'admin' | 'moderator',
@@ -26,7 +26,7 @@ export default function AddUserPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!form.name || !form.email || !form.password || !form.role) {
+    if (!form.name || !form.login || !form.password || !form.role) {
       alert('Пожалуйста, заполните все обязательные поля');
       return;
     }
@@ -51,7 +51,7 @@ export default function AddUserPage() {
         },
         body: JSON.stringify({
           name: form.name,
-          email: form.email,
+          login: form.login,
           password: form.password,
           role: form.role,
           avatar: form.avatar || undefined,
@@ -115,15 +115,15 @@ export default function AddUserPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-                Email *
+              <label htmlFor="login" className="block text-sm font-medium text-white mb-2">
+                Логин *
               </label>
               <Input
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="user@example.com"
+                id="login"
+                type="text"
+                value={form.login}
+                onChange={(e) => setForm(prev => ({ ...prev, login: e.target.value }))}
+                placeholder="Введите логин пользователя"
                 className="bg-neutral-700 border-neutral-600 text-white"
                 required
               />

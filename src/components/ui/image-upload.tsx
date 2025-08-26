@@ -54,7 +54,14 @@ export default function ImageUpload({
       }
 
       const data = await response.json();
+      
+      // Обновляем состояние с новым URL изображения
       onChange(data.url);
+      
+      // Очищаем input для возможности повторной загрузки того же файла
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('Ошибка при загрузке изображения');

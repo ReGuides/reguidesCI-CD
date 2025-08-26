@@ -5,7 +5,7 @@ const UserSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
-  email: { 
+  login: { 
     type: String, 
     required: true,
     unique: true,
@@ -46,7 +46,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Индексы для оптимизации запросов
-UserSchema.index({ email: 1 });
+UserSchema.index({ login: 1 });
 UserSchema.index({ role: 1 });
 UserSchema.index({ isActive: 1 });
 

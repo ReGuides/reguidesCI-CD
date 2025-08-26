@@ -256,7 +256,7 @@ export default function UsersPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-white">{user.name}</h3>
-                    <p className="text-sm text-gray-400">{user.email}</p>
+                    <p className="text-sm text-gray-400">{user.login}</p>
                   </div>
                 </div>
 
