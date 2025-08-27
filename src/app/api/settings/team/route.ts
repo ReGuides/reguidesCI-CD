@@ -23,14 +23,14 @@ export async function GET() {
     
     // Объединяем данные пользователей с ролями и описаниями
     const teamWithUsers = settings.team.map(member => {
-      const user = users.find(u => u._id.toString() === member.userId);
+      const user = users.find(u => u._id?.toString() === member.userId);
       return {
         ...member,
         user: user ? {
-          _id: user._id,
-          name: user.name,
-          avatar: user.avatar,
-          email: user.email
+          _id: user._id?.toString() || '',
+          name: user.name || '',
+          avatar: user.avatar || '',
+          email: user.email || ''
         } : null
       };
     });

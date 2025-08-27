@@ -27,10 +27,10 @@ export async function GET() {
             const user = users.find(u => u._id?.toString() === member.userId);
             if (user) {
               return {
-                name: user.name,
+                name: user.name || '',
                 role: member.role,
                 description: member.description,
-                avatar: user.avatar,
+                avatar: user.avatar || '',
                 order: member.order
               };
             }
