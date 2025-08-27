@@ -4,16 +4,6 @@ import { About, IAbout } from '@/lib/db/models/About';
 import { User } from '@/lib/db/models/User';
 import SiteSettings from '@/models/SiteSettings';
 
-interface AboutData {
-  team?: Array<{
-    name: string;
-    avatar?: string | null;
-    role?: string;
-    description?: string;
-  }>;
-  [key: string]: unknown;
-}
-
 export async function GET() {
   try {
     await connectToDatabase();
