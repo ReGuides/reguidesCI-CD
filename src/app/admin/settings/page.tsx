@@ -9,7 +9,6 @@ import {
   Save, 
   Globe,
   Upload,
-  X,
   Plus,
   Trash2,
   MoveUp,
@@ -108,12 +107,7 @@ export default function SettingsPage() {
     }
   };
 
-  const removeImage = (type: 'logo' | 'favicon') => {
-    setSettings(prev => ({
-      ...prev,
-      [type]: type === 'logo' ? '/images/logos/logo.png' : '/favicon.ico'
-    }));
-  };
+
 
   useEffect(() => {
     fetchSettings();
@@ -241,7 +235,7 @@ export default function SettingsPage() {
     }));
   };
 
-  const updateTeamMember = (index: number, field: keyof TeamMember, value: any) => {
+  const updateTeamMember = (index: number, field: keyof TeamMember, value: string | Record<string, string>) => {
     setSettings(prev => ({
       ...prev,
       team: prev.team.map((member, i) => 
@@ -469,13 +463,13 @@ export default function SettingsPage() {
                   <Upload className="w-4 h-4 mr-2" />
                   {uploadingFavicon ? 'Загрузка...' : 'Загрузить'}
                 </Button>
-                <input
-                  id="favicon-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileSelect.bind(null, 'favicon')}
-                />
+                                 <input
+                   id="favicon-upload"
+                   type="file"
+                   accept="image/*"
+                   className="hidden"
+                   onChange={(e) => handleFileSelect('favicon', e)}
+                 />
               </div>
             </div>
           </CardContent>
@@ -508,9 +502,9 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {settings.team.length === 0 ? (
-              <p className="text-neutral-400 text-center py-8">
-                Команда пока не добавлена. Нажмите "Добавить участника" чтобы начать.
-              </p>
+                             <p className="text-neutral-400 text-center py-8">
+                 Команда пока не добавлена. Нажмите &quot;Добавить участника&quot; чтобы начать.
+               </p>
             ) : (
               <div className="space-y-4">
                 {settings.team.map((member, index) => (
