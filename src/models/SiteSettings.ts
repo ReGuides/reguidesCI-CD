@@ -1,12 +1,10 @@
 import mongoose from 'mongoose';
 
 export interface TeamMember {
-  name: string;
-  role: string;
-  description?: string;
-  avatar?: string;
-  social?: Record<string, string>;
-  order: number;
+  userId: string;        // ID пользователя из коллекции users
+  role: string;          // Роль в команде
+  description?: string;  // Описание участника
+  order: number;         // Порядок отображения
 }
 
 export interface ISiteSettings {
@@ -23,12 +21,10 @@ interface ISiteSettingsModel extends mongoose.Model<ISiteSettings> {
 }
 
 const teamMemberSchema = new mongoose.Schema<TeamMember>({
-  name: { type: String, required: true },
-  role: { type: String, required: true },
-  description: { type: String },
-  avatar: { type: String },
-  social: { type: mongoose.Schema.Types.Mixed },
-  order: { type: Number, default: 0 }
+  userId: { type: String, required: true },  // ID пользователя
+  role: { type: String, required: true },    // Роль в команде
+  description: { type: String },             // Описание
+  order: { type: Number, default: 0 }        // Порядок
 });
 
 const siteSettingsSchema = new mongoose.Schema<ISiteSettings>({
@@ -47,7 +43,7 @@ const siteSettingsSchema = new mongoose.Schema<ISiteSettings>({
     default: '/favicon.ico'
   },
   
-  // Команда разработчиков
+  // Команда разработчиков (массив пользователей с ролями)
   team: {
     type: [teamMemberSchema],
     default: []

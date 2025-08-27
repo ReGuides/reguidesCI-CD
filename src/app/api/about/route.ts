@@ -18,7 +18,30 @@ export async function GET() {
       try {
         const siteSettings = await SiteSettings.getSettings();
         if (siteSettings.team && siteSettings.team.length > 0) {
-          about.team = siteSettings.team;
+          // Получаем данные пользователей для команды
+          const userIds = siteSettings.team.map(member => member.userId);
+          const users = await User.find({ _id: { $in: userIds } }).lean();
+          
+          // Формируем команду с данными пользователей
+          const teamMembers = siteSettings.team.map(member => {
+            const user = users.find(u => u._id?.toString() === member.userId);
+            if (user) {
+              return {
+                name: user.name,
+                role: member.role,
+                description: member.description,
+                avatar: user.avatar,
+                order: member.order
+              };
+            }
+            return null;
+          }).filter(Boolean);
+          
+          // Присваиваем команду только если есть валидные участники
+          if (teamMembers.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            about.team = teamMembers as any;
+          }
         }
       } catch (error) {
         console.error('Error fetching site settings team:', error);

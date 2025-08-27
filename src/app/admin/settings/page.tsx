@@ -12,7 +12,8 @@ import {
   Plus,
   Trash2,
   MoveUp,
-  MoveDown
+  MoveDown,
+  Users
 } from 'lucide-react';
 import Image from 'next/image';
 import { TeamMember, ISiteSettings } from '@/models/SiteSettings';
@@ -22,6 +23,19 @@ interface SettingsState extends Omit<ISiteSettings, 'createdAt' | 'updatedAt'> {
   _id?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+// Интерфейс для пользователя
+interface User {
+  _id: string;
+  name: string;
+  avatar?: string;
+  email: string;
+}
+
+// Интерфейс для участника команды с данными пользователя
+interface TeamMemberWithUser extends TeamMember {
+  user?: User;
 }
 
 export default function SettingsPage() {
@@ -36,6 +50,13 @@ export default function SettingsPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
+  
+  // Состояние для управления командой
+  const [users, setUsers] = useState<User[]>([]);
+  const [showUserSelector, setShowUserSelector] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [newMemberRole, setNewMemberRole] = useState('');
+  const [newMemberDescription, setNewMemberDescription] = useState('');
 
   // Функция для принудительного обновления настроек
   const refreshSettingsAfterUpload = async () => {
@@ -96,10 +117,9 @@ export default function SettingsPage() {
     }
   };
 
-
-
   useEffect(() => {
     fetchSettings();
+    fetchUsers();
   }, []);
 
   // Загружаем команду при инициализации
@@ -108,6 +128,20 @@ export default function SettingsPage() {
       fetchTeam();
     }
   }, [loading]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/users/list');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setUsers(result.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
 
   const fetchTeam = async () => {
     try {
@@ -197,24 +231,38 @@ export default function SettingsPage() {
     }
   };
 
-
-
-
-
   // Функции для управления командой
   const addTeamMember = () => {
+    if (!selectedUserId || !newMemberRole.trim()) {
+      setMessage({ type: 'error', text: 'Выберите пользователя и укажите роль' });
+      return;
+    }
+
+    // Проверяем, не добавлен ли уже этот пользователь
+    if (settings.team.some(member => member.userId === selectedUserId)) {
+      setMessage({ type: 'error', text: 'Этот пользователь уже в команде' });
+      return;
+    }
+
     const newMember: TeamMember = {
-      name: '',
-      role: '',
-      description: '',
-      avatar: '',
-      social: {},
+      userId: selectedUserId,
+      role: newMemberRole.trim(),
+      description: newMemberDescription.trim() || undefined,
       order: settings.team.length
     };
+
     setSettings(prev => ({
       ...prev,
       team: [...prev.team, newMember]
     }));
+
+    // Сбрасываем форму
+    setSelectedUserId('');
+    setNewMemberRole('');
+    setNewMemberDescription('');
+    setShowUserSelector(false);
+    setMessage({ type: 'success', text: 'Участник добавлен в команду' });
+    setTimeout(() => setMessage(null), 3000);
   };
 
   const removeTeamMember = (index: number) => {
@@ -224,7 +272,7 @@ export default function SettingsPage() {
     }));
   };
 
-  const updateTeamMember = (index: number, field: keyof TeamMember, value: string | Record<string, string>) => {
+  const updateTeamMember = (index: number, field: keyof TeamMember, value: string) => {
     setSettings(prev => ({
       ...prev,
       team: prev.team.map((member, i) => 
@@ -281,35 +329,9 @@ export default function SettingsPage() {
     }
   };
 
-  const migrateTeam = async () => {
-    try {
-      setSaving(true);
-      const response = await fetch('/api/settings/migrate-team', {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setMessage({ type: 'success', text: result.message });
-          // Обновляем команду в интерфейсе
-          setSettings(prev => ({
-            ...prev,
-            team: result.data
-          }));
-          setTimeout(() => setMessage(null), 5000);
-        } else {
-          setMessage({ type: 'error', text: result.message });
-        }
-      } else {
-        setMessage({ type: 'error', text: 'Ошибка при миграции команды' });
-      }
-    } catch (error) {
-      console.error('Error migrating team:', error);
-      setMessage({ type: 'error', text: 'Ошибка при миграции команды' });
-    } finally {
-      setSaving(false);
-    }
+  // Получаем данные пользователя по ID
+  const getUserById = (userId: string) => {
+    return users.find(user => user._id === userId);
   };
 
   if (loading) {
@@ -406,13 +428,13 @@ export default function SettingsPage() {
                   <Upload className="w-4 h-4 mr-2" />
                   {uploadingLogo ? 'Загрузка...' : 'Загрузить'}
                 </Button>
-                                 <input
-                   id="logo-upload"
-                   type="file"
-                   accept="image/*"
-                   className="hidden"
-                   onChange={(e) => handleFileSelect('logo', e)}
-                 />
+                <input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleFileSelect('logo', e)}
+                />
               </div>
             </div>
 
@@ -452,13 +474,13 @@ export default function SettingsPage() {
                   <Upload className="w-4 h-4 mr-2" />
                   {uploadingFavicon ? 'Загрузка...' : 'Загрузить'}
                 </Button>
-                                 <input
-                   id="favicon-upload"
-                   type="file"
-                   accept="image/*"
-                   className="hidden"
-                   onChange={(e) => handleFileSelect('favicon', e)}
-                 />
+                <input
+                  id="favicon-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleFileSelect('favicon', e)}
+                />
               </div>
             </div>
           </CardContent>
@@ -468,147 +490,186 @@ export default function SettingsPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Команда разработчиков</span>
-              <div className="flex gap-2">
-                <Button
-                  onClick={migrateTeam}
-                  size="sm"
-                  variant="outline"
-                  className="border-yellow-600 text-yellow-400 hover:bg-yellow-600 hover:text-white"
-                >
-                  Мигрировать из About
-                </Button>
-                <Button
-                  onClick={addTeamMember}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Добавить участника
-                </Button>
-              </div>
+              <span className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Команда разработчиков
+              </span>
+              <Button
+                onClick={() => setShowUserSelector(!showUserSelector)}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Добавить участника
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Форма добавления участника */}
+            {showUserSelector && (
+              <div className="mb-6 p-4 border border-neutral-700 rounded-lg bg-neutral-800/50">
+                <h3 className="text-lg font-semibold text-white mb-4">Добавить участника команды</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Выберите пользователя *
+                    </label>
+                    <select
+                      value={selectedUserId}
+                      onChange={(e) => setSelectedUserId(e.target.value)}
+                      className="w-full p-2 bg-neutral-800 border border-neutral-600 text-white rounded-md"
+                    >
+                      <option value="">Выберите пользователя</option>
+                      {users.map(user => (
+                        <option key={user._id} value={user._id}>
+                          {user.name} ({user.email})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Роль в команде *
+                    </label>
+                    <Input
+                      value={newMemberRole}
+                      onChange={(e) => setNewMemberRole(e.target.value)}
+                      placeholder="Например: Frontend Developer"
+                      className="bg-neutral-800 border-neutral-600 text-white"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Описание (необязательно)
+                  </label>
+                  <Input
+                    value={newMemberDescription}
+                    onChange={(e) => setNewMemberDescription(e.target.value)}
+                    placeholder="Краткое описание роли участника"
+                    className="bg-neutral-800 border-neutral-600 text-white"
+                  />
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    onClick={addTeamMember}
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Добавить в команду
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowUserSelector(false);
+                      setSelectedUserId('');
+                      setNewMemberRole('');
+                      setNewMemberDescription('');
+                    }}
+                    size="sm"
+                    variant="outline"
+                  >
+                    Отмена
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Список участников команды */}
             {settings.team.length === 0 ? (
-                             <p className="text-neutral-400 text-center py-8">
-                 Команда пока не добавлена. Нажмите &quot;Добавить участника&quot; чтобы начать.
-               </p>
+              <p className="text-neutral-400 text-center py-8">
+                Команда пока не добавлена. Нажмите &quot;Добавить участника&quot; чтобы начать.
+              </p>
             ) : (
               <div className="space-y-4">
-                {settings.team.map((member, index) => (
-                  <div key={index} className="border border-neutral-700 rounded-lg p-4 bg-neutral-800/50">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
+                {settings.team.map((member, index) => {
+                  const user = getUserById(member.userId);
+                  if (!user) return null;
+                  
+                  return (
+                    <div key={index} className="border border-neutral-700 rounded-lg p-4 bg-neutral-800/50">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            onClick={() => moveTeamMember(index, 'up')}
+                            disabled={index === 0}
+                            size="sm"
+                            variant="outline"
+                          >
+                            <MoveUp className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            onClick={() => moveTeamMember(index, 'down')}
+                            disabled={index === settings.team.length - 1}
+                            size="sm"
+                            variant="outline"
+                          >
+                            <MoveDown className="w-4 h-4" />
+                          </Button>
+                          <span className="text-sm text-neutral-400">Порядок: {member.order + 1}</span>
+                        </div>
                         <Button
-                          onClick={() => moveTeamMember(index, 'up')}
-                          disabled={index === 0}
+                          onClick={() => removeTeamMember(index)}
                           size="sm"
                           variant="outline"
+                          className="text-red-400 hover:text-red-300 hover:border-red-400"
                         >
-                          <MoveUp className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
-                        <Button
-                          onClick={() => moveTeamMember(index, 'down')}
-                          disabled={index === settings.team.length - 1}
-                          size="sm"
-                          variant="outline"
-                        >
-                          <MoveDown className="w-4 h-4" />
-                        </Button>
-                        <span className="text-sm text-neutral-400">Порядок: {member.order + 1}</span>
-                      </div>
-                      <Button
-                        onClick={() => removeTeamMember(index)}
-                        size="sm"
-                        variant="outline"
-                        className="text-red-400 hover:text-red-300 hover:border-red-400"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Имя *
-                        </label>
-                        <Input
-                          value={member.name}
-                          onChange={(e) => updateTeamMember(index, 'name', e.target.value)}
-                          placeholder="Имя участника"
-                          className="bg-neutral-800 border-neutral-600 text-white"
-                        />
                       </div>
                       
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Роль *
-                        </label>
-                        <Input
-                          value={member.role}
-                          onChange={(e) => updateTeamMember(index, 'role', e.target.value)}
-                          placeholder="Роль в проекте"
-                          className="bg-neutral-800 border-neutral-600 text-white"
-                        />
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="relative w-12 h-12 bg-neutral-700 rounded-full overflow-hidden">
+                          {user.avatar ? (
+                            <Image
+                              src={user.avatar}
+                              alt={user.name}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                              <span className="text-lg">👤</span>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-semibold text-white">{user.name}</h4>
+                          <p className="text-neutral-400 text-sm">{user.email}</p>
+                        </div>
                       </div>
                       
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Описание
-                        </label>
-                        <Input
-                          value={member.description || ''}
-                          onChange={(e) => updateTeamMember(index, 'description', e.target.value)}
-                          placeholder="Краткое описание участника"
-                          className="bg-neutral-800 border-neutral-600 text-white"
-                        />
-                      </div>
-                      
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Аватар (URL)
-                        </label>
-                        <Input
-                          value={member.avatar || ''}
-                          onChange={(e) => updateTeamMember(index, 'avatar', e.target.value)}
-                          placeholder="URL аватара"
-                          className="bg-neutral-800 border-neutral-600 text-white"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          GitHub
-                        </label>
-                        <Input
-                          value={member.social?.github || ''}
-                          onChange={(e) => updateTeamMember(index, 'social', { 
-                            ...member.social, 
-                            github: e.target.value 
-                          })}
-                          placeholder="GitHub профиль"
-                          className="bg-neutral-800 border-neutral-600 text-white"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Telegram
-                        </label>
-                        <Input
-                          value={member.social?.telegram || ''}
-                          onChange={(e) => updateTeamMember(index, 'social', { 
-                            ...member.social, 
-                            telegram: e.target.value 
-                          })}
-                          placeholder="Telegram"
-                          className="bg-neutral-800 border-neutral-600 text-white"
-                        />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Роль в команде *
+                          </label>
+                          <Input
+                            value={member.role}
+                            onChange={(e) => updateTeamMember(index, 'role', e.target.value)}
+                            placeholder="Роль в проекте"
+                            className="bg-neutral-800 border-neutral-600 text-white"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Описание
+                          </label>
+                          <Input
+                            value={member.description || ''}
+                            onChange={(e) => updateTeamMember(index, 'description', e.target.value)}
+                            placeholder="Описание роли"
+                            className="bg-neutral-800 border-neutral-600 text-white"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 
                 <div className="flex justify-end pt-4">
                   <Button
