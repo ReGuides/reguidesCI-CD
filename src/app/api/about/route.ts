@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
-import { About } from '@/lib/db/models/About';
+import { About, IAbout } from '@/lib/db/models/About';
 import { User } from '@/lib/db/models/User';
 import SiteSettings from '@/models/SiteSettings';
 
@@ -17,7 +17,7 @@ interface AboutData {
 export async function GET() {
   try {
     await connectToDatabase();
-    const about = await About.findOne({ isActive: true }).sort({ updatedAt: -1 }).lean() as AboutData;
+    const about = await About.findOne({ isActive: true }).sort({ updatedAt: -1 }).lean() as IAbout | null;
     
     if (!about) {
       return NextResponse.json({ error: 'About data not found' }, { status: 404 });

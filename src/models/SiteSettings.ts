@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-interface TeamMember {
+export interface TeamMember {
   name: string;
   role: string;
   description?: string;
@@ -9,7 +9,7 @@ interface TeamMember {
   order: number;
 }
 
-interface ISiteSettings {
+export interface ISiteSettings {
   siteName: string;
   logo?: string;
   favicon?: string;

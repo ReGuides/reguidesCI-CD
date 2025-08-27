@@ -15,28 +15,17 @@ import {
   MoveDown
 } from 'lucide-react';
 import Image from 'next/image';
+import { TeamMember, ISiteSettings } from '@/models/SiteSettings';
 
-interface TeamMember {
-  name: string;
-  role: string;
-  description?: string;
-  avatar?: string;
-  social?: Record<string, string>;
-  order: number;
-}
-
-interface SiteSettings {
+// Интерфейс для состояния компонента (с опциональными полями)
+interface SettingsState extends Omit<ISiteSettings, 'createdAt' | 'updatedAt'> {
   _id?: string;
-  siteName: string;
-  logo?: string;
-  favicon?: string;
-  team: TeamMember[];
   createdAt?: string;
   updatedAt?: string;
 }
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState<SiteSettings>({
+  const [settings, setSettings] = useState<SettingsState>({
     siteName: 'ReGuides',
     logo: '/images/logos/logo.png',
     favicon: '/favicon.ico',

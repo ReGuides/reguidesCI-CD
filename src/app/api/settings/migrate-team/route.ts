@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
-import { About } from '@/lib/db/models/About';
+import { About, IAbout } from '@/lib/db/models/About';
 import SiteSettings from '@/models/SiteSettings';
 
 export async function POST() {
@@ -8,7 +8,7 @@ export async function POST() {
     await connectToDatabase();
     
     // Получаем команду из About
-    const about = await About.findOne({ isActive: true }).sort({ updatedAt: -1 }).lean();
+    const about = await About.findOne({ isActive: true }).sort({ updatedAt: -1 }).lean() as IAbout | null;
     
     if (!about || !about.team || !Array.isArray(about.team) || about.team.length === 0) {
       return NextResponse.json({ 
