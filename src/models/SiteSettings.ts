@@ -1,9 +1,19 @@
 import mongoose from 'mongoose';
 
+interface TeamMember {
+  name: string;
+  role: string;
+  description?: string;
+  avatar?: string;
+  social?: Record<string, string>;
+  order: number;
+}
+
 interface ISiteSettings {
   siteName: string;
   logo?: string;
   favicon?: string;
+  team: TeamMember[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -11,6 +21,15 @@ interface ISiteSettings {
 interface ISiteSettingsModel extends mongoose.Model<ISiteSettings> {
   getSettings(): Promise<ISiteSettings>;
 }
+
+const teamMemberSchema = new mongoose.Schema<TeamMember>({
+  name: { type: String, required: true },
+  role: { type: String, required: true },
+  description: { type: String },
+  avatar: { type: String },
+  social: { type: mongoose.Schema.Types.Mixed },
+  order: { type: Number, default: 0 }
+});
 
 const siteSettingsSchema = new mongoose.Schema<ISiteSettings>({
   // Основные настройки
@@ -26,6 +45,12 @@ const siteSettingsSchema = new mongoose.Schema<ISiteSettings>({
   favicon: {
     type: String,
     default: '/favicon.ico'
+  },
+  
+  // Команда разработчиков
+  team: {
+    type: [teamMemberSchema],
+    default: []
   },
   
   // Метаданные

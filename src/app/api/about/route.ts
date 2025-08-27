@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
 import { About } from '@/lib/db/models/About';
 import { User } from '@/lib/db/models/User';
+import SiteSettings from '@/models/SiteSettings';
 
 interface AboutData {
   team?: Array<{
@@ -20,6 +21,18 @@ export async function GET() {
     
     if (!about) {
       return NextResponse.json({ error: 'About data not found' }, { status: 404 });
+    }
+
+    // Если команда не указана в About, берем из настроек сайта
+    if (!about.team || !Array.isArray(about.team) || about.team.length === 0) {
+      try {
+        const siteSettings = await SiteSettings.getSettings();
+        if (siteSettings.team && siteSettings.team.length > 0) {
+          about.team = siteSettings.team;
+        }
+      } catch (error) {
+        console.error('Error fetching site settings team:', error);
+      }
     }
 
     // Podtyagivaem avatarki dlya uchastnikov komandy po imeni
