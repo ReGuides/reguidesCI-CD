@@ -33,10 +33,7 @@ interface User {
   email: string;
 }
 
-// Интерфейс для участника команды с данными пользователя
-interface TeamMemberWithUser extends TeamMember {
-  user?: User;
-}
+
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<SettingsState>({
