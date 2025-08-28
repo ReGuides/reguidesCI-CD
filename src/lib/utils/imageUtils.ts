@@ -1,10 +1,7 @@
 // Утилиты для работы с изображениями
 
 export function getCharacterImage(name: string): string {
-  console.log('getCharacterImage called with name:', name);
-  
   if (!name) {
-    console.log('No name provided, using fallback');
     return getFallbackImage('character');
   }
   
@@ -12,7 +9,6 @@ export function getCharacterImage(name: string): string {
   const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
   const result = `/images/characters/${normalizedName}.png`;
   
-  console.log('Normalized name:', name, '->', normalizedName, '->', result);
   return result;
 }
 
@@ -77,43 +73,38 @@ export function getImageWithFallback(
   name: string,
   type: 'character' | 'weapon' | 'artifact'
 ): string {
-  console.log('getImageWithFallback called with:', { originalImage, name, type });
-  
   // Если есть ссылка из базы данных, используем её
   if (originalImage && originalImage.trim() !== '') {
     // Если это полный URL, возвращаем как есть
     if (originalImage.startsWith('http://') || originalImage.startsWith('https://')) {
-      console.log('Using full URL:', originalImage);
       return originalImage;
     }
     // Если это относительный путь, начинающийся с /, возвращаем как есть
     if (originalImage.startsWith('/')) {
-      console.log('Using absolute path:', originalImage);
       return originalImage;
     }
     // Если это просто имя файла (без пути), добавляем правильный префикс
     if (!originalImage.includes('/')) {
-      const result = `/images/${type}s/${originalImage}`;
-      console.log('Using filename with prefix:', result);
-      return result;
+      // Для персонажей используем правильную папку
+      if (type === 'character') {
+        return `/images/characters/${originalImage}`;
+      }
+      return `/images/${type}s/${originalImage}`;
     }
     // Если это относительный путь без начального /, добавляем префикс
-    const result = `/images/${type}s/${originalImage}`;
-    console.log('Using relative path with prefix:', result);
-    return result;
+    if (type === 'character') {
+      return `/images/characters/${originalImage}`;
+    }
+    return `/images/${type}s/${originalImage}`;
   }
   
   // Если ссылки нет, используем имя персонажа для поиска изображения
   if (name && type === 'character') {
-    const result = getCharacterImage(name);
-    console.log('Using character name fallback:', result);
-    return result;
+    return getCharacterImage(name);
   }
   
   // Иначе возвращаем fallback изображение
-  const result = getFallbackImage(type);
-  console.log('Using default fallback:', result);
-  return result;
+  return getFallbackImage(type);
 }
 
 // Функция для проверки существования изображения
