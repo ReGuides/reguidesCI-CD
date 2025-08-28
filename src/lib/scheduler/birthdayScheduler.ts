@@ -1,4 +1,4 @@
-import { isBirthdayToday } from '@/lib/utils/dateUtils';
+
 
 interface BirthdaySchedulerConfig {
   enabled: boolean;

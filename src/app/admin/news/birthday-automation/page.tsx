@@ -28,7 +28,13 @@ interface CronJobStatus {
 export default function BirthdayAutomationPage() {
   const [loading, setLoading] = useState(false);
   const [characters, setCharacters] = useState<BirthdayCharacter[]>([]);
-  const [schedulerStatus, setSchedulerStatus] = useState<any>(null);
+  const [schedulerStatus, setSchedulerStatus] = useState<{
+    isRunning: boolean;
+    enabled: boolean;
+    lastCheck: Date | undefined;
+    nextCheck: Date | undefined;
+    checkInterval: number;
+  } | null>(null);
   const [status, setStatus] = useState<CronJobStatus>({
     isActive: false,
     totalCharacters: 0,
@@ -366,7 +372,7 @@ export default function BirthdayAutomationPage() {
             <p>• <strong>Встроенный планировщик</strong>: Автоматически запускается при открытии админки</p>
             <p>• <strong>Тестовый режим</strong>: Проверка каждые 5 минут для отладки</p>
             <p>• <strong>Обычный режим</strong>: Проверка каждые 24 часа</p>
-            <p>• <strong>Ручная проверка</strong>: Нажмите "Запустить проверку сейчас"</p>
+            <p>• <strong>Ручная проверка</strong>: Нажмите &quot;Запустить проверку сейчас&quot;</p>
             <p>• <strong>Логи</strong>: Проверяйте консоль браузера для деталей выполнения</p>
           </div>
         </CardContent>
