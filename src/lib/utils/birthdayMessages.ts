@@ -7,7 +7,7 @@ interface BirthdayMessage {
 
 export const birthdayMessages: BirthdayMessage[] = [
   {
-    content: `🎊 **Сегодня особенный день в Тейвате!** 🎊\n\n🎂 **[${characterName}](/characters/${characterId})** празднует свой день рождения!\n\n🌟 Поздравляем всех, кто любит этого персонажа! 🎉\n\n🎮 Сегодня идеальный день, чтобы сделать **[${characterName}](/characters/${characterId})** ещё сильнее!\n\n✨ Переходи на страницу персонажа, чтобы узнать, как его лучше прокачать и какие артефакты ему подходят! 🚀`,
+    content: `🎊 **Сегодня особенный день в Тейвате!** 🎊\n\n🎂 **[{{characterName}}](/characters/{{characterId}})** празднует свой день рождения!\n\n🌟 Поздравляем всех, кто любит этого персонажа! 🎉\n\n🎮 Сегодня идеальный день, чтобы сделать **[{{characterName}}](/characters/{{characterId}})** ещё сильнее!\n\n✨ Переходи на страницу персонажа, чтобы узнать, как его лучше прокачать и какие артефакты ему подходят! 🚀`,
     tags: ['день рождения', 'праздник', 'прокачка', 'удача', 'артефакты', 'тейват']
   }
 ];
@@ -18,8 +18,8 @@ export function getRandomBirthdayMessage(characterName: string, characterId: str
   
   return {
     content: message.content
-      .replace(/\${characterName}/g, characterName)
-      .replace(/\${characterId}/g, characterId),
+      .replace(/\{\{characterName\}\}/g, characterName)
+      .replace(/\{\{characterId\}\}/g, characterId),
     tags: [...message.tags, characterName.toLowerCase()]
   };
 }
@@ -30,8 +30,8 @@ export function getBirthdayMessageByIndex(index: number, characterName: string, 
     const message = birthdayMessages[index];
     return {
       content: message.content
-        .replace(/\${characterName}/g, characterName)
-        .replace(/\${characterId}/g, characterId),
+        .replace(/\{\{characterName\}\}/g, characterName)
+        .replace(/\{\{characterId\}\}/g, characterId),
       tags: [...message.tags, characterName.toLowerCase()]
     };
   }
