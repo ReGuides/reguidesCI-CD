@@ -161,6 +161,12 @@ export default function NewsPage() {
             <RefreshCw className="w-4 h-4 mr-2" />
             Обновить
           </Button>
+          <Link href="/admin/news/birthday-automation">
+            <Button variant="outline" className="border-orange-600 text-orange-400 hover:bg-orange-600 hover:text-white">
+              <Cake className="w-4 h-4 mr-2" />
+              Автоматизация
+            </Button>
+          </Link>
           <Link href="/admin/news/add">
             <Button className="bg-purple-600 hover:bg-purple-700">
               <Plus className="w-4 h-4 mr-2" />

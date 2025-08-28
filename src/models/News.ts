@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import { getRandomBirthdayMessage } from '@/lib/utils/birthdayMessages';
 
 export interface INews extends Document {
   title: string;
@@ -107,9 +108,12 @@ NewsSchema.pre('save', function(next) {
 
 // Статический метод для создания новости о дне рождения
 NewsSchema.statics.createBirthdayNews = async function(characterId: string, characterName: string, characterImage?: string) {
+  // Получаем случайное поздравление
+  const birthdayMessage = getRandomBirthdayMessage(characterName, characterId);
+  
   const birthdayNews = {
     title: `🎉 День рождения ${characterName}!`,
-    content: `Сегодня празднует свой день рождения ${characterName}! 🎂\n\nПоздравляем всех поклонников этого персонажа и желаем удачи в игре! 🎮✨`,
+    content: birthdayMessage.content,
     type: 'birthday' as const,
     isPublished: true,
     characterId: new mongoose.Types.ObjectId(characterId),
@@ -117,7 +121,7 @@ NewsSchema.statics.createBirthdayNews = async function(characterId: string, char
     characterImage: characterImage,
     // Устанавливаем основное изображение новости как изображение персонажа
     image: characterImage ? `/images/characters/${characterImage}` : undefined,
-    tags: ['день рождения', 'праздник', characterName.toLowerCase()],
+    tags: birthdayMessage.tags,
     author: 'Система'
   };
 
