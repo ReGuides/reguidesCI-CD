@@ -13,13 +13,23 @@ export function getNewsImage(
   characterName?: string,
   characterImage?: string
 ): string | null {
+  console.log('🔍 getNewsImage DEBUG:', { newsImage, characterId, characterName, characterImage });
+  
   // Если у новости есть свое изображение
   if (newsImage) {
+    console.log('✅ Using news image:', newsImage);
     return newsImage;
   }
   
   // Если есть изображение персонажа из базы данных
   if (characterImage) {
+    console.log('✅ Using character image from DB:', characterImage);
+    // Если characterImage содержит только имя файла, добавляем путь
+    if (characterImage && !characterImage.startsWith('/') && !characterImage.startsWith('http')) {
+      const fullPath = `/images/characters/${characterImage}`;
+      console.log('🔧 Converting character image to full path:', characterImage, '->', fullPath);
+      return fullPath;
+    }
     return characterImage;
   }
   
@@ -27,10 +37,13 @@ export function getNewsImage(
   if (characterId || characterName) {
     // Для новостей дня рождения всегда показываем изображение персонажа
     if (characterName) {
-      return getImageWithFallback(undefined, characterName, 'character');
+      const fallbackImage = getImageWithFallback(undefined, characterName, 'character');
+      console.log('🔄 Using fallback for character:', characterName, '->', fallbackImage);
+      return fallbackImage;
     }
   }
   
+  console.log('❌ No image found, returning null');
   return null;
 }
 

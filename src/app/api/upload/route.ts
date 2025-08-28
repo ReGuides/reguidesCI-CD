@@ -37,8 +37,11 @@ export async function POST(request: NextRequest) {
     const extension = file.name.split('.').pop();
     const fileName = `${timestamp}-${randomString}.${extension}`;
 
+    // Получаем тип загрузки из formData
+    const uploadType = formData.get('type') as string || 'news';
+    
     // Путь для сохранения файла
-    const uploadDir = join(process.cwd(), 'public', 'images', 'avatars');
+    const uploadDir = join(process.cwd(), 'public', 'images', uploadType);
     const filePath = join(uploadDir, fileName);
 
     // Создаем директорию, если она не существует
@@ -52,7 +55,7 @@ export async function POST(request: NextRequest) {
     await writeFile(filePath, buffer);
 
     // Возвращаем URL файла
-    const fileUrl = `/images/avatars/${fileName}`;
+    const fileUrl = `/images/${uploadType}/${fileName}`;
 
     return NextResponse.json({
       success: true,

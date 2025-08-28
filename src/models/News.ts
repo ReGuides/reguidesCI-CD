@@ -115,6 +115,8 @@ NewsSchema.statics.createBirthdayNews = async function(characterId: string, char
     characterId: new mongoose.Types.ObjectId(characterId),
     characterName: characterName,
     characterImage: characterImage,
+    // Устанавливаем основное изображение новости как изображение персонажа
+    image: characterImage ? `/images/characters/${characterImage}` : undefined,
     tags: ['день рождения', 'праздник', characterName.toLowerCase()],
     author: 'Система'
   };
