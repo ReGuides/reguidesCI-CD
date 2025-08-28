@@ -133,7 +133,7 @@ export default function EditNewsPage() {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('image', file); // Используем 'image' вместо 'file'
       formData.append('type', 'news');
 
       const response = await fetch('/api/upload', {
@@ -145,7 +145,9 @@ export default function EditNewsPage() {
         const data = await response.json();
         setForm(prev => ({ ...prev, image: data.url }));
       } else {
-        throw new Error('Ошибка загрузки изображения');
+        const errorData = await response.json();
+        console.error('Upload error:', errorData);
+        throw new Error(`Ошибка загрузки изображения: ${errorData.error || 'Неизвестная ошибка'}`);
       }
     } catch (error) {
       console.error('Error uploading image:', error);

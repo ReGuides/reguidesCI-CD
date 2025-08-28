@@ -8,9 +8,17 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('image') as File;
 
+    console.log('📤 Upload API called with:', { 
+      hasFile: !!file, 
+      fileName: file?.name, 
+      fileSize: file?.size, 
+      fileType: file?.type 
+    });
+
     if (!file) {
+      console.log('❌ No file found in formData');
       return NextResponse.json(
-        { success: false, error: 'No file uploaded' },
+        { success: false, error: 'No file uploaded. Expected field name: "image"' },
         { status: 400 }
       );
     }
@@ -56,6 +64,13 @@ export async function POST(request: NextRequest) {
 
     // Возвращаем URL файла
     const fileUrl = `/images/${uploadType}/${fileName}`;
+
+    console.log('✅ File uploaded successfully:', {
+      fileName,
+      fileUrl,
+      uploadType,
+      size: file.size
+    });
 
     return NextResponse.json({
       success: true,

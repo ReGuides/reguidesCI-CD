@@ -132,7 +132,7 @@ export default function AddNewsPage() {
     try {
       setUploadingImage(true);
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('image', file); // Используем 'image' вместо 'file'
       formData.append('type', 'news'); // Используем тип news для новостей
 
       const response = await fetch('/api/upload', {
@@ -148,7 +148,9 @@ export default function AddNewsPage() {
           alert('Ошибка при загрузке изображения');
         }
       } else {
-        alert('Ошибка при загрузке изображения');
+        const errorData = await response.json();
+        console.error('Upload error:', errorData);
+        alert(`Ошибка при загрузке изображения: ${errorData.error || 'Неизвестная ошибка'}`);
       }
     } catch (error) {
       console.error('Error uploading image:', error);
