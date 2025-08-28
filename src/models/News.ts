@@ -12,6 +12,8 @@ export interface INews extends Document {
   createdAt: Date;
   updatedAt: Date;
   characterId?: mongoose.Types.ObjectId; // Для новостей о персонажах
+  characterName?: string; // Имя персонажа для отображения
+  characterImage?: string; // Изображение персонажа
   tags: string[];
   views: number;
   author: string;
@@ -19,7 +21,7 @@ export interface INews extends Document {
 
 // Интерфейс для статических методов
 export interface INewsModel extends Model<INews> {
-  createBirthdayNews(characterId: string, characterName: string): Promise<INews>;
+  createBirthdayNews(characterId: string, characterName: string, characterImage?: string): Promise<INews>;
   hasBirthdayNews(characterId: string, date: Date): Promise<boolean>;
 }
 
@@ -65,6 +67,14 @@ const NewsSchema = new Schema<INews>({
     type: Schema.Types.ObjectId,
     ref: 'Character'
   },
+  characterName: {
+    type: String,
+    trim: true
+  },
+  characterImage: {
+    type: String,
+    trim: true
+  },
   tags: [{
     type: String,
     trim: true
@@ -96,13 +106,15 @@ NewsSchema.pre('save', function(next) {
 });
 
 // Статический метод для создания новости о дне рождения
-NewsSchema.statics.createBirthdayNews = async function(characterId: string, characterName: string) {
+NewsSchema.statics.createBirthdayNews = async function(characterId: string, characterName: string, characterImage?: string) {
   const birthdayNews = {
     title: `🎉 День рождения ${characterName}!`,
     content: `Сегодня празднует свой день рождения ${characterName}! 🎂\n\nПоздравляем всех поклонников этого персонажа и желаем удачи в игре! 🎮✨`,
     type: 'birthday' as const,
     isPublished: true,
     characterId: new mongoose.Types.ObjectId(characterId),
+    characterName: characterName,
+    characterImage: characterImage,
     tags: ['день рождения', 'праздник', characterName.toLowerCase()],
     author: 'Система'
   };

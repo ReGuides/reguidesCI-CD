@@ -36,7 +36,8 @@ export async function POST() {
         try {
           const birthdayNews = await (News as INewsModel).createBirthdayNews(
             character._id.toString(),
-            character.name
+            character.name,
+            character.image
           );
           
           results.push({
