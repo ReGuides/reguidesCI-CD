@@ -118,26 +118,7 @@ export default function BirthdayNewsCard({ news }: BirthdayNewsCardProps) {
     return <Heart className="w-4 h-4" />;
   };
 
-  // Функция для создания ссылки на персонажа
-  const createCharacterLink = (text: string, characterName: string) => {
-    if (text.includes(characterName)) {
-      const parts = text.split(characterName);
-      return (
-        <>
-          {parts[0]}
-          <Link 
-            href={`/characters/${news.characterId || characterName.toLowerCase()}`}
-            className="text-purple-400 hover:text-purple-300 underline font-medium inline-flex items-center gap-1"
-          >
-            {characterName}
-            <ExternalLink className="w-3 h-3" />
-          </Link>
-          {parts[1]}
-        </>
-      );
-    }
-    return text;
-  };
+
 
   return (
     <Card className="bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-blue-500/10 border-pink-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/20">
