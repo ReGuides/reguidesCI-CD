@@ -13,6 +13,7 @@ export interface INews extends Document {
   createdAt: Date;
   updatedAt: Date;
   characterId?: mongoose.Types.ObjectId; // Для новостей о персонажах
+  characterSlug?: string; // Slug персонажа для URL
   characterName?: string; // Имя персонажа для отображения
   characterImage?: string; // Изображение персонажа
   tags: string[];
@@ -22,7 +23,7 @@ export interface INews extends Document {
 
 // Интерфейс для статических методов
 export interface INewsModel extends Model<INews> {
-  createBirthdayNews(characterId: string, characterName: string, characterImage?: string): Promise<INews>;
+  createBirthdayNews(characterId: string, characterName: string, characterSlug: string, characterImage?: string): Promise<INews>;
   hasBirthdayNews(characterId: string, date: Date): Promise<boolean>;
 }
 
@@ -68,6 +69,10 @@ const NewsSchema = new Schema<INews>({
     type: Schema.Types.ObjectId,
     ref: 'Character'
   },
+  characterSlug: {
+    type: String,
+    trim: true
+  },
   characterName: {
     type: String,
     trim: true
@@ -107,9 +112,9 @@ NewsSchema.pre('save', function(next) {
 });
 
 // Статический метод для создания новости о дне рождения
-NewsSchema.statics.createBirthdayNews = async function(characterId: string, characterName: string, characterImage?: string) {
+NewsSchema.statics.createBirthdayNews = async function(characterId: string, characterName: string, characterSlug: string, characterImage?: string) {
   // Получаем случайное поздравление
-  const birthdayMessage = getRandomBirthdayMessage(characterName, characterId);
+  const birthdayMessage = getRandomBirthdayMessage(characterName, characterSlug);
   
   const birthdayNews = {
     title: `🎉 День рождения ${characterName}!`,
@@ -117,6 +122,7 @@ NewsSchema.statics.createBirthdayNews = async function(characterId: string, char
     type: 'birthday' as const,
     isPublished: true,
     characterId: new mongoose.Types.ObjectId(characterId),
+    characterSlug: characterSlug,
     characterName: characterName,
     characterImage: characterImage,
     // Устанавливаем основное изображение новости как изображение персонажа

@@ -13,7 +13,7 @@ export async function GET() {
     console.log('🎂 Cron job: Checking birthdays for', today.toISOString().split('T')[0]);
     
     // Находим всех персонажей и фильтруем по дню рождения
-    const allCharacters = await Character.find({}).select('_id name birthday image');
+    const allCharacters = await Character.find({}).select('_id id name birthday image');
     const charactersWithBirthday = allCharacters.filter(char => 
       char.birthday && isBirthdayToday(char.birthday)
     );
@@ -45,6 +45,7 @@ export async function GET() {
           const birthdayNews = await (News as INewsModel).createBirthdayNews(
             character._id.toString(),
             character.name,
+            character.id,
             character.image
           );
           

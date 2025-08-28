@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Cake, ExternalLink, Heart, Star, Zap, Trophy, Gem } from 'lucide-react';
+import { Cake, Heart, Star, Zap, Trophy, Gem } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -14,6 +14,7 @@ interface BirthdayNewsCardProps {
     title: string;
     content: string;
     characterId?: string;
+    characterSlug?: string;
     characterName?: string;
     characterImage?: string;
     image?: string;
@@ -25,27 +26,16 @@ interface BirthdayNewsCardProps {
 export default function BirthdayNewsCard({ news }: BirthdayNewsCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Функция для преобразования текста с разметкой в JSX
+  // Функция для преобразования HTML разметки в JSX
   const renderContent = (content: string) => {
     // Разбиваем на строки
     const lines = content.split('\n');
     
     return lines.map((line, index) => {
-      // Обрабатываем жирный текст с ссылками
-      if (line.includes('**')) {
-        const parts = line.split('**');
+      // Обрабатываем HTML разметку
+      if (line.includes('<')) {
         return (
-          <div key={index} className="mb-2">
-            {parts.map((part, partIndex) => 
-              partIndex % 2 === 1 ? (
-                <strong key={partIndex} className="text-purple-400 font-bold">
-                  {renderLinks(part)}
-                </strong>
-              ) : (
-                <span key={partIndex}>{renderLinks(part)}</span>
-              )
-            )}
-          </div>
+          <div key={index} className="mb-2" dangerouslySetInnerHTML={{ __html: line }} />
         );
       }
       
@@ -55,14 +45,14 @@ export default function BirthdayNewsCard({ news }: BirthdayNewsCardProps) {
         return (
           <div key={index} className="flex items-start gap-2 mb-2 text-sm">
             <span className="text-yellow-400 mt-0.5">{icon}</span>
-            <span className="flex-1">{renderLinks(line.substring(1).trim())}</span>
+            <span className="flex-1">{line.substring(1).trim()}</span>
           </div>
         );
       }
       
       // Обычный текст
       if (line.trim()) {
-        return <div key={index} className="mb-2">{renderLinks(line)}</div>;
+        return <div key={index} className="mb-2">{line}</div>;
       }
       
       // Пустые строки
@@ -70,42 +60,7 @@ export default function BirthdayNewsCard({ news }: BirthdayNewsCardProps) {
     });
   };
 
-  // Функция для обработки ссылок в тексте
-  const renderLinks = (text: string) => {
-    // Ищем ссылки в формате [текст](/путь)
-    const linkRegex = /\[([^\]]+)\]\(\/([^)]+)\)/g;
-    const parts = [];
-    let lastIndex = 0;
-    let match;
 
-    while ((match = linkRegex.exec(text)) !== null) {
-      // Добавляем текст до ссылки
-      if (match.index > lastIndex) {
-        parts.push(text.slice(lastIndex, match.index));
-      }
-
-      // Добавляем ссылку
-      parts.push(
-        <Link
-          key={match.index}
-          href={`/${match[2]}`}
-          className="text-purple-400 hover:text-purple-300 underline font-medium inline-flex items-center gap-1"
-        >
-          {match[1]}
-          <ExternalLink className="w-3 h-3" />
-        </Link>
-      );
-
-      lastIndex = match.index + match[0].length;
-    }
-
-    // Добавляем оставшийся текст
-    if (lastIndex < text.length) {
-      parts.push(text.slice(lastIndex));
-    }
-
-    return parts.length > 0 ? <>{parts}</> : text;
-  };
 
   // Функция для определения иконки по содержимому строки
   const getIconForLine = (line: string) => {
@@ -200,9 +155,9 @@ export default function BirthdayNewsCard({ news }: BirthdayNewsCardProps) {
         </div>
 
         {/* Кнопка перехода к персонажу */}
-        {news.characterId && news.characterName && (
+        {news.characterSlug && news.characterName && (
           <div className="mt-4 pt-4 border-t border-pink-500/20">
-            <Link href={`/characters/${news.characterId}`}>
+            <Link href={`/characters/${news.characterSlug}`}>
               <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white">
                 <Star className="w-4 h-4 mr-2" />
                 Прокачать {news.characterName} в день рождения! 🎂
