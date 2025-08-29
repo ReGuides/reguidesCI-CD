@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db/mongodb';
 import fs from 'fs';
 import path from 'path';
 
@@ -37,11 +36,12 @@ export async function GET(request: NextRequest) {
               // Простой парсинг логов в формате: [timestamp] [level] message
               const match = line.match(/\[([^\]]+)\]\s*\[([^\]]+)\]\s*(.*)/);
               if (match) {
-                const [, timestamp, level, message] = match;
-                if (level === 'all' || level.toLowerCase().includes(level.toLowerCase())) {
+                const [, timestamp, logLevel, message] = match;
+                // Фильтруем по уровню, если указан конкретный уровень
+                if (level === 'all' || logLevel.toLowerCase().includes(level.toLowerCase())) {
                   allLogs.push({
                     timestamp,
-                    level: level.toLowerCase(),
+                    level: logLevel.toLowerCase(),
                     message,
                     source: path.basename(logPath)
                   });
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
                   source: path.basename(logPath)
                 });
               }
-            } catch (parseError) {
+            } catch {
               // Игнорируем ошибки парсинга отдельных строк
             }
           });
