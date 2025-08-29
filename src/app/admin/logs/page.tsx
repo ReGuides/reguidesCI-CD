@@ -36,6 +36,23 @@ interface ConsoleLogsData {
   message: string;
   instructions: string[];
   tips: string[];
+  logs: LogEntry[];
+  serverInfo: {
+    uptime: number;
+    memory: {
+      total: number;
+      used: number;
+      free: number;
+    };
+    cpu: {
+      cores: number;
+      model: string;
+      speed: number;
+    };
+    nodeVersion: string;
+    platform: string;
+    architecture: string;
+  };
 }
 
 export default function LogsPage() {
@@ -81,19 +98,35 @@ export default function LogsPage() {
   const loadConsoleLogs = async () => {
     try {
       setConsoleLoading(true);
-      const response = await fetch('/api/admin/console-logs');
+      const response = await fetch('/api/admin/server-logs');
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
-          setConsoleLogs(result.data);
+          setConsoleLogs({
+            message: `Реальные логи сервера (${result.data.total} записей)`,
+            instructions: [
+              `Всего логов: ${result.data.total}`,
+              `Фильтровано: ${result.data.filtered}`,
+              `Источники: ${result.data.sources.join(', ')}`,
+              `Последнее обновление: ${new Date().toLocaleString('ru-RU')}`
+            ],
+            tips: [
+              'Логи обновляются в реальном времени',
+              'Используйте фильтры для поиска ошибок',
+              'Все API вызовы логируются автоматически',
+              'Ошибки MongoDB будут показаны здесь'
+            ],
+            logs: result.data.logs,
+            serverInfo: result.data.serverInfo
+          });
         } else {
-          console.error('Console logs API error:', result.error);
+          console.error('Server logs API error:', result.error);
         }
       } else {
-        console.error('Console logs API response not ok:', response.status);
+        console.error('Server logs API response not ok:', response.status);
       }
     } catch (error) {
-      console.error('Error loading console logs:', error);
+      console.error('Error loading server logs:', error);
     } finally {
       setConsoleLoading(false);
     }
