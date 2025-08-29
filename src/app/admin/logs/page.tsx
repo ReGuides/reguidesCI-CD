@@ -19,10 +19,12 @@ import {
 } from 'lucide-react';
 
 interface LogEntry {
+  id: string;
   timestamp: string;
   level: string;
   message: string;
   source: string;
+  details?: Record<string, unknown>;
 }
 
 interface LogsData {
@@ -52,6 +54,9 @@ interface ConsoleLogsData {
     nodeVersion: string;
     platform: string;
     architecture: string;
+    totalLogs: number;
+    environment: string;
+    timestamp: string;
   };
 }
 
@@ -317,7 +322,7 @@ export default function LogsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Terminal className="w-5 h-5" />
-              Консольные логи и отладка
+              Реальные логи сервера
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -327,58 +332,88 @@ export default function LogsPage() {
                   <h3 className="text-lg font-semibold text-blue-400 mb-2">
                     {consoleLogs.message}
                   </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="text-neutral-400">Всего логов:</span>
+                      <span className="text-white ml-2 font-mono">{consoleLogs.serverInfo?.totalLogs || 0}</span>
+                    </div>
+                    <div>
+                      <span className="text-neutral-400">Окружение:</span>
+                      <span className="text-white ml-2 font-mono">{consoleLogs.serverInfo?.environment || 'unknown'}</span>
+                    </div>
+                    <div>
+                      <span className="text-neutral-400">Обновлено:</span>
+                      <span className="text-white ml-2 font-mono">{consoleLogs.serverInfo?.timestamp ? new Date(consoleLogs.serverInfo.timestamp).toLocaleString('ru-RU') : 'unknown'}</span>
+                    </div>
+                  </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Реальные логи */}
+                {consoleLogs.logs && consoleLogs.logs.length > 0 ? (
                   <div>
                     <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                      <HelpCircle className="w-5 h-5 text-blue-400" />
-                      Инструкции по отладке
+                      <FileText className="w-5 h-5 text-green-400" />
+                      Последние логи ({consoleLogs.logs.length})
                     </h4>
-                    <div className="space-y-2">
-                      {consoleLogs.instructions.map((instruction, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <span className="text-blue-400 font-mono text-sm">{index + 1}.</span>
-                          <span className="text-neutral-300">{instruction}</span>
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {consoleLogs.logs.map((log) => (
+                        <div
+                          key={log.id}
+                          className={`p-3 rounded-lg border ${getLevelColor(log.level)}`}
+                        >
+                          <div className="flex items-start gap-3">
+                            {getLevelIcon(log.level)}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs opacity-70">{new Date(log.timestamp).toLocaleString('ru-RU')}</span>
+                                <span className="text-xs px-2 py-1 rounded bg-neutral-800/50">
+                                  {log.source}
+                                </span>
+                                <span className="text-xs px-2 py-1 rounded bg-neutral-800/50 uppercase">
+                                  {log.level}
+                                </span>
+                              </div>
+                              <div className="text-sm break-words">{log.message}</div>
+                              {log.details && (
+                                <div className="mt-2 text-xs text-neutral-400">
+                                  <details>
+                                    <summary className="cursor-pointer hover:text-neutral-300">Детали</summary>
+                                    <pre className="mt-1 p-2 bg-neutral-800 rounded text-xs overflow-x-auto">
+                                      {JSON.stringify(log.details, null, 2)}
+                                    </pre>
+                                  </details>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
-                  
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                      <Info className="w-5 h-5 text-green-400" />
-                      Полезные советы
-                    </h4>
-                    <div className="space-y-2">
-                      {consoleLogs.tips.map((tip, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <span className="text-green-400 font-mono text-sm">•</span>
-                          <span className="text-neutral-300">{tip}</span>
-                        </div>
-                      ))}
-                    </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    Логи пока не загружены. Попробуйте обновить страницу или добавить участника команды.
                   </div>
-                </div>
+                )}
                 
                 <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-4">
                   <h4 className="text-lg font-semibold text-yellow-400 mb-2">
-                    Как проверить логи команды
+                    Как получить логи команды
                   </h4>
                   <p className="text-neutral-300 mb-3">
-                    Для отладки проблемы с командой разработчиков:
+                    Чтобы увидеть логи команды разработчиков:
                   </p>
                   <ol className="list-decimal list-inside space-y-1 text-neutral-300">
-                    <li>Откройте терминал, где запущен <code className="bg-neutral-800 px-1 rounded">npm run dev</code></li>
-                    <li>Попробуйте добавить участника команды через админку</li>
-                    <li>Ищите логи, начинающиеся с <code className="bg-neutral-800 px-1 rounded">Team GET -</code> или <code className="bg-neutral-800 px-1 rounded">Team PUT -</code></li>
-                    <li>Если есть ошибки, они будут показаны в консоли</li>
+                    <li>Перейдите в <strong>Настройки</strong> → <strong>Команда разработчиков</strong></li>
+                    <li>Попробуйте добавить участника команды</li>
+                    <li>Вернитесь на эту страницу и нажмите <strong>Обновить</strong></li>
+                    <li>Логи появятся выше с источником "team-api"</li>
                   </ol>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8 text-gray-400">
-                Загрузка информации о консольных логах...
+                Загрузка логов сервера...
               </div>
             )}
           </CardContent>
