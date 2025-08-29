@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerLogs, clearServerLogs, getLogStats, ServerLogEntry } from '@/lib/serverLog';
+import { getServerLogs, clearServerLogs, getLogStats } from '@/lib/serverLog';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const level = searchParams.get('level') || undefined;
     const source = searchParams.get('source') || undefined;
 
-    const logs = getServerLogs(limit, level as any, source);
+    const logs = getServerLogs(limit, level as 'info' | 'warn' | 'error' | 'debug' | undefined, source);
     const stats = getLogStats();
     const sources = Object.keys(stats.bySource);
 
