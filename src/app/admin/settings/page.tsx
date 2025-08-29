@@ -33,6 +33,11 @@ interface User {
   email: string;
 }
 
+// Расширенный интерфейс для TeamMember с поддержкой обеих структур
+interface ExtendedTeamMember extends TeamMember {
+  name?: string; // Для старой структуры
+  avatar?: string; // Для старой структуры
+}
 
 
 export default function SettingsPage() {
@@ -244,7 +249,10 @@ export default function SettingsPage() {
     console.log('Adding team member:', { selectedUserId, newMemberRole, newMemberDescription });
 
     // Проверяем, не добавлен ли уже этот пользователь
-    if (settings.team.some(member => member.userId === selectedUserId)) {
+    if (settings.team.some((member: any) => 
+      (member.userId && member.userId === selectedUserId) || 
+      (member.name && member.name === getUserById(selectedUserId)?.name)
+    )) {
       setMessage({ type: 'error', text: 'Этот пользователь уже в команде' });
       return;
     }
