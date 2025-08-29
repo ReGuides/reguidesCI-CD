@@ -118,6 +118,27 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Валидация каждого участника команды
+    for (let i = 0; i < team.length; i++) {
+      const member = team[i];
+      if (!member.userId || typeof member.userId !== 'string' || member.userId.trim() === '') {
+        addServerLog('error', `Team PUT - Invalid member at index ${i}: missing or empty userId`, 'team-api', { member, index: i });
+        return NextResponse.json(
+          { error: `Team member at index ${i}: userId is required and cannot be empty` },
+          { status: 400 }
+        );
+      }
+      if (!member.role || typeof member.role !== 'string' || member.role.trim() === '') {
+        addServerLog('error', `Team PUT - Invalid member at index ${i}: missing or empty role`, 'team-api', { member, index: i });
+        return NextResponse.json(
+          { error: `Team member at index ${i}: role is required and cannot be empty` },
+          { status: 400 }
+        );
+      }
+    }
+
+    addServerLog('info', 'Team PUT - Team data validation passed', 'team-api', { teamCount: team.length });
     
     // Получаем текущие настройки
     let settings = await SiteSettings.findOne();

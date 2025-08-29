@@ -235,6 +235,12 @@ export default function SettingsPage() {
       return;
     }
 
+    // Дополнительная валидация
+    if (!selectedUserId.trim()) {
+      setMessage({ type: 'error', text: 'ID пользователя не может быть пустым' });
+      return;
+    }
+
     console.log('Adding team member:', { selectedUserId, newMemberRole, newMemberDescription });
 
     // Проверяем, не добавлен ли уже этот пользователь
@@ -244,13 +250,19 @@ export default function SettingsPage() {
     }
 
     const newMember: TeamMember = {
-      userId: selectedUserId,
+      userId: selectedUserId.trim(), // Убеждаемся что userId не пустой
       role: newMemberRole.trim(),
       description: newMemberDescription.trim() || undefined,
       order: settings.team.length
     };
 
     console.log('New team member object:', newMember);
+
+    // Проверяем что все обязательные поля заполнены
+    if (!newMember.userId || !newMember.role) {
+      setMessage({ type: 'error', text: 'Не все обязательные поля заполнены' });
+      return;
+    }
 
     setSettings(prev => ({
       ...prev,
