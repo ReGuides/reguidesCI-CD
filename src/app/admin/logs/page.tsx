@@ -42,7 +42,8 @@ export default function LogsPage() {
   const [activeTab, setActiveTab] = useState<'files' | 'console'>('console');
   const [logs, setLogs] = useState<LogsData | null>(null);
   const [consoleLogs, setConsoleLogs] = useState<ConsoleLogsData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [consoleLoading, setConsoleLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [lines, setLines] = useState(100);
@@ -64,7 +65,11 @@ export default function LogsPage() {
         const result = await response.json();
         if (result.success) {
           setLogs(result.data);
+        } else {
+          console.error('Logs API error:', result.error);
         }
+      } else {
+        console.error('Logs API response not ok:', response.status);
       }
     } catch (error) {
       console.error('Error loading logs:', error);
@@ -75,15 +80,22 @@ export default function LogsPage() {
 
   const loadConsoleLogs = async () => {
     try {
+      setConsoleLoading(true);
       const response = await fetch('/api/admin/console-logs');
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
           setConsoleLogs(result.data);
+        } else {
+          console.error('Console logs API error:', result.error);
         }
+      } else {
+        console.error('Console logs API response not ok:', response.status);
       }
     } catch (error) {
       console.error('Error loading console logs:', error);
+    } finally {
+      setConsoleLoading(false);
     }
   };
 
@@ -146,7 +158,7 @@ export default function LogsPage() {
     } else {
       loadConsoleLogs();
     }
-  }, [activeTab, lines, level]);
+  }, [activeTab]); // Убираем lines и level из зависимостей
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -190,7 +202,7 @@ export default function LogsPage() {
     return true;
   }) || [];
 
-  if (loading) {
+  if ((activeTab === 'files' && loading) || (activeTab === 'console' && consoleLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="lg" className="text-purple-600" />
@@ -411,6 +423,16 @@ export default function LogsPage() {
               </div>
               
               <div className="mt-4 flex items-center gap-4">
+                <Button
+                  onClick={loadLogs}
+                  disabled={loading}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Filter className="w-4 h-4 mr-2" />
+                  Применить фильтры
+                </Button>
+                
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
