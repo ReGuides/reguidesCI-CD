@@ -68,11 +68,21 @@ siteSettingsSchema.pre('save', function(next) {
 
 // Создаем единственный документ настроек
 siteSettingsSchema.statics.getSettings = async function(): Promise<ISiteSettings> {
-  let settings = await this.findOne();
-  if (!settings) {
-    settings = await this.create({});
+  try {
+    let settings = await this.findOne();
+    if (!settings) {
+      settings = await this.create({
+        siteName: 'ReGuides',
+        logo: '/images/logos/logo.png',
+        favicon: '/favicon.ico',
+        team: []
+      });
+    }
+    return settings;
+  } catch (error) {
+    console.error('Error in getSettings:', error);
+    throw error;
   }
-  return settings;
 };
 
 const SiteSettings = mongoose.models.SiteSettings as ISiteSettingsModel || 

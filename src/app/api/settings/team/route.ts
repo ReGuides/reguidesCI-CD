@@ -8,6 +8,10 @@ import mongoose from 'mongoose';
 export async function GET() {
   try {
     await connectToDatabase();
+    console.log('Team GET - Connected to database');
+    
+    console.log('Team GET - SiteSettings model:', SiteSettings);
+    console.log('Team GET - SiteSettings.getSettings:', SiteSettings.getSettings);
     
     const settings = await SiteSettings.getSettings();
     console.log('Team GET - SiteSettings:', settings);
