@@ -133,7 +133,7 @@ export function addMongoError(
 // Функция для получения логов
 export function getServerLogs(
   limit: number = 100,
-  level?: ServerLogEntry['level'],
+  level?: ServerLogEntry['level'] | 'all',
   source?: string
 ): ServerLogEntry[] {
   let filteredLogs = serverLogs;

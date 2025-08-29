@@ -5,10 +5,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '100');
-    const level = searchParams.get('level') || undefined;
-    const source = searchParams.get('source') || undefined;
+    const level = searchParams.get('level') || 'all';
+    const source = searchParams.get('source') || 'all';
 
-    const logs = getServerLogs(limit, level as 'info' | 'warn' | 'error' | 'debug' | undefined, source);
+    const logs = getServerLogs(limit, level as 'info' | 'warn' | 'error' | 'debug' | 'all', source);
     const stats = getLogStats();
     const sources = Object.keys(stats.bySource);
 
