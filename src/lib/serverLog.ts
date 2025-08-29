@@ -1,4 +1,5 @@
-import mongoose from 'mongoose';
+// Убираем неиспользуемый импорт mongoose
+// import mongoose from 'mongoose';
 
 export interface ServerLogEntry {
   id: string;
@@ -64,12 +65,13 @@ export function addServerError(
   context?: Record<string, unknown>
 ): void {
   let message = 'Unknown error';
-  let stack: string | undefined;
+  // Убираем неиспользуемую переменную stack
+  // let stack: string | undefined;
   let details: Record<string, unknown> = {};
 
   if (error instanceof Error) {
     message = error.message;
-    stack = error.stack;
+    // stack = error.stack;
     details = {
       name: error.name,
       ...context
@@ -119,7 +121,8 @@ export function addMongoError(
   collection: string,
   details?: Record<string, unknown>
 ): void {
-  const message = `MongoDB Error in ${operation} on ${collection}`;
+  // Убираем неиспользуемую переменную message
+  // const message = `MongoDB Error in ${operation} on ${collection}`;
   addServerError(error, 'mongodb', {
     operation,
     collection,

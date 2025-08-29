@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerLogs, clearServerLogs, getLogStats } from '@/lib/serverLog';
+import { getServerLogs, clearServerLogs, getLogStats, ServerLogEntry } from '@/lib/serverLog';
 
 export async function GET(request: NextRequest) {
   try {
