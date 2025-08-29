@@ -8,7 +8,7 @@ let serverLogs: Array<{
   level: 'info' | 'error' | 'warn' | 'debug';
   message: string;
   source: string;
-  details?: any;
+  details?: Record<string, unknown>;
 }> = [];
 
 // Функция для добавления логов (будет вызываться из других API endpoints)
@@ -16,7 +16,7 @@ export function addServerLog(
   level: 'info' | 'error' | 'warn' | 'debug',
   message: string,
   source: string,
-  details?: any
+  details?: Record<string, unknown>
 ) {
   const log = {
     id: Date.now().toString() + Math.random().toString(36).substr(2, 9),

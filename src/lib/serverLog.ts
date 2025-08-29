@@ -3,7 +3,7 @@ export function addServerLog(
   level: 'info' | 'error' | 'warn' | 'debug',
   message: string,
   source: string,
-  details?: any
+  details?: Record<string, unknown>
 ) {
   const timestamp = new Date().toISOString();
   const logEntry = {
