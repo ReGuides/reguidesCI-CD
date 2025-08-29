@@ -407,7 +407,7 @@ export default function LogsPage() {
                     <li>Перейдите в <strong>Настройки</strong> → <strong>Команда разработчиков</strong></li>
                     <li>Попробуйте добавить участника команды</li>
                     <li>Вернитесь на эту страницу и нажмите <strong>Обновить</strong></li>
-                    <li>Логи появятся выше с источником "team-api"</li>
+                    <li>Логи появятся выше с источником &quot;team-api&quot;</li>
                   </ol>
                 </div>
               </div>
