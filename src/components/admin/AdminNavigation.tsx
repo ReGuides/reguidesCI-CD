@@ -12,7 +12,8 @@ import {
   Home,
   Megaphone,
   Newspaper,
-  UserCheck
+  UserCheck,
+  FileText as LogsIcon
 } from 'lucide-react';
 
 interface AdminNavigationProps {
@@ -73,6 +74,11 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
       href: '/admin/advertisements',
       label: 'Реклама',
       icon: Megaphone
+    },
+    {
+      href: '/admin/logs',
+      label: 'Логи',
+      icon: LogsIcon
     }
   ];
 
