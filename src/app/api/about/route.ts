@@ -4,6 +4,7 @@ import { About, IAbout } from '@/lib/db/models/About';
 import { User } from '@/lib/db/models/User';
 import SiteSettings from '@/models/SiteSettings';
 import mongoose from 'mongoose';
+import { addServerLog, addMongoLog, addServerError } from '@/lib/serverLog';
 
 export async function GET() {
   try {

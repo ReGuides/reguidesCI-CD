@@ -3,46 +3,50 @@ import { connectToDatabase } from '@/lib/db/mongodb';
 import SiteSettings from '@/models/SiteSettings';
 import { User } from '@/lib/db/models/User';
 import mongoose from 'mongoose';
-import { addServerLog } from '@/lib/serverLog';
+import { addServerLog, addMongoLog, addServerError } from '@/lib/serverLog';
 
 // GET - получение команды разработчиков с данными пользователей
 export async function GET() {
   try {
     await connectToDatabase();
-    console.log('Team GET - Connected to database');
+    addServerLog('info', 'Team GET - Connected to database', 'team-api');
     
-    console.log('Team GET - SiteSettings model:', SiteSettings);
-    console.log('Team GET - SiteSettings.getSettings:', SiteSettings.getSettings);
+    addServerLog('info', 'Team GET - SiteSettings model loaded', 'team-api', { model: 'SiteSettings' });
+    addServerLog('info', 'Team GET - SiteSettings.getSettings method available', 'team-api', { method: 'getSettings' });
     
     const settings = await SiteSettings.getSettings();
-    console.log('Team GET - SiteSettings:', settings);
+    addServerLog('info', 'Team GET - SiteSettings retrieved', 'team-api', { settings });
     
     if (!settings.team || settings.team.length === 0) {
-      console.log('Team GET - No team found, returning empty array');
+      addServerLog('info', 'Team GET - No team found, returning empty array', 'team-api');
       return NextResponse.json({ 
         success: true, 
         data: [] 
       });
     }
 
+    addServerLog('info', `Processing ${settings.team.length} team members`, 'team-api', {
+      teamCount: settings.team.length
+    });
+
     // Получаем данные пользователей для команды
     const userIds = settings.team.map(member => member.userId);
-    console.log('Team GET - User IDs:', userIds);
+    addServerLog('info', 'Team GET - User IDs extracted', 'team-api', { userIds });
     
     // Преобразуем строки в ObjectId для корректного поиска
     const objectIds = userIds.map(id => {
       try {
         return new mongoose.Types.ObjectId(id);
       } catch (error) {
-        console.error('Invalid ObjectId:', id, error);
+        addServerLog('warn', 'Invalid ObjectId format', 'team-api', { id, error: error instanceof Error ? error.message : 'Unknown error' });
         return null;
       }
     }).filter(Boolean);
     
-    console.log('Team GET - ObjectIds:', objectIds);
+    addServerLog('info', 'Team GET - ObjectIds converted', 'team-api', { objectIds });
     
     if (objectIds.length === 0) {
-      console.log('Team GET - No valid ObjectIds found');
+      addServerLog('warn', 'No valid ObjectIds found', 'team-api');
       return NextResponse.json({ 
         success: true, 
         data: [] 
@@ -50,7 +54,10 @@ export async function GET() {
     }
     
     const users = await User.find({ _id: { $in: objectIds } }).lean();
-    console.log('Team GET - Found users:', users.map(u => ({ id: u._id, name: u.name })));
+    addMongoLog('find', 'User', { count: users.length, userIds });
+    addServerLog('info', 'Team GET - Users found', 'team-api', { 
+      users: users.map(u => ({ id: u._id, name: u.name })) 
+    });
     
     // Объединяем данные пользователей с ролями и описаниями
     const teamWithUsers = settings.team.map(member => {
@@ -66,13 +73,19 @@ export async function GET() {
       };
     });
 
-    console.log('Team GET - Final team data:', teamWithUsers);
+    addServerLog('info', 'Team GET - Final team data prepared', 'team-api', { teamWithUsers });
+
+    addServerLog('info', 'Team members retrieved successfully', 'team-api', {
+      processed: teamWithUsers.length,
+      total: settings.team.length
+    });
 
     return NextResponse.json({ 
       success: true, 
       data: teamWithUsers 
     });
   } catch (error) {
+    addServerError(error, 'team-api', { action: 'get_team_settings' });
     console.error('Error fetching team:', error);
     return NextResponse.json(
       { error: 'Failed to fetch team' },
@@ -84,7 +97,10 @@ export async function GET() {
 // PUT - обновление команды разработчиков
 export async function PUT(request: NextRequest) {
   try {
+    addServerLog('info', 'Team settings update requested', 'team-api');
+    
     await connectToDatabase();
+    addMongoLog('connect', 'database', { endpoint: 'team-settings-update' });
     addServerLog('info', 'Team PUT - Connected to database', 'team-api');
     
     const body = await request.json();
@@ -118,7 +134,12 @@ export async function PUT(request: NextRequest) {
     
     // Сохраняем настройки
     await settings.save();
+    addMongoLog('save', 'SiteSettings', { action: 'team_update', teamCount: team.length });
     addServerLog('info', 'Team PUT - Settings saved successfully', 'team-api');
+    
+    addServerLog('info', 'Team settings updated successfully', 'team-api', {
+      finalTeamCount: team.length
+    });
     
     return NextResponse.json({ 
       success: true, 
@@ -132,6 +153,7 @@ export async function PUT(request: NextRequest) {
       error: errorMessage, 
       stack: errorStack 
     });
+    addServerError(error, 'team-api', { action: 'update_team_settings' });
     console.error('Error updating team:', error);
     return NextResponse.json(
       { error: 'Failed to update team' },
