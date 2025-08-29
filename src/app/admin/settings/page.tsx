@@ -235,6 +235,8 @@ export default function SettingsPage() {
       return;
     }
 
+    console.log('Adding team member:', { selectedUserId, newMemberRole, newMemberDescription });
+
     // Проверяем, не добавлен ли уже этот пользователь
     if (settings.team.some(member => member.userId === selectedUserId)) {
       setMessage({ type: 'error', text: 'Этот пользователь уже в команде' });
@@ -247,6 +249,8 @@ export default function SettingsPage() {
       description: newMemberDescription.trim() || undefined,
       order: settings.team.length
     };
+
+    console.log('New team member object:', newMember);
 
     setSettings(prev => ({
       ...prev,
@@ -328,7 +332,7 @@ export default function SettingsPage() {
 
   // Получаем данные пользователя по ID
   const getUserById = (userId: string) => {
-    return users.find(user => user._id === userId);
+    return users.find(user => user._id?.toString() === userId);
   };
 
   if (loading) {

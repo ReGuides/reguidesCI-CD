@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db/mongodb';
 import { About, IAbout } from '@/lib/db/models/About';
 import { User } from '@/lib/db/models/User';
 import SiteSettings from '@/models/SiteSettings';
+import mongoose from 'mongoose';
 
 export async function GET() {
   try {
@@ -13,14 +14,25 @@ export async function GET() {
       return NextResponse.json({ error: 'About data not found' }, { status: 404 });
     }
 
-    // Если команда не указана в About, берем из настроек сайта
-    if (!about.team || !Array.isArray(about.team) || about.team.length === 0) {
-      try {
-        const siteSettings = await SiteSettings.getSettings();
-        if (siteSettings.team && siteSettings.team.length > 0) {
-          // Получаем данные пользователей для команды
-          const userIds = siteSettings.team.map(member => member.userId);
-          const users = await User.find({ _id: { $in: userIds } }).lean();
+    // Всегда берем команду из настроек сайта, даже если в About уже есть команда
+    try {
+      const siteSettings = await SiteSettings.getSettings();
+      if (siteSettings.team && siteSettings.team.length > 0) {
+        // Получаем данные пользователей для команды
+        const userIds = siteSettings.team.map(member => member.userId);
+        
+        // Преобразуем строки в ObjectId для корректного поиска
+        const objectIds = userIds.map(id => {
+          try {
+            return new mongoose.Types.ObjectId(id);
+          } catch (error) {
+            console.error('Invalid ObjectId:', id, error);
+            return null;
+          }
+        }).filter(Boolean);
+        
+        if (objectIds.length > 0) {
+          const users = await User.find({ _id: { $in: objectIds } }).lean();
           
           // Формируем команду с данными пользователей
           const teamMembers = siteSettings.team.map(member => {
@@ -35,17 +47,16 @@ export async function GET() {
               };
             }
             return null;
-          }).filter(Boolean);
+          }).filter((member): member is NonNullable<typeof member> => member !== null);
           
           // Присваиваем команду только если есть валидные участники
           if (teamMembers.length > 0) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            about.team = teamMembers as any;
+            about.team = teamMembers;
           }
         }
-      } catch (error) {
-        console.error('Error fetching site settings team:', error);
       }
+    } catch (error) {
+      console.error('Error fetching site settings team:', error);
     }
 
     // Podtyagivaem avatarki dlya uchastnikov komandy po imeni

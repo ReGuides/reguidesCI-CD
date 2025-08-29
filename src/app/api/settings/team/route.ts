@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
 import SiteSettings from '@/models/SiteSettings';
 import { User } from '@/lib/db/models/User';
+import mongoose from 'mongoose';
 
 // GET - получение команды разработчиков с данными пользователей
 export async function GET() {
@@ -9,8 +10,10 @@ export async function GET() {
     await connectToDatabase();
     
     const settings = await SiteSettings.getSettings();
+    console.log('Team GET - SiteSettings:', settings);
     
     if (!settings.team || settings.team.length === 0) {
+      console.log('Team GET - No team found, returning empty array');
       return NextResponse.json({ 
         success: true, 
         data: [] 
@@ -19,7 +22,30 @@ export async function GET() {
 
     // Получаем данные пользователей для команды
     const userIds = settings.team.map(member => member.userId);
-    const users = await User.find({ _id: { $in: userIds } }).lean();
+    console.log('Team GET - User IDs:', userIds);
+    
+    // Преобразуем строки в ObjectId для корректного поиска
+    const objectIds = userIds.map(id => {
+      try {
+        return new mongoose.Types.ObjectId(id);
+      } catch (error) {
+        console.error('Invalid ObjectId:', id, error);
+        return null;
+      }
+    }).filter(Boolean);
+    
+    console.log('Team GET - ObjectIds:', objectIds);
+    
+    if (objectIds.length === 0) {
+      console.log('Team GET - No valid ObjectIds found');
+      return NextResponse.json({ 
+        success: true, 
+        data: [] 
+      });
+    }
+    
+    const users = await User.find({ _id: { $in: objectIds } }).lean();
+    console.log('Team GET - Found users:', users.map(u => ({ id: u._id, name: u.name })));
     
     // Объединяем данные пользователей с ролями и описаниями
     const teamWithUsers = settings.team.map(member => {
@@ -34,6 +60,8 @@ export async function GET() {
         } : null
       };
     });
+
+    console.log('Team GET - Final team data:', teamWithUsers);
 
     return NextResponse.json({ 
       success: true, 
@@ -56,7 +84,10 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { team } = body;
     
+    console.log('Team PUT - Received team data:', team);
+    
     if (!Array.isArray(team)) {
+      console.log('Team PUT - Invalid team data, not an array');
       return NextResponse.json(
         { error: 'Team must be an array' },
         { status: 400 }
@@ -67,15 +98,18 @@ export async function PUT(request: NextRequest) {
     let settings = await SiteSettings.findOne();
     
     if (!settings) {
+      console.log('Team PUT - Creating new SiteSettings');
       // Создаем новые настройки, если их нет
       settings = new SiteSettings({ team });
     } else {
+      console.log('Team PUT - Updating existing SiteSettings');
       // Обновляем команду
       settings.team = team;
     }
     
     // Сохраняем настройки
     await settings.save();
+    console.log('Team PUT - Settings saved successfully');
     
     return NextResponse.json({ 
       success: true, 

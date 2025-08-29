@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 export interface TeamMember {
-  userId: string;        // ID пользователя из коллекции users
+  userId: string;        // ID пользователя из коллекции users (строка)
   role: string;          // Роль в команде
   description?: string;  // Описание участника
   order: number;         // Порядок отображения
@@ -21,7 +21,7 @@ interface ISiteSettingsModel extends mongoose.Model<ISiteSettings> {
 }
 
 const teamMemberSchema = new mongoose.Schema<TeamMember>({
-  userId: { type: String, required: true },  // ID пользователя
+  userId: { type: String, required: true },  // ID пользователя как строка
   role: { type: String, required: true },    // Роль в команде
   description: { type: String },             // Описание
   order: { type: Number, default: 0 }        // Порядок

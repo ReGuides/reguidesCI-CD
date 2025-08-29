@@ -8,6 +8,7 @@ export async function GET() {
     await connectToDatabase();
     
     const settings = await SiteSettings.getSettings();
+    console.log('SiteSettings GET response:', settings);
     
     return NextResponse.json({ 
       success: true, 
