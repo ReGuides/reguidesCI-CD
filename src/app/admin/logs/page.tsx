@@ -14,8 +14,7 @@ import {
   AlertTriangle,
   Info,
   Eye,
-  Terminal,
-  HelpCircle
+  Terminal
 } from 'lucide-react';
 
 interface LogEntry {
