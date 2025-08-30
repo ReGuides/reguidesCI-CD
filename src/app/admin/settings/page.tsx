@@ -19,10 +19,11 @@ import Image from 'next/image';
 import { TeamMember, ISiteSettings } from '@/models/SiteSettings';
 
 // Интерфейс для состояния компонента (с опциональными полями)
-interface SettingsState extends Omit<ISiteSettings, 'createdAt' | 'updatedAt'> {
+interface SettingsState extends Omit<ISiteSettings, 'createdAt' | 'updatedAt' | 'team'> {
   _id?: string;
   createdAt?: string;
   updatedAt?: string;
+  team: ExtendedTeamMember[]; // Используем расширенный интерфейс
 }
 
 // Интерфейс для пользователя
@@ -249,10 +250,7 @@ export default function SettingsPage() {
     console.log('Adding team member:', { selectedUserId, newMemberRole, newMemberDescription });
 
     // Проверяем, не добавлен ли уже этот пользователь
-    if (settings.team.some((member: any) => 
-      (member.userId && member.userId === selectedUserId) || 
-      (member.name && member.name === getUserById(selectedUserId)?.name)
-    )) {
+    if (settings.team.some(member => member.userId === selectedUserId)) {
       setMessage({ type: 'error', text: 'Этот пользователь уже в команде' });
       return;
     }
