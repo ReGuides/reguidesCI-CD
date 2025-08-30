@@ -342,6 +342,16 @@ export default function SettingsPage() {
       });
 
       console.log('Saving cleaned team:', cleanTeam);
+      console.log('Clean team details:', cleanTeam.map(member => ({
+        userId: member.userId,
+        role: member.role,
+        description: member.description,
+        order: member.order,
+        userIdType: typeof member.userId,
+        roleType: typeof member.role,
+        descriptionType: typeof member.description,
+        orderType: typeof member.order
+      })));
 
       const response = await fetch('/api/settings/team', {
         method: 'PUT',
