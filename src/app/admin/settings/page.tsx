@@ -38,6 +38,7 @@ interface User {
 interface ExtendedTeamMember extends TeamMember {
   name?: string; // Для старой структуры
   avatar?: string; // Для старой структуры
+  _doc?: TeamMember; // Для Mongoose Subdocument
 }
 
 
@@ -250,7 +251,7 @@ export default function SettingsPage() {
     console.log('Adding team member:', { selectedUserId, newMemberRole, newMemberDescription });
 
     // Проверяем, не добавлен ли уже этот пользователь
-    if (settings.team.some((member: any) => {
+    if (settings.team.some((member: ExtendedTeamMember) => {
       const memberData = member._doc || member;
       return memberData.userId === selectedUserId;
     })) {
@@ -328,7 +329,7 @@ export default function SettingsPage() {
       setSaving(true);
       
       // Очищаем старую структуру данных перед отправкой
-      const cleanTeam = settings.team.map((member: any) => {
+      const cleanTeam = settings.team.map((member: ExtendedTeamMember) => {
         // Извлекаем данные из Mongoose Subdocument если это необходимо
         const memberData = member._doc || member;
         
