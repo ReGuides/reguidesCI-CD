@@ -123,21 +123,25 @@ export async function PUT(request: NextRequest) {
     for (let i = 0; i < team.length; i++) {
       const member = team[i];
       
+      // Извлекаем данные из Mongoose Subdocument если это необходимо
+      const memberData = member._doc || member;
+      
       addServerLog('info', `Validating team member at index ${i}`, 'team-api', { 
         member, 
+        memberData,
         memberType: typeof member,
-        hasRole: !!member.role,
-        roleType: typeof member.role,
-        roleValue: member.role,
-        hasUserId: !!member.userId,
-        userIdType: typeof member.userId,
-        userIdValue: member.userId
+        hasRole: !!memberData.role,
+        roleType: typeof memberData.role,
+        roleValue: memberData.role,
+        hasUserId: !!memberData.userId,
+        userIdType: typeof memberData.userId,
+        userIdValue: memberData.userId
       });
       
       // Проверяем новую структуру (с userId)
-      if (member.userId) {
-        if (typeof member.userId !== 'string' || member.userId.trim() === '') {
-          addServerLog('error', `Team PUT - Invalid member at index ${i}: missing or empty userId`, 'team-api', { member, index: i });
+      if (memberData.userId) {
+        if (typeof memberData.userId !== 'string' || memberData.userId.trim() === '') {
+          addServerLog('error', `Team PUT - Invalid member at index ${i}: missing or empty userId`, 'team-api', { member, memberData, index: i });
           return NextResponse.json(
             { error: `Team member at index ${i}: userId is required and cannot be empty` },
             { status: 400 }
@@ -146,20 +150,20 @@ export async function PUT(request: NextRequest) {
       }
       
       // Проверяем старую структуру (с name) - для обратной совместимости
-      if (member.name && !member.userId) {
-        addServerLog('warn', `Team PUT - Member at index ${i} uses old structure (name instead of userId)`, 'team-api', { member, index: i });
+      if (memberData.name && !memberData.userId) {
+        addServerLog('warn', `Team PUT - Member at index ${i} uses old structure (name instead of userId)`, 'team-api', { member, memberData, index: i });
         // Пропускаем валидацию userId для старой структуры
       }
       
-      if (!member.role || typeof member.role !== 'string' || member.role.trim() === '') {
-        addServerLog('error', `Team PUT - Invalid member at index ${i}: missing or empty role`, 'team-api', { member, index: i });
+      if (!memberData.role || typeof memberData.role !== 'string' || memberData.role.trim() === '') {
+        addServerLog('error', `Team PUT - Invalid member at index ${i}: missing or empty role`, 'team-api', { member, memberData, index: i });
         return NextResponse.json(
           { error: `Team member at index ${i}: role is required and cannot be empty` },
           { status: 400 }
         );
       }
       
-      addServerLog('info', `Team member at index ${i} validation passed`, 'team-api', { member, index: i });
+      addServerLog('info', `Team member at index ${i} validation passed`, 'team-api', { member, memberData, index: i });
     }
 
     addServerLog('info', 'Team PUT - Team data validation passed', 'team-api', { teamCount: team.length });

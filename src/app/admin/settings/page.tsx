@@ -250,7 +250,10 @@ export default function SettingsPage() {
     console.log('Adding team member:', { selectedUserId, newMemberRole, newMemberDescription });
 
     // Проверяем, не добавлен ли уже этот пользователь
-    if (settings.team.some(member => member.userId === selectedUserId)) {
+    if (settings.team.some((member: any) => {
+      const memberData = member._doc || member;
+      return memberData.userId === selectedUserId;
+    })) {
       setMessage({ type: 'error', text: 'Этот пользователь уже в команде' });
       return;
     }
@@ -323,12 +326,28 @@ export default function SettingsPage() {
   const saveTeam = async () => {
     try {
       setSaving(true);
+      
+      // Очищаем старую структуру данных перед отправкой
+      const cleanTeam = settings.team.map((member: any) => {
+        // Извлекаем данные из Mongoose Subdocument если это необходимо
+        const memberData = member._doc || member;
+        
+        return {
+          userId: memberData.userId,
+          role: memberData.role,
+          description: memberData.description,
+          order: memberData.order
+        };
+      });
+
+      console.log('Saving cleaned team:', cleanTeam);
+
       const response = await fetch('/api/settings/team', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ team: settings.team }),
+        body: JSON.stringify({ team: cleanTeam }),
       });
 
       if (response.ok) {
@@ -338,7 +357,9 @@ export default function SettingsPage() {
           setTimeout(() => setMessage(null), 3000);
         }
       } else {
-        setMessage({ type: 'error', text: 'Ошибка при обновлении команды' });
+        const errorData = await response.json();
+        console.error('Team save error:', errorData);
+        setMessage({ type: 'error', text: `Ошибка при обновлении команды: ${errorData.error || 'Неизвестная ошибка'}` });
       }
     } catch (error) {
       console.error('Error saving team:', error);
