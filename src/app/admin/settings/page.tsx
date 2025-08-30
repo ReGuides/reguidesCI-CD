@@ -731,85 +731,86 @@ export default function SettingsPage() {
                   );
                 })}
                 
-                {/* Отображение участников без userId (старая структура) */}
-                {settings.team.map((member, index) => {
-                  // Если у участника есть name (старая структура), показываем его
-                  if (member.name && !member.userId) {
-                    return (
-                      <div key={`old-${index}`} className="border border-orange-700 rounded-lg p-4 bg-orange-900/20">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-orange-400">Старая структура</span>
-                            <span className="text-sm text-neutral-400">Порядок: {member.order + 1}</span>
-                          </div>
-                          <Button
-                            onClick={() => removeTeamMember(index)}
-                            size="sm"
-                            variant="outline"
-                            className="text-red-400 hover:text-red-300 hover:border-red-400"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="relative w-12 h-12 bg-neutral-700 rounded-full overflow-hidden">
-                            {member.avatar ? (
-                              <Image
-                                src={member.avatar}
-                                alt={member.name}
-                                fill
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-neutral-400">
-                                <span className="text-lg">👤</span>
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <h4 className="text-lg font-semibold text-white">{member.name}</h4>
-                            <p className="text-orange-400 text-sm">Требует обновления структуры</p>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                              Роль в команде *
-                            </label>
-                            <Input
-                              value={member.role || ''}
-                              onChange={(e) => updateTeamMember(index, 'role', e.target.value)}
-                              placeholder="Роль в проекте"
-                              className="bg-neutral-800 border-neutral-600 text-white"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                              Описание
-                            </label>
-                            <Input
-                              value={member.description || ''}
-                              onChange={(e) => updateTeamMember(index, 'description', e.target.value)}
-                              placeholder="Описание роли"
-                              className="bg-neutral-800 border-neutral-600 text-white"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="mt-4 p-3 bg-orange-800/30 rounded border border-orange-600">
-                          <p className="text-orange-300 text-sm">
-                            ⚠️ Этот участник использует старую структуру данных. 
-                            Удалите его и добавьте заново через форму выше для корректной работы.
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                })}
+                                                  {/* Отображение участников без userId (старая структура) */}
+                 {settings.team.map((member, index) => {
+                   // Если у участника есть name (старая структура), показываем его
+                   const memberData = member._doc || member;
+                   if ((memberData as any).name && !(memberData as any).userId) {
+                     return (
+                       <div key={`old-${index}`} className="border border-orange-700 rounded-lg p-4 bg-orange-900/20">
+                         <div className="flex items-center justify-between mb-4">
+                           <div className="flex items-center gap-2">
+                             <span className="text-sm text-orange-400">Старая структура</span>
+                             <span className="text-sm text-neutral-400">Порядок: {(memberData.order || 0) + 1}</span>
+                           </div>
+                           <Button
+                             onClick={() => removeTeamMember(index)}
+                             size="sm"
+                             variant="outline"
+                             className="text-red-400 hover:text-red-300 hover:border-red-400"
+                           >
+                             <Trash2 className="w-4 h-4" />
+                           </Button>
+                         </div>
+                         
+                                                    <div className="flex items-center gap-4 mb-4">
+                             <div className="relative w-12 h-12 bg-neutral-700 rounded-full overflow-hidden">
+                               {(memberData as any).avatar ? (
+                                 <Image
+                                   src={(memberData as any).avatar}
+                                   alt={(memberData as any).name || 'Unknown'}
+                                   fill
+                                   className="object-cover"
+                                 />
+                               ) : (
+                                 <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                                   <span className="text-lg">👤</span>
+                                 </div>
+                               )}
+                             </div>
+                             <div>
+                               <h4 className="text-lg font-semibold text-white">{(memberData as any).name}</h4>
+                               <p className="text-orange-400 text-sm">Требует обновления структуры</p>
+                             </div>
+                           </div>
+                           
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             <div>
+                               <label className="block text-sm font-medium text-gray-300 mb-2">
+                                 Роль в команде *
+                               </label>
+                               <Input
+                                 value={(memberData as any).role || ''}
+                                 onChange={(e) => updateTeamMember(index, 'role', e.target.value)}
+                                 placeholder="Роль в проекте"
+                                 className="bg-neutral-800 border-neutral-600 text-white"
+                               />
+                             </div>
+                             
+                             <div>
+                               <label className="block text-sm font-medium text-gray-300 mb-2">
+                                 Описание
+                               </label>
+                               <Input
+                                 value={(memberData as any).description || ''}
+                                 onChange={(e) => updateTeamMember(index, 'description', e.target.value)}
+                                 placeholder="Описание роли"
+                                 className="bg-neutral-800 border-neutral-600 text-white"
+                               />
+                             </div>
+                           </div>
+                         
+                         <div className="mt-4 p-3 bg-orange-800/30 rounded border border-orange-600">
+                           <p className="text-orange-300 text-sm">
+                             ⚠️ Этот участник использует старую структуру данных. 
+                             Удалите его и добавьте заново через форму выше для корректной работы.
+                           </p>
+                         </div>
+                       </div>
+                     );
+                   }
+                   return null;
+                 })}
                 
                 <div className="flex justify-end pt-4">
                   <Button
