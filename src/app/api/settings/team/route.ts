@@ -123,6 +123,17 @@ export async function PUT(request: NextRequest) {
     for (let i = 0; i < team.length; i++) {
       const member = team[i];
       
+      addServerLog('info', `Validating team member at index ${i}`, 'team-api', { 
+        member, 
+        memberType: typeof member,
+        hasRole: !!member.role,
+        roleType: typeof member.role,
+        roleValue: member.role,
+        hasUserId: !!member.userId,
+        userIdType: typeof member.userId,
+        userIdValue: member.userId
+      });
+      
       // Проверяем новую структуру (с userId)
       if (member.userId) {
         if (typeof member.userId !== 'string' || member.userId.trim() === '') {
@@ -147,6 +158,8 @@ export async function PUT(request: NextRequest) {
           { status: 400 }
         );
       }
+      
+      addServerLog('info', `Team member at index ${i} validation passed`, 'team-api', { member, index: i });
     }
 
     addServerLog('info', 'Team PUT - Team data validation passed', 'team-api', { teamCount: team.length });
