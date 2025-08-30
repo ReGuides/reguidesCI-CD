@@ -34,11 +34,21 @@ interface User {
   email: string;
 }
 
+// Интерфейс для старой структуры участника команды
+interface OldTeamMember {
+  name: string;
+  role: string;
+  description?: string;
+  avatar?: string;
+  order: number;
+  _id: string;
+}
+
 // Расширенный интерфейс для TeamMember с поддержкой обеих структур
 interface ExtendedTeamMember extends TeamMember {
   name?: string; // Для старой структуры
   avatar?: string; // Для старой структуры
-  _doc?: TeamMember; // Для Mongoose Subdocument
+  _doc?: OldTeamMember; // Для Mongoose Subdocument со старой структурой
 }
 
 
@@ -250,11 +260,11 @@ export default function SettingsPage() {
 
     console.log('Adding team member:', { selectedUserId, newMemberRole, newMemberDescription });
 
-    // Проверяем, не добавлен ли уже этот пользователь
-    if (settings.team.some((member: ExtendedTeamMember) => {
-      const memberData = member._doc || member;
-      return memberData.userId === selectedUserId;
-    })) {
+         // Проверяем, не добавлен ли уже этот пользователь
+     if (settings.team.some((member: ExtendedTeamMember) => {
+       const memberData = member._doc || member;
+       return 'userId' in memberData && memberData.userId === selectedUserId;
+     })) {
       setMessage({ type: 'error', text: 'Этот пользователь уже в команде' });
       return;
     }
@@ -328,30 +338,36 @@ export default function SettingsPage() {
     try {
       setSaving(true);
       
-      // Очищаем старую структуру данных перед отправкой
-      const cleanTeam = settings.team.map((member: ExtendedTeamMember) => {
-        // Извлекаем данные из Mongoose Subdocument если это необходимо
-        const memberData = member._doc || member;
-        
-        return {
-          userId: memberData.userId,
-          role: memberData.role,
-          description: memberData.description,
-          order: memberData.order
-        };
-      });
+             // Очищаем старую структуру данных перед отправкой
+       const cleanTeam = settings.team.map((member: ExtendedTeamMember) => {
+         // Извлекаем данные из Mongoose Subdocument если это необходимо
+         const memberData = member._doc || member;
+         
+         // Проверяем, что у участника есть userId (новая структура)
+         if ('userId' in memberData && memberData.userId) {
+           return {
+             userId: memberData.userId,
+             role: memberData.role,
+             description: memberData.description,
+             order: memberData.order
+           };
+         }
+         
+         // Если это старая структура, пропускаем
+         return null;
+       }).filter(Boolean);
 
       console.log('Saving cleaned team:', cleanTeam);
-      console.log('Clean team details:', cleanTeam.map(member => ({
-        userId: member.userId,
-        role: member.role,
-        description: member.description,
-        order: member.order,
-        userIdType: typeof member.userId,
-        roleType: typeof member.role,
-        descriptionType: typeof member.description,
-        orderType: typeof member.order
-      })));
+             console.log('Clean team details:', cleanTeam.map(member => ({
+         userId: member!.userId,
+         role: member!.role,
+         description: member!.description,
+         order: member!.order,
+         userIdType: typeof member!.userId,
+         roleType: typeof member!.role,
+         descriptionType: typeof member!.description,
+         orderType: typeof member!.order
+       })));
 
       const response = await fetch('/api/settings/team', {
         method: 'PUT',
@@ -735,7 +751,7 @@ export default function SettingsPage() {
                  {settings.team.map((member, index) => {
                    // Если у участника есть name (старая структура), показываем его
                    const memberData = member._doc || member;
-                   if ((memberData as any).name && !(memberData as any).userId) {
+                   if ('name' in memberData && !('userId' in memberData)) {
                      return (
                        <div key={`old-${index}`} className="border border-orange-700 rounded-lg p-4 bg-orange-900/20">
                          <div className="flex items-center justify-between mb-4">
@@ -755,10 +771,10 @@ export default function SettingsPage() {
                          
                                                     <div className="flex items-center gap-4 mb-4">
                              <div className="relative w-12 h-12 bg-neutral-700 rounded-full overflow-hidden">
-                               {(memberData as any).avatar ? (
+                               {('avatar' in memberData && memberData.avatar) ? (
                                  <Image
-                                   src={(memberData as any).avatar}
-                                   alt={(memberData as any).name || 'Unknown'}
+                                   src={memberData.avatar}
+                                   alt={'name' in memberData ? memberData.name : 'Unknown'}
                                    fill
                                    className="object-cover"
                                  />
@@ -769,7 +785,7 @@ export default function SettingsPage() {
                                )}
                              </div>
                              <div>
-                               <h4 className="text-lg font-semibold text-white">{(memberData as any).name}</h4>
+                               <h4 className="text-lg font-semibold text-white">{'name' in memberData ? memberData.name : 'Unknown'}</h4>
                                <p className="text-orange-400 text-sm">Требует обновления структуры</p>
                              </div>
                            </div>
@@ -780,7 +796,7 @@ export default function SettingsPage() {
                                  Роль в команде *
                                </label>
                                <Input
-                                 value={(memberData as any).role || ''}
+                                 value={'role' in memberData ? memberData.role : ''}
                                  onChange={(e) => updateTeamMember(index, 'role', e.target.value)}
                                  placeholder="Роль в проекте"
                                  className="bg-neutral-800 border-neutral-600 text-white"
@@ -792,7 +808,7 @@ export default function SettingsPage() {
                                  Описание
                                </label>
                                <Input
-                                 value={(memberData as any).description || ''}
+                                 value={'description' in memberData ? memberData.description : ''}
                                  onChange={(e) => updateTeamMember(index, 'description', e.target.value)}
                                  placeholder="Описание роли"
                                  className="bg-neutral-800 border-neutral-600 text-white"
