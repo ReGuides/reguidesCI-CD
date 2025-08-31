@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
-import { PageViewModel } from '@/models/Analytics';
-import { getClientIP } from '@/lib/utils/ip';
+import Analytics from '@/models/Analytics';
+import { addServerLog } from '@/lib/serverLog';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,20 +17,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const ip = getClientIP(request);
-    
-    const pageView = new PageViewModel({
-      url,
-      title,
+    const pageView = new Analytics({
       sessionId,
-      userId: userId || null,
-      ip,
-      userAgent: userAgent || request.headers.get('user-agent'),
-      referrer: referrer || request.headers.get('referer'),
+      userId: userId || undefined,
+      page: url,
+      pageType: 'page',
+      userAgent: userAgent || request.headers.get('user-agent') || 'Unknown',
+      browser: 'Unknown',
+      browserVersion: 'Unknown',
+      os: 'Unknown',
+      osVersion: 'Unknown',
+      device: 'desktop',
+      screenResolution: 'Unknown',
+      country: 'Unknown',
+      timezone: 'UTC',
+      language: 'en',
+      timeOnPage: 0,
+      isBounce: false,
+      scrollDepth: 0,
+      clicks: 0,
+      loadTime: 0,
+      isFirstVisit: false,
       timestamp: new Date()
     });
 
     await pageView.save();
+    
+    addServerLog('info', 'analytics-page-views', 'Page view tracked successfully', { 
+      page: url, 
+      sessionId, 
+      userId 
+    });
 
     return NextResponse.json({ 
       success: true, 
@@ -38,6 +55,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error tracking page view:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    addServerLog('error', 'analytics-page-views', 'Error tracking page view', { error: errorMessage });
+    
     return NextResponse.json(
       { error: 'Failed to track page view' },
       { status: 500 }
@@ -70,12 +90,12 @@ export async function GET(request: NextRequest) {
     }
     
     // Получаем просмотры страниц с фильтрацией
-    const pageViews = await PageViewModel.aggregate([
-      { $match: query },
+    const pageViews = await Analytics.aggregate([
+      { $match: { ...query, pageType: 'page' } },
       {
         $addFields: {
           // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
         }
       },
       { $match: { isAdminPage: false } },
@@ -87,12 +107,20 @@ export async function GET(request: NextRequest) {
       }
     ]);
     
+    addServerLog('info', 'analytics-page-views', 'Page views fetched successfully', { 
+      count: pageViews.length,
+      limit 
+    });
+
     return NextResponse.json({ 
       success: true, 
       data: pageViews 
     });
   } catch (error) {
     console.error('Error fetching page views:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    addServerLog('error', 'analytics-page-views', 'Error fetching page views', { error: errorMessage });
+    
     return NextResponse.json(
       { error: 'Failed to fetch page views' },
       { status: 500 }
