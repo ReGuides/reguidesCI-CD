@@ -10,6 +10,7 @@ interface ImageUploadProps {
   placeholder?: string;
   className?: string;
   accept?: string;
+  uploadType?: string; // Добавляем параметр для указания типа загрузки
 }
 
 export default function ImageUpload({
@@ -17,7 +18,8 @@ export default function ImageUpload({
   onChange,
   placeholder = 'Загрузить изображение',
   className = '',
-  accept = 'image/*'
+  accept = 'image/*',
+  uploadType = 'news' // По умолчанию news
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -43,6 +45,7 @@ export default function ImageUpload({
 
       const formData = new FormData();
       formData.append('image', file);
+      formData.append('uploadType', uploadType); // Добавляем uploadType в FormData
 
       const response = await fetch('/api/upload', {
         method: 'POST',

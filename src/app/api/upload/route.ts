@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     const fileName = `${timestamp}-${randomString}.${extension}`;
 
     // Получаем тип загрузки из formData
-    const uploadType = formData.get('type') as string || 'news';
+    const uploadType = formData.get('uploadType') as string || formData.get('type') as string || 'news';
     
     // Путь для сохранения файла
     const uploadDir = join(process.cwd(), 'public', 'images', uploadType);
