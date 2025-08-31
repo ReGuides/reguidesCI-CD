@@ -102,20 +102,31 @@ class BirthdayScheduler {
     // Запускаем первую проверку сразу
     this.runCheck();
 
-    // Вычисляем время следующего запуска
-    const nextRunTime = this.calculateNextRunTime();
-    this.config.nextCheck = nextRunTime;
-    
-    // Вычисляем интервал до следующего запуска
-    const interval = this.calculateIntervalToNextRun();
-    
-    // Устанавливаем таймер для следующего запуска
-    this.intervalId = setTimeout(() => {
-      this.runCheck();
-      this.scheduleNextRun(); // Планируем следующий запуск
-    }, interval);
+    // Проверяем, в каком режиме работаем
+    if (this.config.checkInterval < 24 * 60 * 60 * 1000) {
+      // Тестовый режим - каждые N минут
+      this.intervalId = setInterval(() => {
+        this.runCheck();
+      }, this.config.checkInterval);
+      
+      this.config.nextCheck = new Date(Date.now() + this.config.checkInterval);
+      console.log(`🎂 Birthday Scheduler: Started in test mode. Checking every ${this.config.checkInterval / (1000 * 60)} minutes`);
+    } else {
+      // Нормальный режим - в 00:00 МСК
+      const nextRunTime = this.calculateNextRunTime();
+      this.config.nextCheck = nextRunTime;
+      
+      const interval = this.calculateIntervalToNextRun();
+      
+      this.intervalId = setTimeout(() => {
+        this.runCheck();
+        this.scheduleNextRun();
+      }, interval);
 
-    console.log(`🎂 Birthday Scheduler: Started. Next run at ${nextRunTime.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })} (Moscow time)`);
+      console.log(`🎂 Birthday Scheduler: Started in normal mode. Next run at ${nextRunTime.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })} (Moscow time)`);
+    }
+    
+    this.saveConfig();
   }
 
   /**
@@ -140,7 +151,9 @@ class BirthdayScheduler {
 
   public stop() {
     if (this.intervalId) {
+      // Очищаем как setTimeout, так и setInterval
       clearTimeout(this.intervalId);
+      clearInterval(this.intervalId);
       this.intervalId = null;
     }
     this.isRunning = false;

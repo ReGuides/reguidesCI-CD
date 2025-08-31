@@ -201,10 +201,7 @@ export default function NewsPage() {
                   <div className="flex-1">
                     <p className="text-white font-medium">{character.name}</p>
                     <p className="text-gray-400 text-sm">
-                      {new Date(character.birthday).toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'long'
-                      })}
+                      {character.birthday}
                     </p>
                   </div>
                   <Badge 
