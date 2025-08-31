@@ -52,15 +52,18 @@ export default function NewsPage() {
 
   const fetchBirthdayCharacters = async () => {
     try {
+      console.log('🔍 Fetching birthday characters...');
       const response = await fetch('/api/news/generate-birthday');
       if (response.ok) {
         const data = await response.json();
+        console.log('🔍 API response:', data);
         if (data.success) {
+          console.log('🔍 Setting birthday characters:', data.data.characters);
           setBirthdayCharacters(data.data.characters);
         }
       }
     } catch (error) {
-      console.error('Error fetching birthday characters:', error);
+      console.error('❌ Error fetching birthday characters:', error);
     }
   };
 
@@ -132,6 +135,7 @@ export default function NewsPage() {
   };
 
   useEffect(() => {
+    console.log('🔍 useEffect triggered');
     fetchNews();
     fetchBirthdayCharacters();
   }, []);
@@ -146,6 +150,13 @@ export default function NewsPage() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Отладочная информация */}
+      <div className="bg-yellow-900/20 border border-yellow-600/30 p-4 rounded-lg">
+        <h3 className="text-yellow-400 font-medium mb-2">🔍 Отладочная информация</h3>
+        <p className="text-yellow-300 text-sm">birthdayCharacters.length: {birthdayCharacters.length}</p>
+        <p className="text-yellow-300 text-sm">birthdayCharacters: {JSON.stringify(birthdayCharacters, null, 2)}</p>
+      </div>
+
       {/* Заголовок */}
       <div className="flex justify-between items-center">
         <div>
