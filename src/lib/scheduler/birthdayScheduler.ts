@@ -46,6 +46,51 @@ class BirthdayScheduler {
     }
   }
 
+  /**
+   * Вычисляет время следующего запуска в 00:00 по московскому времени
+   */
+  private calculateNextRunTime(): Date {
+    const now = new Date();
+    
+    // Получаем московское время
+    const moscowTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
+    
+    // Следующий день в 00:00 по МСК
+    const nextRun = new Date(moscowTime);
+    nextRun.setDate(nextRun.getDate() + 1);
+    nextRun.setHours(0, 0, 0, 0);
+    
+    // Конвертируем московское время обратно в локальное время сервера
+    const localNextRun = new Date(nextRun.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
+    
+    console.log('🎂 Scheduler: Next run calculated:', {
+      now: now.toISOString(),
+      moscowTime: moscowTime.toISOString(),
+      nextRun: nextRun.toISOString(),
+      localNextRun: localNextRun.toISOString()
+    });
+    
+    return localNextRun;
+  }
+
+  /**
+   * Вычисляет интервал до следующего запуска
+   */
+  private calculateIntervalToNextRun(): number {
+    const nextRun = this.calculateNextRunTime();
+    const now = new Date();
+    const interval = nextRun.getTime() - now.getTime();
+    
+    // Если интервал отрицательный (прошло время), запускаем через 1 минуту
+    if (interval <= 0) {
+      console.log('🎂 Scheduler: Next run time has passed, scheduling in 1 minute');
+      return 60 * 1000; // 1 минута
+    }
+    
+    console.log(`🎂 Scheduler: Next run in ${Math.round(interval / (1000 * 60))} minutes`);
+    return interval;
+  }
+
   public start() {
     if (this.isRunning || !this.config.enabled) {
       return;
@@ -57,17 +102,45 @@ class BirthdayScheduler {
     // Запускаем первую проверку сразу
     this.runCheck();
 
-    // Устанавливаем интервал для регулярных проверок
-    this.intervalId = setInterval(() => {
+    // Вычисляем время следующего запуска
+    const nextRunTime = this.calculateNextRunTime();
+    this.config.nextCheck = nextRunTime;
+    
+    // Вычисляем интервал до следующего запуска
+    const interval = this.calculateIntervalToNextRun();
+    
+    // Устанавливаем таймер для следующего запуска
+    this.intervalId = setTimeout(() => {
       this.runCheck();
-    }, this.config.checkInterval);
+      this.scheduleNextRun(); // Планируем следующий запуск
+    }, interval);
 
-    console.log(`🎂 Birthday Scheduler: Started with ${this.config.checkInterval / (1000 * 60 * 60)} hour interval`);
+    console.log(`🎂 Birthday Scheduler: Started. Next run at ${nextRunTime.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })} (Moscow time)`);
+  }
+
+  /**
+   * Планирует следующий запуск в 00:00 МСК
+   */
+  private scheduleNextRun() {
+    if (!this.isRunning) return;
+    
+    const interval = this.calculateIntervalToNextRun();
+    const nextRunTime = this.calculateNextRunTime();
+    
+    this.config.nextCheck = nextRunTime;
+    this.saveConfig();
+    
+    this.intervalId = setTimeout(() => {
+      this.runCheck();
+      this.scheduleNextRun(); // Рекурсивно планируем следующий запуск
+    }, interval);
+    
+    console.log(`🎂 Birthday Scheduler: Next run scheduled at ${nextRunTime.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })} (Moscow time)`);
   }
 
   public stop() {
     if (this.intervalId) {
-      clearInterval(this.intervalId);
+      clearTimeout(this.intervalId);
       this.intervalId = null;
     }
     this.isRunning = false;
@@ -95,7 +168,6 @@ class BirthdayScheduler {
 
       // Обновляем время последней проверки
       this.config.lastCheck = new Date();
-      this.config.nextCheck = new Date(Date.now() + this.config.checkInterval);
       this.saveConfig();
 
     } catch (error) {
@@ -144,14 +216,20 @@ class BirthdayScheduler {
 
   // Метод для тестирования (запуск проверки каждые 5 минут)
   public enableTestMode() {
-    this.setConfig({ checkInterval: 5 * 60 * 1000 }); // 5 минут
+    this.stop();
+    this.config.checkInterval = 5 * 60 * 1000; // 5 минут
+    this.saveConfig();
+    this.start();
     console.log('🎂 Birthday Scheduler: Test mode enabled (checking every 5 minutes)');
   }
 
-  // Метод для возврата к нормальному режиму
+  // Метод для возврата к нормальному режиму (00:00 МСК)
   public enableNormalMode() {
-    this.setConfig({ checkInterval: 24 * 60 * 60 * 1000 }); // 24 часа
-    console.log('🎂 Birthday Scheduler: Normal mode enabled (checking every 24 hours)');
+    this.stop();
+    this.config.checkInterval = 24 * 60 * 60 * 1000; // 24 часа
+    this.saveConfig();
+    this.start();
+    console.log('🎂 Birthday Scheduler: Normal mode enabled (checking at 00:00 Moscow time)');
   }
 }
 

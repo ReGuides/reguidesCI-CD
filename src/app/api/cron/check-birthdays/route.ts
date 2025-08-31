@@ -98,7 +98,8 @@ export async function GET() {
   }
 }
 
-// POST - принудительная проверка (для тестирования)
+// POST - для работы с планировщиком
 export async function POST() {
+  // Просто вызываем GET метод
   return GET();
 }
