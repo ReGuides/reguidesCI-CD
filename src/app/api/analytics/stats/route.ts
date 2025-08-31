@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Базовые условия для фильтрации
-    const matchConditions: any = { timestamp: { $gte: startDate } };
+    const matchConditions: Record<string, unknown> = { timestamp: { $gte: startDate } };
     if (pageType) matchConditions.pageType = pageType;
     if (pageId) matchConditions.pageId = pageId;
     

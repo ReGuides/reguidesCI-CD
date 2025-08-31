@@ -102,7 +102,6 @@ class AnalyticsTracker {
   private detectDevice(): 'desktop' | 'mobile' | 'tablet' {
     const userAgent = navigator.userAgent;
     const screenWidth = window.screen.width;
-    const screenHeight = window.screen.height;
     
     if (userAgent.includes('Mobile') || screenWidth <= 768) {
       return 'mobile';
@@ -282,7 +281,7 @@ class AnalyticsTracker {
     }, 100);
   }
 
-  public trackEvent(eventType: string, eventName: string, metadata?: any): void {
+  public trackEvent(eventType: string, eventName: string, metadata?: Record<string, unknown>): void {
     // Дополнительное отслеживание событий
     console.log('Event tracked:', { eventType, eventName, metadata });
   }
@@ -308,7 +307,7 @@ export function trackPageView(): void {
   }
 }
 
-export function trackEvent(eventType: string, eventName: string, metadata?: any): void {
+export function trackEvent(eventType: string, eventName: string, metadata?: Record<string, unknown>): void {
   if (analyticsTracker) {
     analyticsTracker.trackEvent(eventType, eventName, metadata);
   }

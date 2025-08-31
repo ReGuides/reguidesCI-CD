@@ -23,8 +23,8 @@ interface AnalyticsStats {
   period: string;
   startDate: string;
   total: {
-    totalPageViews: number;
-    uniqueVisitors: number;
+  totalPageViews: number;
+  uniqueVisitors: number;
     totalSessions: number;
     averageTimeOnPage: number;
     averageLoadTime: number;
@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
     <div className="p-6 space-y-6">
       {/* Заголовок */}
       <div className="flex justify-between items-center">
-        <div>
+          <div>
           <h1 className="text-3xl font-bold text-white">Аналитика сайта</h1>
           <p className="text-gray-400">Подробная статистика посещений и поведения пользователей</p>
         </div>
@@ -196,7 +196,7 @@ export default function AnalyticsPage() {
 
       {stats && (
         <>
-          {/* Основные метрики */}
+      {/* Основные метрики */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border-blue-500/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -210,52 +210,52 @@ export default function AnalyticsPage() {
             </Card>
 
             <Card className="bg-gradient-to-r from-green-500/10 to-green-600/10 border-green-500/20">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-green-400">Уникальные посетители</CardTitle>
                 <Users className="h-4 w-4 text-green-400" />
-              </CardHeader>
-              <CardContent>
+          </CardHeader>
+          <CardContent>
                 <div className="text-2xl font-bold text-white">{formatNumber(stats.total.uniqueVisitors)}</div>
                 <p className="text-xs text-green-300">Активных пользователей</p>
-              </CardContent>
-            </Card>
+          </CardContent>
+        </Card>
 
             <Card className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 border-purple-500/20">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-purple-400">Время на странице</CardTitle>
                 <Clock className="h-4 w-4 text-purple-400" />
-              </CardHeader>
-              <CardContent>
+          </CardHeader>
+          <CardContent>
                 <div className="text-2xl font-bold text-white">{formatTime(stats.total.averageTimeOnPage)}</div>
                 <p className="text-xs text-purple-300">Среднее время</p>
-              </CardContent>
-            </Card>
+          </CardContent>
+        </Card>
 
             <Card className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 border-orange-500/20">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-orange-400">Процент отказов</CardTitle>
                 <TrendingUp className="h-4 w-4 text-orange-400" />
-              </CardHeader>
-              <CardContent>
+          </CardHeader>
+          <CardContent>
                 <div className="text-2xl font-bold text-white">{stats.total.bounceRate.toFixed(1)}%</div>
                 <p className="text-xs text-orange-300">Пользователи ушли быстро</p>
-              </CardContent>
-            </Card>
-          </div>
+          </CardContent>
+        </Card>
+      </div>
 
           {/* Топ страниц */}
-          <Card className="bg-neutral-800 border-neutral-700">
-            <CardHeader>
+        <Card className="bg-neutral-800 border-neutral-700">
+          <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-purple-400" />
                 Топ страниц
               </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
                 {stats.topPages.slice(0, 10).map((page, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-                    <div className="flex items-center space-x-3">
+                <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                  <div className="flex items-center space-x-3">
                       <Badge variant="outline" className="text-xs">
                         {page.pageType}
                       </Badge>
@@ -304,26 +304,26 @@ export default function AnalyticsPage() {
                           <Users className="w-3 h-3 inline mr-1" />
                           {formatNumber(country.uniqueVisitors)}
                         </span>
-                      </div>
-                    </div>
-                  ))}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
             {/* Топ устройств */}
-            <Card className="bg-neutral-800 border-neutral-700">
-              <CardHeader>
+          <Card className="bg-neutral-800 border-neutral-700">
+            <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Monitor className="w-5 h-5 text-green-400" />
                   Устройства
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
+            </CardHeader>
+            <CardContent>
                 <div className="space-y-3">
                   {stats.topDevices.map((device, index) => (
                     <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                         {getDeviceIcon(device.device)}
                         <span className="text-white capitalize">{device.device}</span>
                       </div>
@@ -358,7 +358,7 @@ export default function AnalyticsPage() {
                 <div className="space-y-3">
                   {stats.topBrowsers.slice(0, 8).map((browser, index) => (
                     <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                         {getBrowserIcon(browser.browser)}
                         <span className="text-white">{browser.browser}</span>
                       </div>
@@ -374,20 +374,20 @@ export default function AnalyticsPage() {
                       </div>
                     </div>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
             {/* Топ ОС */}
-            <Card className="bg-neutral-800 border-neutral-700">
-              <CardHeader>
+          <Card className="bg-neutral-800 border-neutral-700">
+            <CardHeader>
                                  <CardTitle className="text-white flex items-center gap-2">
                    <Monitor className="w-5 h-5 text-blue-400" />
                    Операционные системы
                  </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
                   {stats.topOS.slice(0, 8).map((os, index) => (
                     <div key={index} className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
@@ -472,10 +472,10 @@ export default function AnalyticsPage() {
                       </div>
                     );
                   })}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         </>
       )}
     </div>
