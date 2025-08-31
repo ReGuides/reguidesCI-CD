@@ -201,15 +201,15 @@ export default function NewsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {birthdayCharacters.map((character) => (
                 <div key={character._id} className="flex items-center space-x-3 p-3 bg-neutral-800/50 rounded-lg">
-                  {character.image && (
-                    <Image 
-                      src={character.image} 
-                      alt={character.name}
-                      width={48}
-                      height={48}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  )}
+                                     {character.image && (
+                     <Image 
+                       src={`/images/characters/${character.image}`}
+                       alt={character.name}
+                       width={48}
+                       height={48}
+                       className="w-12 h-12 rounded-full object-cover"
+                     />
+                   )}
                   <div className="flex-1">
                     <p className="text-white font-medium">{character.name}</p>
                     <p className="text-gray-400 text-sm">
