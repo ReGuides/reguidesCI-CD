@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db/mongodb';
-import { PageViewModel, EventModel } from '@/models/Analytics';
+import connectToDatabase from '@/lib/mongodb';
+import Analytics from '@/models/Analytics';
 
 export async function GET(request: NextRequest) {
   try {
@@ -36,12 +36,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Получаем общую статистику просмотров
-    const pageViewsStats = await PageViewModel.aggregate([
+    const pageViewsStats = await Analytics.aggregate([
       { $match: { timestamp: dateFilter } },
       {
         $addFields: {
           // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
         }
       },
       { $match: { isAdminPage: false } },
@@ -56,20 +56,20 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Получаем топ страниц
-    const topPages = await PageViewModel.aggregate([
+    const topPages = await Analytics.aggregate([
       { $match: { timestamp: dateFilter } },
       {
         $addFields: {
           // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
         }
       },
       { $match: { isAdminPage: false } },
       {
         $group: {
-          _id: '$url',
+          _id: '$page',
           views: { $sum: 1 },
-          title: { $first: '$title' }
+          pageType: { $first: '$pageType' }
         }
       },
       { $sort: { views: -1 } },
@@ -77,79 +77,33 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Получаем статистику по устройствам
-    const deviceStats = await PageViewModel.aggregate([
+    const deviceStats = await Analytics.aggregate([
       { $match: { timestamp: dateFilter } },
       {
         $addFields: {
           // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
         }
       },
       { $match: { isAdminPage: false } },
       {
-        $addFields: {
-          deviceType: {
-            $cond: {
-              if: { $regexMatch: { input: '$userAgent', regex: /Mobile|Android|iPhone/i } },
-              then: 'mobile',
-              else: {
-                $cond: {
-                  if: { $regexMatch: { input: '$userAgent', regex: /Tablet|iPad/i } },
-                  then: 'tablet',
-                  else: 'desktop'
-                }
-              }
-            }
-          }
-        }
-      },
-      {
         $group: {
-          _id: '$deviceType',
+          _id: '$device',
           count: { $sum: 1 }
         }
       }
     ]);
 
     // Получаем статистику по браузерам
-    const browserStats = await PageViewModel.aggregate([
+    const browserStats = await Analytics.aggregate([
       { $match: { timestamp: dateFilter } },
       {
         $addFields: {
           // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
         }
       },
       { $match: { isAdminPage: false } },
-      {
-        $addFields: {
-          browser: {
-            $cond: {
-              if: { $regexMatch: { input: '$userAgent', regex: /Chrome/i } },
-              then: 'Chrome',
-              else: {
-                $cond: {
-                  if: { $regexMatch: { input: '$userAgent', regex: /Firefox/i } },
-                  then: 'Firefox',
-                  else: {
-                    $cond: {
-                      if: { $regexMatch: { input: '$userAgent', regex: /Safari/i } },
-                      then: 'Safari',
-                      else: {
-                        $cond: {
-                          if: { $regexMatch: { input: '$userAgent', regex: /Edge/i } },
-                          then: 'Edge',
-                          else: 'Other'
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       {
         $group: {
           _id: '$browser',
@@ -159,32 +113,32 @@ export async function GET(request: NextRequest) {
       { $sort: { count: -1 } }
     ]);
 
-    // Получаем статистику событий
-    const eventStats = await EventModel.aggregate([
+    // Получаем статистику событий (клики, прокрутка)
+    const eventStats = await Analytics.aggregate([
       { $match: { timestamp: dateFilter } },
       {
         $addFields: {
           // Исключаем события на страницах админки
-          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
         }
       },
       { $match: { isAdminPage: false } },
       {
         $group: {
-          _id: '$eventType',
-          count: { $sum: 1 }
+          _id: null,
+          totalClicks: { $sum: '$clicks' },
+          totalScrollDepth: { $avg: '$scrollDepth' }
         }
-      },
-      { $sort: { count: -1 } }
+      }
     ]);
 
     // Получаем почасовую статистику
-    const hourlyStats = await PageViewModel.aggregate([
+    const hourlyStats = await Analytics.aggregate([
       { $match: { timestamp: dateFilter } },
       {
         $addFields: {
           // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
         }
       },
       { $match: { isAdminPage: false } },
@@ -209,12 +163,12 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Получаем статистику по дням недели
-    const weeklyStats = await PageViewModel.aggregate([
+    const weeklyStats = await Analytics.aggregate([
       { $match: { timestamp: dateFilter } },
       {
         $addFields: {
           // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$url', regex: /\/admin/i } }
+          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
         }
       },
       { $match: { isAdminPage: false } },
@@ -246,17 +200,17 @@ export async function GET(request: NextRequest) {
         averageViewsPerSession: pageViewsStats[0]?.totalPageViews / (pageViewsStats[0]?.uniqueSessions?.length || 1) || 0
       },
       topPages,
-      deviceStats: deviceStats.reduce((acc, stat) => {
+      deviceStats: deviceStats.reduce((acc: Record<string, number>, stat: { _id: string; count: number }) => {
         acc[stat._id] = stat.count;
         return acc;
-      }, {} as Record<string, number>),
+      }, {}),
       browserStats,
       eventStats,
-      hourlyStats: hourlyStats.map(stat => ({
+      hourlyStats: hourlyStats.map((stat: { _id: number; count: number }) => ({
         hour: stat._id,
         count: stat.count
       })),
-      weeklyStats: weeklyStats.map(stat => ({
+      weeklyStats: weeklyStats.map((stat: { _id: number; count: number }) => ({
         day: stat._id,
         count: stat.count
       }))
