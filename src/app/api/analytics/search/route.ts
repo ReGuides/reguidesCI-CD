@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
     
     const body = await request.json();
-    const { query, sessionId, userId, resultsCount, clickedResult } = body;
+    const { query, sessionId, userId, resultsCount } = body;
     
     if (!query || !sessionId) {
       return NextResponse.json(
