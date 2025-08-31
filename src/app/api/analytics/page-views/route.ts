@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
     
     const body = await request.json();
-    const { url, title, sessionId, userId, userAgent, referrer } = body;
+    const { url, title, sessionId, userId, userAgent } = body;
     
     if (!url || !title || !sessionId) {
       return NextResponse.json(
