@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
     
     const body = await request.json();
-    const { eventType, eventName, sessionId, userId, page, elementId, elementText, metadata } = body;
+    const { eventType, eventName, sessionId, userId, page } = body;
     
     if (!eventType || !eventName || !sessionId || !page) {
       addServerLog('error', 'analytics-events', 'Missing required fields', { body });
