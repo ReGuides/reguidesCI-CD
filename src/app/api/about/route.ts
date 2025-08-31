@@ -16,44 +16,59 @@ export async function GET() {
       return NextResponse.json({ error: 'About data not found' }, { status: 404 });
     }
 
-    // Всегда берем команду из настроек сайта, даже если в About уже есть команда
+    // Всегда берем команду из настроек сайта
     try {
       const siteSettings = await SiteSettings.getSettings();
+      console.log('🔍 SiteSettings team:', siteSettings.team);
+      
       if (siteSettings.team && siteSettings.team.length > 0) {
         // Получаем данные пользователей для команды
-        const userIds = siteSettings.team.map(member => member.userId);
+        const userIds = siteSettings.team.map(member => member.userId).filter(Boolean);
+        console.log('🔍 User IDs from team:', userIds);
         
-        // Преобразуем строки в ObjectId для корректного поиска
-        const objectIds = userIds.map(id => {
-          try {
-            return new mongoose.Types.ObjectId(id);
-          } catch (error) {
-            console.error('Invalid ObjectId:', id, error);
-            return null;
-          }
-        }).filter(Boolean);
-        
-        if (objectIds.length > 0) {
-          const users = await User.find({ _id: { $in: objectIds } }).lean();
-          
-          // Формируем команду с данными пользователей
-          const teamMembers = siteSettings.team.map(member => {
-            const user = users.find(u => u._id?.toString() === member.userId);
-            if (user) {
-              return {
-                name: user.name || '',
-                role: member.role,
-                description: member.description,
-                avatar: user.avatar || '',
-                order: member.order
-              };
+        if (userIds.length > 0) {
+          // Преобразуем строки в ObjectId для корректного поиска
+          const objectIds = userIds.map(id => {
+            try {
+              return new mongoose.Types.ObjectId(id);
+            } catch (error) {
+              console.error('Invalid ObjectId:', id, error);
+              return null;
             }
-            return null;
-          }).filter((member): member is NonNullable<typeof member> => member !== null);
+          }).filter(Boolean);
           
-          // Присваиваем команду только если есть валидные участники
-          if (teamMembers.length > 0) {
-            about.team = teamMembers;
+          console.log('🔍 ObjectIds for User search:', objectIds);
+          
+          if (objectIds.length > 0) {
+            const users = await User.find({ _id: { $in: objectIds } }).lean();
+            console.log('🔍 Users found:', users.map(u => ({ id: u._id, name: u.name, avatar: u.avatar })));
+            
+            // Формируем команду с данными пользователей
+            const teamMembers = siteSettings.team.map(member => {
+              if (member.userId) {
+                const user = users.find(u => u._id?.toString() === member.userId);
+                console.log(`🔍 Processing member ${member.userId}:`, { user, member });
+                if (user) {
+                  const result = {
+                    name: user.name || '',
+                    role: member.role,
+                    description: member.description,
+                    avatar: user.avatar || '', // Аватар из User
+                    order: member.order
+                  };
+                  console.log(`🔍 Final member data:`, result);
+                  return result;
+                }
+              }
+              return null;
+            }).filter((member): member is NonNullable<typeof member> => member !== null);
+            
+            console.log('🔍 Final team members:', teamMembers);
+            
+            // Присваиваем команду только если есть валидные участники
+            if (teamMembers.length > 0) {
+              about.team = teamMembers;
+            }
           }
         }
       }
@@ -61,21 +76,7 @@ export async function GET() {
       console.error('Error fetching site settings team:', error);
     }
 
-    // Podtyagivaem avatarki dlya uchastnikov komandy po imeni
-    if (about.team && Array.isArray(about.team) && about.team.length > 0) {
-      const userNames = about.team.map((t) => t.name);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const users = await User.find({ name: { $in: userNames } }).lean() as any[];
-      about.team = about.team.map((member) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const user = users.find((u: any) => u.name === member.name);
-        return {
-          ...member,
-          avatar: user?.avatar || member.avatar || null // Prioritize user avatar, then existing member avatar
-        };
-      });
-    }
-
+    console.log('🔍 Final about data:', about);
     return NextResponse.json(about);
   } catch (error) {
     console.error('Error fetching about data:', error);
