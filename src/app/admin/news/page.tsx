@@ -59,7 +59,15 @@ export default function NewsPage() {
         console.log('🔍 API response:', data);
         if (data.success) {
           console.log('🔍 Setting birthday characters:', data.data.characters);
-          setBirthdayCharacters(data.data.characters);
+          // Преобразуем Mongoose документы в обычные объекты
+          const cleanCharacters = data.data.characters.map((char: any) => ({
+            _id: char._doc?._id || char._id,
+            name: char._doc?.name || char.name,
+            birthday: char._doc?.birthday || char.birthday,
+            image: char._doc?.image || char.image,
+            hasNews: char.hasNews
+          }));
+          setBirthdayCharacters(cleanCharacters);
         }
       }
     } catch (error) {
@@ -150,13 +158,6 @@ export default function NewsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Отладочная информация */}
-      <div className="bg-yellow-900/20 border border-yellow-600/30 p-4 rounded-lg">
-        <h3 className="text-yellow-400 font-medium mb-2">🔍 Отладочная информация</h3>
-        <p className="text-yellow-300 text-sm">birthdayCharacters.length: {birthdayCharacters.length}</p>
-        <p className="text-yellow-300 text-sm">birthdayCharacters: {JSON.stringify(birthdayCharacters, null, 2)}</p>
-      </div>
-
       {/* Заголовок */}
       <div className="flex justify-between items-center">
         <div>
