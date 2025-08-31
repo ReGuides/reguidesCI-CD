@@ -1,245 +1,139 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import DashboardChart from '@/components/admin/dashboard-chart';
+import { Badge } from '@/components/ui/badge';
 import { 
-  ArrowLeft,
+  BarChart3, 
+  Users, 
+  Eye, 
+  Clock, 
+  Globe, 
+  Monitor, 
+  Smartphone,
+  Tablet,
+  Chrome,
+  MonitorSmartphone,
   TrendingUp,
-  Eye,
-  MousePointer,
-  Download
+  RefreshCw
 } from 'lucide-react';
-import Link from 'next/link';
 
-interface AnalyticsData {
-  // Общая статистика сайта
-  totalPageViews: number;
-  uniqueVisitors: number;
-  uniqueSessions: number;
-  averageViewsPerSession: number;
-  
-  // Статистика рекламы
-  totalImpressions: number;
-  totalClicks: number;
-  averageCTR: number;
-  
-  // Временные данные
-  monthlyViews: number;
-  weeklyViews: number;
-  dailyViews: number;
-  
-  // Популярный контент
-  topContent: Array<{
-    title: string;
+interface AnalyticsStats {
+  period: string;
+  startDate: string;
+  total: {
+    totalPageViews: number;
+    uniqueVisitors: number;
+    totalSessions: number;
+    averageTimeOnPage: number;
+    averageLoadTime: number;
+    bounceRate: number;
+  };
+  topPages: Array<{
+    page: string;
+    pageType: string;
+    pageId?: string;
     views: number;
-    type: string;
+    uniqueVisitors: number;
   }>;
-  
-  // Статистика рекламы
-  topAdvertisements: Array<{
-    title: string;
-    impressions: number;
-    clicks: number;
-    ctr: number;
+  topCountries: Array<{
+    country: string;
+    views: number;
+    uniqueVisitors: number;
   }>;
-  
-  // Почасовые и недельные данные
-  hourlyData: {
-    labels: string[];
-    impressions: number[];
-    clicks: number[];
-    pageViews: number[];
-  };
-  weeklyTrends: {
-    labels: string[];
-    impressions: number[];
-    clicks: number[];
-    pageViews: number[];
-  };
-  
-  // Дополнительная статистика
-  deviceStats: {
-    desktop: number;
-    mobile: number;
-  };
-  typeStats: {
-    sidebar: number;
-    banner: number;
-    popup: number;
-  };
+  topBrowsers: Array<{
+    browser: string;
+    views: number;
+    uniqueVisitors: number;
+  }>;
+  topDevices: Array<{
+    device: string;
+    views: number;
+    uniqueVisitors: number;
+  }>;
+  topOS: Array<{
+    os: string;
+    views: number;
+    uniqueVisitors: number;
+  }>;
+  hourlyStats: Array<{
+    hour: number;
+    views: number;
+  }>;
+  weeklyStats: Array<{
+    dayOfWeek: number;
+    views: number;
+  }>;
 }
 
-interface Advertisement {
-  _id: string;
-  title: string;
-  type: string;
-  isActive: boolean;
-  impressions: number;
-  clicks: number;
-  createdAt: string;
-}
-
-export default function AdminAnalytics() {
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
-    totalPageViews: 0,
-    uniqueVisitors: 0,
-    uniqueSessions: 0,
-    averageViewsPerSession: 0,
-    totalImpressions: 0,
-    totalClicks: 0,
-    averageCTR: 0,
-    monthlyViews: 0,
-    weeklyViews: 0,
-    dailyViews: 0,
-    topContent: [],
-    topAdvertisements: [],
-    hourlyData: { labels: [], impressions: [], clicks: [], pageViews: [] },
-    weeklyTrends: { labels: [], impressions: [], clicks: [], pageViews: [] },
-    deviceStats: { desktop: 0, mobile: 0 },
-    typeStats: { sidebar: 0, banner: 0, popup: 0 }
-  });
+export default function AnalyticsPage() {
+  const [stats, setStats] = useState<AnalyticsStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
+  const [period, setPeriod] = useState('7d');
+  const [selectedPageType, setSelectedPageType] = useState<string>('');
 
-  const fetchAnalyticsData = useCallback(async () => {
+  const fetchAnalytics = async () => {
     try {
       setLoading(true);
+      const params = new URLSearchParams({ period });
+      if (selectedPageType) params.append('pageType', selectedPageType);
       
-      // Загружаем данные рекламы
-      const adsResponse = await fetch('/api/advertisements');
-      if (adsResponse.ok) {
-        const adsData = await adsResponse.json();
-        if (adsData.success) {
-          const advertisements: Advertisement[] = adsData.data;
-          
-          // Подсчитываем общую статистику
-          const totalImpressions = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.impressions || 0), 0);
-          const totalClicks = advertisements.reduce((sum: number, ad: Advertisement) => sum + (ad.clicks || 0), 0);
-          const averageCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
-
-          // Топ рекламы по CTR
-          const topAds = advertisements
-            .filter((ad: Advertisement) => ad.impressions > 0)
-            .map((ad: Advertisement) => ({
-              title: ad.title,
-              impressions: ad.impressions,
-              clicks: ad.clicks,
-              ctr: ad.impressions > 0 ? (ad.clicks / ad.impressions) * 100 : 0
-            }))
-            .sort((a, b) => b.ctr - a.ctr)
-            .slice(0, 10);
-
-          // Генерируем почасовые данные
-          const hourlyData = generateHourlyData(advertisements);
-          
-          // Генерируем недельные тренды
-          const weeklyTrends = generateWeeklyTrends(advertisements);
-          
-          // Статистика по устройствам (симуляция)
-          const deviceStats = {
-            desktop: Math.round(totalImpressions * 0.65),
-            mobile: Math.round(totalImpressions * 0.35)
-          };
-
-          // Статистика по типам рекламы
-          const typeStats = {
-            sidebar: advertisements.filter((ad: Advertisement) => ad.type === 'sidebar').length,
-            banner: advertisements.filter((ad: Advertisement) => ad.type === 'banner').length,
-            popup: advertisements.filter((ad: Advertisement) => ad.type === 'popup').length
-          };
-
-          setAnalyticsData({
-            totalPageViews: 0, // Placeholder, needs actual data fetching
-            uniqueVisitors: 0, // Placeholder, needs actual data fetching
-            uniqueSessions: 0, // Placeholder, needs actual data fetching
-            averageViewsPerSession: 0, // Placeholder, needs actual data fetching
-            totalImpressions,
-            totalClicks,
-            averageCTR: Math.round(averageCTR * 100) / 100,
-            monthlyViews: 0, // Placeholder, needs actual data fetching
-            weeklyViews: 0, // Placeholder, needs actual data fetching
-            dailyViews: 0, // Placeholder, needs actual data fetching
-            topContent: [], // Placeholder, needs actual data fetching
-            topAdvertisements: topAds,
-            hourlyData,
-            weeklyTrends,
-            deviceStats,
-            typeStats
-          });
+      const response = await fetch(`/api/analytics/stats?${params}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setStats(data.data);
         }
       }
     } catch (error) {
-      console.error('Error fetching analytics data:', error);
+      console.error('Error fetching analytics:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    fetchAnalyticsData();
-  }, [fetchAnalyticsData, timeRange]);
+    fetchAnalytics();
+  }, [period, selectedPageType]);
 
-  const generateHourlyData = (advertisements: Advertisement[]) => {
-    const labels: string[] = [];
-    const impressions: number[] = [];
-    const clicks: number[] = [];
-    const pageViews: number[] = [];
-    
-    // Простая логика: распределяем данные по часам с понятными пиками
-    for (let i = 0; i < 24; i++) {
-      labels.push(`${i}:00`);
-      
-      const totalImpressions = advertisements.reduce((sum, ad) => sum + (ad.impressions || 0), 0);
-      const totalClicks = advertisements.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
-      
-      // Простые множители для разных часов
-      let hourMultiplier = 0.5; // Базовый уровень
-      
-      if (i >= 9 && i <= 12) hourMultiplier = 1.5;    // Утро - пик
-      else if (i >= 13 && i <= 14) hourMultiplier = 1.2; // Обед
-      else if (i >= 18 && i <= 21) hourMultiplier = 1.8; // Вечер - максимальный пик
-      else if (i >= 22 || i <= 6) hourMultiplier = 0.2;  // Ночь - минимум
-      
-      impressions.push(Math.round((totalImpressions / 24) * hourMultiplier));
-      clicks.push(Math.round((totalClicks / 24) * hourMultiplier));
-      pageViews.push(Math.round((totalImpressions * 10 / 24) * hourMultiplier)); // Симулируем просмотры страниц
+  const getDeviceIcon = (device: string) => {
+    switch (device) {
+      case 'desktop': return <Monitor className="w-4 h-4" />;
+      case 'mobile': return <Smartphone className="w-4 h-4" />;
+      case 'tablet': return <Tablet className="w-4 h-4" />;
+      default: return <Monitor className="w-4 h-4" />;
     }
-    
-    return { labels, impressions, clicks, pageViews };
   };
 
-  const generateWeeklyTrends = (advertisements: Advertisement[]) => {
-    const labels: string[] = [];
-    const impressions: number[] = [];
-    const clicks: number[] = [];
-    const pageViews: number[] = [];
-    
-    const totalImpressions = advertisements.reduce((sum, ad) => sum + (ad.impressions || 0), 0);
-    const totalClicks = advertisements.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
-    
-    // Простые множители для дней недели
-    const dayMultipliers = [0.8, 1.1, 1.3, 1.1, 1.0, 0.6, 0.5]; // Пн-Вс
-    
-    dayMultipliers.forEach(multiplier => {
-      impressions.push(Math.round((totalImpressions / 7) * multiplier));
-      clicks.push(Math.round((totalClicks / 7) * multiplier));
-      pageViews.push(Math.round((totalImpressions * 10 / 7) * multiplier)); // Симулируем просмотры страниц
-    });
-    
-    return { labels, impressions, clicks, pageViews };
+  const getBrowserIcon = (browser: string) => {
+    switch (browser.toLowerCase()) {
+      case 'chrome': return <Chrome className="w-4 h-4" />;
+      case 'firefox': return <MonitorSmartphone className="w-4 h-4" />;
+      case 'safari': return <MonitorSmartphone className="w-4 h-4" />;
+      default: return <Chrome className="w-4 h-4" />;
+    }
   };
 
-  const exportData = () => {
-    const dataStr = JSON.stringify(analyticsData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `analytics-${timeRange}-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+  const getOSIcon = (os: string) => {
+    switch (os.toLowerCase()) {
+      case 'windows': return <Monitor className="w-4 h-4" />;
+      case 'macos': return <Monitor className="w-4 h-4" />;
+      case 'linux': return <Monitor className="w-4 h-4" />;
+      default: return <Monitor className="w-4 h-4" />;
+    }
+  };
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+  };
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   if (loading) {
@@ -254,176 +148,336 @@ export default function AdminAnalytics() {
     <div className="p-6 space-y-6">
       {/* Заголовок */}
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <Link href="/admin">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Назад
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-white">Подробная аналитика</h1>
-            <p className="text-gray-400">Детальный анализ эффективности рекламы</p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold text-white">Аналитика сайта</h1>
+          <p className="text-gray-400">Подробная статистика посещений и поведения пользователей</p>
         </div>
         <div className="flex gap-3">
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as '7d' | '30d' | '90d')}
-            className="bg-neutral-700 border border-neutral-600 text-white rounded-md px-3 py-2"
+          <Button 
+            onClick={fetchAnalytics}
+            variant="outline" 
+            className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white"
           >
-            <option value="7d">Последние 7 дней</option>
-            <option value="30d">Последние 30 дней</option>
-            <option value="90d">Последние 90 дней</option>
-          </select>
-          <Button onClick={exportData} variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            Экспорт
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Обновить
           </Button>
         </div>
       </div>
 
-      {/* Основные метрики */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border-blue-500/30">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-300">Общие показы</CardTitle>
-            <Eye className="h-5 w-5 text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">{analyticsData.totalImpressions.toLocaleString()}</div>
-            <p className="text-xs text-blue-300">за выбранный период</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-600/20 to-green-800/20 border-green-500/30">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-300">Общие клики</CardTitle>
-            <MousePointer className="h-5 w-5 text-green-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">{analyticsData.totalClicks.toLocaleString()}</div>
-            <p className="text-xs text-green-300">за выбранный период</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border-purple-500/30">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-300">Средний CTR</CardTitle>
-            <TrendingUp className="h-5 w-5 text-purple-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">{analyticsData.averageCTR}%</div>
-            <p className="text-xs text-purple-300">показатель конверсии</p>
-          </CardContent>
-        </Card>
+      {/* Фильтры */}
+      <div className="flex gap-4">
+        <select
+          value={period}
+          onChange={(e) => setPeriod(e.target.value)}
+          className="bg-neutral-800 border border-neutral-600 text-white px-3 py-2 rounded-lg"
+        >
+          <option value="1d">Последние 24 часа</option>
+          <option value="7d">Последние 7 дней</option>
+          <option value="30d">Последние 30 дней</option>
+          <option value="90d">Последние 90 дней</option>
+          <option value="all">Все время</option>
+        </select>
+        
+        <select
+          value={selectedPageType}
+          onChange={(e) => setSelectedPageType(e.target.value)}
+          className="bg-neutral-800 border border-neutral-600 text-white px-3 py-2 rounded-lg"
+        >
+          <option value="">Все типы страниц</option>
+          <option value="character">Персонажи</option>
+          <option value="weapon">Оружие</option>
+          <option value="artifact">Артефакты</option>
+          <option value="news">Новости</option>
+          <option value="about">О проекте</option>
+          <option value="home">Главная</option>
+          <option value="search">Поиск</option>
+        </select>
       </div>
 
-      {/* Графики */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <DashboardChart
-          data={{
-            labels: analyticsData.hourlyData.labels,
-            data: analyticsData.hourlyData.impressions
-          }}
-          type="bar"
-          title="Показы по часам (24 часа)"
-        />
-        <DashboardChart
-          data={{
-            labels: analyticsData.weeklyTrends.labels,
-            data: analyticsData.weeklyTrends.impressions
-          }}
-          type="line"
-          title="Недельные тренды показов"
-        />
-      </div>
+      {stats && (
+        <>
+          {/* Основные метрики */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border-blue-500/20">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-blue-400">Просмотры страниц</CardTitle>
+                <Eye className="h-4 w-4 text-blue-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{formatNumber(stats.total.totalPageViews)}</div>
+                <p className="text-xs text-blue-300">Всего просмотров</p>
+              </CardContent>
+            </Card>
 
-      {/* Дополнительная аналитика */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-neutral-800 border-neutral-700">
-          <CardHeader>
-            <CardTitle className="text-white">Топ рекламы по CTR</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {analyticsData.topAdvertisements.slice(0, 5).map((ad, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-lg font-bold text-purple-400">#{index + 1}</span>
-                    <div>
-                      <p className="text-white text-sm font-medium">{ad.title}</p>
-                      <p className="text-gray-400 text-xs">CTR: {ad.ctr.toFixed(2)}%</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-blue-400 text-xs">👁 {ad.impressions}</span>
-                    <span className="text-green-400 text-xs">🖱 {ad.clicks}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="bg-gradient-to-r from-green-500/10 to-green-600/10 border-green-500/20">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-green-400">Уникальные посетители</CardTitle>
+                <Users className="h-4 w-4 text-green-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{formatNumber(stats.total.uniqueVisitors)}</div>
+                <p className="text-xs text-green-300">Активных пользователей</p>
+              </CardContent>
+            </Card>
 
-        <div className="space-y-6">
+            <Card className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 border-purple-500/20">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-purple-400">Время на странице</CardTitle>
+                <Clock className="h-4 w-4 text-purple-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{formatTime(stats.total.averageTimeOnPage)}</div>
+                <p className="text-xs text-purple-300">Среднее время</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 border-orange-500/20">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-orange-400">Процент отказов</CardTitle>
+                <TrendingUp className="h-4 w-4 text-orange-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{stats.total.bounceRate.toFixed(1)}%</div>
+                <p className="text-xs text-orange-300">Пользователи ушли быстро</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Топ страниц */}
           <Card className="bg-neutral-800 border-neutral-700">
             <CardHeader>
-              <CardTitle className="text-white">Статистика по устройствам</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Desktop</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-neutral-700 rounded-full h-2">
-                      <div 
-                        className="bg-blue-500 h-2 rounded-full" 
-                        style={{ width: `${(analyticsData.deviceStats.desktop / analyticsData.totalImpressions) * 100}%` }}
-                      />
-                    </div>
-                    <span className="text-white font-semibold">{analyticsData.deviceStats.desktop.toLocaleString()}</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Mobile</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-neutral-700 rounded-full h-2">
-                      <div 
-                        className="bg-green-500 h-2 rounded-full" 
-                        style={{ width: `${(analyticsData.deviceStats.mobile / analyticsData.totalImpressions) * 100}%` }}
-                      />
-                    </div>
-                    <span className="text-white font-semibold">{analyticsData.deviceStats.mobile.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-neutral-800 border-neutral-700">
-            <CardHeader>
-              <CardTitle className="text-white">Распределение по типам</CardTitle>
+              <CardTitle className="text-white flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-purple-400" />
+                Топ страниц
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Сайдбар</span>
-                  <span className="text-white font-semibold">{analyticsData.typeStats.sidebar}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Баннер</span>
-                  <span className="text-white font-semibold">{analyticsData.typeStats.banner}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Всплывающее окно</span>
-                  <span className="text-white font-semibold">{analyticsData.typeStats.popup}</span>
-                </div>
+                {stats.topPages.slice(0, 10).map((page, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Badge variant="outline" className="text-xs">
+                        {page.pageType}
+                      </Badge>
+                      <span className="text-white font-medium">{page.page}</span>
+                      {page.pageId && (
+                        <span className="text-gray-400 text-sm">ID: {page.pageId}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-4 text-sm">
+                      <span className="text-gray-400">
+                        <Eye className="w-3 h-3 inline mr-1" />
+                        {formatNumber(page.views)}
+                      </span>
+                      <span className="text-gray-400">
+                        <Users className="w-3 h-3 inline mr-1" />
+                        {formatNumber(page.uniqueVisitors)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
-        </div>
-      </div>
+
+          {/* География и устройства */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Топ стран */}
+            <Card className="bg-neutral-800 border-neutral-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Globe className="w-5 h-5 text-blue-400" />
+                  Топ стран
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {stats.topCountries.slice(0, 10).map((country, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <span className="text-white">{country.country}</span>
+                      <div className="flex items-center space-x-4 text-sm">
+                        <span className="text-gray-400">
+                          <Eye className="w-3 h-3 inline mr-1" />
+                          {formatNumber(country.views)}
+                        </span>
+                        <span className="text-gray-400">
+                          <Users className="w-3 h-3 inline mr-1" />
+                          {formatNumber(country.uniqueVisitors)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Топ устройств */}
+            <Card className="bg-neutral-800 border-neutral-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Monitor className="w-5 h-5 text-green-400" />
+                  Устройства
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {stats.topDevices.map((device, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        {getDeviceIcon(device.device)}
+                        <span className="text-white capitalize">{device.device}</span>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm">
+                        <span className="text-gray-400">
+                          <Eye className="w-3 h-3 inline mr-1" />
+                          {formatNumber(device.views)}
+                        </span>
+                        <span className="text-gray-400">
+                          <Users className="w-3 h-3 inline mr-1" />
+                          {formatNumber(device.uniqueVisitors)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Браузеры и ОС */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Топ браузеров */}
+            <Card className="bg-neutral-800 border-neutral-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Chrome className="w-5 h-5 text-yellow-400" />
+                  Браузеры
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {stats.topBrowsers.slice(0, 8).map((browser, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        {getBrowserIcon(browser.browser)}
+                        <span className="text-white">{browser.browser}</span>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm">
+                        <span className="text-gray-400">
+                          <Eye className="w-3 h-3 inline mr-1" />
+                          {formatNumber(browser.views)}
+                        </span>
+                        <span className="text-gray-400">
+                          <Users className="w-3 h-3 inline mr-1" />
+                          {formatNumber(browser.uniqueVisitors)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Топ ОС */}
+            <Card className="bg-neutral-800 border-neutral-700">
+              <CardHeader>
+                                 <CardTitle className="text-white flex items-center gap-2">
+                   <Monitor className="w-5 h-5 text-blue-400" />
+                   Операционные системы
+                 </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {stats.topOS.slice(0, 8).map((os, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        {getOSIcon(os.os)}
+                        <span className="text-white">{os.os}</span>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm">
+                        <span className="text-gray-400">
+                          <Eye className="w-3 h-3 inline mr-1" />
+                          {formatNumber(os.views)}
+                        </span>
+                        <span className="text-gray-400">
+                          <Users className="w-3 h-3 inline mr-1" />
+                          {formatNumber(os.uniqueVisitors)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Временная статистика */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* По часам */}
+            <Card className="bg-neutral-800 border-neutral-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-purple-400" />
+                  Активность по часам
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {stats.hourlyStats.map((hour, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <span className="text-white text-sm">{hour.hour}:00</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-32 bg-neutral-700 rounded-full h-2">
+                          <div 
+                            className="bg-purple-500 h-2 rounded-full" 
+                            style={{ width: `${(hour.views / Math.max(...stats.hourlyStats.map(h => h.views))) * 100}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-gray-400 text-sm w-12 text-right">
+                          {formatNumber(hour.views)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* По дням недели */}
+            <Card className="bg-neutral-800 border-neutral-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-green-400" />
+                  Активность по дням недели
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {stats.weeklyStats.map((day, index) => {
+                    const dayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+                    return (
+                      <div key={index} className="flex items-center justify-between">
+                        <span className="text-white text-sm">{dayNames[day.dayOfWeek - 1]}</span>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-32 bg-neutral-700 rounded-full h-2">
+                            <div 
+                              className="bg-green-500 h-2 rounded-full" 
+                              style={{ width: `${(day.views / Math.max(...stats.weeklyStats.map(d => d.views))) * 100}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-gray-400 text-sm w-12 text-right">
+                            {formatNumber(day.views)}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 } 

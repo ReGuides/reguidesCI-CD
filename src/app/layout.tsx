@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { AnalyticsProvider } from '@/components/analytics-provider';
+import { AnalyticsProvider } from '@/components/providers/AnalyticsProvider';
 import { SiteSettingsProvider } from '@/components/site-settings-provider';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
