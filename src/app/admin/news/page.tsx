@@ -60,10 +60,10 @@ export default function NewsPage() {
         if (data.success) {
           console.log('🔍 Setting birthday characters:', data.data.characters);
           // Преобразуем Mongoose документы в обычные объекты
-          const cleanCharacters = data.data.characters.map((char: any) => ({
-            _id: char._doc?._id || char._id,
-            name: char._doc?.name || char.name,
-            birthday: char._doc?.birthday || char.birthday,
+          const cleanCharacters = data.data.characters.map((char: { _doc?: { _id: string; name: string; birthday: string; image?: string }; _id?: string; name?: string; birthday?: string; image?: string; hasNews: boolean }) => ({
+            _id: char._doc?._id || char._id || '',
+            name: char._doc?.name || char.name || '',
+            birthday: char._doc?.birthday || char.birthday || '',
             image: char._doc?.image || char.image,
             hasNews: char.hasNews
           }));
