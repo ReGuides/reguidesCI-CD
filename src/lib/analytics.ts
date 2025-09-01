@@ -140,6 +140,12 @@ class AnalyticsTracker {
 
   private initTracking(): void {
     if (this.isTracking) return;
+    
+    // Не отслеживаем аналитику на страницах админки
+    if (window.location.pathname.startsWith('/admin')) {
+      return;
+    }
+    
     this.isTracking = true;
 
     // Отслеживаем клики
@@ -188,6 +194,11 @@ class AnalyticsTracker {
 
   private async trackPageView(isLeaving: boolean = false): Promise<void> {
     try {
+      // Не отслеживаем аналитику на страницах админки
+      if (this.currentPage.startsWith('/admin')) {
+        return;
+      }
+      
       const now = new Date();
       const timeOnPage = Math.round((now.getTime() - this.pageStart.getTime()) / 1000);
       
@@ -270,16 +281,23 @@ class AnalyticsTracker {
   }
 
   public startNewPage(): void {
+    // Не отслеживаем аналитику на страницах админки
+    if (this.currentPage.startsWith('/admin')) {
+      return;
+    }
+    
     this.trackPageView(true); // Завершаем предыдущую страницу
     this.pageStart = new Date();
     this.currentPage = window.location.pathname;
     this.clickCount = 0;
     this.maxScrollDepth = 0;
     
-    // Отслеживаем новую страницу
-    setTimeout(() => {
-      this.trackPageView(false);
-    }, 100);
+    // Отслеживаем новую страницу только если это не админка
+    if (!this.currentPage.startsWith('/admin')) {
+      setTimeout(() => {
+        this.trackPageView(false);
+      }, 100);
+    }
   }
 
   public trackEvent(eventType: string, eventName: string, metadata?: Record<string, unknown>): void {

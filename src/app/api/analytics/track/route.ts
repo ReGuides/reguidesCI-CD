@@ -37,6 +37,15 @@ export async function POST(request: NextRequest) {
       isFirstVisit
     } = body;
 
+    // Не отслеживаем аналитику для страниц админки
+    if (page.startsWith('/admin')) {
+      addServerLog('info', 'analytics-track', 'Admin page skipped', { page });
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Admin page skipped' 
+      });
+    }
+
     // Валидация обязательных полей
     if (!sessionId || !page || !pageType || !userAgent || !device || !country) {
       addServerLog('error', 'analytics-track', 'Missing required fields', { body });

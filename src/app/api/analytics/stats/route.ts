@@ -32,8 +32,11 @@ export async function GET(request: NextRequest) {
         break;
     }
     
-    // Базовые условия для фильтрации
-    const matchConditions: Record<string, unknown> = { timestamp: { $gte: startDate } };
+    // Базовые условия для фильтрации (исключаем админку)
+    const matchConditions: Record<string, unknown> = { 
+      timestamp: { $gte: startDate },
+      page: { $not: /^\/admin/ } // Исключаем страницы админки
+    };
     if (pageType) matchConditions.pageType = pageType;
     if (pageId) matchConditions.pageId = pageId;
     
