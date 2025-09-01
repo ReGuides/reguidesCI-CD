@@ -97,12 +97,9 @@ export function Header() {
             <Link href="/articles" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
               Новости и статьи
             </Link>
-            <Link href="/about" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
-              О проекте
-            </Link>
-            <Link href="/privacy-policy" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
-              Конфиденциальность
-            </Link>
+                          <Link href="/about" className="text-text hover:text-highlight transition-colors whitespace-nowrap">
+                О проекте
+              </Link>
           </div>
         </nav>
 
@@ -151,20 +148,13 @@ export function Header() {
               >
                 Новости и статьи
               </Link>
-              <Link 
-                href="/about" 
-                className="block px-4 py-3 text-text hover:text-highlight hover:bg-neutral-700 rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                О проекте
-              </Link>
-              <Link 
-                href="/privacy-policy" 
-                className="block px-4 py-3 text-text hover:text-highlight hover:bg-neutral-700 rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Конфиденциальность
-              </Link>
+                              <Link
+                  href="/about"
+                  className="block px-4 py-3 text-text hover:text-highlight hover:bg-neutral-700 rounded-lg transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  О проекте
+                </Link>
             </div>
           </div>
         )}
