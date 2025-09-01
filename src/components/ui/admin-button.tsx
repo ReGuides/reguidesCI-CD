@@ -45,13 +45,13 @@ const AdminButton = forwardRef<HTMLButtonElement, AdminButtonProps>(
         {...props}
       >
         {icon && iconPosition === 'left' && (
-          <span className={cn('flex-shrink-0', iconSizeClasses[size], children && 'mr-2')}>
+          <span className={cn('flex-shrink-0', iconSizeClasses[size], children ? 'mr-2' : undefined)}>
             {icon}
           </span>
         )}
         {children}
         {icon && iconPosition === 'right' && (
-          <span className={cn('flex-shrink-0', iconSizeClasses[size], children && 'ml-2')}>
+          <span className={cn('flex-shrink-0', iconSizeClasses[size], children ? 'ml-2' : undefined)}>
             {icon}
           </span>
         )}
