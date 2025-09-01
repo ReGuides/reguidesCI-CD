@@ -12,20 +12,25 @@ export async function GET(request: NextRequest) {
     const pageType = searchParams.get('pageType');
     const pageId = searchParams.get('pageId');
     
-    // Вычисляем дату начала периода
+    // Вычисляем дату начала периода (по МСК)
     let startDate = new Date();
+    
+    // Устанавливаем время в 00:00:00 по МСК для текущего дня
+    const moscowOffset = 3; // UTC+3 для МСК
+    startDate.setUTCHours(0 - moscowOffset, 0, 0, 0);
+    
     switch (period) {
       case '1d':
-        startDate.setDate(startDate.getDate() - 1);
+        startDate.setUTCDate(startDate.getUTCDate() - 1);
         break;
       case '7d':
-        startDate.setDate(startDate.getDate() - 7);
+        startDate.setUTCDate(startDate.getUTCDate() - 7);
         break;
       case '30d':
-        startDate.setDate(startDate.getDate() - 30);
+        startDate.setUTCDate(startDate.getUTCDate() - 30);
         break;
       case '90d':
-        startDate.setDate(startDate.getDate() - 90);
+        startDate.setUTCDate(startDate.getUTCDate() - 90);
         break;
       case 'all':
         startDate = new Date(0); // 1970-01-01
@@ -178,12 +183,22 @@ export async function GET(request: NextRequest) {
       { $limit: 10 }
     ]);
     
-    // 7. Статистика по времени (часы дня)
+    // 7. Статистика по времени (часы дня по МСК)
     const hourlyStats = await Analytics.aggregate([
       { $match: matchConditions },
       {
+        $addFields: {
+          moscowHour: {
+            $hour: {
+              date: '$timestamp',
+              timezone: 'Europe/Moscow'
+            }
+          }
+        }
+      },
+      {
         $group: {
-          _id: { $hour: '$timestamp' },
+          _id: '$moscowHour',
           views: { $sum: 1 }
         }
       },
@@ -197,12 +212,22 @@ export async function GET(request: NextRequest) {
       { $sort: { hour: 1 } }
     ]);
     
-    // 8. Статистика по дням недели
+    // 8. Статистика по дням недели (по МСК)
     const weeklyStats = await Analytics.aggregate([
       { $match: matchConditions },
       {
+        $addFields: {
+          moscowDayOfWeek: {
+            $dayOfWeek: {
+              date: '$timestamp',
+              timezone: 'Europe/Moscow'
+            }
+          }
+        }
+      },
+      {
         $group: {
-          _id: { $dayOfWeek: '$timestamp' },
+          _id: '$moscowDayOfWeek',
           views: { $sum: 1 }
         }
       },
@@ -216,11 +241,11 @@ export async function GET(request: NextRequest) {
       { $sort: { dayOfWeek: 1 } }
     ]);
     
-    // 9. Если указан pageId, получаем детальную статистику по странице
-    let pageStats = null;
-    if (pageId) {
-      pageStats = await Analytics.aggregate([
-        { $match: { pageId, timestamp: { $gte: startDate } } },
+         // 9. Если указан pageId, получаем детальную статистику по странице
+     let pageStats = null;
+     if (pageId) {
+       pageStats = await Analytics.aggregate([
+         { $match: { pageId, timestamp: { $gte: startDate }, page: { $not: /^\/admin/ } } },
         {
           $group: {
             _id: null,
