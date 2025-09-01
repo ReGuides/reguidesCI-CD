@@ -38,9 +38,9 @@ export default function AdvertisementPopup() {
               setTimeout(() => {
                 setIsVisible(true);
                 
-                // Отслеживаем показ рекламы
-                if (ad._id && typeof window !== 'undefined' && (window as any).trackAdImpression) {
-                  (window as any).trackAdImpression(ad._id, 'popup', 'modal', ad.title);
+                // Отправляем событие показа рекламы
+                if (typeof window !== 'undefined' && window.trackAdImpression) {
+                  window.trackAdImpression(ad._id, 'popup', 'modal', ad.title);
                 }
               }, 3000);
             }
@@ -108,9 +108,9 @@ export default function AdvertisementPopup() {
               rel="noopener noreferrer"
               className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold rounded-lg transition-all duration-200 text-center shadow-lg hover:shadow-purple-500/25 transform hover:scale-105"
               onClick={() => {
-                // Отслеживаем клик по рекламе
-                if (typeof window !== 'undefined' && (window as any).trackAdClick) {
-                  (window as any).trackAdClick(advertisement._id, 'popup', 'modal', advertisement.title);
+                // Отправляем событие клика по рекламе
+                if (typeof window !== 'undefined' && window.trackAdClick) {
+                  window.trackAdClick(advertisement._id, 'popup', 'modal', advertisement.title);
                 }
               }}
             >

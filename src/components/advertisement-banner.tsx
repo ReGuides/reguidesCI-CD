@@ -45,9 +45,9 @@ export default function AdvertisementBanner() {
                   console.error('Error tracking impression:', error);
                 });
                 
-                // Отправляем в рекламную аналитику
-                if (typeof window !== 'undefined' && (window as any).trackAdImpression) {
-                  (window as any).trackAdImpression(ad._id, 'banner', 'header', ad.title);
+                // Отправляем событие показа рекламы
+                if (typeof window !== 'undefined' && window.trackAdImpression) {
+                  window.trackAdImpression(ad._id, 'banner', 'header', ad.title);
                 }
               }
             }
@@ -114,9 +114,9 @@ export default function AdvertisementBanner() {
                       method: 'POST'
                     });
                     
-                    // Отправляем в рекламную аналитику
-                    if (typeof window !== 'undefined' && (window as any).trackAdClick) {
-                      (window as any).trackAdClick(advertisement._id, 'banner', 'header', advertisement.title);
+                    // Отправляем событие клика по рекламе
+                    if (typeof window !== 'undefined' && window.trackAdClick) {
+                      window.trackAdClick(advertisement._id, 'banner', 'header', advertisement.title);
                     }
                   } catch (error) {
                     console.error('Error tracking click:', error);
