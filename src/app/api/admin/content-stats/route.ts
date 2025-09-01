@@ -6,7 +6,7 @@ import { addServerLog } from '@/lib/serverLog';
 import { CharacterModel } from '@/models/Character';
 import { WeaponModel } from '@/models/Weapon';
 import { ArtifactModel } from '@/models/Artifact';
-import { ArticleModel } from '@/models/Article';
+import News from '@/models/News';
 
 export async function GET() {
   try {
@@ -17,7 +17,7 @@ export async function GET() {
       characters: 0,
       weapons: 0,
       artifacts: 0,
-      articles: 0,
+      news: 0,
       builds: 0
     };
 
@@ -43,10 +43,10 @@ export async function GET() {
     }
 
     try {
-      // Статистика статей
-      contentStats.articles = await ArticleModel.countDocuments();
+      // Статистика новостей
+      contentStats.news = await News.countDocuments();
     } catch (error) {
-      addServerLog('warn', 'content-stats', 'Failed to count articles', { error: error instanceof Error ? error.message : 'Unknown error' });
+      addServerLog('warn', 'content-stats', 'Failed to count news', { error: error instanceof Error ? error.message : 'Unknown error' });
     }
 
     // Пока что builds = 0, так как система сборок еще не реализована

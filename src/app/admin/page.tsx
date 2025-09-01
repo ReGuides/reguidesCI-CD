@@ -36,7 +36,7 @@ interface DashboardStats {
   totalCharacters: number;
   totalWeapons: number;
   totalArtifacts: number;
-  totalArticles: number;
+  totalNews: number;
   totalBuilds: number;
   
   // Популярный контент
@@ -76,7 +76,7 @@ export default function AdminDashboard() {
     totalCharacters: 0,
     totalWeapons: 0,
     totalArtifacts: 0,
-    totalArticles: 0,
+    totalNews: 0,
     totalBuilds: 0,
     topContent: [],
     recentActivity: []
@@ -109,7 +109,7 @@ export default function AdminDashboard() {
             totalCharacters: contentData.data.characters,
             totalWeapons: contentData.data.weapons,
             totalArtifacts: contentData.data.artifacts,
-            totalArticles: contentData.data.articles,
+            totalNews: contentData.data.news,
             totalBuilds: contentData.data.builds
           }));
         }
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
         />
         <StatCard
           title="Контент сайта"
-          value={stats.totalCharacters + stats.totalWeapons + stats.totalArtifacts + stats.totalArticles}
+          value={stats.totalCharacters + stats.totalWeapons + stats.totalArtifacts + stats.totalNews}
           icon={FileText}
           color="yellow"
         />
@@ -289,12 +289,12 @@ export default function AdminDashboard() {
               <span className="text-white font-semibold">{stats.totalArtifacts}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-400">Статьи</span>
-              <span className="text-white font-semibold">{stats.totalArticles}</span>
+              <span className="text-gray-400">Новости</span>
+              <span className="text-white font-semibold">{stats.totalNews}</span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-neutral-700">
               <span className="text-gray-300 font-medium">Всего контента</span>
-              <span className="text-white font-bold text-lg">{stats.totalCharacters + stats.totalWeapons + stats.totalArtifacts + stats.totalArticles}</span>
+              <span className="text-white font-bold text-lg">{stats.totalCharacters + stats.totalWeapons + stats.totalArtifacts + stats.totalNews}</span>
             </div>
           </CardContent>
         </Card>
@@ -325,10 +325,10 @@ export default function AdminDashboard() {
                 Добавить артефакт
               </Button>
             </Link>
-            <Link href="/admin/articles/add">
+            <Link href="/admin/news/add">
               <Button className="w-full bg-orange-600 hover:bg-orange-700">
                 <FileText className="w-4 h-4 mr-2" />
-                Добавить статью
+                Добавить новость
               </Button>
             </Link>
           </div>
