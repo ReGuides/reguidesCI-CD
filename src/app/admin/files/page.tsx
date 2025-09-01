@@ -479,14 +479,14 @@ export default function FilesManagementPage() {
               {/* Left/Right controls */}
               <button
                 onClick={() => { const prev = (currentIndex - 1 + currentList.length) % currentList.length; setCurrentIndex(prev); setSelectedImage(currentList[prev]); }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white"
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10"
                 aria-label="Предыдущая"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={() => { const next = (currentIndex + 1) % currentList.length; setCurrentIndex(next); setSelectedImage(currentList[next]); }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10"
                 aria-label="Следующая"
               >
                 <ChevronRight className="w-6 h-6" />

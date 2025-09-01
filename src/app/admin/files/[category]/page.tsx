@@ -176,8 +176,8 @@ export default function FilesCategoryPage() {
               </div>
             </div>
             <div className="relative bg-neutral-900" style={{ height: '70vh' }}>
-              <button onClick={() => setCurrentIndex((i) => (i - 1 + files.length) % files.length)} className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white"><ChevronLeft className="w-6 h-6" /></button>
-              <button onClick={() => setCurrentIndex((i) => (i + 1) % files.length)} className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white"><ChevronRight className="w-6 h-6" /></button>
+              <button onClick={() => setCurrentIndex((i) => (i - 1 + files.length) % files.length)} className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10"><ChevronLeft className="w-6 h-6" /></button>
+              <button onClick={() => setCurrentIndex((i) => (i + 1) % files.length)} className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10"><ChevronRight className="w-6 h-6" /></button>
               <div className="absolute inset-0">
                 <div className="relative w-full h-full">
                   <Image src={files[currentIndex].url} alt={files[currentIndex].name} fill sizes="100vw" style={{ objectFit: 'contain' }} onLoad={e => {
