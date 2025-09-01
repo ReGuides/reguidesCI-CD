@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     
     // Базовые условия для фильтрации (исключаем админку)
     const matchConditions: Record<string, unknown> = { 
-      timestamp: { $gte: startDate },
+      visitDate: { $gte: startDate.toISOString().split('T')[0] },
       page: { $not: /^\/admin/ } // Исключаем страницы админки
     };
     if (pageType) matchConditions.pageType = pageType;
@@ -52,8 +52,7 @@ export async function GET(request: NextRequest) {
         $group: {
           _id: null,
           totalPageViews: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$sessionId' },
-          totalSessions: { $addToSet: '$sessionId' },
+          uniqueVisitors: { $addToSet: '$anonymousSessionId' },
           averageTimeOnPage: { $avg: '$timeOnPage' },
           averageLoadTime: { $avg: '$loadTime' },
           bounceRate: { $avg: { $cond: ['$isBounce', 1, 0] } }
@@ -64,7 +63,6 @@ export async function GET(request: NextRequest) {
           _id: 0,
           totalPageViews: 1,
           uniqueVisitors: { $size: '$uniqueVisitors' },
-          totalSessions: { $size: '$totalSessions' },
           averageTimeOnPage: { $round: ['$averageTimeOnPage', 2] },
           averageLoadTime: { $round: ['$averageLoadTime', 2] },
           bounceRate: { $round: [{ $multiply: ['$bounceRate', 100] }, 2] }
@@ -79,7 +77,7 @@ export async function GET(request: NextRequest) {
         $group: {
           _id: { page: '$page', pageType: '$pageType', pageId: '$pageId' },
           views: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$sessionId' }
+          uniqueVisitors: { $addToSet: '$anonymousSessionId' }
         }
       },
       {
@@ -96,20 +94,20 @@ export async function GET(request: NextRequest) {
       { $limit: 20 }
     ]);
     
-    // 3. Топ стран
-    const topCountries = await Analytics.aggregate([
+    // 3. Топ регионов (континентов)
+    const topRegions = await Analytics.aggregate([
       { $match: matchConditions },
       {
         $group: {
-          _id: '$country',
+          _id: '$region',
           views: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$sessionId' }
+          uniqueVisitors: { $addToSet: '$anonymousSessionId' }
         }
       },
       {
         $project: {
           _id: 0,
-          country: '$_id',
+          region: '$_id',
           views: 1,
           uniqueVisitors: { $size: '$uniqueVisitors' }
         }
@@ -118,42 +116,20 @@ export async function GET(request: NextRequest) {
       { $limit: 20 }
     ]);
     
-    // 4. Топ браузеров
-    const topBrowsers = await Analytics.aggregate([
-      { $match: matchConditions },
-      {
-        $group: {
-          _id: '$browser',
-          views: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$sessionId' }
-        }
-      },
-      {
-        $project: {
-          _id: 0,
-          browser: '$_id',
-          views: 1,
-          uniqueVisitors: { $size: '$uniqueVisitors' }
-        }
-      },
-      { $sort: { views: -1 } },
-      { $limit: 10 }
-    ]);
-    
-    // 5. Топ устройств
+    // 4. Топ устройств
     const topDevices = await Analytics.aggregate([
       { $match: matchConditions },
       {
         $group: {
-          _id: '$device',
+          _id: '$deviceCategory',
           views: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$sessionId' }
+          uniqueVisitors: { $addToSet: '$anonymousSessionId' }
         }
       },
       {
         $project: {
           _id: 0,
-          device: '$_id',
+          deviceCategory: '$_id',
           views: 1,
           uniqueVisitors: { $size: '$uniqueVisitors' }
         }
@@ -161,44 +137,33 @@ export async function GET(request: NextRequest) {
       { $sort: { views: -1 } }
     ]);
     
-    // 6. Топ операционных систем
-    const topOS = await Analytics.aggregate([
+    // 5. Топ размеров экранов
+    const topScreenSizes = await Analytics.aggregate([
       { $match: matchConditions },
       {
         $group: {
-          _id: '$os',
+          _id: '$screenSize',
           views: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$sessionId' }
+          uniqueVisitors: { $addToSet: '$anonymousSessionId' }
         }
       },
       {
         $project: {
           _id: 0,
-          os: '$_id',
+          screenSize: '$_id',
           views: 1,
           uniqueVisitors: { $size: '$uniqueVisitors' }
         }
       },
-      { $sort: { views: -1 } },
-      { $limit: 10 }
+      { $sort: { views: -1 } }
     ]);
     
-    // 7. Статистика по времени (часы дня по МСК)
+    // 6. Статистика по времени (часы дня по МСК)
     const hourlyStats = await Analytics.aggregate([
       { $match: matchConditions },
       {
-        $addFields: {
-          moscowHour: {
-            $hour: {
-              date: '$timestamp',
-              timezone: 'Europe/Moscow'
-            }
-          }
-        }
-      },
-      {
         $group: {
-          _id: '$moscowHour',
+          _id: '$visitHour',
           views: { $sum: 1 }
         }
       },
@@ -212,22 +177,12 @@ export async function GET(request: NextRequest) {
       { $sort: { hour: 1 } }
     ]);
     
-    // 8. Статистика по дням недели (по МСК)
+    // 7. Статистика по дням недели (по МСК)
     const weeklyStats = await Analytics.aggregate([
       { $match: matchConditions },
       {
-        $addFields: {
-          moscowDayOfWeek: {
-            $dayOfWeek: {
-              date: '$timestamp',
-              timezone: 'Europe/Moscow'
-            }
-          }
-        }
-      },
-      {
         $group: {
-          _id: '$moscowDayOfWeek',
+          _id: '$visitDayOfWeek',
           views: { $sum: 1 }
         }
       },
@@ -241,22 +196,22 @@ export async function GET(request: NextRequest) {
       { $sort: { dayOfWeek: 1 } }
     ]);
     
-         // 9. Если указан pageId, получаем детальную статистику по странице
-     let pageStats = null;
-     if (pageId) {
-       pageStats = await Analytics.aggregate([
-         { $match: { pageId, timestamp: { $gte: startDate }, page: { $not: /^\/admin/ } } },
+    // 8. Если указан pageId, получаем детальную статистику по странице
+    let pageStats = null;
+    if (pageId) {
+      pageStats = await Analytics.aggregate([
+        { $match: { pageId, visitDate: { $gte: startDate.toISOString().split('T')[0] }, page: { $not: /^\/admin/ } } },
         {
           $group: {
             _id: null,
             totalViews: { $sum: 1 },
-            uniqueVisitors: { $addToSet: '$sessionId' },
+            uniqueVisitors: { $addToSet: '$anonymousSessionId' },
             averageTimeOnPage: { $avg: '$timeOnPage' },
             averageScrollDepth: { $avg: '$scrollDepth' },
             averageClicks: { $avg: '$clicks' },
             bounceRate: { $avg: { $cond: ['$isBounce', 1, 0] } },
-            topCountries: { $addToSet: '$country' },
-            topDevices: { $addToSet: '$device' }
+            topRegions: { $addToSet: '$region' },
+            topDevices: { $addToSet: '$deviceCategory' }
           }
         },
         {
@@ -268,7 +223,7 @@ export async function GET(request: NextRequest) {
             averageScrollDepth: { $round: ['$averageScrollDepth', 2] },
             averageClicks: { $round: ['$averageClicks', 2] },
             bounceRate: { $round: [{ $multiply: ['$bounceRate', 100] }, 2] },
-            topCountries: { $slice: ['$topCountries', 10] },
+            topRegions: { $slice: ['$topRegions', 10] },
             topDevices: { $slice: ['$topDevices', 5] }
           }
         }
@@ -285,16 +240,14 @@ export async function GET(request: NextRequest) {
       total: totalStats[0] || {
         totalPageViews: 0,
         uniqueVisitors: 0,
-        totalSessions: 0,
         averageTimeOnPage: 0,
         averageLoadTime: 0,
         bounceRate: 0
       },
       topPages,
-      topCountries,
-      topBrowsers,
+      topRegions,
       topDevices,
-      topOS,
+      topScreenSizes,
       hourlyStats,
       weeklyStats,
       pageStats

@@ -1,141 +1,121 @@
-// Утилита для сбора аналитики на клиентской стороне
+// Анонимная аналитика без сбора персональных данных (соответствует 152-ФЗ)
 
 export interface AnalyticsData {
-  sessionId: string;
-  userId?: string;
+  // Анонимная информация (без персональных данных)
+  anonymousSessionId: string;
   page: string;
   pageType: 'character' | 'weapon' | 'artifact' | 'news' | 'about' | 'home' | 'search' | 'other';
   pageId?: string;
-  userAgent: string;
-  browser: string;
-  browserVersion: string;
-  os: string;
-  osVersion: string;
-  device: 'desktop' | 'mobile' | 'tablet';
-  screenResolution: string;
-  country: string;
-  city?: string;
-  timezone: string;
-  language: string;
-  referrer?: string;
-  utmSource?: string;
-  utmMedium?: string;
-  utmCampaign?: string;
+  
+  // Обезличенные технические данные
+  deviceCategory: 'desktop' | 'mobile' | 'tablet';
+  screenSize: 'small' | 'medium' | 'large';
+  
+  // Обезличенная география (только континент)
+  region: 'europe' | 'asia' | 'americas' | 'africa' | 'oceania' | 'unknown';
+  
+  // Обезличенное время
+  visitDate: string; // YYYY-MM-DD
+  visitHour: number; // 0-23 по МСК
+  visitDayOfWeek: number; // 1-7 по МСК
+  
+  // Поведенческие метрики (без идентификации)
   timeOnPage: number;
-  isBounce: boolean;
   scrollDepth: number;
   clicks: number;
   loadTime: number;
-  isFirstVisit: boolean;
+  isBounce: boolean;
 }
 
 class AnalyticsTracker {
-  private sessionId: string;
-  private sessionStart: Date;
+  private anonymousSessionId: string;
   private pageStart: Date;
   private currentPage: string;
   private clickCount: number = 0;
   private maxScrollDepth: number = 0;
   private isTracking: boolean = false;
-  private isFirstVisit: boolean;
 
   constructor() {
-    this.sessionId = this.generateSessionId();
-    this.sessionStart = new Date();
+    // Генерируем анонимный ID сессии (хешированный)
+    this.anonymousSessionId = this.generateAnonymousSessionId();
     this.pageStart = new Date();
     this.currentPage = window.location.pathname;
-    
-    // Проверяем, первый ли это визит
-    this.isFirstVisit = !localStorage.getItem('hasVisitedBefore');
-    if (this.isFirstVisit) {
-      localStorage.setItem('hasVisitedBefore', 'true');
-    }
     
     this.initTracking();
   }
 
-  private generateSessionId(): string {
-    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  private generateAnonymousSessionId(): string {
+    // Создаем анонимный ID на основе времени и случайных данных
+    const data = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+    // Простое хеширование для анонимности
+    return 'anon_' + btoa(data).substr(0, 16).replace(/[^a-zA-Z0-9]/g, '');
   }
 
-  private detectBrowser(): { browser: string; version: string } {
-    const userAgent = navigator.userAgent;
-    
-    if (userAgent.includes('Chrome')) {
-      const match = userAgent.match(/Chrome\/(\d+)/);
-      return { browser: 'Chrome', version: match ? match[1] : 'Unknown' };
-    } else if (userAgent.includes('Firefox')) {
-      const match = userAgent.match(/Firefox\/(\d+)/);
-      return { browser: 'Firefox', version: match ? match[1] : 'Unknown' };
-    } else if (userAgent.includes('Safari')) {
-      const match = userAgent.match(/Version\/(\d+)/);
-      return { browser: 'Safari', version: match ? match[1] : 'Unknown' };
-    } else if (userAgent.includes('Edge')) {
-      const match = userAgent.match(/Edge\/(\d+)/);
-      return { browser: 'Edge', version: match ? match[1] : 'Unknown' };
-    } else {
-      return { browser: 'Unknown', version: 'Unknown' };
-    }
-  }
-
-  private detectOS(): { os: string; version: string } {
-    const userAgent = navigator.userAgent;
-    
-    if (userAgent.includes('Windows')) {
-      const match = userAgent.match(/Windows NT (\d+\.\d+)/);
-      return { os: 'Windows', version: match ? match[1] : 'Unknown' };
-    } else if (userAgent.includes('Mac OS X')) {
-      const match = userAgent.match(/Mac OS X (\d+[._]\d+)/);
-      return { os: 'macOS', version: match ? match[1].replace('_', '.') : 'Unknown' };
-    } else if (userAgent.includes('Linux')) {
-      return { os: 'Linux', version: 'Unknown' };
-    } else if (userAgent.includes('Android')) {
-      const match = userAgent.match(/Android (\d+\.\d+)/);
-      return { os: 'Android', version: match ? match[1] : 'Unknown' };
-    } else if (userAgent.includes('iOS')) {
-      const match = userAgent.match(/OS (\d+[._]\d+)/);
-      return { os: 'iOS', version: match ? match[1].replace('_', '.') : 'Unknown' };
-    } else {
-      return { os: 'Unknown', version: 'Unknown' };
-    }
-  }
-
-  private detectDevice(): 'desktop' | 'mobile' | 'tablet' {
-    const userAgent = navigator.userAgent;
+  private detectDeviceCategory(): 'desktop' | 'mobile' | 'tablet' {
     const screenWidth = window.screen.width;
     
-    if (userAgent.includes('Mobile') || screenWidth <= 768) {
+    if (screenWidth <= 768) {
       return 'mobile';
-    } else if (userAgent.includes('Tablet') || (screenWidth > 768 && screenWidth <= 1024)) {
+    } else if (screenWidth <= 1024) {
       return 'tablet';
     } else {
       return 'desktop';
     }
   }
 
-  private async getGeolocation(): Promise<{ country: string; city?: string }> {
-    try {
-      // Пытаемся получить страну из IP через внешний API
-      const response = await fetch('https://ipapi.co/json/');
-      const data = await response.json();
-      
-      return {
-        country: data.country_name || 'Unknown',
-        city: data.city || undefined
-      };
-    } catch (error) {
-      console.warn('Could not get geolocation:', error);
-      return { country: 'Unknown' };
+  private detectScreenSize(): 'small' | 'medium' | 'large' {
+    const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
+    const area = screenWidth * screenHeight;
+    
+    if (area <= 480000) { // 800x600
+      return 'small';
+    } else if (area <= 1920000) { // 1600x1200
+      return 'medium';
+    } else {
+      return 'large';
     }
   }
 
-  private getUTMParams(): { utmSource?: string; utmMedium?: string; utmCampaign?: string } {
-    const urlParams = new URLSearchParams(window.location.search);
-    return {
-      utmSource: urlParams.get('utm_source') || undefined,
-      utmMedium: urlParams.get('utm_medium') || undefined,
-      utmCampaign: urlParams.get('utm_campaign') || undefined
-    };
+  private async getRegion(): Promise<'europe' | 'asia' | 'americas' | 'africa' | 'oceania' | 'unknown'> {
+    try {
+      // Используем только публичный API для определения континента (без IP)
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      
+      // Определяем континент по коду страны (без сохранения страны)
+      const countryCode = data.country_code;
+      
+      if (['RU', 'DE', 'FR', 'GB', 'IT', 'ES', 'PL', 'UA', 'BY', 'KZ'].includes(countryCode)) {
+        return 'europe';
+      } else if (['CN', 'JP', 'KR', 'IN', 'TH', 'VN', 'ID', 'MY'].includes(countryCode)) {
+        return 'asia';
+      } else if (['US', 'CA', 'BR', 'MX', 'AR', 'CL'].includes(countryCode)) {
+        return 'americas';
+      } else if (['ZA', 'NG', 'EG', 'KE', 'MA'].includes(countryCode)) {
+        return 'africa';
+      } else if (['AU', 'NZ', 'FJ', 'PG'].includes(countryCode)) {
+        return 'oceania';
+      } else {
+        return 'unknown';
+      }
+    } catch (error) {
+      console.warn('Could not determine region:', error);
+      return 'unknown';
+    }
+  }
+
+  private getMoscowTime(): { date: string; hour: number; dayOfWeek: number } {
+    const now = new Date();
+    
+    // Получаем московское время
+    const moscowTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
+    
+    const date = moscowTime.toISOString().split('T')[0]; // YYYY-MM-DD
+    const hour = moscowTime.getHours(); // 0-23
+    const dayOfWeek = moscowTime.getDay() || 7; // 1-7 (понедельник = 1)
+    
+    return { date, hour, dayOfWeek };
   }
 
   private initTracking(): void {
@@ -202,38 +182,32 @@ class AnalyticsTracker {
       const now = new Date();
       const timeOnPage = Math.round((now.getTime() - this.pageStart.getTime()) / 1000);
       
-      const { browser, version: browserVersion } = this.detectBrowser();
-      const { os, version: osVersion } = this.detectOS();
-      const device = this.detectDevice();
-      const { country, city } = await this.getGeolocation();
-      const { utmSource, utmMedium, utmCampaign } = this.getUTMParams();
+      // Получаем обезличенные данные
+      const deviceCategory = this.detectDeviceCategory();
+      const screenSize = this.detectScreenSize();
+      const region = await this.getRegion();
+      const moscowTime = this.getMoscowTime();
+      
+      // Округляем время для анонимности
+      const roundedTimeOnPage = Math.round(timeOnPage / 10) * 10; // Округление до 10 секунд
+      const roundedLoadTime = Math.round(this.getLoadTime() / 100) * 100; // Округление до 100мс
 
       const analyticsData: AnalyticsData = {
-        sessionId: this.sessionId,
+        anonymousSessionId: this.anonymousSessionId,
         page: this.currentPage,
         pageType: this.getPageType(this.currentPage),
         pageId: this.getPageId(this.currentPage),
-        userAgent: navigator.userAgent,
-        browser,
-        browserVersion,
-        os,
-        osVersion,
-        device,
-        screenResolution: `${window.screen.width}x${window.screen.height}`,
-        country,
-        city,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        language: navigator.language,
-        referrer: document.referrer || undefined,
-        utmSource,
-        utmMedium,
-        utmCampaign,
-        timeOnPage: isLeaving ? timeOnPage : 0,
-        isBounce: this.isFirstVisit && timeOnPage < 30,
+        deviceCategory,
+        screenSize,
+        region,
+        visitDate: moscowTime.date,
+        visitHour: moscowTime.hour,
+        visitDayOfWeek: moscowTime.dayOfWeek,
+        timeOnPage: isLeaving ? roundedTimeOnPage : 0,
         scrollDepth: this.maxScrollDepth,
         clicks: this.clickCount,
-        loadTime: this.getLoadTime(),
-        isFirstVisit: this.isFirstVisit
+        loadTime: roundedLoadTime,
+        isBounce: timeOnPage < 30 // Отказ если меньше 30 секунд
       };
 
       // Отправляем данные на сервер
@@ -301,7 +275,7 @@ class AnalyticsTracker {
   }
 
   public trackEvent(eventType: string, eventName: string, metadata?: Record<string, unknown>): void {
-    // Дополнительное отслеживание событий
+    // Дополнительное отслеживание событий (анонимное)
     console.log('Event tracked:', { eventType, eventName, metadata });
   }
 }

@@ -9,32 +9,21 @@ export async function POST(request: NextRequest) {
     
     const body = await request.json();
     const {
-      sessionId,
-      userId,
+      anonymousSessionId,
       page,
       pageType,
       pageId,
-      userAgent,
-      browser,
-      browserVersion,
-      os,
-      osVersion,
-      device,
-      screenResolution,
-      country,
-      city,
-      timezone,
-      language,
-      referrer,
-      utmSource,
-      utmMedium,
-      utmCampaign,
+      deviceCategory,
+      screenSize,
+      region,
+      visitDate,
+      visitHour,
+      visitDayOfWeek,
       timeOnPage,
-      isBounce,
       scrollDepth,
       clicks,
       loadTime,
-      isFirstVisit
+      isBounce
     } = body;
 
     // Не отслеживаем аналитику для страниц админки
@@ -47,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Валидация обязательных полей
-    if (!sessionId || !page || !pageType || !userAgent || !device || !country) {
+    if (!anonymousSessionId || !page || !pageType || !deviceCategory || !region || !visitDate) {
       addServerLog('error', 'analytics-track', 'Missing required fields', { body });
       return NextResponse.json({ 
         success: false, 
@@ -55,44 +44,33 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Создаем запись аналитики
+    // Создаем запись аналитики (без персональных данных)
     const analytics = new Analytics({
-      sessionId,
-      userId,
+      anonymousSessionId,
       page,
       pageType,
       pageId,
-      userAgent,
-      browser: browser || 'Unknown',
-      browserVersion: browserVersion || 'Unknown',
-      os: os || 'Unknown',
-      osVersion: osVersion || 'Unknown',
-      device,
-      screenResolution: screenResolution || 'Unknown',
-      country,
-      city,
-      timezone: timezone || 'UTC',
-      language: language || 'en',
-      referrer,
-      utmSource,
-      utmMedium,
-      utmCampaign,
+      deviceCategory,
+      screenSize: screenSize || 'medium',
+      region,
+      visitDate,
+      visitHour: visitHour || 0,
+      visitDayOfWeek: visitDayOfWeek || 1,
       timeOnPage: timeOnPage || 0,
-      isBounce: isBounce !== undefined ? isBounce : true,
       scrollDepth: scrollDepth || 0,
       clicks: clicks || 0,
       loadTime: loadTime || 0,
-      isFirstVisit: isFirstVisit !== undefined ? isFirstVisit : true
+      isBounce: isBounce !== undefined ? isBounce : true
     });
 
     await analytics.save();
     
     addServerLog('info', 'analytics-track', 'Analytics data saved successfully', { 
-      sessionId, 
+      anonymousSessionId, 
       page, 
       pageType,
-      country,
-      device 
+      region,
+      deviceCategory 
     });
 
     return NextResponse.json({ 
