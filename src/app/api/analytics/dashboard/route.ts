@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
     
     const body = await request.json();
-    const { page, pageType, pageId } = body;
+    const { page } = body;
 
     // Не отслеживаем аналитику для страниц админки
     if (page && page.startsWith('/admin')) {
