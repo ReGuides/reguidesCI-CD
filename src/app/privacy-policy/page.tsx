@@ -339,7 +339,7 @@ export default function PrivacyPolicyPage() {
                 <ul className="list-disc list-inside text-gray-700 space-y-1 ml-4">
                   <li>Электронная почта: privacy@reguides.ru</li>
                   <li>Через форму обратной связи на Сайте</li>
-                  <li>По адресу, указанному в разделе "О проекте"</li>
+                  <li>По адресу, указанному в разделе &quot;О проекте&quot;</li>
                 </ul>
                 <p className="text-gray-700">
                   Мы обязуемся ответить на ваши обращения в течение 30 дней.
