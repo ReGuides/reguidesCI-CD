@@ -49,13 +49,23 @@ export async function PUT(request: NextRequest) {
     // Обновляем настройки
     const settings = await SiteSettings.getSettings();
     settings.contacts = { ...settings.contacts, ...validatedContacts };
-    await settings.save();
+    
+    // Находим документ в базе и обновляем его
+    const updatedSettings = await SiteSettings.findOneAndUpdate(
+      { _id: settings._id },
+      { contacts: settings.contacts },
+      { new: true }
+    );
+    
+    if (!updatedSettings) {
+      throw new Error('Failed to update settings');
+    }
     
     addServerLog('info', 'contacts-api', 'Contacts updated successfully', { contacts: validatedContacts });
     
     return NextResponse.json({
       success: true,
-      contacts: settings.contacts
+      contacts: updatedSettings.contacts
     });
   } catch (error) {
     addServerLog('error', 'contacts-api', 'Failed to update contacts', { error: error instanceof Error ? error.message : 'Unknown error' });
