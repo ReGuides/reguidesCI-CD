@@ -31,8 +31,10 @@ export async function GET(request: NextRequest) {
     const publicDir = path.join(process.cwd(), 'public');
     const projectRoot = process.cwd();
     const externalArchiveDirs = [
-      path.join(projectRoot, 'backups'),
-      path.join(projectRoot, 'archives')
+      process.env.BACKUP_DIR || path.join(projectRoot, 'backups'),
+      path.join(projectRoot, 'archives'),
+      path.join(projectRoot, '../backups'), // Возможно в родительской папке
+      path.join(projectRoot, 'legacy/server/backups') // Возможно в legacy
     ];
 
     const { searchParams } = new URL(request.url);
@@ -138,6 +140,45 @@ export async function GET(request: NextRequest) {
         // ignore missing external archives dirs
       }
     }
+
+    // Ищем резервные каталоги вида .next.backup.YYYYMMDD_HHMMSS и build.tar.gz в корне проекта
+    try {
+      const rootItems = await fs.readdir(projectRoot, { withFileTypes: true });
+      for (const item of rootItems) {
+        if (item.isDirectory() && item.name.startsWith('.next.backup.')) {
+          const fullPath = path.join(projectRoot, item.name);
+          const stats = await fs.stat(fullPath);
+          filesByCategory.archives.push({
+            name: item.name,
+            path: item.name,
+            fullPath,
+            size: stats.size,
+            modified: stats.mtime,
+            type: 'archive',
+            category: 'archives',
+            url: '',
+            location: 'external'
+          });
+        }
+        if (item.isFile && item.name === 'build.tar.gz') {
+          const fullPath = path.join(projectRoot, item.name);
+          try {
+            const stats = await fs.stat(fullPath);
+            filesByCategory.archives.push({
+              name: item.name,
+              path: item.name,
+              fullPath,
+              size: stats.size,
+              modified: stats.mtime,
+              type: 'archive',
+              category: 'archives',
+              url: '',
+              location: 'external'
+            });
+          } catch {}
+        }
+      }
+    } catch {}
 
     // Сортируем файлы по дате изменения (новые сначала)
     Object.keys(filesByCategory).forEach(category => {

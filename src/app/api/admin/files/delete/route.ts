@@ -43,8 +43,19 @@ export async function DELETE(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // Удаляем файл
-    await fs.unlink(fullPath);
+    // Удаляем файл или директорию рекурсивно
+    try {
+      const stat = await fs.stat(fullPath);
+      if (stat.isDirectory()) {
+        // Рекурсивно удаляем директорию (Node 16+)
+        // @ts-ignore
+        await fs.rm(fullPath, { recursive: true, force: true });
+      } else {
+        await fs.unlink(fullPath);
+      }
+    } catch (e) {
+      return NextResponse.json({ success: false, error: 'Failed to delete file or directory' }, { status: 500 });
+    }
 
     addServerLog('info', 'admin-files', 'File deleted successfully', { 
       filePath,
