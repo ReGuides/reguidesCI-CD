@@ -5,7 +5,7 @@ import { addServerLog } from '@/lib/serverLog';
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { filePath } = await request.json();
+    const { filePath, allowExternal } = await request.json();
     
     if (!filePath) {
       return NextResponse.json({ 
@@ -15,14 +15,22 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Проверяем, что путь безопасный (не выходит за пределы public директории)
-    const publicDir = path.join(process.cwd(), 'public');
-    const fullPath = path.resolve(path.join(publicDir, filePath));
+    const projectRoot = process.cwd();
+    const publicDir = path.join(projectRoot, 'public');
+    let fullPath = path.resolve(path.join(publicDir, filePath));
     
-    if (!fullPath.startsWith(publicDir)) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Invalid file path' 
-      }, { status: 400 });
+    // Разрешаем удалять внешние архивы при явном разрешении
+    if (allowExternal) {
+      const externalPath = path.resolve(path.join(projectRoot, filePath));
+      const backupsDir = path.join(projectRoot, 'backups');
+      const archivesDir = path.join(projectRoot, 'archives');
+      if (externalPath.startsWith(backupsDir) || externalPath.startsWith(archivesDir)) {
+        fullPath = externalPath;
+      }
+    }
+    
+    if (!fullPath.startsWith(publicDir) && !fullPath.startsWith(path.join(projectRoot, 'backups')) && !fullPath.startsWith(path.join(projectRoot, 'archives'))) {
+      return NextResponse.json({ success: false, error: 'Invalid file path' }, { status: 400 });
     }
 
     // Проверяем, что файл существует

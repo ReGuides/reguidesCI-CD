@@ -77,6 +77,8 @@ export default function FilesManagementPage() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<FileInfo | null>(null);
+  const [currentList, setCurrentList] = useState<FileInfo[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   useEffect(() => {
     fetchFiles();
@@ -297,7 +299,7 @@ export default function FilesManagementPage() {
                 <p className="text-gray-400 text-center py-8">Нет файлов</p>
               ) : (
                 <div className="space-y-3">
-                  {categoryFiles.map((file: FileInfo) => (
+                  {categoryFiles.slice(0, 5).map((file: FileInfo) => (
                     <div key={file.path} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         {file.type === 'image' && (
@@ -323,6 +325,11 @@ export default function FilesManagementPage() {
                         {file.type === 'image' && (
                           <button
                             onClick={() => {
+                              // подготовим список текущей категории для навигации
+                              const list = (files as any)[category] as FileInfo[];
+                              setCurrentList(list);
+                              const idx = list.findIndex((f) => f.path === file.path);
+                              setCurrentIndex(Math.max(idx, 0));
                               setSelectedImage(file);
                               setShowImageModal(true);
                             }}
@@ -348,6 +355,14 @@ export default function FilesManagementPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+              {categoryFiles.length > 5 && (
+                <div className="mt-3 text-right">
+                  <a href={`/admin/files/${category}`}
+                     className="text-purple-400 hover:text-purple-300 underline">
+                    Показать все ({categoryFiles.length})
+                  </a>
                 </div>
               )}
             </div>
@@ -438,6 +453,29 @@ export default function FilesManagementPage() {
               </div>
               
               <div className="text-center">
+                <div className="flex items-center justify-between mb-2">
+                  <button
+                    onClick={() => {
+                      const prev = (currentIndex - 1 + currentList.length) % currentList.length;
+                      setCurrentIndex(prev);
+                      setSelectedImage(currentList[prev]);
+                    }}
+                    className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded"
+                  >
+                    Предыдущая
+                  </button>
+                  <span className="text-sm text-gray-400">{currentIndex + 1} / {currentList.length}</span>
+                  <button
+                    onClick={() => {
+                      const next = (currentIndex + 1) % currentList.length;
+                      setCurrentIndex(next);
+                      setSelectedImage(currentList[next]);
+                    }}
+                    className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded"
+                  >
+                    Следующая
+                  </button>
+                </div>
                 <Image
                   src={selectedImage.url}
                   alt={selectedImage.name}
