@@ -292,6 +292,10 @@ export default function AdminDashboard() {
               <span className="text-gray-400">Статьи</span>
               <span className="text-white font-semibold">{stats.totalArticles}</span>
             </div>
+            <div className="flex items-center justify-between pt-2 border-t border-neutral-700">
+              <span className="text-gray-300 font-medium">Всего контента</span>
+              <span className="text-white font-bold text-lg">{stats.totalCharacters + stats.totalWeapons + stats.totalArtifacts + stats.totalArticles}</span>
+            </div>
           </CardContent>
         </Card>
       </div>

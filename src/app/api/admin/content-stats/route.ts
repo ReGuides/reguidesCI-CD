@@ -2,11 +2,17 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import { addServerLog } from '@/lib/serverLog';
 
+// Импортируем модели напрямую
+import { CharacterModel } from '@/models/Character';
+import { WeaponModel } from '@/models/Weapon';
+import { ArtifactModel } from '@/models/Artifact';
+import { ArticleModel } from '@/models/Article';
+
 export async function GET() {
   try {
     await connectToDatabase();
     
-    // Получаем статистику контента
+    // Получаем статистику контента напрямую из базы данных
     const contentStats = {
       characters: 0,
       weapons: 0,
@@ -17,54 +23,30 @@ export async function GET() {
 
     try {
       // Статистика персонажей
-      const charactersResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/characters`);
-      if (charactersResponse.ok) {
-        const charactersData = await charactersResponse.json();
-        if (charactersData.success) {
-          contentStats.characters = charactersData.data.length;
-        }
-      }
+      contentStats.characters = await CharacterModel.countDocuments();
     } catch (error) {
-      addServerLog('warn', 'content-stats', 'Failed to fetch characters stats', { error: error instanceof Error ? error.message : 'Unknown error' });
+      addServerLog('warn', 'content-stats', 'Failed to count characters', { error: error instanceof Error ? error.message : 'Unknown error' });
     }
 
     try {
       // Статистика оружия
-      const weaponsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/weapons`);
-      if (weaponsResponse.ok) {
-        const weaponsData = await weaponsResponse.json();
-        if (weaponsData.success) {
-          contentStats.weapons = weaponsData.data.length;
-        }
-      }
+      contentStats.weapons = await WeaponModel.countDocuments();
     } catch (error) {
-      addServerLog('warn', 'content-stats', 'Failed to fetch weapons stats', { error: error instanceof Error ? error.message : 'Unknown error' });
+      addServerLog('warn', 'content-stats', 'Failed to count weapons', { error: error instanceof Error ? error.message : 'Unknown error' });
     }
 
     try {
       // Статистика артефактов
-      const artifactsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/artifacts`);
-      if (artifactsResponse.ok) {
-        const artifactsData = await artifactsResponse.json();
-        if (artifactsData.success) {
-          contentStats.artifacts = artifactsData.data.length;
-        }
-      }
+      contentStats.artifacts = await ArtifactModel.countDocuments();
     } catch (error) {
-      addServerLog('warn', 'content-stats', 'Failed to fetch artifacts stats', { error: error instanceof Error ? error.message : 'Unknown error' });
+      addServerLog('warn', 'content-stats', 'Failed to count artifacts', { error: error instanceof Error ? error.message : 'Unknown error' });
     }
 
     try {
       // Статистика статей
-      const articlesResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/articles`);
-      if (articlesResponse.ok) {
-        const articlesData = await articlesResponse.json();
-        if (articlesData.success) {
-          contentStats.articles = articlesData.data.length;
-        }
-      }
+      contentStats.articles = await ArticleModel.countDocuments();
     } catch (error) {
-      addServerLog('warn', 'content-stats', 'Failed to fetch articles stats', { error: error instanceof Error ? error.message : 'Unknown error' });
+      addServerLog('warn', 'content-stats', 'Failed to count articles', { error: error instanceof Error ? error.message : 'Unknown error' });
     }
 
     // Пока что builds = 0, так как система сборок еще не реализована
