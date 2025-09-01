@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
             location: 'external'
           });
         }
-        if (item.isFile && item.name === 'build.tar.gz') {
+        if (item.isFile() && item.name === 'build.tar.gz') {
           const fullPath = path.join(projectRoot, item.name);
           try {
             const stats = await fs.stat(fullPath);
