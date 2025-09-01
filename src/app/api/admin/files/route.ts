@@ -108,7 +108,7 @@ export async function GET() {
       try {
         const files = await scanDirectory(fullDirPath, dir.category);
         filesByCategory[dir.category as keyof FilesByCategory].push(...files);
-      } catch (error) {
+      } catch {
         console.warn(`Directory ${dir.path} not found or not accessible`);
       }
     }

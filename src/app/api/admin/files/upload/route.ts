@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     // Создаем директорию, если её нет
     try {
       await mkdir(categoryDir, { recursive: true });
-    } catch (error) {
+    } catch {
       console.warn(`Directory ${categoryDir} already exists or cannot be created`);
     }
 
