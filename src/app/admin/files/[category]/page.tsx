@@ -34,6 +34,8 @@ export default function FilesCategoryPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imageDims, setImageDims] = useState<{ width: number; height: number } | null>(null);
 
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     const p = parseInt(searchParams.get('page') || '1', 10);
     setPage(p);
@@ -87,6 +89,44 @@ export default function FilesCategoryPage() {
     if (response.ok) fetchFiles();
   };
 
+  const toggleFileSelection = (filePath: string) => {
+    setSelectedFiles(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(filePath)) {
+        newSet.delete(filePath);
+      } else {
+        newSet.add(filePath);
+      }
+      return newSet;
+    });
+  };
+
+  const unselectAllFiles = () => {
+    setSelectedFiles(new Set());
+  };
+
+  const deleteSelectedFiles = async () => {
+    if (selectedFiles.size === 0) return;
+
+    if (!confirm(`Удалить ${selectedFiles.size} файлов?`)) return;
+
+    const body = Array.from(selectedFiles).map(filePath => ({
+      filePath: filePath,
+      allowExternal: false // Assuming all selected files are public for bulk deletion
+    }));
+
+    const response = await fetch('/api/admin/files/delete', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (response.ok) {
+      fetchFiles();
+      unselectAllFiles();
+    }
+  };
+
   if (loading) {
     return <div className="p-6 text-gray-400">Загрузка...</div>;
   }
@@ -98,10 +138,57 @@ export default function FilesCategoryPage() {
         <div className="text-gray-400">Всего: {total}</div>
       </div>
 
+      {/* Массовое выделение */}
+      {selectedFiles.size > 0 && (
+        <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-yellow-200 font-medium">
+                Выбрано {selectedFiles.size} файлов
+              </span>
+              <button
+                onClick={unselectAllFiles}
+                className="text-yellow-300 hover:text-yellow-200 text-sm underline"
+              >
+                Снять выделение
+              </button>
+            </div>
+            <button
+              onClick={deleteSelectedFiles}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Удалить {selectedFiles.size}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Кнопка "Выбрать все" */}
+      {files.length > 0 && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => {
+              const allFiles = files.map(f => f.path);
+              setSelectedFiles(new Set(allFiles));
+            }}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          >
+            Выбрать все файлы
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {files.map((file, index) => (
           <div key={file.fullPath} className="bg-neutral-800 border border-neutral-700 rounded-lg p-3">
             <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={selectedFiles.has(file.path)}
+                onChange={() => toggleFileSelection(file.path)}
+                className="w-4 h-4 text-purple-600 bg-neutral-800 border-purple-600 rounded focus:ring-purple-500 focus:ring-2"
+              />
               {file.type === 'image' ? (
                 <div className="w-16 h-16 rounded overflow-hidden bg-neutral-700 flex-shrink-0">
                   <Image src={file.url || '/images/logos/logo.png'} alt={file.name} width={64} height={64} className="w-full h-full object-cover" />

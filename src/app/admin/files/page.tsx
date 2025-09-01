@@ -83,6 +83,7 @@ export default function FilesManagementPage() {
   const [currentList, setCurrentList] = useState<FileInfo[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [imageDims, setImageDims] = useState<{ width: number; height: number } | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchFiles();
@@ -203,6 +204,53 @@ export default function FilesManagementPage() {
     }
   };
 
+  // Функции для массового выделения
+  const toggleFileSelection = (filePath: string) => {
+    setSelectedFiles(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(filePath)) {
+        newSet.delete(filePath);
+      } else {
+        newSet.add(filePath);
+      }
+      return newSet;
+    });
+  };
+
+  const unselectAllFiles = () => {
+    setSelectedFiles(new Set());
+  };
+
+  const deleteSelectedFiles = async () => {
+    if (selectedFiles.size === 0) return;
+    if (!confirm(`Вы уверены, что хотите удалить ${selectedFiles.size} файл(а)?`)) return;
+
+    try {
+      const deletePromises = Array.from(selectedFiles).map(async (filePath) => {
+        const response = await fetch('/api/admin/files/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ filePath })
+        });
+        return response.ok;
+      });
+
+      const results = await Promise.all(deletePromises);
+      const successCount = results.filter(Boolean).length;
+      
+      if (successCount > 0) {
+        alert(`Успешно удалено ${successCount} из ${selectedFiles.size} файлов`);
+        setSelectedFiles(new Set());
+        await fetchFiles();
+      }
+    } catch (error) {
+      console.error('Bulk delete failed:', error);
+      alert('Ошибка при массовом удалении файлов');
+    }
+  };
+
   const getCategoryLabel = (category: string): string => {
     const labels: Record<string, string> = {
       characters: 'Персонажи',
@@ -285,6 +333,47 @@ export default function FilesManagementPage() {
         </div>
       </div>
 
+      {/* Массовое выделение */}
+      {selectedFiles.size > 0 && (
+        <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-yellow-200 font-medium">
+                Выбрано {selectedFiles.size} файлов
+              </span>
+              <button
+                onClick={unselectAllFiles}
+                className="text-yellow-300 hover:text-yellow-200 text-sm underline"
+              >
+                Снять выделение
+              </button>
+            </div>
+            <button
+              onClick={deleteSelectedFiles}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Удалить {selectedFiles.size}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Кнопка "Выбрать все" */}
+      {Object.values(files).some(category => category.length > 0) && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => {
+              const allFiles = Object.values(files).flat().map(f => f.path);
+              setSelectedFiles(new Set(allFiles));
+            }}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          >
+            Выбрать все файлы
+          </button>
+        </div>
+      )}
+
       {/* Категории файлов */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {Object.entries(files).map(([category, categoryFiles]) => (
@@ -306,6 +395,12 @@ export default function FilesManagementPage() {
                   {categoryFiles.slice(0, 5).map((file: FileInfo) => (
                     <div key={file.path} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <input
+                          type="checkbox"
+                          checked={selectedFiles.has(file.path)}
+                          onChange={() => toggleFileSelection(file.path)}
+                          className="w-4 h-4 text-purple-600 bg-neutral-800 border-purple-600 rounded focus:ring-purple-500 focus:ring-2"
+                        />
                         {file.type === 'image' && (
                           <div className="w-10 h-10 rounded overflow-hidden bg-neutral-600 flex-shrink-0">
                             <Image
@@ -419,22 +514,33 @@ export default function FilesManagementPage() {
                     <p>Тип: {selectedFile.type}</p>
                   </div>
                 )}
-              </div>
-              
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={handleUpload}
-                  disabled={!selectedFile || uploading}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex-1 disabled:opacity-50"
-                >
-                  {uploading ? 'Загрузка...' : 'Загрузить'}
-                </button>
-                <button
-                  onClick={() => setShowUploadModal(false)}
-                  className="border border-neutral-600 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg flex-1"
-                >
-                  Отмена
-                </button>
+                
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => {
+                      setShowUploadModal(false);
+                      setSelectedFile(null);
+                      setSelectedCategory('characters');
+                    }}
+                    className="flex-1 bg-neutral-700 hover:bg-neutral-600 text-white px-4 py-2 rounded-lg"
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    onClick={handleUpload}
+                    disabled={!selectedFile || uploading}
+                    className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
+                  >
+                    {uploading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Загрузка...
+                      </>
+                    ) : (
+                      'Загрузить'
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -443,83 +549,92 @@ export default function FilesManagementPage() {
 
       {/* Модальное окно просмотра изображения */}
       {showImageModal && selectedImage && (
-        <div className="fixed inset-0 bg-black/70 z-50 p-4 flex items-center justify-center" onKeyDown={(e) => {
-          if (e.key === 'ArrowLeft') {
-            const prev = (currentIndex - 1 + currentList.length) % currentList.length;
-            setCurrentIndex(prev);
-            setSelectedImage(currentList[prev]);
-          } else if (e.key === 'ArrowRight') {
-            const next = (currentIndex + 1) % currentList.length;
-            setCurrentIndex(next);
-            setSelectedImage(currentList[next]);
-          } else if (e.key === 'Escape') {
-            setShowImageModal(false);
-          }
-        }} tabIndex={0}>
-          <div className="relative bg-neutral-900 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-            {/* Top bar */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-700 bg-neutral-800">
-              <div className="text-sm text-gray-300 truncate pr-4">{selectedImage.name}</div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 mr-2">{currentIndex + 1} / {currentList.length}</span>
-                <button onClick={() => copyToClipboard(selectedImage.url)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded text-sm">
-                  <Copy className="w-3 h-3 inline mr-1" /> URL
-                </button>
-                <button onClick={() => handleDelete(selectedImage)} className="border border-red-600 hover:bg-red-900/20 text-red-400 hover:text-red-300 px-3 py-1 rounded text-sm">
-                  <Trash2 className="w-3 h-3 inline mr-1" /> Удалить
-                </button>
-                <button onClick={() => setShowImageModal(false)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded text-sm">
-                  <X className="w-3 h-3 inline mr-1" /> Закрыть
-                </button>
-              </div>
-            </div>
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl max-h-full w-full h-full flex items-center justify-center">
+            {/* Кнопка закрытия */}
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+            >
+              <X className="w-8 h-8" />
+            </button>
 
-            {/* Image area */}
-            <div className="relative bg-neutral-900" style={{ height: '70vh' }}>
-              {/* Left/Right controls */}
-              <button
-                onClick={() => { const prev = (currentIndex - 1 + currentList.length) % currentList.length; setCurrentIndex(prev); setSelectedImage(currentList[prev]); }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10"
-                aria-label="Предыдущая"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button
-                onClick={() => { const next = (currentIndex + 1) % currentList.length; setCurrentIndex(next); setSelectedImage(currentList[next]); }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10"
-                aria-label="Следующая"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
+            {/* Навигационные кнопки */}
+            {currentList.length > 1 && (
+              <>
+                <button
+                  onClick={() => {
+                    const newIndex = currentIndex > 0 ? currentIndex - 1 : currentList.length - 1;
+                    setCurrentIndex(newIndex);
+                    setSelectedImage(currentList[newIndex]);
+                  }}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-black/50 hover:bg-black/70 p-2 rounded-full"
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </button>
+                <button
+                  onClick={() => {
+                    const newIndex = currentIndex < currentList.length - 1 ? currentIndex + 1 : 0;
+                    setCurrentIndex(newIndex);
+                    setSelectedImage(currentList[newIndex]);
+                  }}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-black/50 hover:bg-black/70 p-2 rounded-full"
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </button>
+              </>
+            )}
 
-              <div className="absolute inset-0">
-                <div className="relative w-full h-full">
-                  <Image
-                    src={selectedImage.url}
-                    alt={selectedImage.name}
-                    fill
-                    sizes="100vw"
-                    style={{ objectFit: 'contain' }}
-                    onLoad={e => {
-                      const el = e.currentTarget as HTMLImageElement;
-                      setImageDims({ width: el.naturalWidth, height: el.naturalHeight });
-                    }}
-                  />
+            {/* Изображение */}
+            <div className="relative">
+              <Image
+                src={selectedImage.url}
+                alt={selectedImage.name}
+                width={800}
+                height={600}
+                className="max-w-full max-h-full object-contain"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  setImageDims({ width: img.naturalWidth, height: img.naturalHeight });
+                }}
+              />
+              
+              {/* Информация об изображении */}
+              <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold">{selectedImage.name}</h3>
+                    <p className="text-sm text-gray-300">
+                      {formatFileSize(selectedImage.size)} • {formatDate(selectedImage.modified)}
+                      {imageDims && ` • ${imageDims.width} × ${imageDims.height}`}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => copyToClipboard(selectedImage.url)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
+                    >
+                      <Copy className="w-3 h-3" />
+                      Копировать URL
+                    </button>
+                    <button
+                      onClick={() => handleDelete(selectedImage)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Удалить
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Info bar */}
-            <div className="px-4 py-3 border-t border-neutral-700 bg-neutral-800 text-sm text-gray-300 grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div>
-                <div><span className="text-gray-400">Путь:</span> {selectedImage.path}</div>
-                <div><span className="text-gray-400">Категория:</span> {getCategoryLabel(selectedImage.category)}</div>
+            {/* Счетчик изображений */}
+            {currentList.length > 1 && (
+              <div className="absolute top-4 left-4 text-white bg-black/50 px-3 py-1 rounded-full text-sm">
+                {currentIndex + 1} / {currentList.length}
               </div>
-              <div>
-                <div><span className="text-gray-400">Размер:</span> {formatFileSize(selectedImage.size)}{imageDims ? ` • ${imageDims.width}×${imageDims.height}px` : ''}</div>
-                <div><span className="text-gray-400">Изменен:</span> {formatDate(selectedImage.modified)}</div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       )}
