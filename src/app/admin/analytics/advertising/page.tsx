@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +10,6 @@ import {
   Eye, 
   Clock, 
   Globe, 
-  Monitor, 
-  Smartphone,
-  Tablet,
   TrendingUp,
   RefreshCw,
   Target,
@@ -88,7 +85,7 @@ export default function AdvertisingAnalyticsPage() {
   const [selectedUtmSource, setSelectedUtmSource] = useState<string>('');
   const [selectedCampaign, setSelectedCampaign] = useState<string>('');
 
-  const fetchAdvertisingAnalytics = async () => {
+  const fetchAdvertisingAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({ period });
@@ -107,20 +104,13 @@ export default function AdvertisingAnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [period, selectedUtmSource, selectedCampaign]);
 
   useEffect(() => {
     fetchAdvertisingAnalytics();
-  }, [period, selectedUtmSource, selectedCampaign]);
+  }, [period, selectedUtmSource, selectedCampaign, fetchAdvertisingAnalytics]);
 
-  const getDeviceIcon = (deviceCategory: string) => {
-    switch (deviceCategory) {
-      case 'desktop': return <Monitor className="w-4 h-4" />;
-      case 'mobile': return <Smartphone className="w-4 h-4" />;
-      case 'tablet': return <Tablet className="w-4 h-4" />;
-      default: return <Monitor className="w-4 h-4" />;
-    }
-  };
+
 
   const getRegionName = (region: string) => {
     const regionNames: Record<string, string> = {
