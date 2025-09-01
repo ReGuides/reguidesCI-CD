@@ -156,6 +156,14 @@ export default function AnalyticsPage() {
             <RefreshCw className="w-4 h-4 mr-2" />
             Обновить
           </Button>
+          <Button 
+            onClick={() => window.location.href = '/admin/analytics/advertising'}
+            variant="outline" 
+            className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white"
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Рекламная аналитика
+          </Button>
         </div>
       </div>
 

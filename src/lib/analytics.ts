@@ -219,6 +219,36 @@ class AnalyticsTracker {
         body: JSON.stringify(analyticsData),
       });
 
+      // Если есть UTM-метки, отправляем рекламную аналитику
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get('utm_source');
+      const utmMedium = urlParams.get('utm_medium');
+      const utmCampaign = urlParams.get('utm_campaign');
+      const utmTerm = urlParams.get('utm_term');
+      const utmContent = urlParams.get('utm_content');
+      
+      if (utmSource || utmMedium || utmCampaign || utmTerm || utmContent) {
+        const advertisingData = {
+          ...analyticsData,
+          utmSource,
+          utmMedium,
+          utmCampaign,
+          utmTerm,
+          utmContent,
+          isFirstVisit: this.isFirstVisit,
+          conversionGoal: undefined, // Будет установлено при достижении цели
+          conversionValue: undefined  // Будет установлено при достижении цели
+        };
+        
+        await fetch('/api/analytics/advertising/track', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(advertisingData),
+        });
+      }
+
       // Сбрасываем счетчики для новой страницы
       if (!isLeaving) {
         this.clickCount = 0;
@@ -278,6 +308,57 @@ class AnalyticsTracker {
     // Дополнительное отслеживание событий (анонимное)
     console.log('Event tracked:', { eventType, eventName, metadata });
   }
+
+  public trackConversion(goal: string, value?: number): void {
+    // Отслеживание конверсий для рекламной аналитики
+    if (this.currentPage.startsWith('/admin')) {
+      return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmSource = urlParams.get('utm_source');
+    const utmMedium = urlParams.get('utm_medium');
+    const utmCampaign = urlParams.get('utm_campaign');
+    
+    if (utmSource || utmMedium || utmCampaign) {
+      const conversionData = {
+        anonymousSessionId: this.anonymousSessionId,
+        page: this.currentPage,
+        pageType: this.getPageType(this.currentPage),
+        pageId: this.getPageId(this.currentPage),
+        deviceCategory: this.detectDeviceCategory(),
+        screenSize: this.detectScreenSize(),
+        region: 'unknown', // Будет получено асинхронно
+        visitDate: this.getMoscowTime().date,
+        visitHour: this.getMoscowTime().hour,
+        visitDayOfWeek: this.getMoscowTime().dayOfWeek,
+        timeOnPage: 0,
+        scrollDepth: 0,
+        clicks: 0,
+        loadTime: 0,
+        isBounce: false,
+        utmSource,
+        utmMedium,
+        utmCampaign,
+        utmTerm: urlParams.get('utm_term'),
+        utmContent: urlParams.get('utm_content'),
+        isFirstVisit: this.isFirstVisit,
+        conversionGoal: goal,
+        conversionValue: value || 0
+      };
+
+      // Отправляем конверсию
+      fetch('/api/analytics/advertising/track', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(conversionData),
+      }).catch(error => {
+        console.error('Error tracking conversion:', error);
+      });
+    }
+  }
 }
 
 // Создаем глобальный экземпляр трекера
@@ -297,6 +378,12 @@ export function getAnalytics(): AnalyticsTracker | null {
 export function trackPageView(): void {
   if (analyticsTracker) {
     analyticsTracker.startNewPage();
+  }
+}
+
+export function trackConversion(goal: string, value?: number): void {
+  if (analyticsTracker) {
+    analyticsTracker.trackConversion(goal, value);
   }
 }
 
