@@ -24,12 +24,23 @@ export async function DELETE(request: NextRequest) {
       const externalPath = path.resolve(path.join(projectRoot, filePath));
       const backupsDir = path.join(projectRoot, 'backups');
       const archivesDir = path.join(projectRoot, 'archives');
-      if (externalPath.startsWith(backupsDir) || externalPath.startsWith(archivesDir)) {
+      const baseName = path.basename(externalPath);
+      const isDeployBackup = baseName.startsWith('.next.backup.') || baseName === 'build.tar.gz';
+      if (
+        externalPath.startsWith(backupsDir) ||
+        externalPath.startsWith(archivesDir) ||
+        (isDeployBackup && path.dirname(externalPath) === projectRoot)
+      ) {
         fullPath = externalPath;
       }
     }
     
-    if (!fullPath.startsWith(publicDir) && !fullPath.startsWith(path.join(projectRoot, 'backups')) && !fullPath.startsWith(path.join(projectRoot, 'archives'))) {
+    const isInPublic = fullPath.startsWith(publicDir);
+    const isInBackups = fullPath.startsWith(path.join(projectRoot, 'backups'));
+    const isInArchives = fullPath.startsWith(path.join(projectRoot, 'archives'));
+    const baseName = path.basename(fullPath);
+    const isDeployBackup = path.dirname(fullPath) === projectRoot && (baseName.startsWith('.next.backup.') || baseName === 'build.tar.gz');
+    if (!isInPublic && !isInBackups && !isInArchives && !isDeployBackup) {
       return NextResponse.json({ success: false, error: 'Invalid file path' }, { status: 400 });
     }
 
@@ -48,12 +59,12 @@ export async function DELETE(request: NextRequest) {
       const stat = await fs.stat(fullPath);
       if (stat.isDirectory()) {
         // Рекурсивно удаляем директорию (Node 16+)
-        // @ts-ignore
+        // @ts-expect-error: rm with recursive option may not be in older typings
         await fs.rm(fullPath, { recursive: true, force: true });
       } else {
         await fs.unlink(fullPath);
       }
-    } catch (e) {
+    } catch {
       return NextResponse.json({ success: false, error: 'Failed to delete file or directory' }, { status: 500 });
     }
 
