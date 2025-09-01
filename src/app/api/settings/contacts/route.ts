@@ -37,8 +37,8 @@ export async function PUT(request: NextRequest) {
     }
     
     // Валидация полей контактов
-    const validFields = ['email', 'telegram', 'discord', 'vk', 'website', 'description'];
-    const validatedContacts: any = {};
+    const validFields = ['email', 'telegram', 'discord', 'vk', 'website', 'description'] as const;
+    const validatedContacts: Partial<Record<typeof validFields[number], string>> = {};
     
     validFields.forEach(field => {
       if (contacts[field] !== undefined) {
