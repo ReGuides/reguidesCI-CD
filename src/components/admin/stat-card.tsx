@@ -10,7 +10,7 @@ interface StatCardProps {
     isPositive: boolean;
   };
   icon: LucideIcon;
-  color: 'blue' | 'green' | 'purple' | 'red' | 'yellow';
+  color: 'blue' | 'green' | 'purple' | 'red' | 'yellow' | 'indigo' | 'pink' | 'emerald';
 }
 
 export default function StatCard({ title, value, change, icon: Icon, color }: StatCardProps) {
@@ -19,7 +19,10 @@ export default function StatCard({ title, value, change, icon: Icon, color }: St
     green: 'bg-green-600/20 text-green-400',
     purple: 'bg-purple-600/20 text-purple-400',
     red: 'bg-red-600/20 text-red-400',
-    yellow: 'bg-yellow-600/20 text-yellow-400'
+    yellow: 'bg-yellow-600/20 text-yellow-400',
+    indigo: 'bg-indigo-600/20 text-indigo-400',
+    pink: 'bg-pink-600/20 text-pink-400',
+    emerald: 'bg-emerald-600/20 text-emerald-400'
   };
 
   return (
