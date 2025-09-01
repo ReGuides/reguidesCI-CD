@@ -326,7 +326,7 @@ export default function FilesManagementPage() {
                           <button
                             onClick={() => {
                               // подготовим список текущей категории для навигации
-                              const list = (files as any)[category] as FileInfo[];
+                              const list = files[category as keyof FilesByCategory];
                               setCurrentList(list);
                               const idx = list.findIndex((f) => f.path === file.path);
                               setCurrentIndex(Math.max(idx, 0));

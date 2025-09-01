@@ -72,7 +72,10 @@ export default function FilesCategoryPage() {
   const handleDelete = async (file: FileInfo) => {
     if (!confirm(`Удалить файл "${file.name}"?`)) return;
 
-    const body: any = { filePath: file.location === 'public' ? file.path : file.fullPath, allowExternal: file.location === 'external' };
+    const body: { filePath: string; allowExternal: boolean } = { 
+      filePath: file.location === 'public' ? file.path : file.fullPath, 
+      allowExternal: file.location === 'external' 
+    };
 
     const response = await fetch('/api/admin/files/delete', {
       method: 'DELETE',

@@ -167,8 +167,8 @@ export async function GET(request: NextRequest) {
     addServerLog('info', 'admin-files', 'Files list retrieved successfully', { totalFiles, totalImages, totalArchives });
 
     // Если указан фильтр категории - возвращаем постранично только её
-    if (filterCategory && (filesByCategory as any)[filterCategory]) {
-      const allItems: FileInfo[] = (filesByCategory as any)[filterCategory] as FileInfo[];
+    if (filterCategory && filterCategory in filesByCategory) {
+      const allItems: FileInfo[] = filesByCategory[filterCategory as keyof FilesByCategory];
       const start = (page - 1) * limit;
       const paged = allItems.slice(start, start + limit);
       const pages = Math.max(Math.ceil(allItems.length / limit), 1);
