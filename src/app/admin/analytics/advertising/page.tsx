@@ -76,6 +76,27 @@ interface AdvertisingStats {
     uniqueVisitors: number;
     conversions: number;
   }>;
+  // Новые поля для внутренней рекламы
+  adStats: {
+    totalImpressions: number;
+    totalClicks: number;
+    averageCTR: number;
+  };
+  topAdBlocks: Array<{
+    adId: string;
+    adTitle: string;
+    adType: string;
+    adPlacement: string;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+  }>;
+  adTypeStats: Array<{
+    adType: string;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+  }>;
 }
 
 export default function AdvertisingAnalyticsPage() {
@@ -263,41 +284,77 @@ export default function AdvertisingAnalyticsPage() {
             </Card>
           </div>
 
-          {/* Дополнительные метрики */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 border-cyan-500/20">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-cyan-400">Новые посетители</CardTitle>
-                <Zap className="h-4 w-4 text-cyan-400" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-white">{formatNumber(stats.total.firstTimeVisitors)}</div>
-                <p className="text-xs text-cyan-300">Первый визит</p>
-              </CardContent>
-            </Card>
+                     {/* Дополнительные метрики */}
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+             <Card className="bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 border-cyan-500/20">
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                 <CardTitle className="text-sm font-medium text-cyan-400">Новые посетители</CardTitle>
+                 <Zap className="h-4 w-4 text-cyan-400" />
+               </CardHeader>
+               <CardContent>
+                 <div className="text-2xl font-bold text-white">{formatNumber(stats.total.firstTimeVisitors)}</div>
+                 <p className="text-xs text-cyan-300">Первый визит</p>
+               </CardContent>
+             </Card>
 
-            <Card className="bg-gradient-to-r from-pink-500/10 to-pink-600/10 border-pink-500/20">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-pink-400">Возвраты</CardTitle>
-                <Repeat className="h-4 w-4 text-pink-400" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-white">{formatNumber(stats.total.returnVisitors)}</div>
-                <p className="text-xs text-pink-300">Повторные визиты</p>
-              </CardContent>
-            </Card>
+             <Card className="bg-gradient-to-r from-pink-500/10 to-pink-600/10 border-pink-500/20">
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                 <CardTitle className="text-sm font-medium text-pink-400">Возвраты</CardTitle>
+                 <Repeat className="h-4 w-4 text-pink-400" />
+               </CardHeader>
+               <CardContent>
+                 <div className="text-2xl font-bold text-white">{formatNumber(stats.total.returnVisitors)}</div>
+                 <p className="text-xs text-pink-300">Повторные визиты</p>
+               </CardContent>
+             </Card>
 
-            <Card className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border-yellow-500/20">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-yellow-400">Время на странице</CardTitle>
-                <Clock className="h-4 w-4 text-yellow-400" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-white">{formatTime(stats.total.averageTimeOnPage)}</div>
-                <p className="text-xs text-yellow-300">Среднее время</p>
-              </CardContent>
-            </Card>
-          </div>
+             <Card className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border-yellow-500/20">
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                 <CardTitle className="text-sm font-medium text-yellow-400">Время на странице</CardTitle>
+                 <Clock className="h-4 w-4 text-yellow-400" />
+               </CardHeader>
+               <CardContent>
+                 <div className="text-2xl font-bold text-white">{formatTime(stats.total.averageTimeOnPage)}</div>
+                 <p className="text-xs text-yellow-300">Среднее время</p>
+               </CardContent>
+             </Card>
+           </div>
+
+           {/* Метрики внутренней рекламы */}
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+             <Card className="bg-gradient-to-r from-indigo-500/10 to-indigo-600/10 border-indigo-500/20">
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                 <CardTitle className="text-sm font-medium text-indigo-400">Показы рекламы</CardTitle>
+                 <Eye className="h-4 w-4 text-indigo-400" />
+               </CardHeader>
+               <CardContent>
+                 <div className="text-2xl font-bold text-white">{formatNumber(stats.adStats.totalImpressions)}</div>
+                 <p className="text-xs text-indigo-300">Всего показов</p>
+               </CardContent>
+             </Card>
+
+             <Card className="bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 border-emerald-500/20">
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                 <CardTitle className="text-sm font-medium text-emerald-400">Клики по рекламе</CardTitle>
+                 <Target className="h-4 w-4 text-emerald-400" />
+               </CardHeader>
+               <CardContent>
+                 <div className="text-2xl font-bold text-white">{formatNumber(stats.adStats.totalClicks)}</div>
+                 <p className="text-xs text-emerald-300">Всего кликов</p>
+               </CardContent>
+             </Card>
+
+             <Card className="bg-gradient-to-r from-violet-500/10 to-violet-600/10 border-violet-500/20">
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                 <CardTitle className="text-sm font-medium text-violet-400">Средний CTR</CardTitle>
+                 <TrendingUp className="h-4 w-4 text-violet-400" />
+               </CardHeader>
+               <CardContent>
+                 <div className="text-2xl font-bold text-white">{stats.adStats.averageCTR.toFixed(2)}%</div>
+                 <p className="text-xs text-violet-300">Click-through rate</p>
+               </CardContent>
+             </Card>
+           </div>
 
           {/* Топ UTM-источников */}
           <Card className="bg-neutral-800 border-neutral-700">
@@ -483,40 +540,110 @@ export default function AdvertisingAnalyticsPage() {
             </Card>
           </div>
 
-          {/* Статистика по регионам */}
-          <Card className="bg-neutral-800 border-neutral-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Globe className="w-5 h-5 text-blue-400" />
-                Статистика по регионам
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {stats.regionStats && stats.regionStats.map((region, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="text-white">{getRegionName(region.region)}</span>
-                    <div className="flex items-center space-x-4 text-sm">
-                      <span className="text-gray-400">
-                        <Eye className="w-3 h-3 inline mr-1" />
-                        {formatNumber(region.visits)}
-                      </span>
-                      <span className="text-gray-400">
-                        <Users className="w-3 h-3 inline mr-1" />
-                        {formatNumber(region.uniqueVisitors)}
-                      </span>
-                      <span className="text-gray-400">
-                        <Target className="w-3 h-3 inline mr-1" />
-                        {formatNumber(region.conversions)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      )}
-    </div>
-  );
-}
+                     {/* Статистика по регионам */}
+           <Card className="bg-neutral-800 border-neutral-700">
+             <CardHeader>
+               <CardTitle className="text-white flex items-center gap-2">
+                 <Globe className="w-5 h-5 text-blue-400" />
+                 Статистика по регионам
+               </CardTitle>
+             </CardHeader>
+             <CardContent>
+               <div className="space-y-3">
+                 {stats.regionStats && stats.regionStats.map((region, index) => (
+                   <div key={index} className="flex items-center justify-between">
+                     <span className="text-white">{getRegionName(region.region)}</span>
+                     <div className="flex items-center space-x-4 text-sm">
+                       <span className="text-gray-400">
+                         <Eye className="w-3 h-3 inline mr-1" />
+                         {formatNumber(region.visits)}
+                       </span>
+                       <span className="text-gray-400">
+                         <Users className="w-3 h-3 inline mr-1" />
+                         {formatNumber(region.uniqueVisitors)}
+                       </span>
+                       <span className="text-gray-400">
+                         <Target className="w-3 h-3 inline mr-1" />
+                         {formatNumber(region.conversions)}
+                       </span>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             </CardContent>
+           </Card>
+
+           {/* Топ рекламных блоков */}
+           <Card className="bg-neutral-800 border-neutral-700">
+             <CardHeader>
+               <CardTitle className="text-white flex items-center gap-2">
+                 <BarChart3 className="w-5 h-5 text-indigo-400" />
+                 Топ рекламных блоков
+               </CardTitle>
+             </CardHeader>
+             <CardContent>
+               <div className="space-y-3">
+                 {stats.topAdBlocks && stats.topAdBlocks.slice(0, 10).map((ad, index) => (
+                   <div key={index} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                     <div className="flex items-center space-x-3">
+                       <Badge variant="outline" className="text-xs">
+                         {ad.adType || 'unknown'}
+                       </Badge>
+                       <span className="text-white font-medium">{ad.adTitle || 'Без названия'}</span>
+                       <span className="text-gray-400 text-sm">({ad.adPlacement || 'unknown'})</span>
+                     </div>
+                     <div className="flex items-center space-x-4 text-sm">
+                       <span className="text-gray-400">
+                         <Eye className="w-3 h-3 inline mr-1" />
+                         {formatNumber(ad.impressions)}
+                       </span>
+                       <span className="text-gray-400">
+                         <Target className="w-3 h-3 inline mr-1" />
+                         {formatNumber(ad.clicks)}
+                       </span>
+                       <span className="text-indigo-400 font-medium">
+                         {ad.ctr.toFixed(2)}%
+                       </span>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             </CardContent>
+           </Card>
+
+           {/* Статистика по типам рекламы */}
+           <Card className="bg-neutral-800 border-neutral-700">
+             <CardHeader>
+               <CardTitle className="text-white flex items-center gap-2">
+                 <TrendingUp className="w-5 h-5 text-emerald-400" />
+                 Статистика по типам рекламы
+               </CardTitle>
+             </CardHeader>
+             <CardContent>
+               <div className="space-y-3">
+                 {stats.adTypeStats && stats.adTypeStats.map((adType, index) => (
+                   <div key={index} className="flex items-center justify-between">
+                     <span className="text-white capitalize">{adType.adType || 'unknown'}</span>
+                     <div className="flex items-center space-x-4 text-sm">
+                       <span className="text-gray-400">
+                         <Eye className="w-3 h-3 inline mr-1" />
+                         {formatNumber(adType.impressions)}
+                       </span>
+                       <span className="text-gray-400">
+                         <Target className="w-3 h-3 inline mr-1" />
+                         {formatNumber(adType.clicks)}
+                       </span>
+                       <span className="text-emerald-400 font-medium">
+                         {adType.ctr.toFixed(2)}%
+                       </span>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             </CardContent>
+           </Card>
+         </>
+       )}
+     </div>
+   );
+ }

@@ -48,6 +48,12 @@ class AnalyticsTracker {
       localStorage.setItem('hasVisitedBefore', 'true');
     }
     
+    // Привязываем функции отслеживания рекламы к глобальному объекту
+    if (typeof window !== 'undefined') {
+      window.trackAdImpression = this.trackAdImpression.bind(this);
+      window.trackAdClick = this.trackAdClick.bind(this);
+    }
+    
     this.initTracking();
   }
 
@@ -366,6 +372,116 @@ class AnalyticsTracker {
       });
     }
   }
+
+  public trackAdImpression(adId: string, adType: string, placement: string, adTitle: string): void {
+    // Отслеживание показа рекламы
+    if (this.currentPage.startsWith('/admin')) {
+      return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmSource = urlParams.get('utm_source');
+    const utmMedium = urlParams.get('utm_medium');
+    const utmCampaign = urlParams.get('utm_campaign');
+    
+    const adData = {
+      anonymousSessionId: this.anonymousSessionId,
+      page: this.currentPage,
+      pageType: this.getPageType(this.currentPage),
+      pageId: this.getPageId(this.currentPage),
+      deviceCategory: this.detectDeviceCategory(),
+      screenSize: this.detectScreenSize(),
+      region: 'unknown', // Будет получено асинхронно
+      visitDate: this.getMoscowTime().date,
+      visitHour: this.getMoscowTime().hour,
+      visitDayOfWeek: this.getMoscowTime().dayOfWeek,
+      timeOnPage: 0,
+      scrollDepth: 0,
+      clicks: 0,
+      loadTime: 0,
+      isBounce: false,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      utmTerm: urlParams.get('utm_term'),
+      utmContent: urlParams.get('utm_content'),
+      isFirstVisit: this.isFirstVisit,
+      conversionGoal: undefined,
+      conversionValue: undefined,
+      // Дополнительные поля для рекламы
+      adId,
+      adType,
+      adPlacement: placement,
+      adTitle,
+      eventType: 'impression'
+    };
+
+    // Отправляем данные о показе рекламы
+    fetch('/api/analytics/advertising/track', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(adData),
+    }).catch(error => {
+      console.error('Error tracking ad impression:', error);
+    });
+  }
+
+  public trackAdClick(adId: string, adType: string, placement: string, adTitle: string): void {
+    // Отслеживание клика по рекламе
+    if (this.currentPage.startsWith('/admin')) {
+      return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmSource = urlParams.get('utm_source');
+    const utmMedium = urlParams.get('utm_medium');
+    const utmCampaign = urlParams.get('utm_campaign');
+    
+    const adData = {
+      anonymousSessionId: this.anonymousSessionId,
+      page: this.currentPage,
+      pageType: this.getPageType(this.currentPage),
+      pageId: this.getPageId(this.currentPage),
+      deviceCategory: this.detectDeviceCategory(),
+      screenSize: this.detectScreenSize(),
+      region: 'unknown', // Будет получено асинхронно
+      visitDate: this.getMoscowTime().date,
+      visitHour: this.getMoscowTime().hour,
+      visitDayOfWeek: this.getMoscowTime().dayOfWeek,
+      timeOnPage: 0,
+      scrollDepth: 0,
+      clicks: 0,
+      loadTime: 0,
+      isBounce: false,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      utmTerm: urlParams.get('utm_term'),
+      utmContent: urlParams.get('utm_content'),
+      isFirstVisit: this.isFirstVisit,
+      conversionGoal: undefined,
+      conversionValue: undefined,
+      // Дополнительные поля для рекламы
+      adId,
+      adType,
+      adPlacement: placement,
+      adTitle,
+      eventType: 'click'
+    };
+
+    // Отправляем данные о клике по рекламе
+    fetch('/api/analytics/advertising/track', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(adData),
+    }).catch(error => {
+      console.error('Error tracking ad click:', error);
+    });
+  }
 }
 
 // Создаем глобальный экземпляр трекера
@@ -397,5 +513,17 @@ export function trackConversion(goal: string, value?: number): void {
 export function trackEvent(eventType: string, eventName: string, metadata?: Record<string, unknown>): void {
   if (analyticsTracker) {
     analyticsTracker.trackEvent(eventType, eventName, metadata);
+  }
+}
+
+export function trackAdImpression(adId: string, adType: string, placement: string, adTitle: string): void {
+  if (analyticsTracker) {
+    analyticsTracker.trackAdImpression(adId, adType, placement, adTitle);
+  }
+}
+
+export function trackAdClick(adId: string, adType: string, placement: string, adTitle: string): void {
+  if (analyticsTracker) {
+    analyticsTracker.trackAdClick(adId, adType, placement, adTitle);
   }
 }

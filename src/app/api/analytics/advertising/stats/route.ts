@@ -247,6 +247,80 @@ export async function GET(request: NextRequest) {
       },
       { $sort: { visits: -1 } }
     ]);
+
+    // 9. Статистика по внутренней рекламе
+    const adStats = await AdvertisingAnalytics.aggregate([
+      { $match: { ...matchConditions, adId: { $exists: true, $ne: null } } },
+      {
+        $group: {
+          _id: null,
+          totalImpressions: { $sum: { $cond: [{ $eq: ['$eventType', 'impression'] }, 1, 0] } },
+          totalClicks: { $sum: { $cond: [{ $eq: ['$eventType', 'click'] }, 1, 0] } },
+          averageCTR: { $avg: { $cond: [{ $eq: ['$eventType', 'impression'] }, 0, { $divide: ['$clicks', 1] }] } }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          totalImpressions: 1,
+          totalClicks: 1,
+          averageCTR: { $round: [{ $multiply: ['$averageCTR', 100] }, 2] }
+        }
+      }
+    ]);
+
+    // 10. Топ рекламных блоков по показам
+    const topAdBlocks = await AdvertisingAnalytics.aggregate([
+      { $match: { ...matchConditions, adId: { $exists: true, $ne: null } } },
+      {
+        $group: {
+          _id: '$adId',
+          adTitle: { $first: '$adTitle' },
+          adType: { $first: '$adType' },
+          adPlacement: { $first: '$adPlacement' },
+          impressions: { $sum: { $cond: [{ $eq: ['$eventType', 'impression'] }, 1, 0] } },
+          clicks: { $sum: { $cond: [{ $eq: ['$eventType', 'click'] }, 1, 0] } },
+          ctr: { $avg: { $cond: [{ $eq: ['$eventType', 'impression'] }, 0, { $divide: ['$clicks', 1] }] } }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          adId: '$_id',
+          adTitle: 1,
+          adType: 1,
+          adPlacement: 1,
+          impressions: 1,
+          clicks: 1,
+          ctr: { $round: [{ $multiply: ['$ctr', 100] }, 2] }
+        }
+      },
+      { $sort: { impressions: -1 } },
+      { $limit: 20 }
+    ]);
+
+    // 11. Статистика по типам рекламы
+    const adTypeStats = await AdvertisingAnalytics.aggregate([
+      { $match: { ...matchConditions, adType: { $exists: true, $ne: null } } },
+      {
+        $group: {
+          _id: '$adType',
+          impressions: { $sum: { $cond: [{ $eq: ['$eventType', 'impression'] }, 1, 0] } },
+          clicks: { $sum: { $cond: [{ $eq: ['$eventType', 'click'] }, 1, 0] } },
+          ctr: { $avg: { $cond: [{ $eq: ['$eventType', 'impression'] }, 0, { $divide: ['$clicks', 1] }] } }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          adType: '$_id',
+          impressions: 1,
+          clicks: 1,
+          ctr: { $round: [{ $multiply: ['$ctr', 100] }, 2] }
+        }
+      },
+      { $sort: { impressions: -1 } }
+    ]);
     
     const stats = {
       period,
@@ -267,7 +341,11 @@ export async function GET(request: NextRequest) {
       conversionsByGoal,
       hourlyStats,
       weeklyStats,
-      regionStats
+      regionStats,
+      // Новые поля для внутренней рекламы
+      adStats: adStats[0] || { totalImpressions: 0, totalClicks: 0, averageCTR: 0 },
+      topAdBlocks,
+      adTypeStats
     };
     
     addServerLog('info', 'advertising-analytics-stats', 'Advertising analytics stats retrieved successfully', { 

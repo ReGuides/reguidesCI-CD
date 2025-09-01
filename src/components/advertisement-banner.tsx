@@ -38,11 +38,17 @@ export default function AdvertisementBanner() {
               
               // Отслеживаем показ рекламы
               if (ad._id) {
+                // Отправляем в существующую систему рекламы
                 fetch(`/api/advertisements/${ad._id}/impression`, {
                   method: 'POST'
                 }).catch(error => {
                   console.error('Error tracking impression:', error);
                 });
+                
+                // Отправляем в рекламную аналитику
+                if (typeof window !== 'undefined' && (window as any).trackAdImpression) {
+                  (window as any).trackAdImpression(ad._id, 'banner', 'header', ad.title);
+                }
               }
             }
           }
@@ -107,6 +113,11 @@ export default function AdvertisementBanner() {
                     await fetch(`/api/advertisements/${advertisement._id}/click`, {
                       method: 'POST'
                     });
+                    
+                    // Отправляем в рекламную аналитику
+                    if (typeof window !== 'undefined' && (window as any).trackAdClick) {
+                      (window as any).trackAdClick(advertisement._id, 'banner', 'header', advertisement.title);
+                    }
                   } catch (error) {
                     console.error('Error tracking click:', error);
                   }

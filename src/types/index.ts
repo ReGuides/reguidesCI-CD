@@ -334,4 +334,12 @@ export interface Talent {
   energyCost?: number;
   priority?: number;
   scaling?: Record<string, Record<string, string>>;
+}
+
+// Global window types for analytics
+declare global {
+  interface Window {
+    trackAdImpression: (adId: string, adType: string, placement: string, adTitle: string) => void;
+    trackAdClick: (adId: string, adType: string, placement: string, adTitle: string) => void;
+  }
 } 

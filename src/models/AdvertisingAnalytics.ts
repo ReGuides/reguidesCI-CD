@@ -40,6 +40,13 @@ export interface IAdvertisingAnalytics extends Document {
   conversionGoal?: string;   // Цель конверсии (регистрация, покупка, etc.)
   conversionValue?: number;  // Стоимость конверсии
   
+  // Новые поля для внутренней рекламы
+  adId?: string;             // ID рекламного блока
+  adType?: 'banner' | 'sidebar' | 'popup'; // Тип рекламы
+  adPlacement?: string;      // Размещение рекламы (header, sidebar, modal, etc.)
+  adTitle?: string;          // Заголовок рекламы
+  eventType?: 'impression' | 'click' | 'conversion'; // Тип события
+  
   // Время и продолжительность
   sessionStart: Date;
   sessionEnd?: Date;
@@ -165,6 +172,29 @@ const AdvertisingAnalyticsSchema = new Schema<IAdvertisingAnalytics>({
     min: 0 
   },
   
+  // Новые поля для внутренней рекламы
+  adId: { 
+    type: String, 
+    index: true 
+  },
+  adType: { 
+    type: String, 
+    enum: ['banner', 'sidebar', 'popup'],
+    index: true 
+  },
+  adPlacement: { 
+    type: String, 
+    index: true 
+  },
+  adTitle: { 
+    type: String 
+  },
+  eventType: { 
+    type: String, 
+    enum: ['impression', 'click', 'conversion'],
+    index: true 
+  },
+  
   // Время сессии
   sessionStart: { 
     type: Date, 
@@ -186,5 +216,10 @@ AdvertisingAnalyticsSchema.index({ utmMedium: 1, visitDate: -1 });
 AdvertisingAnalyticsSchema.index({ region: 1, visitDate: -1 });
 AdvertisingAnalyticsSchema.index({ deviceCategory: 1, visitDate: -1 });
 AdvertisingAnalyticsSchema.index({ conversionGoal: 1, visitDate: -1 });
+// Новые индексы для внутренней рекламы
+AdvertisingAnalyticsSchema.index({ adId: 1, visitDate: -1 });
+AdvertisingAnalyticsSchema.index({ adType: 1, visitDate: -1 });
+AdvertisingAnalyticsSchema.index({ adPlacement: 1, visitDate: -1 });
+AdvertisingAnalyticsSchema.index({ eventType: 1, visitDate: -1 });
 
 export default mongoose.models.AdvertisingAnalytics || mongoose.model<IAdvertisingAnalytics>('AdvertisingAnalytics', AdvertisingAnalyticsSchema);

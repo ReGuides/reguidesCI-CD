@@ -31,7 +31,12 @@ export async function POST(request: NextRequest) {
       utmContent,
       isFirstVisit,
       conversionGoal,
-      conversionValue
+      conversionValue,
+      adId,
+      adType,
+      adPlacement,
+      adTitle,
+      eventType
     } = body;
 
     // Не отслеживаем аналитику для страниц админки
@@ -77,6 +82,11 @@ export async function POST(request: NextRequest) {
       isFirstVisit: isFirstVisit !== undefined ? isFirstVisit : true,
       conversionGoal,
       conversionValue,
+      adId,
+      adType,
+      adPlacement,
+      adTitle,
+      eventType,
       sessionStart: new Date()
     });
 
@@ -89,7 +99,11 @@ export async function POST(request: NextRequest) {
       utmSource,
       utmCampaign,
       region,
-      deviceCategory 
+      deviceCategory,
+      adId,
+      adType,
+      adPlacement,
+      eventType
     });
 
     return NextResponse.json({ 
