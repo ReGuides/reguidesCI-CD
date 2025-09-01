@@ -59,7 +59,6 @@ export async function DELETE(request: NextRequest) {
       const stat = await fs.stat(fullPath);
       if (stat.isDirectory()) {
         // Рекурсивно удаляем директорию (Node 16+)
-        // @ts-expect-error: rm with recursive option may not be in older typings
         await fs.rm(fullPath, { recursive: true, force: true });
       } else {
         await fs.unlink(fullPath);
