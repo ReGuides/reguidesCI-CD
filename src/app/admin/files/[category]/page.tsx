@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Copy, Trash2, Eye } from 'lucide-react';
+import { Copy, Trash2, Eye, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface FileInfo {
   name: string;
@@ -32,6 +32,7 @@ export default function FilesCategoryPage() {
 
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [imageDims, setImageDims] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
     const p = parseInt(searchParams.get('page') || '1', 10);
@@ -151,19 +152,50 @@ export default function FilesCategoryPage() {
       </div>
 
       {showImageModal && files[currentIndex] && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-neutral-800 rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="text-white text-sm truncate pr-4">{files[currentIndex].name}</div>
-              <button onClick={() => setShowImageModal(false)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded">Закрыть</button>
+        <div className="fixed inset-0 bg-black/70 z-50 p-4 flex items-center justify-center" onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') setCurrentIndex((i) => (i - 1 + files.length) % files.length);
+          if (e.key === 'ArrowRight') setCurrentIndex((i) => (i + 1) % files.length);
+          if (e.key === 'Escape') setShowImageModal(false);
+        }} tabIndex={0}>
+          <div className="relative bg-neutral-900 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-700 bg-neutral-800">
+              <div className="text-sm text-gray-300 truncate pr-4">{files[currentIndex].name}</div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 mr-2">{currentIndex + 1} / {files.length}</span>
+                {files[currentIndex].url && (
+                  <button onClick={() => copyToClipboard(files[currentIndex].url)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded text-sm">
+                    <Copy className="w-3 h-3 inline mr-1" /> URL
+                  </button>
+                )}
+                <button onClick={() => handleDelete(files[currentIndex])} className="border border-red-600 hover:bg-red-900/20 text-red-400 hover:text-red-300 px-3 py-1 rounded text-sm">
+                  <Trash2 className="w-3 h-3 inline mr-1" /> Удалить
+                </button>
+                <button onClick={() => setShowImageModal(false)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded text-sm">
+                  <X className="w-3 h-3 inline mr-1" /> Закрыть
+                </button>
+              </div>
             </div>
-            <div className="flex items-center justify-between mb-2">
-              <button onClick={() => setCurrentIndex((i) => (i - 1 + files.length) % files.length)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded">Предыдущая</button>
-              <span className="text-gray-400 text-sm">{currentIndex + 1} / {files.length}</span>
-              <button onClick={() => setCurrentIndex((i) => (i + 1) % files.length)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded">Следующая</button>
+            <div className="relative bg-neutral-900" style={{ height: '70vh' }}>
+              <button onClick={() => setCurrentIndex((i) => (i - 1 + files.length) % files.length)} className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white"><ChevronLeft className="w-6 h-6" /></button>
+              <button onClick={() => setCurrentIndex((i) => (i + 1) % files.length)} className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white"><ChevronRight className="w-6 h-6" /></button>
+              <div className="absolute inset-0">
+                <div className="relative w-full h-full">
+                  <Image src={files[currentIndex].url} alt={files[currentIndex].name} fill sizes="100vw" style={{ objectFit: 'contain' }} onLoad={e => {
+                    const el = e.currentTarget as HTMLImageElement;
+                    setImageDims({ width: el.naturalWidth, height: el.naturalHeight });
+                  }} />
+                </div>
+              </div>
             </div>
-            <div className="text-center">
-              <Image src={files[currentIndex].url} alt={files[currentIndex].name} width={1200} height={800} className="inline-block max-w-full h-auto rounded" />
+            <div className="px-4 py-3 border-t border-neutral-700 bg-neutral-800 text-sm text-gray-300 grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div>
+                <div><span className="text-gray-400">Путь:</span> {files[currentIndex].path}</div>
+                <div><span className="text-gray-400">Категория:</span> {category}</div>
+              </div>
+              <div>
+                <div><span className="text-gray-400">Размер:</span> {Math.round(files[currentIndex].size / 1024)} KB{imageDims ? ` • ${imageDims.width}×${imageDims.height}px` : ''}</div>
+                <div><span className="text-gray-400">Изменен:</span> {new Date(files[currentIndex].modified).toLocaleString('ru-RU')}</div>
+              </div>
             </div>
           </div>
         </div>

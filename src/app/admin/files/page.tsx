@@ -14,7 +14,10 @@ import {
   Users,
   Target,
   Shield,
-  User
+  User,
+  ChevronLeft,
+  ChevronRight,
+  X
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -79,6 +82,7 @@ export default function FilesManagementPage() {
   const [selectedImage, setSelectedImage] = useState<FileInfo | null>(null);
   const [currentList, setCurrentList] = useState<FileInfo[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [imageDims, setImageDims] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
     fetchFiles();
@@ -439,75 +443,81 @@ export default function FilesManagementPage() {
 
       {/* Модальное окно просмотра изображения */}
       {showImageModal && selectedImage && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-neutral-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-white">{selectedImage.name}</h3>
-                <button
-                  onClick={() => setShowImageModal(false)}
-                  className="border border-neutral-600 hover:bg-neutral-700 text-white px-4 py-2 rounded"
-                >
-                  Закрыть
+        <div className="fixed inset-0 bg-black/70 z-50 p-4 flex items-center justify-center" onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') {
+            const prev = (currentIndex - 1 + currentList.length) % currentList.length;
+            setCurrentIndex(prev);
+            setSelectedImage(currentList[prev]);
+          } else if (e.key === 'ArrowRight') {
+            const next = (currentIndex + 1) % currentList.length;
+            setCurrentIndex(next);
+            setSelectedImage(currentList[next]);
+          } else if (e.key === 'Escape') {
+            setShowImageModal(false);
+          }
+        }} tabIndex={0}>
+          <div className="relative bg-neutral-900 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            {/* Top bar */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-700 bg-neutral-800">
+              <div className="text-sm text-gray-300 truncate pr-4">{selectedImage.name}</div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 mr-2">{currentIndex + 1} / {currentList.length}</span>
+                <button onClick={() => copyToClipboard(selectedImage.url)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded text-sm">
+                  <Copy className="w-3 h-3 inline mr-1" /> URL
+                </button>
+                <button onClick={() => handleDelete(selectedImage)} className="border border-red-600 hover:bg-red-900/20 text-red-400 hover:text-red-300 px-3 py-1 rounded text-sm">
+                  <Trash2 className="w-3 h-3 inline mr-1" /> Удалить
+                </button>
+                <button onClick={() => setShowImageModal(false)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded text-sm">
+                  <X className="w-3 h-3 inline mr-1" /> Закрыть
                 </button>
               </div>
-              
-              <div className="text-center">
-                <div className="flex items-center justify-between mb-2">
-                  <button
-                    onClick={() => {
-                      const prev = (currentIndex - 1 + currentList.length) % currentList.length;
-                      setCurrentIndex(prev);
-                      setSelectedImage(currentList[prev]);
+            </div>
+
+            {/* Image area */}
+            <div className="relative bg-neutral-900" style={{ height: '70vh' }}>
+              {/* Left/Right controls */}
+              <button
+                onClick={() => { const prev = (currentIndex - 1 + currentList.length) % currentList.length; setCurrentIndex(prev); setSelectedImage(currentList[prev]); }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white"
+                aria-label="Предыдущая"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={() => { const next = (currentIndex + 1) % currentList.length; setCurrentIndex(next); setSelectedImage(currentList[next]); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white"
+                aria-label="Следующая"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+
+              <div className="absolute inset-0">
+                <div className="relative w-full h-full">
+                  <Image
+                    src={selectedImage.url}
+                    alt={selectedImage.name}
+                    fill
+                    sizes="100vw"
+                    style={{ objectFit: 'contain' }}
+                    onLoad={e => {
+                      const el = e.currentTarget as HTMLImageElement;
+                      setImageDims({ width: el.naturalWidth, height: el.naturalHeight });
                     }}
-                    className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded"
-                  >
-                    Предыдущая
-                  </button>
-                  <span className="text-sm text-gray-400">{currentIndex + 1} / {currentList.length}</span>
-                  <button
-                    onClick={() => {
-                      const next = (currentIndex + 1) % currentList.length;
-                      setCurrentIndex(next);
-                      setSelectedImage(currentList[next]);
-                    }}
-                    className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded"
-                  >
-                    Следующая
-                  </button>
+                  />
                 </div>
-                <Image
-                  src={selectedImage.url}
-                  alt={selectedImage.name}
-                  width={800}
-                  height={600}
-                  className="max-w-full h-auto rounded-lg"
-                />
-                
-                <div className="mt-4 text-left space-y-2 text-sm text-gray-400">
-                  <p><strong>Путь:</strong> {selectedImage.path}</p>
-                  <p><strong>URL:</strong> {selectedImage.url}</p>
-                  <p><strong>Размер:</strong> {formatFileSize(selectedImage.size)}</p>
-                  <p><strong>Изменен:</strong> {formatDate(selectedImage.modified)}</p>
-                  <p><strong>Категория:</strong> {getCategoryLabel(selectedImage.category)}</p>
-                </div>
-                
-                <div className="mt-4 flex gap-2 justify-center">
-                  <button
-                    onClick={() => copyToClipboard(selectedImage.url)}
-                    className="border border-neutral-600 hover:bg-neutral-700 text-white px-4 py-2 rounded"
-                  >
-                    <Copy className="w-4 h-4 mr-2 inline" />
-                    Копировать URL
-                  </button>
-                  <button
-                    onClick={() => handleDelete(selectedImage)}
-                    className="border border-red-600 hover:bg-red-900/20 text-red-400 hover:text-red-300 px-4 py-2 rounded"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2 inline" />
-                    Удалить
-                  </button>
-                </div>
+              </div>
+            </div>
+
+            {/* Info bar */}
+            <div className="px-4 py-3 border-t border-neutral-700 bg-neutral-800 text-sm text-gray-300 grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div>
+                <div><span className="text-gray-400">Путь:</span> {selectedImage.path}</div>
+                <div><span className="text-gray-400">Категория:</span> {getCategoryLabel(selectedImage.category)}</div>
+              </div>
+              <div>
+                <div><span className="text-gray-400">Размер:</span> {formatFileSize(selectedImage.size)}{imageDims ? ` • ${imageDims.width}×${imageDims.height}px` : ''}</div>
+                <div><span className="text-gray-400">Изменен:</span> {formatDate(selectedImage.modified)}</div>
               </div>
             </div>
           </div>
