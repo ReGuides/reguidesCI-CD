@@ -37,6 +37,7 @@ class AnalyticsTracker {
   private clickCount: number = 0;
   private maxScrollDepth: number = 0;
   private isTracking: boolean = false;
+  private isFirstVisit: boolean;
 
   constructor() {
     this.sessionId = this.generateSessionId();
