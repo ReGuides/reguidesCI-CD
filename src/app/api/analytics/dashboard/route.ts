@@ -1,230 +1,84 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Analytics from '@/models/Analytics';
+import { addServerLog } from '@/lib/serverLog';
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     await connectToDatabase();
     
-    const { searchParams } = new URL(request.url);
-    const from = searchParams.get('from');
-    const to = searchParams.get('to');
-    
-    let dateFilter: { $gte?: Date; $lte?: Date } = {};
-    if (from && to) {
-      // Устанавливаем начало дня для from в московском времени (00:00:00)
-      const fromDate = new Date(from + 'T00:00:00+03:00');
-      
-      // Устанавливаем конец дня для to в московском времени (23:59:59.999)
-      const toDate = new Date(to + 'T23:59:59.999+03:00');
-      
-      dateFilter = {
-        $gte: fromDate,
-        $lte: toDate
-      };
-    } else {
-      // По умолчанию последние 30 дней в московском времени
-      const now = new Date();
-      const moscowOffset = 3 * 60 * 60 * 1000; // UTC+3 в миллисекундах
-      const moscowTime = new Date(now.getTime() + moscowOffset);
-      
-      const thirtyDaysAgo = new Date(moscowTime);
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      thirtyDaysAgo.setHours(0, 0, 0, 0);
-      
-      dateFilter = { $gte: thirtyDaysAgo };
+    const body = await request.json();
+    const { page, pageType, pageId } = body;
+
+    // Не отслеживаем аналитику для страниц админки
+    if (page && page.startsWith('/admin')) {
+      addServerLog('info', 'analytics-dashboard', 'Admin page skipped', { page });
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Admin page skipped' 
+      });
     }
 
-    // Получаем общую статистику просмотров
-    const pageViewsStats = await Analytics.aggregate([
-      { $match: { timestamp: dateFilter } },
-      {
-        $addFields: {
-          // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
-        }
-      },
-      { $match: { isAdminPage: false } },
+    // Получаем статистику по странице
+    const pageStats = await Analytics.aggregate([
+      { $match: { $and: [{ page }, { page: { $not: /^\/admin/ } }] } },
       {
         $group: {
           _id: null,
-          totalPageViews: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$userId' },
-          uniqueSessions: { $addToSet: '$sessionId' }
+          totalViews: { $sum: 1 },
+          uniqueVisitors: { $addToSet: '$anonymousSessionId' },
+          averageTimeOnPage: { $avg: '$timeOnPage' },
+          averageScrollDepth: { $avg: '$scrollDepth' },
+          averageClicks: { $avg: '$clicks' },
+          bounceRate: { $avg: { $cond: ['$isBounce', 1, 0] } },
+          topRegions: { $addToSet: '$region' },
+          topDevices: { $addToSet: '$deviceCategory' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          totalViews: 1,
+          uniqueVisitors: { $size: '$uniqueVisitors' },
+          averageTimeOnPage: { $round: ['$averageTimeOnPage', 2] },
+          averageScrollDepth: { $round: ['$averageScrollDepth', 2] },
+          averageClicks: { $round: ['$averageClicks', 2] },
+          bounceRate: { $round: [{ $multiply: ['$bounceRate', 100] }, 2] },
+          topRegions: { $slice: ['$topRegions', 10] },
+          topDevices: { $slice: ['$topDevices', 5] }
         }
       }
     ]);
 
-    // Получаем топ страниц
-    const topPages = await Analytics.aggregate([
-      { $match: { timestamp: dateFilter } },
-      {
-        $addFields: {
-          // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
-        }
-      },
-      { $match: { isAdminPage: false } },
-      {
-        $group: {
-          _id: '$page',
-          views: { $sum: 1 },
-          pageType: { $first: '$pageType' }
-        }
-      },
-      { $sort: { views: -1 } },
-      { $limit: 10 }
-    ]);
-
-    // Получаем статистику по устройствам
-    const deviceStats = await Analytics.aggregate([
-      { $match: { timestamp: dateFilter } },
-      {
-        $addFields: {
-          // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
-        }
-      },
-      { $match: { isAdminPage: false } },
-      {
-        $group: {
-          _id: '$device',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-
-    // Получаем статистику по браузерам
-    const browserStats = await Analytics.aggregate([
-      { $match: { timestamp: dateFilter } },
-      {
-        $addFields: {
-          // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
-        }
-      },
-      { $match: { isAdminPage: false } },
-      {
-        $group: {
-          _id: '$browser',
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { count: -1 } }
-    ]);
-
-    // Получаем статистику событий (клики, прокрутка)
-    const eventStats = await Analytics.aggregate([
-      { $match: { timestamp: dateFilter } },
-      {
-        $addFields: {
-          // Исключаем события на страницах админки
-          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
-        }
-      },
-      { $match: { isAdminPage: false } },
-      {
-        $group: {
-          _id: null,
-          totalClicks: { $sum: '$clicks' },
-          totalScrollDepth: { $avg: '$scrollDepth' }
-        }
-      }
-    ]);
-
-    // Получаем почасовую статистику
-    const hourlyStats = await Analytics.aggregate([
-      { $match: { timestamp: dateFilter } },
-      {
-        $addFields: {
-          // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
-        }
-      },
-      { $match: { isAdminPage: false } },
-      {
-        $addFields: {
-          // Конвертируем время в московское (UTC+3)
-          moscowTime: {
-            $add: [
-              '$timestamp',
-              3 * 60 * 60 * 1000 // +3 часа в миллисекундах
-            ]
-          }
-        }
-      },
-      {
-        $group: {
-          _id: { $hour: '$moscowTime' },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { '_id': 1 } }
-    ]);
-
-    // Получаем статистику по дням недели
-    const weeklyStats = await Analytics.aggregate([
-      { $match: { timestamp: dateFilter } },
-      {
-        $addFields: {
-          // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
-        }
-      },
-      { $match: { isAdminPage: false } },
-      {
-        $addFields: {
-          // Конвертируем время в московское (UTC+3)
-          moscowTime: {
-            $add: [
-              '$timestamp',
-              3 * 60 * 60 * 1000 // +3 часа в миллисекундах
-            ]
-          }
-        }
-      },
-      {
-        $group: {
-          _id: { $dayOfWeek: '$moscowTime' },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { '_id': 1 } }
-    ]);
-
-    const stats = {
-      overview: {
-        totalPageViews: pageViewsStats[0]?.totalPageViews || 0,
-        uniqueVisitors: pageViewsStats[0]?.uniqueVisitors?.length || 0,
-        uniqueSessions: pageViewsStats[0]?.uniqueSessions?.length || 0,
-        averageViewsPerSession: pageViewsStats[0]?.totalPageViews / (pageViewsStats[0]?.uniqueSessions?.length || 1) || 0
-      },
-      topPages,
-      deviceStats: deviceStats.reduce((acc: Record<string, number>, stat: { _id: string; count: number }) => {
-        acc[stat._id] = stat.count;
-        return acc;
-      }, {}),
-      browserStats,
-      eventStats,
-      hourlyStats: hourlyStats.map((stat: { _id: number; count: number }) => ({
-        hour: stat._id,
-        count: stat.count
-      })),
-      weeklyStats: weeklyStats.map((stat: { _id: number; count: number }) => ({
-        day: stat._id,
-        count: stat.count
-      }))
+    const stats = pageStats[0] || {
+      totalViews: 0,
+      uniqueVisitors: 0,
+      averageTimeOnPage: 0,
+      averageScrollDepth: 0,
+      averageClicks: 0,
+      bounceRate: 0,
+      topRegions: [],
+      topDevices: []
     };
+
+    addServerLog('info', 'analytics-dashboard', 'Dashboard stats retrieved successfully', { 
+      page, 
+      totalViews: stats.totalViews 
+    });
 
     return NextResponse.json({ 
       success: true, 
       data: stats 
     });
+
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch dashboard stats' },
-      { status: 500 }
-    );
+    console.error('Analytics dashboard error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    addServerLog('error', 'analytics-dashboard', 'Error retrieving dashboard stats', { error: errorMessage });
+    
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Internal server error' 
+    }, { status: 500 });
   }
 }

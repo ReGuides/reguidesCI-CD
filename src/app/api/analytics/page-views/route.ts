@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db/mongodb';
+import connectToDatabase from '@/lib/mongodb';
 import Analytics from '@/models/Analytics';
 import { addServerLog } from '@/lib/serverLog';
 
@@ -8,60 +8,58 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
     
     const body = await request.json();
-    const { url, title, sessionId, userId, userAgent } = body;
-    
-    if (!url || !title || !sessionId) {
-      return NextResponse.json(
-        { error: 'Missing required fields: url, title, sessionId' },
-        { status: 400 }
-      );
+    const { page, pageType, pageId } = body;
+
+    // Не отслеживаем аналитику для страниц админки
+    if (page && page.startsWith('/admin')) {
+      addServerLog('info', 'analytics-page-views', 'Admin page skipped', { page });
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Admin page skipped' 
+      });
     }
 
+    // Создаем запись просмотра страницы (анонимную)
     const pageView = new Analytics({
-      sessionId,
-      userId: userId || undefined,
-      page: url,
-      pageType: 'page',
-      userAgent: userAgent || request.headers.get('user-agent') || 'Unknown',
-      browser: 'Unknown',
-      browserVersion: 'Unknown',
-      os: 'Unknown',
-      osVersion: 'Unknown',
-      device: 'desktop',
-      screenResolution: 'Unknown',
-      country: 'Unknown',
-      timezone: 'UTC',
-      language: 'en',
+      anonymousSessionId: 'pageview_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+      page: page || '/',
+      pageType: pageType || 'page',
+      pageId,
+      deviceCategory: 'desktop', // По умолчанию
+      screenSize: 'medium', // По умолчанию
+      region: 'unknown', // По умолчанию
+      visitDate: new Date().toISOString().split('T')[0],
+      visitHour: new Date().getHours(),
+      visitDayOfWeek: new Date().getDay() || 7,
       timeOnPage: 0,
-      isBounce: false,
       scrollDepth: 0,
       clicks: 0,
       loadTime: 0,
-      isFirstVisit: false,
-      timestamp: new Date()
+      isBounce: true
     });
 
     await pageView.save();
     
     addServerLog('info', 'analytics-page-views', 'Page view tracked successfully', { 
-      page: url, 
-      sessionId, 
-      userId 
+      page, 
+      pageType,
+      pageId 
     });
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Page view tracked successfully' 
+      message: 'Page view tracked' 
     });
+
   } catch (error) {
-    console.error('Error tracking page view:', error);
+    console.error('Analytics page-views error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     addServerLog('error', 'analytics-page-views', 'Error tracking page view', { error: errorMessage });
     
-    return NextResponse.json(
-      { error: 'Failed to track page view' },
-      { status: 500 }
-    );
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Internal server error' 
+    }, { status: 500 });
   }
 }
 
@@ -70,60 +68,44 @@ export async function GET(request: NextRequest) {
     await connectToDatabase();
     
     const { searchParams } = new URL(request.url);
-    const from = searchParams.get('from');
-    const to = searchParams.get('to');
-    const limit = parseInt(searchParams.get('limit') || '100');
+    const page = searchParams.get('page');
+    const pageType = searchParams.get('pageType');
+    const limit = parseInt(searchParams.get('limit') || '50');
     
-    const query: { timestamp?: { $gte: Date; $lte: Date } } = {};
+    // Базовые условия для фильтрации (исключаем админку)
+    const matchConditions: Record<string, unknown> = { 
+      pageType: 'page',
+      page: { $not: /^\/admin/ }
+    };
     
-    if (from && to) {
-      // Устанавливаем начало дня для from в московском времени (00:00:00)
-      const fromDate = new Date(from + 'T00:00:00+03:00');
-      
-      // Устанавливаем конец дня для to в московском времени (23:59:59.999)
-      const toDate = new Date(to + 'T23:59:59.999+03:00');
-      
-      query.timestamp = {
-        $gte: fromDate,
-        $lte: toDate
-      };
-    }
+    if (page) matchConditions.page = page;
+    if (pageType) matchConditions.pageType = pageType;
     
-    // Получаем просмотры страниц с фильтрацией
-    const pageViews = await Analytics.aggregate([
-      { $match: { ...query, pageType: 'page' } },
-      {
-        $addFields: {
-          // Исключаем страницы админки
-          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
-        }
-      },
-      { $match: { isAdminPage: false } },
-      {
-        $sort: { timestamp: -1 }
-      },
-      {
-        $limit: limit
-      }
-    ]);
+    // Получаем просмотры страниц
+    const pageViews = await Analytics.find(matchConditions)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .select('page pageType pageId visitDate visitHour timeOnPage scrollDepth clicks createdAt');
     
-    addServerLog('info', 'analytics-page-views', 'Page views fetched successfully', { 
+    addServerLog('info', 'analytics-page-views', 'Page views retrieved successfully', { 
       count: pageViews.length,
-      limit 
+      page,
+      pageType 
     });
-
+    
     return NextResponse.json({ 
       success: true, 
       data: pageViews 
     });
+
   } catch (error) {
-    console.error('Error fetching page views:', error);
+    console.error('Analytics page-views error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    addServerLog('error', 'analytics-page-views', 'Error fetching page views', { error: errorMessage });
+    addServerLog('error', 'analytics-page-views', 'Error retrieving page views', { error: errorMessage });
     
-    return NextResponse.json(
-      { error: 'Failed to fetch page views' },
-      { status: 500 }
-    );
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Internal server error' 
+    }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db/mongodb';
+import connectToDatabase from '@/lib/mongodb';
 import Analytics from '@/models/Analytics';
 import { addServerLog } from '@/lib/serverLog';
 
@@ -8,61 +8,58 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
     
     const body = await request.json();
-    const { query, sessionId, userId, resultsCount } = body;
-    
-    if (!query || !sessionId) {
-      return NextResponse.json(
-        { error: 'Missing required fields: query, sessionId' },
-        { status: 400 }
-      );
+    const { page, pageType, pageId } = body;
+
+    // Не отслеживаем аналитику для страниц админки
+    if (page && page.startsWith('/admin')) {
+      addServerLog('info', 'analytics-search', 'Admin page skipped', { page });
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Admin page skipped' 
+      });
     }
 
+    // Создаем запись поиска (анонимную)
     const searchQuery = new Analytics({
-      sessionId,
-      userId: userId || undefined,
-      page: '/search',
-      pageType: 'search',
-      userAgent: 'Search Tracking',
-      browser: 'Unknown',
-      browserVersion: 'Unknown',
-      os: 'Unknown',
-      osVersion: 'Unknown',
-      device: 'desktop',
-      screenResolution: 'Unknown',
-      country: 'Unknown',
-      timezone: 'UTC',
-      language: 'en',
+      anonymousSessionId: 'search_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+      page: page || '/search',
+      pageType: pageType || 'search',
+      pageId,
+      deviceCategory: 'desktop', // По умолчанию
+      screenSize: 'medium', // По умолчанию
+      region: 'unknown', // По умолчанию
+      visitDate: new Date().toISOString().split('T')[0],
+      visitHour: new Date().getHours(),
+      visitDayOfWeek: new Date().getDay() || 7,
       timeOnPage: 0,
-      isBounce: false,
       scrollDepth: 0,
-      clicks: 1,
+      clicks: 1, // Поиск = 1 клик
       loadTime: 0,
-      isFirstVisit: false,
-      timestamp: new Date()
+      isBounce: false
     });
 
     await searchQuery.save();
     
     addServerLog('info', 'analytics-search', 'Search query tracked successfully', { 
-      query, 
-      sessionId, 
-      userId,
-      resultsCount 
+      page, 
+      pageType,
+      pageId 
     });
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Search query tracked successfully' 
+      message: 'Search query tracked' 
     });
+
   } catch (error) {
-    console.error('Error tracking search query:', error);
+    console.error('Analytics search error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     addServerLog('error', 'analytics-search', 'Error tracking search query', { error: errorMessage });
     
-    return NextResponse.json(
-      { error: 'Failed to track search query' },
-      { status: 500 }
-    );
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Internal server error' 
+    }, { status: 500 });
   }
 }
 
@@ -71,60 +68,44 @@ export async function GET(request: NextRequest) {
     await connectToDatabase();
     
     const { searchParams } = new URL(request.url);
-    const from = searchParams.get('from');
-    const to = searchParams.get('to');
-    const limit = parseInt(searchParams.get('limit') || '100');
+    const page = searchParams.get('page');
+    const pageType = searchParams.get('pageType');
+    const limit = parseInt(searchParams.get('limit') || '50');
     
-    const query: { timestamp?: { $gte: Date; $lte: Date } } = {};
+    // Базовые условия для фильтрации (исключаем админку)
+    const matchConditions: Record<string, unknown> = { 
+      pageType: 'search',
+      page: { $not: /^\/admin/ }
+    };
     
-    if (from && to) {
-      // Устанавливаем начало дня для from в московском времени (00:00:00)
-      const fromDate = new Date(from + 'T00:00:00+03:00');
-      
-      // Устанавливаем конец дня для to в московском времени (23:59:59.999)
-      const toDate = new Date(to + 'T23:59:59.999+03:00');
-      
-      query.timestamp = {
-        $gte: fromDate,
-        $lte: toDate
-      };
-    }
+    if (page) matchConditions.page = page;
+    if (pageType) matchConditions.pageType = pageType;
     
-    // Получаем поисковые запросы с фильтрацией
-    const searchQueries = await Analytics.aggregate([
-      { $match: { ...query, pageType: 'search' } },
-      {
-        $addFields: {
-          // Исключаем поиски на страницах админки
-          isAdminPage: { $regexMatch: { input: '$page', regex: /\/admin/i } }
-        }
-      },
-      { $match: { isAdminPage: false } },
-      {
-        $sort: { timestamp: -1 }
-      },
-      {
-        $limit: limit
-      }
-    ]);
+    // Получаем поисковые запросы
+    const searchQueries = await Analytics.find(matchConditions)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .select('page pageType pageId visitDate visitHour clicks createdAt');
     
-    addServerLog('info', 'analytics-search', 'Search queries fetched successfully', { 
+    addServerLog('info', 'analytics-search', 'Search queries retrieved successfully', { 
       count: searchQueries.length,
-      limit 
+      page,
+      pageType 
     });
-
+    
     return NextResponse.json({ 
       success: true, 
       data: searchQueries 
     });
+
   } catch (error) {
-    console.error('Error fetching search queries:', error);
+    console.error('Analytics search error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    addServerLog('error', 'analytics-search', 'Error fetching search queries', { error: errorMessage });
+    addServerLog('error', 'analytics-search', 'Error retrieving search queries', { error: errorMessage });
     
-    return NextResponse.json(
-      { error: 'Failed to fetch search queries' },
-      { status: 500 }
-    );
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Internal server error' 
+    }, { status: 500 });
   }
 }
