@@ -5,9 +5,13 @@ import { addServerLog } from '@/lib/serverLog';
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { filePath, allowExternal } = await request.json();
+    const body = await request.json();
+    const { filePath, allowExternal } = body;
+    
+    addServerLog('info', 'admin-files-delete', 'Delete request received', { body, filePath, allowExternal });
     
     if (!filePath) {
+      addServerLog('warn', 'admin-files-delete', 'File path is missing', { body });
       return NextResponse.json({ 
         success: false, 
         error: 'File path is required' 

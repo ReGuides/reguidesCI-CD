@@ -227,12 +227,19 @@ export default function FilesManagementPage() {
 
     try {
       const deletePromises = Array.from(selectedFiles).map(async (filePath) => {
+        // Находим файл для определения его типа
+        const file = Object.values(files).flat().find(f => f.path === filePath);
+        if (!file) return false;
+
         const response = await fetch('/api/admin/files/delete', {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ filePath })
+          body: JSON.stringify({ 
+            filePath: file.path,
+            allowExternal: false // Пока что удаляем только публичные файлы
+          })
         });
         return response.ok;
       });

@@ -107,23 +107,37 @@ export default function FilesCategoryPage() {
 
   const deleteSelectedFiles = async () => {
     if (selectedFiles.size === 0) return;
+    if (!confirm(`Вы уверены, что хотите удалить ${selectedFiles.size} файл(а)?`)) return;
 
-    if (!confirm(`Удалить ${selectedFiles.size} файлов?`)) return;
+    try {
+      const deletePromises = Array.from(selectedFiles).map(async (filePath) => {
+        const file = files.find(f => f.path === filePath);
+        if (!file) return false;
+        
+        const body: { filePath: string; allowExternal: boolean } = { 
+          filePath: file.location === 'public' ? file.path : file.fullPath, 
+          allowExternal: file.location === 'external' 
+        };
 
-    const body = Array.from(selectedFiles).map(filePath => ({
-      filePath: filePath,
-      allowExternal: false // Assuming all selected files are public for bulk deletion
-    }));
+        const response = await fetch('/api/admin/files/delete', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        return response.ok;
+      });
 
-    const response = await fetch('/api/admin/files/delete', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-
-    if (response.ok) {
-      fetchFiles();
-      unselectAllFiles();
+      const results = await Promise.all(deletePromises);
+      const successCount = results.filter(Boolean).length;
+      
+      if (successCount > 0) {
+        alert(`Успешно удалено ${successCount} из ${selectedFiles.size} файлов`);
+        setSelectedFiles(new Set());
+        await fetchFiles();
+      }
+    } catch (error) {
+      console.error('Bulk delete failed:', error);
+      alert('Ошибка при массовом удалении файлов');
     }
   };
 
