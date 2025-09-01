@@ -48,12 +48,12 @@ export async function PUT(request: NextRequest) {
     
     // Обновляем настройки
     const settings = await SiteSettings.getSettings();
-    settings.contacts = { ...settings.contacts, ...validatedContacts };
+    const updatedContacts = { ...settings.contacts, ...validatedContacts };
     
-    // Находим документ в базе и обновляем его
+    // Обновляем документ в базе (поскольку у нас только один документ настроек)
     const updatedSettings = await SiteSettings.findOneAndUpdate(
-      { _id: settings._id },
-      { contacts: settings.contacts },
+      {}, // Пустой фильтр - обновляем единственный документ
+      { contacts: updatedContacts },
       { new: true }
     );
     
