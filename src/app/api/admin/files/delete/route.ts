@@ -3,7 +3,26 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { addServerLog } from '@/lib/serverLog';
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'DELETE, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
+
 export async function DELETE(request: NextRequest) {
+  return handleDeleteRequest(request);
+}
+
+export async function POST(request: NextRequest) {
+  return handleDeleteRequest(request);
+}
+
+async function handleDeleteRequest(request: NextRequest) {
   try {
     const body = await request.json();
     const { filePath, allowExternal } = body;

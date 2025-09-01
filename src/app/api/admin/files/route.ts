@@ -28,6 +28,11 @@ interface FilesByCategory {
 
 export async function GET(request: NextRequest) {
   try {
+    addServerLog('info', 'admin-files', 'Files list request received', { 
+      url: request.url,
+      searchParams: Object.fromEntries(new URL(request.url).searchParams)
+    });
+
     const publicDir = path.join(process.cwd(), 'public');
     const projectRoot = process.cwd();
     const externalArchiveDirs = [

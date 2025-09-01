@@ -81,7 +81,7 @@ export default function FilesCategoryPage() {
     };
 
     const response = await fetch('/api/admin/files/delete', {
-      method: 'DELETE',
+      method: 'POST', // Используем POST вместо DELETE
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
@@ -120,7 +120,7 @@ export default function FilesCategoryPage() {
         };
 
         const response = await fetch('/api/admin/files/delete', {
-          method: 'DELETE',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });

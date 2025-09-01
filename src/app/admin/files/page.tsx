@@ -149,15 +149,20 @@ export default function FilesManagementPage() {
 
     try {
       const response = await fetch('/api/admin/files/delete', {
-        method: 'DELETE',
+        method: 'POST', // Используем POST вместо DELETE
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ filePath: file.path })
+        body: JSON.stringify({ 
+          filePath: file.path,
+          allowExternal: false // Пока что удаляем только публичные файлы
+        })
       });
 
       if (response.ok) {
         await fetchFiles();
+      } else {
+        console.error('Delete failed:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Delete failed:', error);
@@ -232,7 +237,7 @@ export default function FilesManagementPage() {
         if (!file) return false;
 
         const response = await fetch('/api/admin/files/delete', {
-          method: 'DELETE',
+          method: 'POST', // Используем POST вместо DELETE
           headers: {
             'Content-Type': 'application/json'
           },
