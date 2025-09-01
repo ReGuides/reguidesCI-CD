@@ -41,7 +41,7 @@ export function Footer() {
             О проекте
           </Link>
           <Link 
-            href="/policy" 
+            href="/privacy-policy" 
             className="text-neutral-400 hover:text-white transition-colors"
           >
             Политика конфиденциальности

@@ -151,6 +151,19 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
             </div>
           </div>
         </div>
+        
+        <div className="border-t border-neutral-700/40 mt-4 pt-3">
+          <h3 className="text-xs font-semibold text-neutral-400 mb-2 tracking-wide uppercase">Документы</h3>
+          <div className="space-y-1">
+            <Link 
+              href="/privacy-policy" 
+              className="flex items-center text-xs text-neutral-400 hover:text-white transition-colors gap-2 px-2 py-1 rounded hover:bg-neutral-700/40"
+            >
+              <FileText className="w-3 h-3" />
+              <span>Политика конфиденциальности</span>
+            </Link>
+          </div>
+        </div>
       </div>
     </aside>
   );

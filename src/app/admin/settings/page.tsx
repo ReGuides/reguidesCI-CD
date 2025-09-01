@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,8 @@ import {
   Trash2,
   MoveUp,
   MoveDown,
-  Users
+  Users,
+  FileText
 } from 'lucide-react';
 import Image from 'next/image';
 import { TeamMember, ISiteSettings } from '@/models/SiteSettings';
@@ -415,6 +417,15 @@ export default function SettingsPage() {
         <div>
           <h1 className="text-3xl font-bold text-white">Настройки сайта</h1>
           <p className="text-gray-400">Основные настройки сайта</p>
+          <div className="mt-2">
+            <Link 
+              href="/privacy-policy" 
+              className="inline-flex items-center text-sm text-blue-400 hover:text-blue-300 transition-colors gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              Политика конфиденциальности
+            </Link>
+          </div>
         </div>
         <Button 
           onClick={handleSave} 
