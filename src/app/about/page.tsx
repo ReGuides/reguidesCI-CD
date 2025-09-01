@@ -12,6 +12,8 @@ interface Stats {
   builds?: number;
 }
 
+
+
 export default function AboutPage() {
   const [about, setAbout] = useState<IAbout | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -35,6 +37,8 @@ export default function AboutPage() {
     };
     loadAbout();
   }, []);
+
+
 
   useEffect(() => {
     const loadStats = async () => {
@@ -205,10 +209,15 @@ export default function AboutPage() {
         )}
 
         {/* Contact Info */}
-        {about.contactInfo && (
+        {about.contactInfo && (about.contactInfo.email || about.contactInfo.telegram || about.contactInfo.discord || about.contactInfo.vk || about.contactInfo.website) && (
           <div className="bg-neutral-800 border border-neutral-700 p-8 rounded-xl">
             <h2 className="text-2xl font-bold text-white mb-6 text-center">Связаться с нами</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {about.contactInfo.description && (
+              <p className="text-neutral-300 text-center mb-6 max-w-2xl mx-auto">
+                {about.contactInfo.description}
+              </p>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {about.contactInfo.email && (
                 <a 
                   href={`mailto:${about.contactInfo.email}`}
@@ -220,7 +229,7 @@ export default function AboutPage() {
               )}
               {about.contactInfo.telegram && (
                 <a 
-                  href={about.contactInfo.telegram}
+                  href={about.contactInfo.telegram.startsWith('@') ? `https://t.me/${about.contactInfo.telegram.slice(1)}` : about.contactInfo.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 p-4 bg-neutral-700 rounded-lg hover:bg-neutral-600 transition-colors"
@@ -231,7 +240,7 @@ export default function AboutPage() {
               )}
               {about.contactInfo.discord && (
                 <a 
-                  href={about.contactInfo.discord}
+                  href={about.contactInfo.discord.includes('discord.gg') ? about.contactInfo.discord : `https://discord.gg/${about.contactInfo.discord}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 p-4 bg-neutral-700 rounded-lg hover:bg-neutral-600 transition-colors"
@@ -240,15 +249,26 @@ export default function AboutPage() {
                   <span className="text-white">Discord</span>
                 </a>
               )}
-              {about.contactInfo.github && (
+              {about.contactInfo.vk && (
                 <a 
-                  href={about.contactInfo.github}
+                  href={about.contactInfo.vk.includes('vk.com') ? about.contactInfo.vk : `https://vk.com/${about.contactInfo.vk}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 p-4 bg-neutral-700 rounded-lg hover:bg-neutral-600 transition-colors"
                 >
-                  <span className="text-2xl">🐙</span>
-                  <span className="text-white">GitHub</span>
+                  <span className="text-2xl">🌐</span>
+                  <span className="text-white">VK</span>
+                </a>
+              )}
+              {about.contactInfo.website && (
+                <a 
+                  href={about.contactInfo.website.startsWith('http') ? about.contactInfo.website : `https://${about.contactInfo.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 p-4 bg-neutral-700 rounded-lg hover:bg-neutral-600 transition-colors"
+                >
+                  <span className="text-2xl">🌍</span>
+                  <span className="text-white">Веб-сайт</span>
                 </a>
               )}
             </div>

@@ -59,7 +59,15 @@ export default function SettingsPage() {
     siteName: 'ReGuides',
     logo: '/images/logos/logo.png',
     favicon: '/favicon.ico',
-    team: []
+    team: [],
+    contacts: {
+      email: '',
+      telegram: '',
+      discord: '',
+      vk: '',
+      website: '',
+      description: ''
+    }
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -73,6 +81,17 @@ export default function SettingsPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [newMemberRole, setNewMemberRole] = useState('');
   const [newMemberDescription, setNewMemberDescription] = useState('');
+  
+  // Состояние для управления контактами
+  const [contacts, setContacts] = useState({
+    email: '',
+    telegram: '',
+    discord: '',
+    vk: '',
+    website: '',
+    description: ''
+  });
+  const [savingContacts, setSavingContacts] = useState(false);
 
   // Функция для принудительного обновления настроек
   const refreshSettingsAfterUpload = async () => {
@@ -87,6 +106,49 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Error refreshing settings:', error);
+    }
+  };
+  
+  // Функции для управления контактами
+  const loadContacts = async () => {
+    try {
+      const response = await fetch('/api/settings/contacts');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setContacts(result.contacts);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading contacts:', error);
+    }
+  };
+  
+  const saveContacts = async () => {
+    try {
+      setSavingContacts(true);
+      const response = await fetch('/api/settings/contacts', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ contacts }),
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setMessage({ type: 'success', text: 'Контакты успешно сохранены!' });
+          setContacts(result.contacts);
+        }
+      } else {
+        setMessage({ type: 'error', text: 'Ошибка при сохранении контактов' });
+      }
+    } catch (error) {
+      console.error('Error saving contacts:', error);
+      setMessage({ type: 'error', text: 'Ошибка при сохранении контактов' });
+    } finally {
+      setSavingContacts(false);
     }
   };
 
@@ -136,6 +198,7 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchSettings();
     fetchUsers();
+    loadContacts();
   }, []);
 
   // Загружаем команду при инициализации
@@ -560,6 +623,101 @@ export default function SettingsPage() {
                   onChange={(e) => handleFileSelect('favicon', e)}
                 />
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Контактная информация */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Контактная информация
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Email
+              </label>
+              <Input
+                value={contacts.email}
+                onChange={(e) => setContacts(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="contact@example.com"
+                className="bg-neutral-800 border-neutral-600 text-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Telegram
+              </label>
+              <Input
+                value={contacts.telegram}
+                onChange={(e) => setContacts(prev => ({ ...prev, telegram: e.target.value }))}
+                placeholder="@username или ссылка"
+                className="bg-neutral-800 border-neutral-600 text-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Discord
+              </label>
+              <Input
+                value={contacts.discord}
+                onChange={(e) => setContacts(prev => ({ ...prev, discord: e.target.value }))}
+                placeholder="username#1234 или ссылка"
+                className="bg-neutral-800 border-neutral-600 text-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                VK
+              </label>
+              <Input
+                value={contacts.vk}
+                onChange={(e) => setContacts(prev => ({ ...prev, vk: e.target.value }))}
+                placeholder="vk.com/username или ссылка"
+                className="bg-neutral-800 border-neutral-600 text-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Веб-сайт
+              </label>
+              <Input
+                value={contacts.website}
+                onChange={(e) => setContacts(prev => ({ ...prev, website: e.target.value }))}
+                placeholder="https://example.com"
+                className="bg-neutral-800 border-neutral-600 text-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Описание
+              </label>
+              <textarea
+                value={contacts.description}
+                onChange={(e) => setContacts(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Краткое описание для страницы контактов"
+                rows={3}
+                className="w-full p-3 bg-neutral-800 border border-neutral-600 text-white rounded-md resize-none focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                onClick={saveContacts}
+                disabled={savingContacts}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {savingContacts ? 'Сохранение...' : 'Сохранить контакты'}
+              </Button>
             </div>
           </CardContent>
         </Card>

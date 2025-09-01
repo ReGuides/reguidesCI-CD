@@ -1,7 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
+import { ContactsModal } from '@/components/contacts-modal';
 
 export function Footer() {
+  const [isContactsModalOpen, setIsContactsModalOpen] = useState(false);
+
   return (
     <footer className="bg-header text-text border-t border-neutral-800 mt-8 lg:mt-12">
       <div className="max-w-7xl mx-auto px-4 py-6 lg:py-8 flex flex-col lg:flex-row items-center justify-between gap-4">
@@ -46,11 +52,20 @@ export function Footer() {
           >
             Политика конфиденциальности
           </Link>
-          <button className="text-neutral-400 hover:text-white transition-colors">
+          <button 
+            onClick={() => setIsContactsModalOpen(true)}
+            className="text-neutral-400 hover:text-white transition-colors"
+          >
             Контакты
           </button>
         </div>
       </div>
+      
+      {/* Модальное окно контактов */}
+      <ContactsModal 
+        isOpen={isContactsModalOpen}
+        onClose={() => setIsContactsModalOpen(false)}
+      />
     </footer>
   );
 } 

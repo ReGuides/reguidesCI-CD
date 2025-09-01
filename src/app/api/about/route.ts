@@ -16,10 +16,15 @@ export async function GET() {
       return NextResponse.json({ error: 'About data not found' }, { status: 404 });
     }
 
-    // Всегда берем команду из настроек сайта
+    // Всегда берем команду и контакты из настроек сайта
     try {
       const siteSettings = await SiteSettings.getSettings();
       console.log('🔍 SiteSettings team:', siteSettings.team);
+      
+      // Добавляем контакты из настроек сайта
+      if (siteSettings.contacts) {
+        about.contactInfo = siteSettings.contacts;
+      }
       
       if (siteSettings.team && siteSettings.team.length > 0) {
         // Получаем данные пользователей для команды

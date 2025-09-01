@@ -12,6 +12,14 @@ export interface ISiteSettings {
   logo?: string;
   favicon?: string;
   team: TeamMember[];
+  contacts: {
+    email?: string;
+    telegram?: string;
+    discord?: string;
+    vk?: string;
+    website?: string;
+    description?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -49,6 +57,16 @@ const siteSettingsSchema = new mongoose.Schema<ISiteSettings>({
     default: []
   },
   
+  // Контактная информация
+  contacts: {
+    email: { type: String },
+    telegram: { type: String },
+    discord: { type: String },
+    vk: { type: String },
+    website: { type: String },
+    description: { type: String }
+  },
+  
   // Метаданные
   createdAt: {
     type: Date,
@@ -75,7 +93,15 @@ siteSettingsSchema.statics.getSettings = async function(): Promise<ISiteSettings
         siteName: 'ReGuides',
         logo: '/images/logos/logo.png',
         favicon: '/favicon.ico',
-        team: []
+        team: [],
+        contacts: {
+          email: '',
+          telegram: '',
+          discord: '',
+          vk: '',
+          website: '',
+          description: 'Свяжитесь с нами для получения дополнительной информации о проекте.'
+        }
       });
     }
     return settings;

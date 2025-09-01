@@ -27,7 +27,9 @@ export interface ContactInfo {
   email?: string;
   telegram?: string;
   discord?: string;
-  github?: string;
+  vk?: string;
+  website?: string;
+  description?: string;
 }
 
 export interface SocialLinks {
@@ -78,7 +80,9 @@ const ContactInfoSchema = new Schema<ContactInfo>({
   email: { type: String },
   telegram: { type: String },
   discord: { type: String },
-  github: { type: String }
+  vk: { type: String },
+  website: { type: String },
+  description: { type: String }
 });
 
 const AboutSchema = new Schema<IAbout>({
