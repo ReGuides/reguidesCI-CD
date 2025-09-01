@@ -34,12 +34,19 @@ class AnalyticsTracker {
   private clickCount: number = 0;
   private maxScrollDepth: number = 0;
   private isTracking: boolean = false;
+  private isFirstVisit: boolean = false;
 
   constructor() {
     // Генерируем анонимный ID сессии (хешированный)
     this.anonymousSessionId = this.generateAnonymousSessionId();
     this.pageStart = new Date();
     this.currentPage = window.location.pathname;
+    
+    // Проверяем, первый ли это визит
+    this.isFirstVisit = !localStorage.getItem('hasVisitedBefore');
+    if (this.isFirstVisit) {
+      localStorage.setItem('hasVisitedBefore', 'true');
+    }
     
     this.initTracking();
   }
