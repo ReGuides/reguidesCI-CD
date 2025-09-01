@@ -1,20 +1,27 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
+  Home, 
   Users, 
-  Sword, 
-  Shield, 
+  Target, 
   FileText, 
   Settings, 
+  Megaphone, 
   BarChart3,
-  Home,
-  Megaphone,
-  Newspaper,
-  UserCheck,
-  FileText as LogsIcon
+  LogsIcon
 } from 'lucide-react';
+
+interface NavigationStats {
+  characters: number;
+  weapons: number;
+  artifacts: number;
+  news: number;
+  users: number;
+  advertisements: number;
+}
 
 interface AdminNavigationProps {
   className?: string;
@@ -22,6 +29,35 @@ interface AdminNavigationProps {
 
 export default function AdminNavigation({ className = '' }: AdminNavigationProps) {
   const pathname = usePathname();
+  const [navigationStats, setNavigationStats] = useState<NavigationStats>({
+    characters: 0,
+    weapons: 0,
+    artifacts: 0,
+    news: 0,
+    users: 0,
+    advertisements: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNavigationStats = async () => {
+      try {
+        const response = await fetch('/api/admin/navigation-stats');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setNavigationStats(data.data);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch navigation stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNavigationStats();
+  }, []);
 
   const navigationItems = [
     {
@@ -43,12 +79,12 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
     {
       href: '/admin/weapons',
       label: 'Оружие',
-      icon: Sword
+      icon: Target
     },
     {
       href: '/admin/artifacts',
       label: 'Артефакты',
-      icon: Shield
+      icon: Target
     },
     {
       href: '/admin/articles',
@@ -58,12 +94,12 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
     {
       href: '/admin/news',
       label: 'Новости',
-      icon: Newspaper
+      icon: Target
     },
     {
       href: '/admin/users',
       label: 'Пользователи',
-      icon: UserCheck
+      icon: Target
     },
     {
       href: '/admin/settings',
@@ -127,27 +163,27 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span className="text-neutral-400">Персонажей:</span>
-              <span className="text-white font-semibold">127</span>
+              <span className="text-white font-semibold">{loading ? 'Загрузка...' : navigationStats.characters}</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-neutral-400">Оружия:</span>
-              <span className="text-white font-semibold">89</span>
+              <span className="text-white font-semibold">{loading ? 'Загрузка...' : navigationStats.weapons}</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-neutral-400">Артефактов:</span>
-              <span className="text-white font-semibold">52</span>
+              <span className="text-white font-semibold">{loading ? 'Загрузка...' : navigationStats.artifacts}</span>
             </div>
             <div className="flex justify-between text-xs">
-              <span className="text-neutral-400">Статей:</span>
-              <span className="text-white font-semibold">24</span>
+              <span className="text-neutral-400">Новостей:</span>
+              <span className="text-white font-semibold">{loading ? 'Загрузка...' : navigationStats.news}</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-neutral-400">Пользователей:</span>
-              <span className="text-white font-semibold">12</span>
+              <span className="text-white font-semibold">{loading ? 'Загрузка...' : navigationStats.users}</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-neutral-400">Рекламы:</span>
-              <span className="text-white font-semibold">8</span>
+              <span className="text-white font-semibold">{loading ? 'Загрузка...' : navigationStats.advertisements}</span>
             </div>
           </div>
         </div>
