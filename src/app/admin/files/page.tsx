@@ -297,7 +297,7 @@ export default function FilesManagementPage() {
                 <p className="text-gray-400 text-center py-8">Нет файлов</p>
               ) : (
                 <div className="space-y-3">
-                  {categoryFiles.map((file) => (
+                  {categoryFiles.map((file: FileInfo) => (
                     <div key={file.path} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         {file.type === 'image' && (
