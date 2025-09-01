@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { IAbout, Feature, TeamMember } from '@/lib/db/models/About';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import { Copy, Check } from 'lucide-react';
 
 interface Stats {
   characters: number;
@@ -19,6 +20,7 @@ export default function AboutPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedEmails, setCopiedEmails] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadAbout = async () => {
@@ -51,6 +53,40 @@ export default function AboutPage() {
     };
     loadStats();
   }, []);
+
+  const copyEmail = async (email: string) => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedEmails(prev => new Set(prev).add(email));
+      
+      // Сбрасываем статус копирования через 2 секунды
+      setTimeout(() => {
+        setCopiedEmails(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(email);
+          return newSet;
+        });
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy email:', error);
+      // Fallback для старых браузеров
+      const textArea = document.createElement('textarea');
+      textArea.value = email;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      setCopiedEmails(prev => new Set(prev).add(email));
+      setTimeout(() => {
+        setCopiedEmails(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(email);
+          return newSet;
+        });
+      }, 2000);
+    }
+  };
 
   const renderFeature = (feature: Feature) => (
     <div key={feature.title} className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl hover:bg-neutral-750 transition-colors">
@@ -219,13 +255,18 @@ export default function AboutPage() {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {about.contactInfo.email && (
-                <a 
-                  href={`mailto:${about.contactInfo.email}`}
-                  className="flex items-center justify-center gap-2 p-4 bg-neutral-700 rounded-lg hover:bg-neutral-600 transition-colors"
+                <button 
+                  onClick={() => copyEmail(about.contactInfo.email!)}
+                  className="flex items-center justify-center gap-2 p-4 bg-neutral-700 rounded-lg hover:bg-neutral-600 transition-colors w-full"
                 >
                   <span className="text-2xl">📧</span>
                   <span className="text-white">Email</span>
-                </a>
+                  {copiedEmails.has(about.contactInfo.email!) ? (
+                    <Check className="w-4 h-4 text-green-400" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-neutral-400" />
+                  )}
+                </button>
               )}
               {about.contactInfo.telegram && (
                 <a 

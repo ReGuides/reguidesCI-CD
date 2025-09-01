@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Mail, MessageCircle, Globe, ExternalLink } from 'lucide-react';
+import { X, Mail, MessageCircle, Globe, ExternalLink, Copy, Check } from 'lucide-react';
 
 interface Contacts {
   email?: string;
@@ -20,6 +20,7 @@ interface ContactsModalProps {
 export function ContactsModal({ isOpen, onClose }: ContactsModalProps) {
   const [contacts, setContacts] = useState<Contacts>({});
   const [loading, setLoading] = useState(true);
+  const [copiedEmails, setCopiedEmails] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (isOpen) {
@@ -41,6 +42,40 @@ export function ContactsModal({ isOpen, onClose }: ContactsModalProps) {
       console.error('Error loading contacts:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const copyEmail = async (email: string) => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedEmails(prev => new Set(prev).add(email));
+      
+      // Сбрасываем статус копирования через 2 секунды
+      setTimeout(() => {
+        setCopiedEmails(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(email);
+          return newSet;
+        });
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy email:', error);
+      // Fallback для старых браузеров
+      const textArea = document.createElement('textarea');
+      textArea.value = email;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      setCopiedEmails(prev => new Set(prev).add(email));
+      setTimeout(() => {
+        setCopiedEmails(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(email);
+          return newSet;
+        });
+      }, 2000);
     }
   };
 
@@ -76,14 +111,18 @@ export function ContactsModal({ isOpen, onClose }: ContactsModalProps) {
 
               <div className="space-y-3">
                 {contacts.email && (
-                  <a
-                    href={`mailto:${contacts.email}`}
-                    className="flex items-center gap-3 p-3 bg-neutral-700/50 rounded-lg hover:bg-neutral-700 transition-colors text-white"
+                  <button
+                    onClick={() => copyEmail(contacts.email!)}
+                    className="flex items-center gap-3 p-3 bg-neutral-700/50 rounded-lg hover:bg-neutral-700 transition-colors text-white w-full text-left"
                   >
                     <Mail className="w-5 h-5 text-blue-400 flex-shrink-0" />
                     <span className="flex-1">{contacts.email}</span>
-                    <ExternalLink className="w-4 h-4 text-neutral-400" />
-                  </a>
+                    {copiedEmails.has(contacts.email!) ? (
+                      <Check className="w-4 h-4 text-green-400" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-neutral-400" />
+                    )}
+                  </button>
                 )}
 
                 {contacts.telegram && (
