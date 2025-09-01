@@ -11,7 +11,8 @@ import {
   Settings, 
   Megaphone, 
   BarChart3,
-  LogsIcon
+  LogsIcon,
+  FolderOpen
 } from 'lucide-react';
 
 interface NavigationStats {
@@ -115,6 +116,11 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
       href: '/admin/logs',
       label: 'Логи',
       icon: LogsIcon
+    },
+    {
+      href: '/admin/files',
+      label: 'Файлы',
+      icon: FolderOpen
     }
   ];
 
