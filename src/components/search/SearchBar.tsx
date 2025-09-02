@@ -81,7 +81,9 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
       if (query.trim().length >= 2) {
         setIsLoading(true);
         try {
+          console.log('SearchBar: Making API call to:', `/api/search?q=${encodeURIComponent(query.trim())}`);
           const response = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
+          console.log('SearchBar: API response status:', response.status);
           if (response.ok) {
             const data = await response.json();
             console.log('SearchBar: API response:', data);

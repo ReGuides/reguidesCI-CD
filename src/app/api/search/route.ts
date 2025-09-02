@@ -64,10 +64,12 @@ export async function GET(request: NextRequest) {
       const charactersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/characters`);
       if (charactersResponse.ok) {
         const charactersData = await charactersResponse.json();
-        const characters = Array.isArray(charactersData) ? charactersData : charactersData.characters || [];
+        const characters = Array.isArray(charactersData) ? charactersData : charactersData.data || [];
         
         console.log('Search API: Found characters:', characters.length);
         console.log('Search API: Characters data structure:', charactersData);
+        console.log('Search API: Search term:', searchTerm);
+        console.log('Search API: First few characters:', characters.slice(0, 3).map((c: CharacterData) => ({ name: c.name, element: c.element })));
 
         characters.forEach((char: CharacterData) => {
           if (char.name && char.name.toLowerCase().includes(searchTerm)) {
@@ -91,7 +93,11 @@ export async function GET(request: NextRequest) {
       const weaponsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/weapons`);
       if (weaponsResponse.ok) {
         const weaponsData = await weaponsResponse.json();
-        const weapons = Array.isArray(weaponsData) ? weaponsData : weaponsData.weapons || [];
+        const weapons = Array.isArray(weaponsData) ? weaponsData : weaponsData.data || [];
+        
+        console.log('Search API: Found weapons:', weapons.length);
+        console.log('Search API: Weapons data structure:', weaponsData);
+        console.log('Search API: First few weapons:', weapons.slice(0, 3).map((w: WeaponData) => ({ name: w.name, type: w.type })));
 
         weapons.forEach((weapon: WeaponData) => {
           if (weapon.name && weapon.name.toLowerCase().includes(searchTerm)) {
@@ -115,7 +121,11 @@ export async function GET(request: NextRequest) {
       const artifactsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/artifacts`);
       if (artifactsResponse.ok) {
         const artifactsData = await artifactsResponse.json();
-        const artifacts = Array.isArray(artifactsData) ? artifactsData : artifactsData.artifacts || [];
+        const artifacts = Array.isArray(artifactsData) ? artifactsData : artifactsData.data || [];
+        
+        console.log('Search API: Found artifacts:', artifacts.length);
+        console.log('Search API: Artifacts data structure:', artifactsData);
+        console.log('Search API: First few artifacts:', artifacts.slice(0, 3).map((a: ArtifactData) => ({ name: a.name, rarity: a.rarity })));
 
         artifacts.forEach((artifact: ArtifactData) => {
           if (artifact.name && artifact.name.toLowerCase().includes(searchTerm)) {
@@ -141,6 +151,13 @@ export async function GET(request: NextRequest) {
 
     // Ограничиваем количество результатов
     const limitedResults = results.slice(0, 20);
+    
+    console.log('Search API: Final results count:', limitedResults.length);
+    console.log('Search API: Results by type:', {
+      characters: limitedResults.filter(r => r.type === 'character').length,
+      weapons: limitedResults.filter(r => r.type === 'weapon').length,
+      artifacts: limitedResults.filter(r => r.type === 'artifact').length
+    });
 
     return NextResponse.json({ results: limitedResults });
   } catch (error) {
