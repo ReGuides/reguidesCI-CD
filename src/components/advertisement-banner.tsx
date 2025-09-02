@@ -97,6 +97,16 @@ export default function AdvertisementBanner() {
               <p className="text-gray-300 text-xs leading-tight line-clamp-2">
                 {advertisement.description}
               </p>
+              
+              {/* Отображаем ERID если он указан */}
+              {advertisement.erid && (
+                <div className="mt-1 flex items-center gap-1">
+                  <span className="text-xs text-gray-500 uppercase tracking-wide">ERID:</span>
+                  <span className="text-xs font-mono text-blue-300 bg-neutral-800 px-1.5 py-0.5 rounded text-xs">
+                    {advertisement.erid}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
           

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Advertisement } from '@/types';
 import Image from 'next/image';
-import { X } from 'lucide-react';
+
 
 export default function AdvertisementPopup() {
   const [advertisement, setAdvertisement] = useState<Advertisement | null>(null);
@@ -89,16 +89,15 @@ export default function AdvertisementPopup() {
   const imageUrl = getImageUrl(advertisement.backgroundImage);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
-      <div className="bg-neutral-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl relative">
-        {/* Кнопка закрытия - перемещена в правый верхний угол изображения */}
-        <button
-          onClick={() => setIsVisible(false)}
-          className="absolute top-3 right-3 z-10 w-8 h-8 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors backdrop-blur-sm"
-          aria-label="Закрыть рекламу"
-        >
-          <X className="w-4 h-4" />
-        </button>
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4 transition-opacity duration-300"
+      onClick={() => setIsVisible(false)} // Закрытие по клику вне модалки
+    >
+      <div 
+        className="bg-neutral-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl relative transform transition-all duration-300 scale-100 opacity-100"
+        onClick={(e) => e.stopPropagation()} // Предотвращаем закрытие при клике на модалку
+      >
+
         
         {/* Изображение */}
         {imageUrl && !imageError && (
@@ -133,19 +132,32 @@ export default function AdvertisementPopup() {
         
         {/* Контент */}
         <div className="p-6">
-          <div className="mb-4">
-            <h2 className="text-xl font-bold text-white mb-2">{advertisement.title || 'Реклама'}</h2>
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-white mb-3">{advertisement.title || 'Реклама'}</h2>
             <p className="text-gray-300 text-sm leading-relaxed">
               {advertisement.description || 'Описание рекламы'}
             </p>
+            
+            {/* Отображаем ERID если он указан */}
+            {advertisement.erid && (
+              <div className="mt-3 p-2 bg-neutral-700/50 rounded-lg border border-neutral-600">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">ERID:</span>
+                  <span className="text-xs font-mono text-blue-300 bg-neutral-800 px-2 py-1 rounded">
+                    {advertisement.erid}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3">
+            {/* Основная кнопка действия */}
             <a
               href={advertisement.url || '#'}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold rounded-lg transition-all duration-200 text-center shadow-lg hover:shadow-purple-500/25 transform hover:scale-105"
+              className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-lg transition-all duration-200 text-center shadow-lg hover:shadow-blue-500/25 transform hover:scale-105 border-0 text-base"
               onClick={() => {
                 // Отправляем событие клика по рекламе
                 if (typeof window !== 'undefined' && window.trackAdClick) {
@@ -155,9 +167,11 @@ export default function AdvertisementPopup() {
             >
               {advertisement.cta || 'Узнать больше'}
             </a>
+            
+            {/* Кнопка "Позже" */}
             <button
               onClick={() => setIsVisible(false)}
-              className="px-6 py-4 bg-neutral-700 hover:bg-neutral-600 text-gray-300 hover:text-white font-medium rounded-lg transition-colors border border-neutral-600 hover:border-neutral-500"
+              className="w-full px-6 py-3 bg-transparent hover:bg-neutral-700 text-gray-400 hover:text-white font-medium rounded-lg transition-colors border border-neutral-600 hover:border-neutral-500 text-sm"
             >
               Позже
             </button>

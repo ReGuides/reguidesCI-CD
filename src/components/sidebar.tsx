@@ -259,6 +259,19 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
               <div className="p-4">
                 <h4 className="text-white font-semibold text-sm mb-2">{ad.title}</h4>
                 <p className="text-gray-300 text-xs mb-3 line-clamp-2">{ad.description}</p>
+                
+                {/* Отображаем ERID если он указан */}
+                {ad.erid && (
+                  <div className="mb-3 p-2 bg-neutral-700/50 rounded border border-neutral-600">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400 uppercase tracking-wide">ERID:</span>
+                      <span className="text-xs font-mono text-blue-300 bg-neutral-800 px-2 py-1 rounded">
+                        {ad.erid}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
                 <a
                   href={ad.url}
                   target="_blank"
