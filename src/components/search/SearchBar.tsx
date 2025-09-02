@@ -187,15 +187,14 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
       return imageUrl;
     }
     
-    // Если URL начинается с /, убираем лишний / в начале
+    // Если URL начинается с /, возвращаем как есть (абсолютный путь)
     if (imageUrl.startsWith('/')) {
-      const result = imageUrl.substring(1);
-      console.log('SearchBar: getImageUrl - removing leading /, result:', result);
-      return result;
+      console.log('SearchBar: getImageUrl - absolute path, returning as is:', imageUrl);
+      return imageUrl;
     }
     
-    // Иначе добавляем базовый путь
-    const result = `${type}s/${imageUrl}`;
+    // Иначе добавляем базовый путь с / в начале для Next.js Image
+    const result = `/${type}s/${imageUrl}`;
     console.log('SearchBar: getImageUrl - adding base path, result:', result);
     return result;
   };
