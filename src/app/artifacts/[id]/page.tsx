@@ -6,12 +6,20 @@ import Link from 'next/link';
 import { Artifact } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import PageTitle from '@/components/ui/page-title';
 
 export default function ArtifactDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [artifact, setArtifact] = useState<Artifact | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Устанавливаем заголовок страницы
+  useEffect(() => {
+    if (artifact) {
+      document.title = `${artifact.name} - ReGuides`;
+    }
+  }, [artifact]);
 
   useEffect(() => {
     const fetchArtifact = async () => {

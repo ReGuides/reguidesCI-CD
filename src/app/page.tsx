@@ -10,6 +10,7 @@ import NewsSection from '@/components/news-section';
 import FriendsSection from '@/components/friends-section';
 import CharacterCarousel from '@/components/character-carousel';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import PageTitle from '@/components/ui/page-title';
 
 
 function parsePatchNumber(patch?: string): number {
@@ -25,6 +26,15 @@ function sortByPatchNumber(a: Character, b: Character): number {
 }
 
 export default function HomePage() {
+  return (
+    <>
+      <PageTitle title="Главная" />
+      <HomePageContent />
+    </>
+  );
+}
+
+function HomePageContent() {
   const router = useRouter();
   const [characters, setCharacters] = useState<Character[]>([]);
   const [allStats, setAllStats] = useState<{ _id: string; views: number }[]>([]);

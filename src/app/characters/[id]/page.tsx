@@ -17,6 +17,7 @@ import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
 import { Weapon, Artifact, Talent } from '@/types';
+import PageTitle from '@/components/ui/page-title';
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations'; // weapons теперь используется для рекомендаций
 
@@ -33,6 +34,13 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
   const [isGameplayDescriptionCollapsed, setIsGameplayDescriptionCollapsed] = useState(false);
+
+  // Устанавливаем заголовок страницы
+  useEffect(() => {
+    if (character) {
+      document.title = `${character.name} - ReGuides`;
+    }
+  }, [character]);
 
   useEffect(() => {
     const fetchCharacter = async () => {

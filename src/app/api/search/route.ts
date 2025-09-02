@@ -66,21 +66,11 @@ export async function GET(request: NextRequest) {
         const charactersData = await charactersResponse.json();
         const characters = Array.isArray(charactersData) ? charactersData : charactersData.data || [];
         
-        console.log('Search API: Found characters:', characters.length);
-        console.log('Search API: Characters data structure:', charactersData);
-        console.log('Search API: Search term:', searchTerm);
-        console.log('Search API: First few characters:', characters.slice(0, 3).map((c: CharacterData) => ({ name: c.name, element: c.element })));
+
 
         characters.forEach((char: CharacterData) => {
           if (char.name && char.name.toLowerCase().includes(searchTerm)) {
-            console.log('Search API: Adding character:', { 
-          name: char.name, 
-          image: char.image,
-          imageType: typeof char.image,
-          imageLength: char.image?.length || 0,
-          finalImagePath: char.image,
-          originalImagePath: char.image
-        });
+    
             results.push({
               id: char.id || char._id || '',
               name: char.name,
@@ -103,20 +93,11 @@ export async function GET(request: NextRequest) {
         const weaponsData = await weaponsResponse.json();
         const weapons = Array.isArray(weaponsData) ? weaponsData : weaponsData.data || [];
         
-        console.log('Search API: Found weapons:', weapons.length);
-        console.log('Search API: Weapons data structure:', weaponsData);
-        console.log('Search API: First few weapons:', weapons.slice(0, 3).map((w: WeaponData) => ({ name: w.name, type: w.type, image: w.image })));
+
 
         weapons.forEach((weapon: WeaponData) => {
           if (weapon.name && weapon.name.toLowerCase().includes(searchTerm)) {
-            console.log('Search API: Adding weapon:', { 
-          name: weapon.name, 
-          image: weapon.image,
-          imageType: typeof weapon.image,
-          imageLength: weapon.image?.length || 0,
-          finalImagePath: weapon.image,
-          originalImagePath: weapon.image
-        });
+    
             results.push({
               id: weapon.id || weapon._id || '',
               name: weapon.name,
@@ -139,20 +120,11 @@ export async function GET(request: NextRequest) {
         const artifactsData = await artifactsResponse.json();
         const artifacts = Array.isArray(artifactsData) ? artifactsData : artifactsData.data || [];
         
-        console.log('Search API: Found artifacts:', artifacts.length);
-        console.log('Search API: Artifacts data structure:', artifactsData);
-        console.log('Search API: First few artifacts:', artifacts.slice(0, 3).map((a: ArtifactData) => ({ name: a.name, rarity: a.rarity, image: a.image })));
+
 
         artifacts.forEach((artifact: ArtifactData) => {
           if (artifact.name && artifact.name.toLowerCase().includes(searchTerm)) {
-            console.log('Search API: Adding artifact:', { 
-          name: artifact.name, 
-          image: artifact.image,
-          imageType: typeof artifact.image,
-          imageLength: artifact.image?.length || 0,
-          finalImagePath: artifact.image,
-          originalImagePath: artifact.image
-        });
+    
             results.push({
               id: artifact.id || artifact._id || '',
               name: artifact.name,
@@ -176,12 +148,7 @@ export async function GET(request: NextRequest) {
     // Ограничиваем количество результатов
     const limitedResults = results.slice(0, 20);
     
-    console.log('Search API: Final results count:', limitedResults.length);
-    console.log('Search API: Results by type:', {
-      characters: limitedResults.filter(r => r.type === 'character').length,
-      weapons: limitedResults.filter(r => r.type === 'weapon').length,
-      artifacts: limitedResults.filter(r => r.type === 'artifact').length
-    });
+
 
     return NextResponse.json({ results: limitedResults });
   } catch (error) {

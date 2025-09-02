@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { IAbout, TeamMember } from '@/lib/db/models/About';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Copy, Check } from 'lucide-react';
+import PageTitle from '@/components/ui/page-title';
 
 interface Stats {
   characters: number;
@@ -16,6 +17,15 @@ interface Stats {
 
 
 export default function AboutPage() {
+  return (
+    <>
+      <PageTitle title="О проекте" />
+      <AboutPageContent />
+    </>
+  );
+}
+
+function AboutPageContent() {
   const [about, setAbout] = useState<IAbout | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);

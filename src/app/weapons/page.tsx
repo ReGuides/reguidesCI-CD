@@ -5,8 +5,18 @@ import { WeaponCard } from '@/components/weapon-card';
 import { WeaponFilters } from '@/components/features/weapon-filters';
 import { Weapon } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import PageTitle from '@/components/ui/page-title';
 
 export default function WeaponsPage() {
+  return (
+    <>
+      <PageTitle title="Оружие" />
+      <WeaponsPageContent />
+    </>
+  );
+}
+
+function WeaponsPageContent() {
   const [weapons, setWeapons] = useState<Weapon[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

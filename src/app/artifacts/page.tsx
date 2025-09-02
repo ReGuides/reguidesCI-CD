@@ -5,8 +5,18 @@ import { ArtifactCard } from '@/components/artifact-card';
 import { ArtifactFilters } from '@/components/features/artifact-filters';
 import { Artifact } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import PageTitle from '@/components/ui/page-title';
 
 export default function ArtifactsPage() {
+  return (
+    <>
+      <PageTitle title="Артефакты" />
+      <ArtifactsPageContent />
+    </>
+  );
+}
+
+function ArtifactsPageContent() {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

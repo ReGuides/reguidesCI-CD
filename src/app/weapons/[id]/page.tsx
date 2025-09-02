@@ -6,12 +6,20 @@ import Link from 'next/link';
 import { Weapon } from '@/types';
 import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import PageTitle from '@/components/ui/page-title';
 
 export default function WeaponDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [weapon, setWeapon] = useState<Weapon | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Устанавливаем заголовок страницы
+  useEffect(() => {
+    if (weapon) {
+      document.title = `${weapon.name} - ReGuides`;
+    }
+  }, [weapon]);
 
   useEffect(() => {
     const fetchWeapon = async () => {

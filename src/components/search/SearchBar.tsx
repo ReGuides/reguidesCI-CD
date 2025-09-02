@@ -81,21 +81,14 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
       if (query.trim().length >= 2) {
         setIsLoading(true);
         try {
-          console.log('SearchBar: Making API call to:', `/api/search?q=${encodeURIComponent(query.trim())}`);
-          const response = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
-          console.log('SearchBar: API response status:', response.status);
-          if (response.ok) {
-            const data = await response.json();
-            console.log('SearchBar: API response:', data);
-            console.log('SearchBar: Results count:', data.results?.length || 0);
-            console.log('SearchBar: First few results with images:', data.results?.slice(0, 3).map((r: SearchResult) => ({ name: r.name, type: r.type, image: r.image })));
+                     const response = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
+           if (response.ok) {
+             const data = await response.json();
             setResults(data.results || []);
             setShowResults(true);
             // Позиционируем результаты после их показа
             setTimeout(positionSearchResults, 0);
-          } else {
-            console.error('SearchBar: API response not ok:', response.status, response.statusText);
-          }
+                     }
         } catch (error) {
           console.error('Search error:', error);
         } finally {
@@ -118,35 +111,25 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
       router.push(`/characters/${result.id}`);
          } else if (result.type === 'weapon') {
        // Загружаем полные данные оружия и открываем модальное окно
-       try {
-         console.log('SearchBar: Loading weapon data for ID:', result.id);
-         const response = await fetch(`/api/weapons/${result.id}`);
-         console.log('SearchBar: Weapon API response status:', response.status);
-         if (response.ok) {
-           const weapon = await response.json();
-           console.log('SearchBar: Weapon data loaded:', weapon);
+               try {
+          const response = await fetch(`/api/weapons/${result.id}`);
+          if (response.ok) {
+            const weapon = await response.json();
            setSelectedWeapon(weapon);
            setIsWeaponModalOpen(true);
-         } else {
-           console.error('SearchBar: Weapon API response not ok:', response.status, response.statusText);
-         }
+                   }
        } catch (error) {
          console.error('Error loading weapon:', error);
        }
          } else if (result.type === 'artifact') {
        // Загружаем полные данные артефакта и открываем модальное окно
-       try {
-         console.log('SearchBar: Loading artifact data for ID:', result.id);
-         const response = await fetch(`/api/artifacts/${result.id}`);
-         console.log('SearchBar: Artifact API response status:', response.status);
-         if (response.ok) {
-           const artifact = await response.json();
-           console.log('SearchBar: Artifact data loaded:', artifact);
+               try {
+          const response = await fetch(`/api/artifacts/${result.id}`);
+          if (response.ok) {
+            const artifact = await response.json();
            setSelectedArtifact(artifact);
            setIsArtifactModalOpen(true);
-         } else {
-           console.error('SearchBar: Artifact API response not ok:', response.status, response.statusText);
-         }
+                   }
        } catch (error) {
          console.error('Error loading artifact:', error);
        }
@@ -175,28 +158,21 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
   // Функция для проверки и исправления пути изображения
   const getImageUrl = (imageUrl: string | undefined, type: 'character' | 'weapon' | 'artifact') => {
     if (!imageUrl || imageUrl.trim() === '') {
-      console.log('SearchBar: getImageUrl - empty imageUrl');
       return null;
     }
     
-    console.log('SearchBar: getImageUrl - input:', { imageUrl, type });
-    
     // Если URL уже полный (начинается с http), возвращаем как есть
     if (imageUrl.startsWith('http')) {
-      console.log('SearchBar: getImageUrl - full URL, returning as is:', imageUrl);
       return imageUrl;
     }
     
     // Если URL начинается с /, возвращаем как есть (абсолютный путь)
     if (imageUrl.startsWith('/')) {
-      console.log('SearchBar: getImageUrl - absolute path, returning as is:', imageUrl);
       return imageUrl;
     }
     
     // Иначе добавляем базовый путь с / в начале для Next.js Image
-    const result = `/images/${type}s/${imageUrl}`;
-    console.log('SearchBar: getImageUrl - adding base path, result:', result);
-    return result;
+    return `/images/${type}s/${imageUrl}`;
   };
 
   const groupResults = () => {
@@ -210,10 +186,7 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
 
   const groupedResults = groupResults();
   
-  // Отладочная информация
-  console.log('SearchBar: Current results:', results);
-  console.log('SearchBar: Grouped results:', groupedResults);
-  console.log('SearchBar: Show results:', showResults);
+
 
   return (
     <div className={`relative ${className}`} ref={searchRef}>
@@ -286,19 +259,15 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
                                width={40}
                                height={40}
                                className="w-full h-full object-cover"
-                               onError={(e) => {
-                                 console.log('SearchBar: Character image failed to load:', imageUrl);
-                                 const target = e.target as HTMLImageElement;
-                                 target.style.display = 'none';
-                                 // Показываем placeholder вместо сломанного изображения
-                                 const placeholder = target.parentElement?.querySelector('.placeholder') as HTMLElement;
-                                 if (placeholder) {
-                                   placeholder.style.display = 'flex';
-                                 }
-                               }}
-                               onLoad={() => {
-                                 console.log('SearchBar: Character image loaded successfully:', imageUrl);
-                               }}
+                                                               onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  // Показываем placeholder вместо сломанного изображения
+                                  const placeholder = target.parentElement?.querySelector('.placeholder') as HTMLElement;
+                                  if (placeholder) {
+                                    placeholder.style.display = 'flex';
+                                  }
+                                }}
                              />
                            ) : null;
                          })()}
@@ -352,19 +321,15 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
                                width={40}
                                height={40}
                                className="w-full h-full object-cover"
-                               onError={(e) => {
-                                 console.log('SearchBar: Weapon image failed to load:', imageUrl);
-                                 const target = e.target as HTMLImageElement;
-                                 target.style.display = 'none';
-                                 // Показываем placeholder вместо сломанного изображения
-                                 const placeholder = target.parentElement?.querySelector('.placeholder') as HTMLElement;
-                                 if (placeholder) {
-                                   placeholder.style.display = 'flex';
-                                 }
-                               }}
-                               onLoad={() => {
-                                 console.log('SearchBar: Weapon image loaded successfully:', imageUrl);
-                               }}
+                                                               onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  // Показываем placeholder вместо сломанного изображения
+                                  const placeholder = target.parentElement?.querySelector('.placeholder') as HTMLElement;
+                                  if (placeholder) {
+                                    placeholder.style.display = 'flex';
+                                  }
+                                }}
                              />
                            ) : null;
                          })()}
@@ -415,19 +380,15 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
                                width={40}
                                height={40}
                                className="w-full h-full object-cover"
-                               onError={(e) => {
-                                 console.log('SearchBar: Artifact image failed to load:', imageUrl);
-                                 const target = e.target as HTMLImageElement;
-                                 target.style.display = 'none';
-                                 // Показываем placeholder вместо сломанного изображения
-                                 const placeholder = target.parentElement?.querySelector('.placeholder') as HTMLElement;
-                                 if (placeholder) {
-                                   placeholder.style.display = 'flex';
-                                 }
-                               }}
-                               onLoad={() => {
-                                 console.log('SearchBar: Artifact image loaded successfully:', imageUrl);
-                               }}
+                                                               onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  // Показываем placeholder вместо сломанного изображения
+                                  const placeholder = target.parentElement?.querySelector('.placeholder') as HTMLElement;
+                                  if (placeholder) {
+                                    placeholder.style.display = 'flex';
+                                  }
+                                }}
                              />
                            ) : null;
                          })()}

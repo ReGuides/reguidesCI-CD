@@ -7,6 +7,7 @@ import { Calendar, Eye, Tag, User, X } from 'lucide-react';
 import Image from 'next/image';
 import { getNewsImage, getNewsImageAlt } from '@/lib/utils/newsImageUtils';
 import { useRouter } from 'next/navigation';
+import PageTitle from '@/components/ui/page-title';
 
 interface NewsFilters {
   type?: string;
@@ -25,6 +26,15 @@ interface Pagination {
 }
 
 export default function ArticlesPage() {
+  return (
+    <>
+      <PageTitle title="Статьи" />
+      <ArticlesPageContent />
+    </>
+  );
+}
+
+function ArticlesPageContent() {
   const router = useRouter();
   const [news, setNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);

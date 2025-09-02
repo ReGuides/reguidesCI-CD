@@ -5,8 +5,18 @@ import { CharacterCard } from '@/components/character-card';
 import { CharacterFilters } from '@/components/features/character-filters';
 import { Character } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import PageTitle from '@/components/ui/page-title';
 
 export default function CharactersPage() {
+  return (
+    <>
+      <PageTitle title="Персонажи" />
+      <CharactersPageContent />
+    </>
+  );
+}
+
+function CharactersPageContent() {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
