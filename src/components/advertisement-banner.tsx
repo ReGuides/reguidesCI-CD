@@ -118,7 +118,8 @@ export default function AdvertisementBanner() {
                 }
                 setIsVisible(false);
               }}
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-sm font-semibold rounded transition-all duration-200 shadow-md hover:shadow-purple-500/25"
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white !text-white text-sm font-semibold rounded transition-all duration-200 shadow-md hover:shadow-purple-500/25"
+              style={{ color: 'white' }}
             >
               {advertisement.cta || 'Перейти'}
             </button>

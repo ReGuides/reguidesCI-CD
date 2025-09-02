@@ -159,7 +159,8 @@ export default function AdvertisementPopup() {
                   }
                   setIsVisible(false); // Use setIsVisible to close the popup
                 }}
-                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-purple-500/25"
+                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white !text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-purple-500/25"
+                style={{ color: 'white' }}
               >
                 {advertisement.cta || 'Перейти'}
               </button>
