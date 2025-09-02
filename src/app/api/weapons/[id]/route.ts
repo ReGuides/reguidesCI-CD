@@ -36,6 +36,7 @@ export async function GET(
     }
 
     // Убираем служебные поля MongoDB
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, __v, ...cleanWeapon } = weapon;
 
     return NextResponse.json(cleanWeapon);

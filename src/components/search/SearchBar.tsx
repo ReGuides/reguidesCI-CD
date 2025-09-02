@@ -88,7 +88,7 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
             const data = await response.json();
             console.log('SearchBar: API response:', data);
             console.log('SearchBar: Results count:', data.results?.length || 0);
-            console.log('SearchBar: First few results with images:', data.results?.slice(0, 3).map((r: any) => ({ name: r.name, type: r.type, image: r.image })));
+            console.log('SearchBar: First few results with images:', data.results?.slice(0, 3).map((r: SearchResult) => ({ name: r.name, type: r.type, image: r.image })));
             setResults(data.results || []);
             setShowResults(true);
             // Позиционируем результаты после их показа

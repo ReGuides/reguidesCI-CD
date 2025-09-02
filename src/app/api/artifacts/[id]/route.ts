@@ -36,6 +36,7 @@ export async function GET(
     }
 
     // Убираем служебные поля MongoDB и очищаем данные
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, __v, createdAt, updatedAt, ...cleanArtifact } = artifact;
     
     // Убеждаемся, что все поля являются примитивами
