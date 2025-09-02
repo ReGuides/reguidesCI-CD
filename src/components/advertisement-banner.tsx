@@ -111,31 +111,17 @@ export default function AdvertisementBanner() {
           </div>
           
           <div className="flex items-center gap-3 flex-shrink-0">
-            <a
-              href={advertisement.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-xs font-bold rounded transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-purple-500/25"
-              onClick={async () => {
-                // Отслеживаем клик по рекламе
-                if (advertisement._id) {
-                  try {
-                    await fetch(`/api/advertisements/${advertisement._id}/click`, {
-                      method: 'POST'
-                    });
-                    
-                    // Отправляем событие клика по рекламе
-                    if (typeof window !== 'undefined' && window.trackAdClick) {
-                      window.trackAdClick(advertisement._id, 'banner', 'header', advertisement.title);
-                    }
-                  } catch (error) {
-                    console.error('Error tracking click:', error);
-                  }
+            <button
+              onClick={() => {
+                if (advertisement.url) {
+                  window.open(advertisement.url, '_blank', 'noopener,noreferrer');
                 }
+                setIsVisible(false);
               }}
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-sm font-semibold rounded transition-all duration-200 shadow-md hover:shadow-purple-500/25"
             >
-              {advertisement.cta}
-            </a>
+              {advertisement.cta || 'Перейти'}
+            </button>
             <button
               onClick={() => setIsVisible(false)}
               className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
