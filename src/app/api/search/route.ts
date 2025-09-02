@@ -21,6 +21,32 @@ interface SearchResult {
   weaponType?: string;
 }
 
+interface CharacterData {
+  _id?: string;
+  id?: string;
+  name: string;
+  image?: string;
+  rarity?: number;
+  element?: string;
+}
+
+interface WeaponData {
+  _id?: string;
+  id?: string;
+  name: string;
+  image?: string;
+  rarity?: number;
+  type?: string;
+}
+
+interface ArtifactData {
+  _id?: string;
+  id?: string;
+  name: string;
+  image?: string;
+  rarity?: number | number[];
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -40,10 +66,10 @@ export async function GET(request: NextRequest) {
         const charactersData = await charactersResponse.json();
         const characters = Array.isArray(charactersData) ? charactersData : charactersData.characters || [];
 
-        characters.forEach((char: any) => {
+        characters.forEach((char: CharacterData) => {
           if (char.name && char.name.toLowerCase().includes(searchTerm)) {
             results.push({
-              id: char.id || char._id,
+              id: char.id || char._id || '',
               name: char.name,
               type: 'character',
               image: char.image,
@@ -64,10 +90,10 @@ export async function GET(request: NextRequest) {
         const weaponsData = await weaponsResponse.json();
         const weapons = Array.isArray(weaponsData) ? weaponsData : weaponsData.weapons || [];
 
-        weapons.forEach((weapon: any) => {
+        weapons.forEach((weapon: WeaponData) => {
           if (weapon.name && weapon.name.toLowerCase().includes(searchTerm)) {
             results.push({
-              id: weapon.id || weapon._id,
+              id: weapon.id || weapon._id || '',
               name: weapon.name,
               type: 'weapon',
               image: weapon.image,
@@ -88,10 +114,10 @@ export async function GET(request: NextRequest) {
         const artifactsData = await artifactsResponse.json();
         const artifacts = Array.isArray(artifactsData) ? artifactsData : artifactsData.artifacts || [];
 
-        artifacts.forEach((artifact: any) => {
+        artifacts.forEach((artifact: ArtifactData) => {
           if (artifact.name && artifact.name.toLowerCase().includes(searchTerm)) {
             results.push({
-              id: artifact.id || artifact._id,
+              id: artifact.id || artifact._id || '',
               name: artifact.name,
               type: 'artifact',
               image: artifact.image,
