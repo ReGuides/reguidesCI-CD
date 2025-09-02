@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Character } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -17,11 +18,19 @@ import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
 import { Weapon, Artifact, Talent } from '@/types';
-import PageTitle from '@/components/ui/page-title';
+
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations'; // weapons теперь используется для рекомендаций
 
 export default function CharacterDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  return (
+    <>
+      <CharacterDetailPageContent params={params} />
+    </>
+  );
+}
+
+function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
@@ -180,15 +189,16 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
             <span className="text-xl">←</span> Назад
           </Link>
           
-          <img 
-            src={getImageWithFallback(character.image, character.name, 'character')} 
-            alt={character.name} 
-            className="w-full h-full object-contain"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = '/images/characters/default.png';
-            }}
-          />
+                     <Image 
+             src={getImageWithFallback(character.image, character.name, 'character')} 
+             alt={character.name} 
+             width={400}
+             height={560}
+             className="w-full h-full object-contain"
+             onError={() => {
+               // Next.js Image автоматически обрабатывает ошибки
+             }}
+           />
           
           <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent py-4 px-4">
             <div className="text-center">

@@ -3,12 +3,21 @@
 import { useState, useEffect } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Artifact } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import PageTitle from '@/components/ui/page-title';
+
 
 export default function ArtifactDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  return (
+    <>
+      <ArtifactDetailPageContent params={params} />
+    </>
+  );
+}
+
+function ArtifactDetailPageContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [artifact, setArtifact] = useState<Artifact | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,15 +81,16 @@ export default function ArtifactDetailPage({ params }: { params: Promise<{ id: s
             {/* Artifact Image */}
             <div className="md:w-1/3">
               <div className="relative">
-                <img
-                  src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
-                  alt={artifact.name}
-                  className="w-full h-96 md:h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = '/images/artifacts/default.png';
-                  }}
-                />
+                                 <Image
+                   src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
+                   alt={artifact.name}
+                   width={400}
+                   height={600}
+                   className="w-full h-96 md:h-full object-cover"
+                   onError={() => {
+                     // Next.js Image автоматически обрабатывает ошибки
+                   }}
+                 />
                 {artifact.rarity && artifact.rarity.length > 0 && (
                   <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">
                     {Math.max(...artifact.rarity)}★

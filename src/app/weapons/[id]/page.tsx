@@ -3,12 +3,21 @@
 import { useState, useEffect } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Weapon } from '@/types';
 import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import PageTitle from '@/components/ui/page-title';
+
 
 export default function WeaponDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  return (
+    <>
+      <WeaponDetailPageContent params={params} />
+    </>
+  );
+}
+
+function WeaponDetailPageContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [weapon, setWeapon] = useState<Weapon | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,15 +81,16 @@ export default function WeaponDetailPage({ params }: { params: Promise<{ id: str
             {/* Weapon Image */}
             <div className="md:w-1/3">
               <div className="relative">
-                <img
-                  src={getSafeImageUrl(weapon.image, weapon.name, 'weapon')}
-                  alt={weapon.name}
-                  className="w-full h-96 md:h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = '/images/weapons/default.png';
-                  }}
-                />
+                                 <Image
+                   src={getSafeImageUrl(weapon.image, weapon.name, 'weapon')}
+                   alt={weapon.name}
+                   width={400}
+                   height={600}
+                   className="w-full h-96 md:h-full object-cover"
+                   onError={() => {
+                     // Next.js Image автоматически обрабатывает ошибки
+                   }}
+                 />
                 {weapon.rarity && (
                   <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">
                     {weapon.rarity}★
