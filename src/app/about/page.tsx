@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { IAbout, Feature, TeamMember } from '@/lib/db/models/About';
+import { IAbout, TeamMember } from '@/lib/db/models/About';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Copy, Check } from 'lucide-react';
 
@@ -88,21 +88,7 @@ export default function AboutPage() {
     }
   };
 
-  const renderFeature = (feature: Feature) => (
-    <div key={feature.title} className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl hover:bg-neutral-750 transition-colors">
-      <div className="flex items-start gap-4">
-        {feature.icon && (
-          <div className="flex-shrink-0 text-3xl">
-            {feature.icon}
-          </div>
-        )}
-        <div>
-          <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-          <p className="text-neutral-400 leading-relaxed">{feature.description}</p>
-        </div>
-      </div>
-    </div>
-  );
+
 
   const renderTeamMember = (member: TeamMember) => (
     <div key={member.name} className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl hover:bg-neutral-750 transition-colors">
@@ -193,8 +179,59 @@ export default function AboutPage() {
           {about.subtitle && (
             <p className="text-xl text-neutral-400 mb-6">{about.subtitle}</p>
           )}
-          <div className="max-w-3xl mx-auto">
-            <p className="text-lg text-neutral-300 leading-relaxed">{about.description}</p>
+          <div className="max-w-4xl mx-auto">
+            <p className="text-lg text-neutral-300 leading-relaxed mb-8">{about.description}</p>
+            
+            {/* Key Advantages - Integrated into main description */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+              <div className="bg-gradient-to-br from-blue-900/20 to-blue-600/20 border border-blue-500/30 p-6 rounded-xl">
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl">🎯</div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Только нужная информация</h3>
+                    <p className="text-blue-100 text-sm leading-relaxed">
+                      Никаких лишних деталей - только то, что нужно для выбора оружия, артефактов и сборки персонажа.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-purple-900/20 to-purple-600/20 border border-purple-500/30 p-6 rounded-xl">
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl">⚡</div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Быстрый поиск</h3>
+                    <p className="text-purple-100 text-sm leading-relaxed">
+                      Находите нужную информацию за несколько кликов без необходимости читать длинные статьи.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-green-900/20 to-green-600/20 border border-green-500/30 p-6 rounded-xl">
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl">📱</div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Адаптивный дизайн</h3>
+                    <p className="text-green-100 text-sm leading-relaxed">
+                      Удобно использовать как на компьютере, так и на мобильных устройствах.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-orange-900/20 to-orange-600/20 border border-orange-500/30 p-6 rounded-xl">
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl">🔍</div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Практичность</h3>
+                    <p className="text-orange-100 text-sm leading-relaxed">
+                      Вся информация структурирована для быстрого принятия решений в игре.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -220,17 +257,7 @@ export default function AboutPage() {
           </div>
         )}
 
-        {/* Features */}
-        {about.features && about.features.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-white mb-8 text-center">Возможности</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {about.features
-                .sort((a, b) => a.order - b.order)
-                .map(renderFeature)}
-            </div>
-          </div>
-        )}
+
 
         {/* Team */}
         {about.team && about.team.length > 0 && (
