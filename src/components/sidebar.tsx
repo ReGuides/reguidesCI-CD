@@ -262,10 +262,10 @@ export default function Sidebar({ onNewsSelect }: SidebarProps) {
                 
                 {/* Отображаем ERID если он указан */}
                 {ad.erid && (
-                  <div className="mb-3 p-2 bg-neutral-700/50 rounded border border-neutral-600">
+                  <div className="mb-3 p-2 bg-neutral-800/30 rounded border border-neutral-700/50">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400 uppercase tracking-wide">ERID:</span>
-                      <span className="text-xs font-mono text-blue-300 bg-neutral-800 px-2 py-1 rounded">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide">ERID:</span>
+                      <span className="text-xs font-mono text-gray-400 bg-neutral-800/50 px-2 py-1 rounded">
                         {ad.erid}
                       </span>
                     </div>

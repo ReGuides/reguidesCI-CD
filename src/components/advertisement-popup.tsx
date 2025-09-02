@@ -140,41 +140,37 @@ export default function AdvertisementPopup() {
             
             {/* Отображаем ERID если он указан */}
             {advertisement.erid && (
-              <div className="mt-3 p-2 bg-neutral-700/50 rounded-lg border border-neutral-600">
+              <div className="mt-3 p-2 bg-neutral-800/30 rounded border border-neutral-700/50">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400 uppercase tracking-wide">ERID:</span>
-                  <span className="text-xs font-mono text-blue-300 bg-neutral-800 px-2 py-1 rounded">
+                  <span className="text-xs text-gray-500 uppercase tracking-wide">ERID:</span>
+                  <span className="text-xs font-mono text-gray-400 bg-neutral-800/50 px-2 py-1 rounded">
                     {advertisement.erid}
                   </span>
                 </div>
               </div>
             )}
-          </div>
-          
-          <div className="flex flex-col gap-3">
-            {/* Основная кнопка действия */}
-            <a
-              href={advertisement.url || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-lg transition-all duration-200 text-center shadow-lg hover:shadow-blue-500/25 transform hover:scale-105 border-0 text-base"
-              onClick={() => {
-                // Отправляем событие клика по рекламе
-                if (typeof window !== 'undefined' && window.trackAdClick) {
-                  window.trackAdClick(advertisement._id, 'popup', 'modal', advertisement.title || 'Реклама');
-                }
-              }}
-            >
-              {advertisement.cta || 'Узнать больше'}
-            </a>
-            
-            {/* Кнопка "Позже" */}
-            <button
-              onClick={() => setIsVisible(false)}
-              className="w-full px-6 py-3 bg-transparent hover:bg-neutral-700 text-gray-400 hover:text-white font-medium rounded-lg transition-colors border border-neutral-600 hover:border-neutral-500 text-sm"
-            >
-              Позже
-            </button>
+
+            {/* Кнопки */}
+            <div className="flex flex-col gap-3 mt-6">
+              <button
+                onClick={() => {
+                  if (advertisement.url) {
+                    window.open(advertisement.url, '_blank', 'noopener,noreferrer');
+                  }
+                  setIsVisible(false); // Use setIsVisible to close the popup
+                }}
+                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                {advertisement.cta || 'Перейти'}
+              </button>
+              
+              <button
+                onClick={() => setIsVisible(false)}
+                className="w-full px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-gray-300 hover:text-white font-medium rounded-lg transition-all duration-200"
+              >
+                Позже
+              </button>
+            </div>
           </div>
         </div>
       </div>
