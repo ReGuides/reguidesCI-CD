@@ -104,6 +104,14 @@ export default function AddAdvertisementPage() {
   const handleImageUpload = async (file: File) => {
     try {
       setUploadingImage(true);
+      setMessage(null); // Сбрасываем предыдущие сообщения
+      
+      console.log('📤 Starting image upload:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+      });
+
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'advertisement');
@@ -113,23 +121,31 @@ export default function AddAdvertisementPage() {
         body: formData,
       });
 
+      console.log('📥 Upload response status:', response.status);
+
       if (response.ok) {
         const result = await response.json();
+        console.log('📥 Upload response data:', result);
+        
         if (result.success) {
           setForm(prev => ({
             ...prev,
             backgroundImage: result.url
           }));
           setMessage({ type: 'success', text: 'Изображение успешно загружено!' });
+          console.log('✅ Image uploaded successfully:', result.url);
         } else {
-          setMessage({ type: 'error', text: 'Ошибка при загрузке изображения' });
+          console.error('❌ Upload failed:', result.error);
+          setMessage({ type: 'error', text: `Ошибка при загрузке изображения: ${result.error}` });
         }
       } else {
-        setMessage({ type: 'error', text: 'Ошибка при загрузке изображения' });
+        const errorText = await response.text();
+        console.error('❌ Upload HTTP error:', response.status, errorText);
+        setMessage({ type: 'error', text: `Ошибка HTTP ${response.status}: ${errorText}` });
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
-      setMessage({ type: 'error', text: 'Ошибка при загрузке изображения' });
+      console.error('❌ Upload exception:', error);
+      setMessage({ type: 'error', text: `Ошибка при загрузке изображения: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}` });
     } finally {
       setUploadingImage(false);
     }

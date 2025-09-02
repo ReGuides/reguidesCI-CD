@@ -70,6 +70,8 @@ export interface Advertisement {
   updatedAt?: string;
 }
 
+
+
 // About types
 export interface About {
   _id: string;

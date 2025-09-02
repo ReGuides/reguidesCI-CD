@@ -6,7 +6,8 @@ import { existsSync } from 'fs';
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file = formData.get('image') as File;
+    // Поддерживаем оба варианта: 'image' и 'file'
+    const file = (formData.get('image') || formData.get('file')) as File;
 
     console.log('📤 Upload API called with:', { 
       hasFile: !!file, 
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
     if (!file) {
       console.log('❌ No file found in formData');
       return NextResponse.json(
-        { success: false, error: 'No file uploaded. Expected field name: "image"' },
+        { success: false, error: 'No file uploaded. Expected field name: "image" or "file"' },
         { status: 400 }
       );
     }
@@ -55,6 +56,7 @@ export async function POST(request: NextRequest) {
     // Создаем директорию, если она не существует
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });
+      console.log('📁 Created directory:', uploadDir);
     }
 
     // Конвертируем файл в Buffer и сохраняем

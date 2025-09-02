@@ -10,6 +10,7 @@ export default function AdvertisementPopup() {
   const [advertisement, setAdvertisement] = useState<Advertisement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -67,6 +68,26 @@ export default function AdvertisementPopup() {
     return null;
   }
 
+  // Функция для получения правильного URL изображения
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return null;
+    
+    // Если это полный URL, возвращаем как есть
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    
+    // Если это относительный путь, добавляем базовый URL
+    if (imagePath.startsWith('/')) {
+      return imagePath;
+    }
+    
+    // Иначе добавляем базовый путь
+    return `/images/advertisement/${imagePath}`;
+  };
+
+  const imageUrl = getImageUrl(advertisement.backgroundImage);
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
       <div className="bg-neutral-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl relative">
@@ -80,14 +101,32 @@ export default function AdvertisementPopup() {
         </button>
         
         {/* Изображение */}
-        {advertisement.backgroundImage && (
+        {imageUrl && !imageError && (
           <div className="relative h-48">
             <Image
-              src={advertisement.backgroundImage}
+              src={imageUrl}
               alt={advertisement.title}
               fill
               className="object-cover"
+              onError={() => {
+                console.error('Failed to load advertisement image:', imageUrl);
+                setImageError(true);
+              }}
+              onLoad={() => {
+                console.log('Advertisement image loaded successfully:', imageUrl);
+              }}
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-800/80 to-transparent" />
+          </div>
+        )}
+        
+        {/* Fallback для изображения или если изображение не загрузилось */}
+        {(!imageUrl || imageError) && (
+          <div className="relative h-48 bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+            <div className="text-white text-center">
+              <div className="text-4xl mb-2">📢</div>
+              <div className="text-sm opacity-80">Реклама</div>
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-neutral-800/80 to-transparent" />
           </div>
         )}
