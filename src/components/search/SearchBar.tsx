@@ -175,21 +175,29 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
   // Функция для проверки и исправления пути изображения
   const getImageUrl = (imageUrl: string | undefined, type: 'character' | 'weapon' | 'artifact') => {
     if (!imageUrl || imageUrl.trim() === '') {
+      console.log('SearchBar: getImageUrl - empty imageUrl');
       return null;
     }
     
+    console.log('SearchBar: getImageUrl - input:', { imageUrl, type });
+    
     // Если URL уже полный (начинается с http), возвращаем как есть
     if (imageUrl.startsWith('http')) {
+      console.log('SearchBar: getImageUrl - full URL, returning as is:', imageUrl);
       return imageUrl;
     }
     
-    // Если URL начинается с /, возвращаем как есть
+    // Если URL начинается с /, убираем лишний / в начале
     if (imageUrl.startsWith('/')) {
-      return imageUrl;
+      const result = imageUrl.substring(1);
+      console.log('SearchBar: getImageUrl - removing leading /, result:', result);
+      return result;
     }
     
     // Иначе добавляем базовый путь
-    return `/${type}s/${imageUrl}`;
+    const result = `${type}s/${imageUrl}`;
+    console.log('SearchBar: getImageUrl - adding base path, result:', result);
+    return result;
   };
 
   const groupResults = () => {

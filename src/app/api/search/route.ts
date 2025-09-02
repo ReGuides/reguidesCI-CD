@@ -77,7 +77,8 @@ export async function GET(request: NextRequest) {
           name: char.name, 
           image: char.image,
           imageType: typeof char.image,
-          imageLength: char.image?.length || 0
+          imageLength: char.image?.length || 0,
+          finalImagePath: char.image
         });
             results.push({
               id: char.id || char._id || '',
@@ -111,7 +112,8 @@ export async function GET(request: NextRequest) {
           name: weapon.name, 
           image: weapon.image,
           imageType: typeof weapon.image,
-          imageLength: weapon.image?.length || 0
+          imageLength: weapon.image?.length || 0,
+          finalImagePath: weapon.image
         });
             results.push({
               id: weapon.id || weapon._id || '',
@@ -145,7 +147,8 @@ export async function GET(request: NextRequest) {
           name: artifact.name, 
           image: artifact.image,
           imageType: typeof artifact.image,
-          imageLength: artifact.image?.length || 0
+          imageLength: artifact.image?.length || 0,
+          finalImagePath: artifact.image
         });
             results.push({
               id: artifact.id || artifact._id || '',
