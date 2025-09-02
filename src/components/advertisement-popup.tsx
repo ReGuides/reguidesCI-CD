@@ -41,7 +41,7 @@ export default function AdvertisementPopup() {
                 
                 // Отправляем событие показа рекламы
                 if (typeof window !== 'undefined' && window.trackAdImpression) {
-                  window.trackAdImpression(ad._id, 'popup', 'modal', ad.title);
+                  window.trackAdImpression(ad._id, 'popup', 'modal', ad.title || 'Реклама');
                 }
               }, 3000);
             }
@@ -69,7 +69,7 @@ export default function AdvertisementPopup() {
   }
 
   // Функция для получения правильного URL изображения
-  const getImageUrl = (imagePath: string) => {
+  const getImageUrl = (imagePath: string | undefined): string | null => {
     if (!imagePath) return null;
     
     // Если это полный URL, возвращаем как есть
@@ -105,7 +105,7 @@ export default function AdvertisementPopup() {
           <div className="relative h-48">
             <Image
               src={imageUrl}
-              alt={advertisement.title}
+              alt={advertisement.title || 'Advertisement'}
               fill
               className="object-cover"
               onError={() => {
@@ -134,26 +134,26 @@ export default function AdvertisementPopup() {
         {/* Контент */}
         <div className="p-6">
           <div className="mb-4">
-            <h2 className="text-xl font-bold text-white mb-2">{advertisement.title}</h2>
+            <h2 className="text-xl font-bold text-white mb-2">{advertisement.title || 'Реклама'}</h2>
             <p className="text-gray-300 text-sm leading-relaxed">
-              {advertisement.description}
+              {advertisement.description || 'Описание рекламы'}
             </p>
           </div>
           
           <div className="flex gap-3">
             <a
-              href={advertisement.url}
+              href={advertisement.url || '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold rounded-lg transition-all duration-200 text-center shadow-lg hover:shadow-purple-500/25 transform hover:scale-105"
               onClick={() => {
                 // Отправляем событие клика по рекламе
                 if (typeof window !== 'undefined' && window.trackAdClick) {
-                  window.trackAdClick(advertisement._id, 'popup', 'modal', advertisement.title);
+                  window.trackAdClick(advertisement._id, 'popup', 'modal', advertisement.title || 'Реклама');
                 }
               }}
             >
-              {advertisement.cta}
+              {advertisement.cta || 'Узнать больше'}
             </a>
             <button
               onClick={() => setIsVisible(false)}
