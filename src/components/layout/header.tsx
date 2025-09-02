@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, X, Search } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { SearchBar } from '@/components/search/SearchBar';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,14 +61,7 @@ export function Header() {
           
           {/* Поиск по центру */}
           <div className="hidden md:flex flex-1 justify-center px-8 min-w-0">
-            <div className="relative w-full max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
-              <input
-                type="text"
-                placeholder="Поиск персонажей, оружия, артефактов..."
-                className="w-full pl-10 pr-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-accent"
-              />
-            </div>
+            <SearchBar className="w-full max-w-md" />
           </div>
 
           {/* Мобильное меню */}
@@ -108,14 +102,7 @@ export function Header() {
           <div className="md:hidden mt-4 space-y-4 animate-fade-in">
             {/* Мобильный поиск */}
             <div className="mb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Поиск персонажей, оружия, артефактов..."
-                  className="w-full pl-10 pr-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-accent"
-                />
-              </div>
+              <SearchBar />
             </div>
             
             {/* Навигационные ссылки */}

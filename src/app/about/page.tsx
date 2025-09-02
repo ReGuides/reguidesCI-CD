@@ -237,7 +237,7 @@ export default function AboutPage() {
 
         {/* Statistics */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl text-center">
               <div className="text-3xl font-bold text-blue-400 mb-2">{stats.characters}</div>
               <div className="text-neutral-400">Персонажей</div>
@@ -249,10 +249,6 @@ export default function AboutPage() {
             <div className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl text-center">
               <div className="text-3xl font-bold text-green-400 mb-2">{stats.artifacts}</div>
               <div className="text-neutral-400">Артефактов</div>
-            </div>
-            <div className="bg-neutral-800 border border-neutral-700 p-6 rounded-xl text-center">
-              <div className="text-3xl font-bold text-yellow-400 mb-2">{stats.builds ?? '-'}</div>
-              <div className="text-neutral-400">Сборок</div>
             </div>
           </div>
         )}
