@@ -194,7 +194,7 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
     }
     
     // Иначе добавляем базовый путь с / в начале для Next.js Image
-    const result = `/${type}s/${imageUrl}`;
+    const result = `/images/${type}s/${imageUrl}`;
     console.log('SearchBar: getImageUrl - adding base path, result:', result);
     return result;
   };
