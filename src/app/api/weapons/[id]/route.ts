@@ -4,8 +4,9 @@ import { WeaponModel } from '@/models/Weapon';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await connectToDatabase();
     
@@ -16,9 +17,7 @@ export async function GET(
       );
     }
 
-    const weaponId = params.id;
-    
-    if (!weaponId) {
+    if (!id) {
       return NextResponse.json(
         { error: 'Weapon ID is required' },
         { status: 400 }
@@ -26,7 +25,7 @@ export async function GET(
     }
 
     const weaponsCollection = WeaponModel.collection;
-    const weapon = await weaponsCollection.findOne({ id: weaponId });
+    const weapon = await weaponsCollection.findOne({ id: id });
 
     if (!weapon) {
       return NextResponse.json(

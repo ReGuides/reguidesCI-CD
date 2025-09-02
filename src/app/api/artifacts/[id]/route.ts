@@ -4,8 +4,9 @@ import mongoose from 'mongoose';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await connectToDatabase();
     
@@ -16,9 +17,7 @@ export async function GET(
       );
     }
 
-    const artifactId = params.id;
-    
-    if (!artifactId) {
+    if (!id) {
       return NextResponse.json(
         { error: 'Artifact ID is required' },
         { status: 400 }
@@ -26,7 +25,7 @@ export async function GET(
     }
 
     const artifactsCollection = mongoose.connection.db.collection('artifacts');
-    const artifact = await artifactsCollection.findOne({ id: artifactId });
+    const artifact = await artifactsCollection.findOne({ id: id });
 
     if (!artifact) {
       return NextResponse.json(
