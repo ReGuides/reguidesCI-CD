@@ -73,6 +73,12 @@ export async function GET(request: NextRequest) {
 
         characters.forEach((char: CharacterData) => {
           if (char.name && char.name.toLowerCase().includes(searchTerm)) {
+            console.log('Search API: Adding character:', { 
+          name: char.name, 
+          image: char.image,
+          imageType: typeof char.image,
+          imageLength: char.image?.length || 0
+        });
             results.push({
               id: char.id || char._id || '',
               name: char.name,
@@ -97,10 +103,16 @@ export async function GET(request: NextRequest) {
         
         console.log('Search API: Found weapons:', weapons.length);
         console.log('Search API: Weapons data structure:', weaponsData);
-        console.log('Search API: First few weapons:', weapons.slice(0, 3).map((w: WeaponData) => ({ name: w.name, type: w.type })));
+        console.log('Search API: First few weapons:', weapons.slice(0, 3).map((w: WeaponData) => ({ name: w.name, type: w.type, image: w.image })));
 
         weapons.forEach((weapon: WeaponData) => {
           if (weapon.name && weapon.name.toLowerCase().includes(searchTerm)) {
+            console.log('Search API: Adding weapon:', { 
+          name: weapon.name, 
+          image: weapon.image,
+          imageType: typeof weapon.image,
+          imageLength: weapon.image?.length || 0
+        });
             results.push({
               id: weapon.id || weapon._id || '',
               name: weapon.name,
@@ -125,10 +137,16 @@ export async function GET(request: NextRequest) {
         
         console.log('Search API: Found artifacts:', artifacts.length);
         console.log('Search API: Artifacts data structure:', artifactsData);
-        console.log('Search API: First few artifacts:', artifacts.slice(0, 3).map((a: ArtifactData) => ({ name: a.name, rarity: a.rarity })));
+        console.log('Search API: First few artifacts:', artifacts.slice(0, 3).map((a: ArtifactData) => ({ name: a.name, rarity: a.rarity, image: a.image })));
 
         artifacts.forEach((artifact: ArtifactData) => {
           if (artifact.name && artifact.name.toLowerCase().includes(searchTerm)) {
+            console.log('Search API: Adding artifact:', { 
+          name: artifact.name, 
+          image: artifact.image,
+          imageType: typeof artifact.image,
+          imageLength: artifact.image?.length || 0
+        });
             results.push({
               id: artifact.id || artifact._id || '',
               name: artifact.name,

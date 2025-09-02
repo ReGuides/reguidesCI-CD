@@ -1,23 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
-import { ArtifactModel } from '@/models/Artifact';
+import mongoose from 'mongoose';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectToDatabase();
     
-    if (!ArtifactModel) {
+    if (!mongoose.connection.db) {
       return NextResponse.json(
         { error: 'Database connection failed' },
         { status: 500 }
       );
     }
 
-    const { id } = await params;
-    const artifactsCollection = ArtifactModel.collection;
+    const artifactId = params.id;
     
-    const artifact = await artifactsCollection.findOne({ id });
-    
+    if (!artifactId) {
+      return NextResponse.json(
+        { error: 'Artifact ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const artifactsCollection = mongoose.connection.db.collection('artifacts');
+    const artifact = await artifactsCollection.findOne({ id: artifactId });
+
     if (!artifact) {
       return NextResponse.json(
         { error: 'Artifact not found' },
@@ -25,10 +35,25 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
-    // Очищаем от служебных полей MongoDB
-    const { ...cleanArtifact } = artifact;
+    // Убираем служебные поля MongoDB и очищаем данные
+    const { _id, __v, createdAt, updatedAt, ...cleanArtifact } = artifact;
     
-    return NextResponse.json({ data: cleanArtifact });
+    // Убеждаемся, что все поля являются примитивами
+    const safeArtifact = {
+      ...cleanArtifact,
+      id: typeof cleanArtifact.id === 'object' ? cleanArtifact.id?.toString() || '' : (cleanArtifact.id?.toString() || ''),
+      name: cleanArtifact.name?.toString() || '',
+      rarity: Array.isArray(cleanArtifact.rarity) && cleanArtifact.rarity.length > 0
+        ? cleanArtifact.rarity.map(r => Number(r))
+        : [5],
+      pieces: Number(cleanArtifact.pieces) || 5,
+      bonus1: cleanArtifact.bonus1?.toString() || '',
+      bonus2: cleanArtifact.bonus2?.toString() || '',
+      bonus4: cleanArtifact.bonus4?.toString() || '',
+      image: cleanArtifact.image?.toString() || ''
+    };
+
+    return NextResponse.json(safeArtifact);
   } catch (error) {
     console.error('Error fetching artifact:', error);
     return NextResponse.json(
@@ -37,128 +62,3 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     );
   }
 }
-
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    await connectToDatabase();
-    
-    if (!ArtifactModel) {
-      return NextResponse.json(
-        { error: 'Database connection failed' },
-        { status: 500 }
-      );
-    }
-
-    const { id } = await params;
-    const artifactData = await request.json();
-    
-    // Валидация обязательных полей
-    if (!artifactData.name || !artifactData.id || !artifactData.rarity || !artifactData.pieces) {
-      return NextResponse.json(
-        { error: 'Missing required fields: name, id, rarity, pieces' },
-        { status: 400 }
-      );
-    }
-
-    // Валидация количества предметов
-    const validPieces = [1, 2, 4, 5];
-    if (!validPieces.includes(artifactData.pieces)) {
-      return NextResponse.json(
-        { error: 'Invalid pieces value. Must be 1, 2, 4, or 5' },
-        { status: 400 }
-      );
-    }
-
-    const artifactsCollection = ArtifactModel.collection;
-    
-    // Проверяем, существует ли артефакт
-    const existingArtifact = await artifactsCollection.findOne({ id });
-    if (!existingArtifact) {
-      return NextResponse.json(
-        { error: 'Artifact not found' },
-        { status: 404 }
-      );
-    }
-
-    // Обновляем артефакт
-    const updateData = {
-      ...artifactData,
-      updatedAt: new Date()
-    };
-
-    const result = await artifactsCollection.updateOne(
-      { id },
-      { $set: updateData }
-    );
-    
-    if (result.matchedCount === 0) {
-      return NextResponse.json(
-        { error: 'Artifact not found' },
-        { status: 404 }
-      );
-    }
-    
-    return NextResponse.json(
-      { 
-        message: 'Artifact updated successfully',
-        artifactId: id 
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('Error updating artifact:', error);
-    return NextResponse.json(
-      { error: 'Failed to update artifact' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    await connectToDatabase();
-    
-    if (!ArtifactModel) {
-      return NextResponse.json(
-        { error: 'Database connection failed' },
-        { status: 500 }
-      );
-    }
-
-    const { id } = await params;
-    const artifactsCollection = ArtifactModel.collection;
-    
-    // Проверяем, существует ли артефакт
-    const existingArtifact = await artifactsCollection.findOne({ id });
-    if (!existingArtifact) {
-      return NextResponse.json(
-        { error: 'Artifact not found' },
-        { status: 404 }
-      );
-    }
-
-    // Удаляем артефакт
-    const result = await artifactsCollection.deleteOne({ id });
-    
-    if (result.deletedCount === 0) {
-      return NextResponse.json(
-        { error: 'Artifact not found' },
-        { status: 404 }
-      );
-    }
-    
-    return NextResponse.json(
-      { 
-        message: 'Artifact deleted successfully',
-        artifactId: id 
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('Error deleting artifact:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete artifact' },
-      { status: 500 }
-    );
-  }
-} 

@@ -88,6 +88,7 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
             const data = await response.json();
             console.log('SearchBar: API response:', data);
             console.log('SearchBar: Results count:', data.results?.length || 0);
+            console.log('SearchBar: First few results with images:', data.results?.slice(0, 3).map((r: any) => ({ name: r.name, type: r.type, image: r.image })));
             setResults(data.results || []);
             setShowResults(true);
             // Позиционируем результаты после их показа
@@ -115,30 +116,40 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
 
     if (result.type === 'character') {
       router.push(`/characters/${result.id}`);
-    } else if (result.type === 'weapon') {
-      // Загружаем полные данные оружия и открываем модальное окно
-      try {
-        const response = await fetch(`/api/weapons/${result.id}`);
-        if (response.ok) {
-          const weapon = await response.json();
-          setSelectedWeapon(weapon);
-          setIsWeaponModalOpen(true);
-        }
-      } catch (error) {
-        console.error('Error loading weapon:', error);
-      }
-    } else if (result.type === 'artifact') {
-      // Загружаем полные данные артефакта и открываем модальное окно
-      try {
-        const response = await fetch(`/api/artifacts/${result.id}`);
-        if (response.ok) {
-          const artifact = await response.json();
-          setSelectedArtifact(artifact);
-          setIsArtifactModalOpen(true);
-        }
-      } catch (error) {
-        console.error('Error loading artifact:', error);
-      }
+         } else if (result.type === 'weapon') {
+       // Загружаем полные данные оружия и открываем модальное окно
+       try {
+         console.log('SearchBar: Loading weapon data for ID:', result.id);
+         const response = await fetch(`/api/weapons/${result.id}`);
+         console.log('SearchBar: Weapon API response status:', response.status);
+         if (response.ok) {
+           const weapon = await response.json();
+           console.log('SearchBar: Weapon data loaded:', weapon);
+           setSelectedWeapon(weapon);
+           setIsWeaponModalOpen(true);
+         } else {
+           console.error('SearchBar: Weapon API response not ok:', response.status, response.statusText);
+         }
+       } catch (error) {
+         console.error('Error loading weapon:', error);
+       }
+         } else if (result.type === 'artifact') {
+       // Загружаем полные данные артефакта и открываем модальное окно
+       try {
+         console.log('SearchBar: Loading artifact data for ID:', result.id);
+         const response = await fetch(`/api/artifacts/${result.id}`);
+         console.log('SearchBar: Artifact API response status:', response.status);
+         if (response.ok) {
+           const artifact = await response.json();
+           console.log('SearchBar: Artifact data loaded:', artifact);
+           setSelectedArtifact(artifact);
+           setIsArtifactModalOpen(true);
+         } else {
+           console.error('SearchBar: Artifact API response not ok:', response.status, response.statusText);
+         }
+       } catch (error) {
+         console.error('Error loading artifact:', error);
+       }
     }
   };
 
@@ -159,6 +170,26 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
       'Dendro': '🌱'
     };
     return elementIcons[element] || '';
+  };
+
+  // Функция для проверки и исправления пути изображения
+  const getImageUrl = (imageUrl: string | undefined, type: 'character' | 'weapon' | 'artifact') => {
+    if (!imageUrl || imageUrl.trim() === '') {
+      return null;
+    }
+    
+    // Если URL уже полный (начинается с http), возвращаем как есть
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    
+    // Если URL начинается с /, возвращаем как есть
+    if (imageUrl.startsWith('/')) {
+      return imageUrl;
+    }
+    
+    // Иначе добавляем базовый путь
+    return `/${type}s/${imageUrl}`;
   };
 
   const groupResults = () => {
@@ -238,24 +269,39 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
                       onClick={() => handleResultClick(result)}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-800 cursor-pointer transition-colors"
                     >
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-700 flex-shrink-0">
-                        {result.image ? (
-                          <Image
-                            src={result.image}
-                            alt={result.name}
-                            width={40}
-                            height={40}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src = '/images/characters/default.png';
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-neutral-600 flex items-center justify-center text-neutral-400">
-                            👤
-                          </div>
-                        )}
-                      </div>
+                       <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-700 flex-shrink-0 relative">
+                         {(() => {
+                           const imageUrl = getImageUrl(result.image, 'character');
+                           return imageUrl ? (
+                             <Image
+                               src={imageUrl}
+                               alt={result.name}
+                               width={40}
+                               height={40}
+                               className="w-full h-full object-cover"
+                               onError={(e) => {
+                                 console.log('SearchBar: Character image failed to load:', imageUrl);
+                                 const target = e.target as HTMLImageElement;
+                                 target.style.display = 'none';
+                                 // Показываем placeholder вместо сломанного изображения
+                                 const placeholder = target.parentElement?.querySelector('.placeholder') as HTMLElement;
+                                 if (placeholder) {
+                                   placeholder.style.display = 'flex';
+                                 }
+                               }}
+                               onLoad={() => {
+                                 console.log('SearchBar: Character image loaded successfully:', imageUrl);
+                               }}
+                             />
+                           ) : null;
+                         })()}
+                         <div 
+                           className="placeholder w-full h-full bg-neutral-600 flex items-center justify-center text-neutral-400 text-lg absolute inset-0"
+                           style={{ display: getImageUrl(result.image, 'character') ? 'none' : 'flex' }}
+                         >
+                           👤
+                         </div>
+                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-white font-medium truncate">{result.name}</div>
                         <div className="flex items-center gap-2 text-sm text-neutral-400">
@@ -289,24 +335,39 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
                       onClick={() => handleResultClick(result)}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-800 cursor-pointer transition-colors"
                     >
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-700 flex-shrink-0">
-                        {result.image ? (
-                          <Image
-                            src={result.image}
-                            alt={result.name}
-                            width={40}
-                            height={40}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src = '/images/weapons/default.png';
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-neutral-600 flex items-center justify-center text-neutral-400">
-                            ⚔️
-                          </div>
-                        )}
-                      </div>
+                       <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-700 flex-shrink-0 relative">
+                         {(() => {
+                           const imageUrl = getImageUrl(result.image, 'weapon');
+                           return imageUrl ? (
+                             <Image
+                               src={imageUrl}
+                               alt={result.name}
+                               width={40}
+                               height={40}
+                               className="w-full h-full object-cover"
+                               onError={(e) => {
+                                 console.log('SearchBar: Weapon image failed to load:', imageUrl);
+                                 const target = e.target as HTMLImageElement;
+                                 target.style.display = 'none';
+                                 // Показываем placeholder вместо сломанного изображения
+                                 const placeholder = target.parentElement?.querySelector('.placeholder') as HTMLElement;
+                                 if (placeholder) {
+                                   placeholder.style.display = 'flex';
+                                 }
+                               }}
+                               onLoad={() => {
+                                 console.log('SearchBar: Weapon image loaded successfully:', imageUrl);
+                               }}
+                             />
+                           ) : null;
+                         })()}
+                         <div 
+                           className="placeholder w-full h-full bg-neutral-600 flex items-center justify-center text-neutral-400 text-lg absolute inset-0"
+                           style={{ display: getImageUrl(result.image, 'weapon') ? 'none' : 'flex' }}
+                         >
+                           ⚔️
+                         </div>
+                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-white font-medium truncate">{result.name}</div>
                         <div className="flex items-center gap-2 text-sm text-neutral-400">
@@ -337,24 +398,39 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
                       onClick={() => handleResultClick(result)}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-800 cursor-pointer transition-colors"
                     >
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-700 flex-shrink-0">
-                        {result.image ? (
-                          <Image
-                            src={result.image}
-                            alt={result.name}
-                            width={40}
-                            height={40}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src = '/images/artifacts/default.png';
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-neutral-600 flex items-center justify-center text-neutral-400">
-                            💎
-                          </div>
-                        )}
-                      </div>
+                       <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-700 flex-shrink-0 relative">
+                         {(() => {
+                           const imageUrl = getImageUrl(result.image, 'artifact');
+                           return imageUrl ? (
+                             <Image
+                               src={imageUrl}
+                               alt={result.name}
+                               width={40}
+                               height={40}
+                               className="w-full h-full object-cover"
+                               onError={(e) => {
+                                 console.log('SearchBar: Artifact image failed to load:', imageUrl);
+                                 const target = e.target as HTMLImageElement;
+                                 target.style.display = 'none';
+                                 // Показываем placeholder вместо сломанного изображения
+                                 const placeholder = target.parentElement?.querySelector('.placeholder') as HTMLElement;
+                                 if (placeholder) {
+                                   placeholder.style.display = 'flex';
+                                 }
+                               }}
+                               onLoad={() => {
+                                 console.log('SearchBar: Artifact image loaded successfully:', imageUrl);
+                               }}
+                             />
+                           ) : null;
+                         })()}
+                         <div 
+                           className="placeholder w-full h-full bg-neutral-600 flex items-center justify-center text-neutral-400 text-lg absolute inset-0"
+                           style={{ display: getImageUrl(result.image, 'artifact') ? 'none' : 'flex' }}
+                         >
+                           💎
+                         </div>
+                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-white font-medium truncate">{result.name}</div>
                         <div className="flex items-center gap-2 text-sm text-neutral-400">
