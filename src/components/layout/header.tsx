@@ -20,7 +20,7 @@ export function Header() {
   const logoUrl = settings?.logo || '/images/logos/logo.png';
 
   return (
-    <header className="bg-header text-text shadow-lg overflow-hidden">
+    <header className="bg-header text-text shadow-lg">
       <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
         <nav className="flex items-center justify-between min-w-0">
           {/* Логотип и название сайта слева */}

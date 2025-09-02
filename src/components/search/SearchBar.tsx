@@ -37,6 +37,21 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  // Функция для позиционирования результатов поиска
+  const positionSearchResults = () => {
+    if (searchRef.current) {
+      const rect = searchRef.current.getBoundingClientRect();
+      const top = rect.bottom + window.scrollY + 8; // 8px отступ
+      const left = rect.left + window.scrollX;
+      const width = rect.width;
+      
+      document.documentElement.style.setProperty('--search-results-top', `${top}px`);
+      document.documentElement.style.setProperty('--search-results-left', `${left}px`);
+      document.documentElement.style.setProperty('--search-results-width', `${width}px`);
+      document.documentElement.style.setProperty('--search-results-max-width', `${width}px`);
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -44,9 +59,22 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
       }
     };
 
+    const handleScroll = () => {
+      if (showResults) {
+        positionSearchResults();
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [showResults]);
 
   useEffect(() => {
     const searchTimeout = setTimeout(async () => {
@@ -56,8 +84,14 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
           const response = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
           if (response.ok) {
             const data = await response.json();
-            setResults(data.results);
+            console.log('SearchBar: API response:', data);
+            console.log('SearchBar: Results count:', data.results?.length || 0);
+            setResults(data.results || []);
             setShowResults(true);
+            // Позиционируем результаты после их показа
+            setTimeout(positionSearchResults, 0);
+          } else {
+            console.error('SearchBar: API response not ok:', response.status, response.statusText);
           }
         } catch (error) {
           console.error('Search error:', error);
@@ -135,6 +169,11 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
   };
 
   const groupedResults = groupResults();
+  
+  // Отладочная информация
+  console.log('SearchBar: Current results:', results);
+  console.log('SearchBar: Grouped results:', groupedResults);
+  console.log('SearchBar: Show results:', showResults);
 
   return (
     <div className={`relative ${className}`} ref={searchRef}>
@@ -147,7 +186,10 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
           placeholder={placeholder}
           className="w-full pl-10 pr-10 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-accent"
           onFocus={() => {
-            if (results.length > 0) setShowResults(true);
+            if (results.length > 0) {
+              setShowResults(true);
+              setTimeout(positionSearchResults, 0);
+            }
           }}
         />
         {query && (
@@ -166,7 +208,12 @@ export function SearchBar({ placeholder = "Поиск персонажей, ор
 
       {/* Результаты поиска */}
       {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+        <div className="fixed bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl z-[9999] max-h-96 overflow-y-auto" style={{ 
+          top: 'var(--search-results-top, 0px)',
+          left: 'var(--search-results-left, 0px)',
+          width: 'var(--search-results-width, 100%)',
+          maxWidth: 'var(--search-results-max-width, 100%)'
+        }}>
           {isLoading ? (
             <div className="p-4 text-center text-neutral-400">
               Поиск...

@@ -65,6 +65,9 @@ export async function GET(request: NextRequest) {
       if (charactersResponse.ok) {
         const charactersData = await charactersResponse.json();
         const characters = Array.isArray(charactersData) ? charactersData : charactersData.characters || [];
+        
+        console.log('Search API: Found characters:', characters.length);
+        console.log('Search API: Characters data structure:', charactersData);
 
         characters.forEach((char: CharacterData) => {
           if (char.name && char.name.toLowerCase().includes(searchTerm)) {
