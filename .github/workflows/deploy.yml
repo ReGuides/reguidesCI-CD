@@ -35,7 +35,7 @@ jobs:
     
     - name: Create build archive
       run: |
-        tar -czf build.tar.gz .next package.json package-lock.json public src/lib/config.ts ecosystem.config.js
+        tar -czf build.tar.gz .next package.json package-lock.json public src/lib/config.ts ecosystem.config.js cleanup-backups.sh
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -94,6 +94,15 @@ jobs:
             mv /var/www/reguides/.next /var/www/reguides/.next.backup.$(date +%Y%m%d_%H%M%S)
           fi
           
+          # Удаляем старые бекапы, оставляем только 2 последних
+          cd /var/www/reguides
+          echo "Current backups:"
+          ls -la .next.backup.* 2>/dev/null || echo "No backups found"
+          echo "Removing old backups (keeping only 2 latest):"
+          ls -t .next.backup.* 2>/dev/null | tail -n +3 | xargs -r rm -rf
+          echo "Remaining backups:"
+          ls -la .next.backup.* 2>/dev/null || echo "No backups remaining"
+          
           # Очищаем старые файлы
           rm -rf /var/www/reguides/.next
           rm -f /var/www/reguides/package-lock.json
@@ -130,6 +139,14 @@ jobs:
             mv .next .next.backup.$(date +%Y%m%d_%H%M%S)
           fi
           
+          # Удаляем старые бекапы, оставляем только 2 последних
+          echo "Current backups:"
+          ls -la .next.backup.* 2>/dev/null || echo "No backups found"
+          echo "Removing old backups (keeping only 2 latest):"
+          ls -t .next.backup.* 2>/dev/null | tail -n +3 | xargs -r rm -rf
+          echo "Remaining backups:"
+          ls -la .next.backup.* 2>/dev/null || echo "No backups remaining"
+          
           # Очищаем старые файлы
           rm -rf .next
           rm -f package-lock.json
@@ -145,5 +162,13 @@ jobs:
           
           # Очищаем архив
           rm -f build.tar.gz
+          
+          # Очищаем старые архивы (если есть)
+          echo "Cleaning up old build archives:"
+          ls -la build.tar.gz.* 2>/dev/null | head -n -2 | awk '{print $9}' | xargs -r rm -f
+          
+          # Устанавливаем права на скрипт очистки
+          chmod +x cleanup-backups.sh
+          echo "📋 Cleanup script is ready to use"
           
           echo "✅ Деплой завершен успешно!"
