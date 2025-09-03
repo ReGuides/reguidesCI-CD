@@ -31,7 +31,7 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
   const [combinationType, setCombinationType] = useState<'2+2' | '2+stat' | 'stat+stat'>('2+2');
   
   // Отдельные состояния для каждого типа комбинации
-  const [selected22Sets, setSelected22Sets] = useState<Artifact[]>([]); // для 2+2
+  const [twoTwoCombinations, setTwoTwoCombinations] = useState<{set1: Artifact, set2: Artifact}[]>([]); // для 2+2
   const [twoStatCombinations, setTwoStatCombinations] = useState<TwoStatCombination[]>([]); // для 2+стат
   const [stat1, setStat1] = useState('');
   const [stat2, setStat2] = useState('');
@@ -56,20 +56,24 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
     }
   };
 
-  const handle22SetSelect = (artifact: Artifact) => {
-    setSelected22Sets(prev => {
-      // Проверяем, сколько раз артефакт уже выбран
-      const count = prev.filter(a => a.id === artifact.id).length;
-      
-      if (count > 0) {
-        // Если артефакт уже выбран, удаляем одно вхождение
-        const index = prev.findIndex(a => a.id === artifact.id);
-        return prev.filter((_, i) => i !== index);
-      } else {
-        // Если артефакт не выбран, добавляем его
-        return [...prev, artifact];
-      }
-    });
+  const handleAddTwoTwoCombination = () => {
+    setTwoTwoCombinations(prev => [...prev, { set1: artifacts[0], set2: artifacts[0] }]);
+  };
+
+  const handleRemoveTwoTwoCombination = (index: number) => {
+    setTwoTwoCombinations(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleTwoTwoSet1Change = (index: number, artifact: Artifact) => {
+    setTwoTwoCombinations(prev => 
+      prev.map((combo, i) => i === index ? { ...combo, set1: artifact } : combo)
+    );
+  };
+
+  const handleTwoTwoSet2Change = (index: number, artifact: Artifact) => {
+    setTwoTwoCombinations(prev => 
+      prev.map((combo, i) => i === index ? { ...combo, set2: artifact } : combo)
+    );
   };
 
   const handleAddTwoStatCombination = () => {
@@ -100,16 +104,17 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
       result.push(...selected);
     } else if (mode === 'combination') {
       // В режиме комбинаций добавляем только новые комбинации
-      if (combinationType === '2+2' && selected22Sets.length >= 2) {
-        // Создаем пары 2+2
-        for (let i = 0; i < Math.floor(selected22Sets.length / 2); i++) {
-          const pair = selected22Sets.slice(i * 2, i * 2 + 2);
-          result.push({
-            setType: 'combination',
-            sets: pair,
-            description: `2+2: ${pair.map(a => a.name).join(' + ')}`
-          } as ArtifactOrCombination);
-        }
+      if (combinationType === '2+2') {
+        // 2+2 комбинации
+        twoTwoCombinations.forEach(combo => {
+          if (combo.set1 && combo.set2) {
+            result.push({
+              setType: 'combination',
+              sets: [combo.set1, combo.set2],
+              description: `2+2: ${combo.set1.name} + ${combo.set2.name}`
+            } as ArtifactOrCombination);
+          }
+        });
       } else if (combinationType === '2+stat') {
         // 2+стат комбинации
         twoStatCombinations.forEach(combo => {
@@ -139,7 +144,7 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
 
   const handleReset = () => {
     setSelected([]);
-    setSelected22Sets([]);
+    setTwoTwoCombinations([]);
     setTwoStatCombinations([]);
     setStat1('');
     setStat2('');
@@ -260,63 +265,123 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
             <div className="space-y-4">
               {combinationType === '2+2' && (
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Выберите сеты для комбинации 2+2</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                    {filteredArtifacts.map(artifact => {
-                      const selectedCount = selected22Sets.filter(a => a.id === artifact.id).length;
-                      const isSelected = selectedCount > 0;
-                      return (
-                        <button
-                          key={artifact.id}
-                          type="button"
-                          onClick={() => handle22SetSelect(artifact)}
-                          className={`relative flex flex-col items-center p-3 rounded-lg border transition-all ${
-                            isSelected
-                              ? 'border-purple-500 bg-purple-500/20'
-                              : 'border-neutral-700 hover:border-neutral-600'
-                          }`}
-                        >
-                          <OptimizedImage
-                            src={getArtifactImage(artifact)}
-                            alt={artifact.name}
-                            className="w-12 h-12 rounded mb-2"
-                            type="artifact"
-                            fallbackSrc="/images/artifacts/default.png"
-                          />
-                          <span className="text-sm text-center font-medium text-white">{artifact.name}</span>
-                          {isSelected && (
-                            <span className="absolute top-2 left-2 bg-purple-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold border-2 border-white shadow">
-                              {selectedCount}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-white">Создайте комбинации 2+2</h3>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={handleAddTwoTwoCombination}
+                      className="text-purple-400 hover:text-purple-300"
+                    >
+                      + Добавить комбинацию
+                    </Button>
                   </div>
-                  {selected22Sets.length >= 2 && (
-                    <div className="mt-4">
-                      <h4 className="text-md font-semibold text-purple-300 mb-2">Созданные комбинации:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {Array.from({ length: Math.floor(selected22Sets.length / 2) }).map((_, i) => {
-                          const pair = selected22Sets.slice(i * 2, i * 2 + 2);
-                          return (
-                            <div key={i} className="flex items-center gap-2 bg-neutral-800 border border-purple-600 rounded px-3 py-2">
-                              {pair.map(a => (
-                                <span key={a.id} className="flex items-center gap-1">
-                                  <OptimizedImage 
-                                    src={getArtifactImage(a)} 
-                                    alt={a.name} 
-                                    className="w-6 h-6 rounded" 
-                                    type="artifact" 
-                                  />
-                                  <span className="text-sm text-white">{a.name}</span>
-                                </span>
-                              ))}
-                              <span className="text-purple-400 font-bold text-sm">2+2</span>
+                  
+                  {twoTwoCombinations.length === 0 ? (
+                    <div className="text-center py-8 text-gray-400">
+                      Нажмите &quot;Добавить комбинацию&quot; чтобы создать первую комбинацию 2+2
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {twoTwoCombinations.map((combo, index) => (
+                        <div key={index} className="bg-neutral-800 border border-purple-600 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-md font-semibold text-purple-300">Комбинация {index + 1}</h4>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleRemoveTwoTwoCombination(index)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              Удалить
+                            </Button>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Выбор первого артефакта */}
+                            <div>
+                              <label className="block text-sm font-medium text-white mb-2">Первый артефакт</label>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                                {filteredArtifacts.map(artifact => {
+                                  const isSelected = combo.set1.id === artifact.id;
+                                  return (
+                                    <button
+                                      key={artifact.id}
+                                      type="button"
+                                      onClick={() => handleTwoTwoSet1Change(index, artifact)}
+                                      className={`relative flex flex-col items-center p-2 rounded border transition-all ${
+                                        isSelected
+                                          ? 'border-purple-500 bg-purple-500/20'
+                                          : 'border-neutral-700 hover:border-neutral-600'
+                                      }`}
+                                    >
+                                      <OptimizedImage
+                                        src={getArtifactImage(artifact)}
+                                        alt={artifact.name}
+                                        className="w-8 h-8 rounded mb-1"
+                                        type="artifact"
+                                        fallbackSrc="/images/artifacts/default.png"
+                                      />
+                                      <span className="text-xs text-center font-medium text-white truncate w-full">{artifact.name}</span>
+                                      {isSelected && (
+                                        <span className="absolute top-1 left-1 bg-purple-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold border border-white shadow">
+                                          ✓
+                                        </span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
                             </div>
-                          );
-                        })}
-                      </div>
+                            
+                            {/* Выбор второго артефакта */}
+                            <div>
+                              <label className="block text-sm font-medium text-white mb-2">Второй артефакт</label>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                                {filteredArtifacts.map(artifact => {
+                                  const isSelected = combo.set2.id === artifact.id;
+                                  return (
+                                    <button
+                                      key={artifact.id}
+                                      type="button"
+                                      onClick={() => handleTwoTwoSet2Change(index, artifact)}
+                                      className={`relative flex flex-col items-center p-2 rounded border transition-all ${
+                                        isSelected
+                                          ? 'border-purple-500 bg-purple-500/20'
+                                          : 'border-neutral-700 hover:border-neutral-600'
+                                      }`}
+                                    >
+                                      <OptimizedImage
+                                        src={getArtifactImage(artifact)}
+                                        alt={artifact.name}
+                                        className="w-8 h-8 rounded mb-1"
+                                        type="artifact"
+                                        fallbackSrc="/images/artifacts/default.png"
+                                      />
+                                      <span className="text-xs text-center font-medium text-white truncate w-full">{artifact.name}</span>
+                                      {isSelected && (
+                                        <span className="absolute top-1 left-1 bg-purple-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold border border-white shadow">
+                                          ✓
+                                        </span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Предварительный просмотр комбинации */}
+                          {combo.set1 && combo.set2 && (
+                            <div className="mt-3 p-2 bg-purple-600/20 border border-purple-500 rounded">
+                              <span className="text-sm text-purple-300">
+                                2+2: {combo.set1.name} + {combo.set2.name}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -472,7 +537,7 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
               onClick={handleApply}
               disabled={
                 (mode === 'single' && selected.length === 0) ||
-                (mode === 'combination' && combinationType === '2+2' && selected22Sets.length < 2) ||
+                (mode === 'combination' && combinationType === '2+2' && (twoTwoCombinations.length === 0 || twoTwoCombinations.some(c => !c.set1 || !c.set2))) ||
                 (mode === 'combination' && combinationType === '2+stat' && (twoStatCombinations.length === 0 || twoStatCombinations.some(c => !c.artifact || !c.stat.trim()))) ||
                 (mode === 'combination' && combinationType === 'stat+stat' && (!stat1.trim() || !stat2.trim()))
               }
