@@ -14,7 +14,7 @@ interface ArtifactCombinationModalProps {
 
 export function ArtifactCombinationModal({ combination, isOpen, onClose }: ArtifactCombinationModalProps) {
   // Type guard для проверки, что это ArtifactCombination с sets
-  const isArtifactCombination = (item: ArtifactOrCombination | null): item is ArtifactOrCombination & { sets: any[] } => {
+  const isArtifactCombination = (item: ArtifactOrCombination | null): item is ArtifactOrCombination & { sets: unknown[] } => {
     return item !== null && 
            'setType' in item && 
            item.setType === 'combination' && 
