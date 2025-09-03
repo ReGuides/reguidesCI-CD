@@ -38,25 +38,11 @@ export default function OptimizedImage({
   };
 
   const handleImageLoad = () => {
-    if (type === 'weapon') {
-      console.log('🔧 OptimizedImage loaded successfully:', {
-        src,
-        alt,
-        type
-      });
-    }
     setIsLoading(false);
     setImageError(false);
   };
 
   const handleImageError = () => {
-    console.error('🔧 OptimizedImage error:', {
-      src,
-      alt,
-      type,
-      fallbackSrc,
-      finalSrc: imageError ? (fallbackSrc || getDefaultFallback()) : (src || getDefaultFallback())
-    });
     setIsLoading(false);
     setImageError(true);
     

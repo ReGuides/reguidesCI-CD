@@ -136,15 +136,7 @@ export function getSafeImageUrl(
 ): string {
   const imageUrl = getImageWithFallback(originalImage, name, type);
   
-  // Логирование для отладки
-  if (type === 'weapon') {
-    console.log('🔧 getSafeImageUrl DEBUG:', {
-      originalImage,
-      name,
-      type,
-      imageUrl
-    });
-  }
+
   
   // Проверяем, не является ли это проблемным изображением
   if (imageUrl.includes('waster-greatsword.webp')) {

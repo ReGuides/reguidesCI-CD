@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Weapon, ArtifactOrCombination } from '@/types';
-import OptimizedImage from '@/components/ui/optimized-image';
+import Image from 'next/image';
 import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import { Zap, Shield, Heart, Target } from 'lucide-react';
 
@@ -259,18 +259,20 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                        onClick={() => onItemClick?.('weapon', weapon.id?.toString() || '')}
                      >
                        <div className="w-20 h-20 mb-3 flex items-center justify-center">
-                         <OptimizedImage
+                         <Image
                            src={getSafeImageUrl(weapon.image, weapon.name, 'weapon')}
                            alt={weapon.name?.toString() || 'Оружие'}
+                           width={80}
+                           height={80}
                            className="w-full h-full rounded object-cover"
-                           type="weapon"
-                           onError={() => {
+                           onError={(e) => {
                              console.error('🔧 Weapon image error in recommendations:', {
                                weaponId: weapon.id,
                                weaponName: weapon.name,
                                weaponImage: weapon.image,
                                imageUrl: getSafeImageUrl(weapon.image, weapon.name, 'weapon')
                              });
+                             e.currentTarget.src = '/images/weapons/default.webp';
                            }}
                          />
                        </div>
@@ -334,11 +336,15 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                             }
                             return (
                               <div key={setKey} className="relative w-full h-full">
-                                <OptimizedImage
+                                <Image
                                   src={getSafeImageUrl(cleanSet.image, cleanSet.name, 'artifact')}
                                   alt={cleanSet.name}
+                                  width={64}
+                                  height={80}
                                   className="w-full h-full rounded object-cover"
-                                  type="artifact"
+                                  onError={(e) => {
+                                    e.currentTarget.src = '/images/artifacts/default.webp';
+                                  }}
                                 />
                               </div>
                             );
@@ -370,11 +376,15 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                          onClick={() => onItemClick?.('artifact', artifact.id?.toString() || '')}
                        >
                          <div className="w-20 h-20 mb-3 flex items-center justify-center">
-                          <OptimizedImage
+                          <Image
                             src={getSafeImageUrl(artifact.image, artifact.name, 'artifact')}
                             alt={artifact.name?.toString() || 'Артефакт'}
+                            width={80}
+                            height={80}
                             className="w-full h-full rounded object-cover"
-                            type="artifact"
+                            onError={(e) => {
+                              e.currentTarget.src = '/images/artifacts/default.webp';
+                            }}
                           />
                         </div>
                         <div className="text-center w-full">
@@ -402,11 +412,15 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                          onClick={() => onItemClick?.('artifact', artifact.id?.toString() || '')}
                        >
                          <div className="w-20 h-20 mb-3 flex items-center justify-center">
-                          <OptimizedImage
+                          <Image
                             src={getSafeImageUrl(artifact.image, artifact.name, 'artifact')}
                             alt={artifact.name?.toString() || 'Артефакт'}
+                            width={80}
+                            height={80}
                             className="w-full h-full rounded object-cover"
-                            type="artifact"
+                            onError={(e) => {
+                              e.currentTarget.src = '/images/artifacts/default.webp';
+                            }}
                           />
                         </div>
                         <div className="text-center w-full">

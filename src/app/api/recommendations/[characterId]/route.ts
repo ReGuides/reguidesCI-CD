@@ -104,7 +104,6 @@ export async function GET(
     }
 
     // Получаем полные данные оружий
-    console.log('🔧 API Recommendations DEBUG - Original weapons:', recommendation?.weapons);
     const weaponsWithFullData = recommendation ? await Promise.all((recommendation.weapons || []).map(async (weapon: unknown) => {
       // Если оружие уже является объектом с полными данными
       if (typeof weapon === 'object' && weapon !== null && 'name' in weapon) {
@@ -220,8 +219,6 @@ export async function GET(
       talentPriorities: characterStats?.talentPriorities || [],
       notes: characterStats?.notes || recommendation?.notes
     };
-    
-    console.log('🔧 API Recommendations DEBUG - Final weapons data:', weaponsWithFullData);
 
     const response = NextResponse.json(recommendationWithFullData);
     
