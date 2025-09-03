@@ -58,10 +58,15 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
 
   const handle22SetSelect = (artifact: Artifact) => {
     setSelected22Sets(prev => {
-      const existing = prev.find(a => a.id === artifact.id);
-      if (existing) {
-        return prev.filter(a => a.id !== artifact.id);
+      // Проверяем, сколько раз артефакт уже выбран
+      const count = prev.filter(a => a.id === artifact.id).length;
+      
+      if (count > 0) {
+        // Если артефакт уже выбран, удаляем одно вхождение
+        const index = prev.findIndex(a => a.id === artifact.id);
+        return prev.filter((_, i) => i !== index);
       } else {
+        // Если артефакт не выбран, добавляем его
         return [...prev, artifact];
       }
     });
@@ -258,7 +263,8 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
                   <h3 className="text-lg font-semibold text-white mb-3">Выберите сеты для комбинации 2+2</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {filteredArtifacts.map(artifact => {
-                      const isSelected = selected22Sets.find(a => a.id === artifact.id);
+                      const selectedCount = selected22Sets.filter(a => a.id === artifact.id).length;
+                      const isSelected = selectedCount > 0;
                       return (
                         <button
                           key={artifact.id}
@@ -280,7 +286,7 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
                           <span className="text-sm text-center font-medium text-white">{artifact.name}</span>
                           {isSelected && (
                             <span className="absolute top-2 left-2 bg-purple-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold border-2 border-white shadow">
-                              {selected22Sets.findIndex(a => a.id === artifact.id) + 1}
+                              {selectedCount}
                             </span>
                           )}
                         </button>
