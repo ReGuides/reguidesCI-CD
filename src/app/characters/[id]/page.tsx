@@ -17,6 +17,7 @@ import { Zap, Users, Sword, Star, BookOpen, ChevronDown, ChevronUp } from 'lucid
 import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
+import { ArtifactCombinationModal } from '@/components/artifact-combination-modal';
 import { Weapon, Artifact, Talent } from '@/types';
 
 
@@ -39,9 +40,11 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [selectedTalent, setSelectedTalent] = useState<Talent | null>(null);
+  const [selectedCombination, setSelectedCombination] = useState<any>(null);
   const [isWeaponModalOpen, setIsWeaponModalOpen] = useState(false);
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
+  const [isCombinationModalOpen, setIsCombinationModalOpen] = useState(false);
   const [isGameplayDescriptionCollapsed, setIsGameplayDescriptionCollapsed] = useState(false);
   
 
@@ -173,6 +176,16 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
   const closeTalentModal = () => {
     setIsTalentModalOpen(false);
     setSelectedTalent(null);
+  };
+
+  const handleCombinationClick = (combination: any) => {
+    setSelectedCombination(combination);
+    setIsCombinationModalOpen(true);
+  };
+
+  const closeCombinationModal = () => {
+    setIsCombinationModalOpen(false);
+    setSelectedCombination(null);
   };
 
   return (
@@ -386,7 +399,11 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
                   </div>
                 </div>
               </div>
-              <CharacterWeaponsSection characterId={character.id} onItemClick={handleItemClick} />
+              <CharacterWeaponsSection 
+                characterId={character.id} 
+                onItemClick={handleItemClick}
+                onCombinationClick={handleCombinationClick}
+              />
             </div>
           )}
 
@@ -465,13 +482,18 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
         isOpen={isArtifactModalOpen}
         onClose={closeArtifactModal}
       />
-      <TalentModal
-        talent={selectedTalent}
-        isOpen={isTalentModalOpen}
-        onClose={closeTalentModal}
-      />
-      
+             <TalentModal
+         talent={selectedTalent}
+         isOpen={isTalentModalOpen}
+         onClose={closeTalentModal}
+       />
+       <ArtifactCombinationModal
+         combination={selectedCombination}
+         isOpen={isCombinationModalOpen}
+         onClose={closeCombinationModal}
+       />
+       
 
-    </div>
+     </div>
   );
 } 

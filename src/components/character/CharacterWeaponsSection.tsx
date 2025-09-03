@@ -9,6 +9,7 @@ import { Zap, Shield, Heart, Target } from 'lucide-react';
 interface CharacterWeaponsSectionProps {
   characterId: string;
   onItemClick?: (type: string, id: string) => void;
+  onCombinationClick?: (combination: any) => void;
 }
 
 interface MainStat {
@@ -39,7 +40,7 @@ interface Recommendation {
   notes?: string;
 }
 
-const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ characterId, onItemClick }) => {
+const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ characterId, onItemClick, onCombinationClick }) => {
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -300,10 +301,8 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                          key={`combination-${index}`} 
                          className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] col-span-2 cursor-pointer"
                          onClick={() => {
-                           // Для комбинаций открываем первый артефакт
-                           if (artifact.sets && artifact.sets.length > 0) {
-                             onItemClick?.('artifact', artifact.sets[0].id?.toString() || '');
-                           }
+                           // Для комбинаций открываем специальное модальное окно
+                           onCombinationClick?.(artifact);
                          }}
                        >
                          <div className="grid grid-cols-2 gap-3 mb-3 w-32 h-20">
