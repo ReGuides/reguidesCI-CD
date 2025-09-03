@@ -89,7 +89,8 @@ export default function RecommendationForm({ initial, onCancel, onSave, characte
   };
 
   const handleArtifactSelect = (selectedArtifacts: ArtifactOrCombination[]) => {
-    setArtifacts(selectedArtifacts);
+    // Добавляем новые артефакты к существующим, а не заменяем их
+    setArtifacts(prev => [...prev, ...selectedArtifacts]);
   };
 
   return (
