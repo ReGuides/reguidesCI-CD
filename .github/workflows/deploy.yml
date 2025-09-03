@@ -55,15 +55,62 @@ jobs:
       with:
         name: build-files
     
-    # Передаем архив на сервер
+    # Проверяем, что файл существует
+    - name: Check build file
+      run: |
+        ls -la build.tar.gz
+        file build.tar.gz
+        du -h build.tar.gz
+    
+    # Проверяем SSH подключение
+    - name: Test SSH connection
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          echo "SSH connection successful!"
+          ls -la /var/www/reguides || echo "Directory does not exist"
+          whoami
+          pwd
+    
+    # Передаем архив на сервер (альтернативный способ)
     - name: Upload build to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          # Создаем директорию если не существует
+          mkdir -p /var/www/reguides
+          
+          # Останавливаем текущий процесс
+          pm2 stop reguides-nextjs 2>/dev/null || true
+          
+          # Создаем backup текущей версии
+          if [ -d "/var/www/reguides/.next" ]; then
+            mv /var/www/reguides/.next /var/www/reguides/.next.backup.$(date +%Y%m%d_%H%M%S)
+          fi
+          
+          # Очищаем старые файлы
+          rm -rf /var/www/reguides/.next
+          rm -f /var/www/reguides/package-lock.json
+          
+          echo "Ready for file upload"
+    
+    # Загружаем файл через scp
+    - name: Copy build file to server
       uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         source: "build.tar.gz"
-        target: "/var/www/reguides"
+        target: "/var/www/reguides/"
+        debug: true
+        overwrite: true
     
     # Разворачиваем на сервере
     - name: Deploy to VPS
