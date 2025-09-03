@@ -191,7 +191,14 @@ export async function GET(
       notes: characterStats?.notes || recommendation?.notes
     };
 
-    return NextResponse.json(recommendationWithFullData);
+    const response = NextResponse.json(recommendationWithFullData);
+    
+    // Добавляем заголовки для предотвращения кэширования
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
   } catch (error) {
     console.error('Error fetching recommendations:', error);
     return NextResponse.json(

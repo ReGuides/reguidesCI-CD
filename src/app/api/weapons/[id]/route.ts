@@ -38,7 +38,14 @@ export async function GET(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, __v, ...cleanWeapon } = weapon;
 
-    return NextResponse.json(cleanWeapon);
+    const response = NextResponse.json(cleanWeapon);
+    
+    // Добавляем заголовки для предотвращения кэширования
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
   } catch (error) {
     console.error('Error fetching weapon:', error);
     return NextResponse.json(
@@ -111,7 +118,14 @@ export async function PUT(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, __v, ...cleanWeapon } = result;
 
-    return NextResponse.json(cleanWeapon);
+    const response = NextResponse.json(cleanWeapon);
+    
+    // Добавляем заголовки для предотвращения кэширования
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
   } catch (error) {
     console.error('Error updating weapon:', error);
     return NextResponse.json(

@@ -75,52 +75,62 @@ export function getImageWithFallback(
 ): string {
   console.log('🔧 getImageWithFallback DEBUG:', { originalImage, name, type });
   
+  let imageUrl = '';
+  
   // Если есть ссылка из базы данных, используем её
   if (originalImage && originalImage.trim() !== '') {
     // Если это полный URL, возвращаем как есть
     if (originalImage.startsWith('http://') || originalImage.startsWith('https://')) {
       console.log('🌐 Using full URL:', originalImage);
-      return originalImage;
+      imageUrl = originalImage;
     }
     // Если это относительный путь, начинающийся с /, возвращаем как есть
-    if (originalImage.startsWith('/')) {
+    else if (originalImage.startsWith('/')) {
       console.log('📁 Using absolute path:', originalImage);
-      return originalImage;
+      imageUrl = originalImage;
     }
     // Если это просто имя файла (без пути), добавляем правильный префикс
-    if (!originalImage.includes('/')) {
+    else if (!originalImage.includes('/')) {
       // Для персонажей используем правильную папку
       if (type === 'character') {
-        const result = `/images/characters/${originalImage}`;
-        console.log('👤 Using character filename with prefix:', result);
-        return result;
+        imageUrl = `/images/characters/${originalImage}`;
+        console.log('👤 Using character filename with prefix:', imageUrl);
+      } else {
+        imageUrl = `/images/${type}s/${originalImage}`;
+        console.log('📦 Using filename with prefix:', imageUrl);
       }
-      const result = `/images/${type}s/${originalImage}`;
-      console.log('📦 Using filename with prefix:', result);
-      return result;
     }
     // Если это относительный путь без начального /, добавляем префикс
-    if (type === 'character') {
-      const result = `/images/characters/${originalImage}`;
-      console.log('👤 Using character relative path with prefix:', result);
-      return result;
+    else {
+      if (type === 'character') {
+        imageUrl = `/images/characters/${originalImage}`;
+        console.log('👤 Using character relative path with prefix:', imageUrl);
+      } else {
+        imageUrl = `/images/${type}s/${originalImage}`;
+        console.log('📦 Using relative path with prefix:', imageUrl);
+      }
     }
-    const result = `/images/${type}s/${originalImage}`;
-    console.log('📦 Using relative path with prefix:', result);
-    return result;
   }
-  
   // Если ссылки нет, используем имя персонажа для поиска изображения
-  if (name && type === 'character') {
-    const result = getCharacterImage(name);
-    console.log('🔄 Using character name fallback:', result);
-    return result;
+  else if (name && type === 'character') {
+    imageUrl = getCharacterImage(name);
+    console.log('🔄 Using character name fallback:', imageUrl);
+  }
+  // Иначе возвращаем fallback изображение
+  else {
+    imageUrl = getFallbackImage(type);
+    console.log('🆘 Using default fallback:', imageUrl);
   }
   
-  // Иначе возвращаем fallback изображение
-  const result = getFallbackImage(type);
-  console.log('🆘 Using default fallback:', result);
-  return result;
+  // Добавляем timestamp для предотвращения кэширования (только для локальных изображений)
+  if (imageUrl.startsWith('/') && !imageUrl.startsWith('//')) {
+    const timestamp = Date.now();
+    const separator = imageUrl.includes('?') ? '&' : '?';
+    imageUrl = `${imageUrl}${separator}v=${timestamp}`;
+    console.log('🕒 Added cache-busting timestamp:', imageUrl);
+  }
+  
+  return imageUrl;
 }
 
 // Функция для проверки существования изображения

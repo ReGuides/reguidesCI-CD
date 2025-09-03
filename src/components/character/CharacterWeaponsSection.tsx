@@ -48,7 +48,9 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
     const fetchRecommendation = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/recommendations/${characterId}`);
+        const response = await fetch(`/api/recommendations/${characterId}?v=${Date.now()}`, {
+          cache: 'no-store'
+        });
         if (response.ok) {
           const data = await response.json();
           setRecommendation(data);
