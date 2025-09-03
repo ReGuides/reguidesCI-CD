@@ -64,12 +64,35 @@ export default function FriendsSection() {
             href={friend.url} 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="flex flex-col items-center gap-2 bg-neutral-800 rounded-xl p-3 sm:p-4 hover:bg-neutral-700 transition shadow"
+            className="flex flex-col items-center gap-2 bg-neutral-800 rounded-xl p-3 sm:p-4 hover:bg-neutral-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
           >
-            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center">
-              <span className="text-neutral-800 font-bold text-sm">{friend.name.charAt(0)}</span>
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center overflow-hidden">
+              {friend.logo ? (
+                <img
+                  src={friend.logo}
+                  alt={friend.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const fallback = target.nextElementSibling as HTMLElement;
+                    if (fallback) {
+                      fallback.style.display = 'flex';
+                    }
+                  }}
+                />
+              ) : null}
+              <span 
+                className={`text-neutral-800 font-bold text-sm sm:text-lg ${
+                  friend.logo ? 'hidden' : 'flex'
+                }`}
+              >
+                {friend.name.charAt(0).toUpperCase()}
+              </span>
             </div>
-            <span className="text-white font-semibold text-sm sm:text-base text-center">{friend.name}</span>
+            <span className="text-white font-semibold text-sm sm:text-base text-center max-w-[120px] sm:max-w-[140px] truncate">
+              {friend.name}
+            </span>
           </a>
         ))}
       </div>

@@ -332,6 +332,28 @@ export default function AdminDashboard() {
               </Button>
             </Link>
           </div>
+          
+          {/* Дополнительные действия */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+            <Link href="/admin/friends">
+              <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
+                <Users className="w-4 h-4 mr-2" />
+                Управление друзьями
+              </Button>
+            </Link>
+            <Link href="/admin/files">
+              <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                <FileText className="w-4 h-4 mr-2" />
+                Управление файлами
+              </Button>
+            </Link>
+            <Link href="/admin/advertisements">
+              <Button className="w-full bg-pink-600 hover:bg-pink-700">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Управление рекламой
+              </Button>
+            </Link>
+          </div>
         </CardContent>
       </Card>
 
