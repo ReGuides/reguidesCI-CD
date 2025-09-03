@@ -71,6 +71,12 @@ export function getImageWithFallback(
 ): string {
   let imageUrl = '';
   
+  console.log('🔧 getImageWithFallback DEBUG:', {
+    originalImage,
+    name,
+    type
+  });
+  
   // Если есть ссылка из базы данных, используем её
   if (originalImage && originalImage.trim() !== '') {
     // Если это полный URL, возвращаем как есть
@@ -116,6 +122,13 @@ export function getImageWithFallback(
   
   // Убираем добавление timestamp, так как это может вызывать проблемы с загрузкой
   
+  console.log('🔧 getImageWithFallback RESULT:', {
+    originalImage,
+    name,
+    type,
+    finalImageUrl: imageUrl
+  });
+  
   return imageUrl;
 }
 
@@ -127,7 +140,12 @@ export function getSafeImageUrl(
 ): string {
   const imageUrl = getImageWithFallback(originalImage, name, type);
   
-
+  console.log('🔧 getSafeImageUrl DEBUG:', {
+    originalImage,
+    name,
+    type,
+    imageUrl
+  });
   
   // Проверяем, не является ли это проблемным изображением
   if (imageUrl.includes('waster-greatsword.webp')) {
