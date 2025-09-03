@@ -3,6 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 
+interface Weapon {
+  id: string;
+  name: string;
+  type: string;
+  rarity: number;
+  image: string;
+  baseAttack: string;
+  subStatName: string;
+  subStatValue: string;
+}
+
 export default function DebugWeaponPage() {
   const params = useParams();
   const weaponId = params.id as string;
@@ -61,28 +72,28 @@ export default function DebugWeaponPage() {
         
                  <div className="space-y-2">
            <div className="text-white">
-             <strong>ID:</strong> {(weapon as any)?.id}
+             <strong>ID:</strong> {(weapon as Weapon)?.id}
            </div>
            <div className="text-white">
-             <strong>Название:</strong> {(weapon as any)?.name}
+             <strong>Название:</strong> {(weapon as Weapon)?.name}
            </div>
            <div className="text-white">
-             <strong>Тип:</strong> {(weapon as any)?.type}
+             <strong>Тип:</strong> {(weapon as Weapon)?.type}
            </div>
            <div className="text-white">
-             <strong>Редкость:</strong> {(weapon as any)?.rarity}
+             <strong>Редкость:</strong> {(weapon as Weapon)?.rarity}
            </div>
            <div className="text-white">
-             <strong>Изображение:</strong> {(weapon as any)?.image}
+             <strong>Изображение:</strong> {(weapon as Weapon)?.image}
            </div>
            <div className="text-white">
-             <strong>Базовая атака:</strong> {(weapon as any)?.baseAttack}
+             <strong>Базовая атака:</strong> {(weapon as Weapon)?.baseAttack}
            </div>
            <div className="text-white">
-             <strong>Доп. характеристика:</strong> {(weapon as any)?.subStatName}
+             <strong>Доп. характеристика:</strong> {(weapon as Weapon)?.subStatName}
            </div>
            <div className="text-white">
-             <strong>Значение доп. характеристики:</strong> {(weapon as any)?.subStatValue}
+             <strong>Значение доп. характеристики:</strong> {(weapon as Weapon)?.subStatValue}
            </div>
          </div>
         
