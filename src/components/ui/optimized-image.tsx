@@ -27,7 +27,7 @@ export default function OptimizedImage({
       case 'character':
         return '/images/characters/default.png';
       case 'weapon':
-        return '/images/weapons/default.png';
+        return '/images/weapons/default.webp';
       case 'artifact':
         return '/images/artifacts/default.webp';
       default:
@@ -36,11 +36,25 @@ export default function OptimizedImage({
   };
 
   const handleImageLoad = () => {
+    if (type === 'weapon') {
+      console.log('🔧 OptimizedImage loaded successfully:', {
+        src,
+        alt,
+        type
+      });
+    }
     setIsLoading(false);
     setImageError(false);
   };
 
   const handleImageError = () => {
+    console.error('🔧 OptimizedImage error:', {
+      src,
+      alt,
+      type,
+      fallbackSrc,
+      finalSrc: imageError ? (fallbackSrc || getDefaultFallback()) : (src || getDefaultFallback())
+    });
     setIsLoading(false);
     setImageError(true);
   };

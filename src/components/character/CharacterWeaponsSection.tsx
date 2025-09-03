@@ -264,6 +264,14 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                            alt={weapon.name?.toString() || 'Оружие'}
                            className="w-full h-full rounded object-cover"
                            type="weapon"
+                           onError={() => {
+                             console.error('🔧 Weapon image error in recommendations:', {
+                               weaponId: weapon.id,
+                               weaponName: weapon.name,
+                               weaponImage: weapon.image,
+                               imageUrl: getSafeImageUrl(weapon.image, weapon.name, 'weapon')
+                             });
+                           }}
                          />
                        </div>
                       <div className="text-center w-full">
