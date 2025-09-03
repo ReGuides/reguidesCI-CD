@@ -112,18 +112,22 @@ export default function AddWeaponPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('type', 'weapons');
+      formData.append('category', 'weapons');
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/admin/files/upload', {
         method: 'POST',
         body: formData,
       });
 
       if (response.ok) {
         const result = await response.json();
-        setFormData(prev => ({ ...prev, image: result.fileUrl }));
-        setPreviewImage(result.fileUrl);
-        alert('Изображение успешно загружено!');
+        if (result.success) {
+          setFormData(prev => ({ ...prev, image: result.fileUrl }));
+          setPreviewImage(result.fileUrl);
+          alert('Изображение успешно загружено!');
+        } else {
+          alert(`Ошибка загрузки: ${result.error || 'Неизвестная ошибка'}`);
+        }
       } else {
         const errorData = await response.json();
         alert(`Ошибка загрузки: ${errorData.error || 'Неизвестная ошибка'}`);
