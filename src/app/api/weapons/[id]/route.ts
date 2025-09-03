@@ -47,3 +47,116 @@ export async function GET(
     );
   }
 }
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  try {
+    await connectToDatabase();
+    
+    if (!WeaponModel) {
+      return NextResponse.json(
+        { error: 'Database connection failed' },
+        { status: 500 }
+      );
+    }
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Weapon ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const weaponData = await request.json();
+    
+    // Валидация обязательных полей
+    if (!weaponData.name || !weaponData.type || !weaponData.rarity) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name, type, rarity' },
+        { status: 400 }
+      );
+    }
+
+    const weaponsCollection = WeaponModel.collection;
+    
+    // Обновляем оружие
+    const updateData = {
+      ...weaponData,
+      updatedAt: new Date()
+    };
+
+    const result = await weaponsCollection.findOneAndUpdate(
+      { id: id },
+      { $set: updateData },
+      { returnDocument: 'after' }
+    );
+
+    if (!result) {
+      return NextResponse.json(
+        { error: 'Weapon not found' },
+        { status: 404 }
+      );
+    }
+
+    // Убираем служебные поля MongoDB
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { _id, __v, ...cleanWeapon } = result;
+
+    return NextResponse.json(cleanWeapon);
+  } catch (error) {
+    console.error('Error updating weapon:', error);
+    return NextResponse.json(
+      { error: 'Failed to update weapon' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  try {
+    await connectToDatabase();
+    
+    if (!WeaponModel) {
+      return NextResponse.json(
+        { error: 'Database connection failed' },
+        { status: 500 }
+      );
+    }
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Weapon ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const weaponsCollection = WeaponModel.collection;
+    
+    const result = await weaponsCollection.deleteOne({ id: id });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { error: 'Weapon not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: 'Weapon deleted successfully' },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error deleting weapon:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete weapon' },
+      { status: 500 }
+    );
+  }
+}

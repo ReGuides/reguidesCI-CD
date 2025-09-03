@@ -68,9 +68,9 @@ export default function EditWeaponPage({ params }: EditWeaponPageProps) {
             id: weapon.id || '',
             type: weapon.type || 'Sword',
             rarity: weapon.rarity || 4,
-            baseAttack: weapon.baseAttack || '',
+            baseAttack: weapon.baseAttack ? weapon.baseAttack.toString() : '',
             subStatName: weapon.subStatName || '',
-            subStatValue: weapon.subStatValue || '',
+            subStatValue: weapon.subStatValue ? weapon.subStatValue.toString() : '',
             passiveName: weapon.passiveName || '',
             passiveEffect: weapon.passiveEffect || '',
             image: weapon.image || ''
@@ -81,8 +81,16 @@ export default function EditWeaponPage({ params }: EditWeaponPageProps) {
             setPreviewImage(weapon.image);
           }
         } else {
-          console.error('Failed to load weapon');
-          alert('Ошибка загрузки оружия');
+          let errorMessage = 'Ошибка загрузки оружия';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch (jsonError) {
+            console.error('Ошибка парсинга JSON ответа:', jsonError);
+            errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          }
+          console.error('Failed to load weapon:', errorMessage);
+          alert(errorMessage);
         }
       } catch (error) {
         console.error('Error loading weapon:', error);
@@ -107,14 +115,22 @@ export default function EditWeaponPage({ params }: EditWeaponPageProps) {
     setSaving(true);
     
     try {
-      console.log('Отправляем данные оружия для обновления:', formData);
+      // Подготавливаем данные для отправки
+      const submitData = {
+        ...formData,
+        baseAttack: formData.baseAttack ? Number(formData.baseAttack) : 0,
+        subStatValue: formData.subStatValue ? Number(formData.subStatValue) : 0,
+        rarity: Number(formData.rarity)
+      };
+      
+      console.log('Отправляем данные оружия для обновления:', submitData);
       
       const response = await fetch(`/api/weapons/${weaponId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (response.ok) {
@@ -123,9 +139,16 @@ export default function EditWeaponPage({ params }: EditWeaponPageProps) {
         alert('Оружие успешно обновлено!');
         router.push('/admin/weapons');
       } else {
-        const errorData = await response.json();
-        console.error('Ошибка обновления оружия:', errorData);
-        alert(`Ошибка обновления оружия: ${errorData.error || 'Неизвестная ошибка'}`);
+        let errorMessage = 'Неизвестная ошибка';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (jsonError) {
+          console.error('Ошибка парсинга JSON ответа:', jsonError);
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        console.error('Ошибка обновления оружия:', errorMessage);
+        alert(`Ошибка обновления оружия: ${errorMessage}`);
       }
     } catch (error) {
       console.error('Ошибка при обновлении оружия:', error);
