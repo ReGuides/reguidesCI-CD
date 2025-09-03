@@ -13,11 +13,13 @@ import CharacterTalentsSection from '@/components/character/CharacterTalentsSect
 import CharacterConstellationsSection from '@/components/character/CharacterConstellationsSection';
 import BuildsSection from '@/components/builds/BuildsSection';
 import MarkdownRenderer from '@/components/ui/markdown-renderer';
-import { Zap, Users, Sword, Star, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { Zap, Users, Sword, Star, BookOpen, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
 import { Weapon, Artifact, Talent } from '@/types';
+import { useTabState } from '@/hooks/useTabState';
+import { UnsavedChangesWarning } from '@/components/ui/unsaved-changes-warning';
 
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations'; // weapons теперь используется для рекомендаций
@@ -43,6 +45,20 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
   const [isGameplayDescriptionCollapsed, setIsGameplayDescriptionCollapsed] = useState(false);
+  
+  // Хук для управления состоянием вкладок
+  const {
+    tabStates,
+    setTabData,
+    markTabAsSaved,
+    hasUnsavedChanges,
+    hasAnyUnsavedChanges,
+    confirmTabChange
+  } = useTabState();
+  
+  // Состояние для предупреждения о несохраненных изменениях
+  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+  const [pendingTabChange, setPendingTabChange] = useState<TabType | null>(null);
 
   // Устанавливаем заголовок страницы
   useEffect(() => {
@@ -90,6 +106,40 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
       'дендро': '#10b981'
     };
     return colors[element.toLowerCase()] || '#6b7280';
+  };
+
+  // Функция для безопасного переключения вкладок
+  const handleTabChange = (newTab: TabType) => {
+    if (hasUnsavedChanges(activeTab)) {
+      setPendingTabChange(newTab);
+      setShowUnsavedWarning(true);
+    } else {
+      setActiveTab(newTab);
+    }
+  };
+
+  // Обработчики для предупреждения о несохраненных изменениях
+  const handleSaveAndContinue = () => {
+    // Здесь можно добавить логику сохранения
+    markTabAsSaved(activeTab);
+    setShowUnsavedWarning(false);
+    if (pendingTabChange) {
+      setActiveTab(pendingTabChange);
+      setPendingTabChange(null);
+    }
+  };
+
+  const handleDiscardChanges = () => {
+    setShowUnsavedWarning(false);
+    if (pendingTabChange) {
+      setActiveTab(pendingTabChange);
+      setPendingTabChange(null);
+    }
+  };
+
+  const handleCancelTabChange = () => {
+    setShowUnsavedWarning(false);
+    setPendingTabChange(null);
   };
 
   if (loading) {
@@ -310,10 +360,13 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
-            onClick={() => setActiveTab('weapons')}
+            onClick={() => handleTabChange('weapons')}
           >
             <Zap className="w-4 h-4" />
             Рекомендации
+            {hasUnsavedChanges('weapons') && (
+              <AlertTriangle className="w-4 h-4 text-yellow-400" />
+            )}
           </button>
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
@@ -321,10 +374,13 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
-            onClick={() => setActiveTab('teams')}
+            onClick={() => handleTabChange('teams')}
           >
             <Users className="w-4 h-4" />
             Команды
+            {hasUnsavedChanges('teams') && (
+              <AlertTriangle className="w-4 h-4 text-yellow-400" />
+            )}
           </button>
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
@@ -332,10 +388,13 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
-            onClick={() => setActiveTab('builds')}
+            onClick={() => handleTabChange('builds')}
           >
             <BookOpen className="w-4 h-4" />
             Сборки
+            {hasUnsavedChanges('builds') && (
+              <AlertTriangle className="w-4 h-4 text-yellow-400" />
+            )}
           </button>
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
@@ -343,10 +402,13 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
-            onClick={() => setActiveTab('talents')}
+            onClick={() => handleTabChange('talents')}
           >
             <Sword className="w-4 h-4" />
             Таланты
+            {hasUnsavedChanges('talents') && (
+              <AlertTriangle className="w-4 h-4 text-yellow-400" />
+            )}
           </button>
           <button
             className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
@@ -354,10 +416,13 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
             }`}
-            onClick={() => setActiveTab('constellations')}
+            onClick={() => handleTabChange('constellations')}
           >
             <Star className="w-4 h-4" />
             Созвездия
+            {hasUnsavedChanges('constellations') && (
+              <AlertTriangle className="w-4 h-4 text-yellow-400" />
+            )}
           </button>
         </div>
 
@@ -431,7 +496,11 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
 
           {activeTab === 'talents' && (
             <div>
-              <CharacterTalentsSection characterId={character.id} />
+              <CharacterTalentsSection 
+                characterId={character.id}
+                onDataChange={(data) => setTabData('talents', data)}
+                onDataSaved={() => markTabAsSaved('talents')}
+              />
             </div>
           )}
 
@@ -458,6 +527,21 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
         talent={selectedTalent}
         isOpen={isTalentModalOpen}
         onClose={closeTalentModal}
+      />
+      
+      {/* Предупреждение о несохраненных изменениях */}
+      <UnsavedChangesWarning
+        isVisible={showUnsavedWarning}
+        onSave={handleSaveAndContinue}
+        onDiscard={handleDiscardChanges}
+        onCancel={handleCancelTabChange}
+        tabName={
+          pendingTabChange === 'weapons' ? 'Рекомендации' :
+          pendingTabChange === 'teams' ? 'Команды' :
+          pendingTabChange === 'builds' ? 'Сборки' :
+          pendingTabChange === 'talents' ? 'Таланты' :
+          pendingTabChange === 'constellations' ? 'Созвездия' : 'Текущая вкладка'
+        }
       />
     </div>
   );
