@@ -10,6 +10,7 @@ interface OptimizedImageProps {
   className?: string;
   fallbackSrc?: string;
   type?: 'character' | 'weapon' | 'artifact';
+  onError?: () => void;
 }
 
 export default function OptimizedImage({
@@ -17,7 +18,8 @@ export default function OptimizedImage({
   alt,
   className = '',
   fallbackSrc,
-  type = 'character'
+  type = 'character',
+  onError
 }: OptimizedImageProps) {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,6 +59,11 @@ export default function OptimizedImage({
     });
     setIsLoading(false);
     setImageError(true);
+    
+    // Вызываем пользовательский обработчик ошибки
+    if (onError) {
+      onError();
+    }
   };
 
   const finalSrc = imageError ? (fallbackSrc || getDefaultFallback()) : (src || getDefaultFallback());
