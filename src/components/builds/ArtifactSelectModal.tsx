@@ -88,9 +88,13 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
   };
 
   const handleApply = () => {
-    const result: ArtifactOrCombination[] = [...selected];
+    let result: ArtifactOrCombination[] = [];
 
-    if (mode === 'combination') {
+    if (mode === 'single') {
+      // В режиме одиночных артефактов используем selected
+      result = [...selected];
+    } else if (mode === 'combination') {
+      // В режиме комбинаций начинаем с пустого списка и добавляем только комбинации
       if (combinationType === '2+2' && selected22Sets.length >= 2) {
         // Создаем пары 2+2
         for (let i = 0; i < Math.floor(selected22Sets.length / 2); i++) {
