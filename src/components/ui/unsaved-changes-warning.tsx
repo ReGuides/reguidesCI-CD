@@ -31,10 +31,10 @@ export function UnsavedChangesWarning({
             <h3 className="text-lg font-semibold text-white mb-1">
               Несохраненные изменения
             </h3>
-            <p className="text-gray-300 text-sm">
-              У вас есть несохраненные изменения в разделе "{tabName}". 
-              Что вы хотите сделать?
-            </p>
+                         <p className="text-gray-300 text-sm">
+               У вас есть несохраненные изменения в разделе &quot;{tabName}&quot;. 
+               Что вы хотите сделать?
+             </p>
           </div>
         </div>
 

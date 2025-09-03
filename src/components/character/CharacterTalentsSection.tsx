@@ -7,7 +7,7 @@ import { Talent } from '@/types';
 
 interface CharacterTalentsSectionProps {
   characterId: string;
-  onDataChange?: (data: any) => void;
+  onDataChange?: (data: unknown) => void;
   onDataSaved?: () => void;
 }
 
@@ -45,8 +45,7 @@ const TALENT_COLORS = {
 
 const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ 
   characterId, 
-  onDataChange, 
-  onDataSaved 
+  onDataChange
 }) => {
   const [talentsData, setTalentsData] = useState<CharacterTalents | null>(null);
   const [loading, setLoading] = useState(true);

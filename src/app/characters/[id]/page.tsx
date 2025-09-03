@@ -48,12 +48,9 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
   
   // Хук для управления состоянием вкладок
   const {
-    tabStates,
     setTabData,
     markTabAsSaved,
-    hasUnsavedChanges,
-    hasAnyUnsavedChanges,
-    confirmTabChange
+    hasUnsavedChanges
   } = useTabState();
   
   // Состояние для предупреждения о несохраненных изменениях

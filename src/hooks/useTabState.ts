@@ -2,13 +2,13 @@ import { useState, useCallback, useRef } from 'react';
 
 interface TabState {
   hasUnsavedChanges: boolean;
-  lastSavedData: any;
-  currentData: any;
+  lastSavedData: unknown;
+  currentData: unknown;
 }
 
 interface UseTabStateReturn {
   tabStates: Record<string, TabState>;
-  setTabData: (tabId: string, data: any) => void;
+  setTabData: (tabId: string, data: unknown) => void;
   markTabAsSaved: (tabId: string) => void;
   hasUnsavedChanges: (tabId: string) => boolean;
   hasAnyUnsavedChanges: () => boolean;
@@ -20,7 +20,7 @@ export function useTabState(): UseTabStateReturn {
   const [tabStates, setTabStates] = useState<Record<string, TabState>>({});
   const currentTabRef = useRef<string>('');
 
-  const setTabData = useCallback((tabId: string, data: any) => {
+  const setTabData = useCallback((tabId: string, data: unknown) => {
     setTabStates(prev => {
       const currentState = prev[tabId];
       const hasChanges = currentState 
