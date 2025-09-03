@@ -386,7 +386,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
                   </div>
                 </div>
               </div>
-              <CharacterWeaponsSection characterId={character.id} />
+              <CharacterWeaponsSection characterId={character.id} onItemClick={handleItemClick} />
             </div>
           )}
 

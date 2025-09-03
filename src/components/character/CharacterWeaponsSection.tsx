@@ -8,6 +8,7 @@ import { Zap, Shield, Heart, Target } from 'lucide-react';
 
 interface CharacterWeaponsSectionProps {
   characterId: string;
+  onItemClick?: (type: string, id: string) => void;
 }
 
 interface MainStat {
@@ -38,7 +39,7 @@ interface Recommendation {
   notes?: string;
 }
 
-const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ characterId }) => {
+const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ characterId, onItemClick }) => {
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -248,16 +249,20 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     // Если id является примитивом, используем его строковое представление
                     weaponKey = `weapon-${weapon.id?.toString() || idx}`;
                   }
-                  return (
-                    <div key={weaponKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px]">
-                      <div className="w-20 h-20 mb-3 flex items-center justify-center">
-                        <OptimizedImage
-                          src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
-                          alt={weapon.name?.toString() || 'Оружие'}
-                          className="w-full h-full rounded object-cover"
-                          type="weapon"
-                        />
-                      </div>
+                                     return (
+                     <div 
+                       key={weaponKey} 
+                       className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] cursor-pointer"
+                       onClick={() => onItemClick?.('weapon', weapon.id?.toString() || '')}
+                     >
+                       <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                         <OptimizedImage
+                           src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
+                           alt={weapon.name?.toString() || 'Оружие'}
+                           className="w-full h-full rounded object-cover"
+                           type="weapon"
+                         />
+                       </div>
                       <div className="text-center w-full">
                         <div className="flex items-center justify-center gap-1 mb-2">
                           <span className="text-yellow-400 text-sm">★{Number(weapon.rarity)}</span>
@@ -290,9 +295,18 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                   // Проверяем тип артефакта
                   if (artifact.setType === 'combination' && 'sets' in artifact && artifact.sets) {
                     // Комбинация сетов (например, 2+2)
-                    return (
-                      <div key={`combination-${index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] col-span-2">
-                        <div className="grid grid-cols-2 gap-3 mb-3 w-32 h-20">
+                                         return (
+                       <div 
+                         key={`combination-${index}`} 
+                         className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] col-span-2 cursor-pointer"
+                         onClick={() => {
+                           // Для комбинаций открываем первый артефакт
+                           if (artifact.sets && artifact.sets.length > 0) {
+                             onItemClick?.('artifact', artifact.sets[0].id?.toString() || '');
+                           }
+                         }}
+                       >
+                         <div className="grid grid-cols-2 gap-3 mb-3 w-32 h-20">
                           {artifact.sets.map((set: { id: string; name: string; image?: string }, setIndex: number) => {
                             // Убеждаемся, что все поля являются примитивами
                             const cleanSet = {
@@ -340,9 +354,13 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                       // Если id является примитивом, используем его строковое представление
                       artifactKey = `single-${artifact.id?.toString() || artifact.name?.toString() || index}`;
                     }
-                    return (
-                      <div key={artifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px]">
-                        <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                                         return (
+                       <div 
+                         key={artifactKey} 
+                         className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] cursor-pointer"
+                         onClick={() => onItemClick?.('artifact', artifact.id?.toString() || '')}
+                       >
+                         <div className="w-20 h-20 mb-3 flex items-center justify-center">
                           <OptimizedImage
                             src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
                             alt={artifact.name?.toString() || 'Артефакт'}
@@ -368,9 +386,13 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                       // Если id является примитивом, используем его строковое представление
                       regularArtifactKey = `regular-${artifact.id?.toString() || artifact.name?.toString() || index}`;
                     }
-                    return (
-                      <div key={regularArtifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px]">
-                        <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                                         return (
+                       <div 
+                         key={regularArtifactKey} 
+                         className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] cursor-pointer"
+                         onClick={() => onItemClick?.('artifact', artifact.id?.toString() || '')}
+                       >
+                         <div className="w-20 h-20 mb-3 flex items-center justify-center">
                           <OptimizedImage
                             src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
                             alt={artifact.name?.toString() || 'Артефакт'}
