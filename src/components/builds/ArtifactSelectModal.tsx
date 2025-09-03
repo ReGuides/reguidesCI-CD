@@ -97,13 +97,11 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
   };
 
   const handleApply = () => {
-    const result: ArtifactOrCombination[] = [];
+    // Начинаем с уже выбранных артефактов
+    const result: ArtifactOrCombination[] = [...selected];
 
-    if (mode === 'single') {
-      // В режиме одиночных артефактов используем selected
-      result.push(...selected);
-    } else if (mode === 'combination') {
-      // В режиме комбинаций добавляем только новые комбинации
+    // Добавляем комбинации в зависимости от текущего режима
+    if (mode === 'combination') {
       if (combinationType === '2+2') {
         // 2+2 комбинации
         twoTwoCombinations.forEach(combo => {
@@ -536,10 +534,10 @@ export const ArtifactSelectModal: React.FC<ArtifactSelectModalProps> = ({
               variant="default"
               onClick={handleApply}
               disabled={
-                (mode === 'single' && selected.length === 0) ||
-                (mode === 'combination' && combinationType === '2+2' && (twoTwoCombinations.length === 0 || twoTwoCombinations.some(c => !c.set1 || !c.set2))) ||
-                (mode === 'combination' && combinationType === '2+stat' && (twoStatCombinations.length === 0 || twoStatCombinations.some(c => !c.artifact || !c.stat.trim()))) ||
-                (mode === 'combination' && combinationType === 'stat+stat' && (!stat1.trim() || !stat2.trim()))
+                selected.length === 0 && 
+                twoTwoCombinations.length === 0 && 
+                twoStatCombinations.length === 0 && 
+                (!stat1.trim() || !stat2.trim())
               }
             >
               Выбрать
