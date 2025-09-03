@@ -111,10 +111,18 @@ export function getImageWithFallback(
       }
     }
   }
-  // Если ссылки нет, используем имя персонажа для поиска изображения
-  else if (name && type === 'character') {
-    imageUrl = getCharacterImage(name);
-    console.log('🔄 Using character name fallback:', imageUrl);
+  // Если ссылки нет, используем имя для поиска изображения
+  else if (name) {
+    if (type === 'character') {
+      imageUrl = getCharacterImage(name);
+      console.log('🔄 Using character name fallback:', imageUrl);
+    } else if (type === 'weapon') {
+      imageUrl = getWeaponImage(name);
+      console.log('🔄 Using weapon name fallback:', imageUrl);
+    } else if (type === 'artifact') {
+      imageUrl = getArtifactImage(name);
+      console.log('🔄 Using artifact name fallback:', imageUrl);
+    }
   }
   // Иначе возвращаем fallback изображение
   else {
