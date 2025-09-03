@@ -7,8 +7,6 @@ import { Talent } from '@/types';
 
 interface CharacterTalentsSectionProps {
   characterId: string;
-  onDataChange?: (data: unknown) => void;
-  onDataSaved?: () => void;
 }
 
 interface CharacterTalents {
@@ -44,8 +42,7 @@ const TALENT_COLORS = {
 };
 
 const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ 
-  characterId, 
-  onDataChange
+  characterId
 }) => {
   const [talentsData, setTalentsData] = useState<CharacterTalents | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,8 +73,6 @@ const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({
         if (response.ok) {
           const data = await response.json();
           setTalentsData(data);
-          // Уведомляем родительский компонент о загруженных данных
-          onDataChange?.(data);
         }
       } catch (state) {
         console.error('Error fetching talents:', state);
@@ -87,7 +82,7 @@ const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({
     };
 
     fetchTalents();
-  }, [characterId, onDataChange]);
+  }, [characterId]);
 
   const handleTalentClick = (talent: Talent) => {
     setSelectedTalent(talent);
