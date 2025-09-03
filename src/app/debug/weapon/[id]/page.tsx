@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 export default function DebugWeaponPage() {
   const params = useParams();
   const weaponId = params.id as string;
-  const [weapon, setWeapon] = useState<any>(null);
+  const [weapon, setWeapon] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
@@ -22,8 +22,8 @@ export default function DebugWeaponPage() {
         } else {
           setError(data.error);
         }
-      } catch (err) {
-        setError('Failed to fetch weapon');
+             } catch {
+         setError('Failed to fetch weapon');
       } finally {
         setLoading(false);
       }
@@ -59,32 +59,32 @@ export default function DebugWeaponPage() {
       <div className="bg-neutral-800 p-6 rounded-lg">
         <h2 className="text-xl font-semibold text-white mb-4">Данные оружия:</h2>
         
-        <div className="space-y-2">
-          <div className="text-white">
-            <strong>ID:</strong> {weapon?.id}
-          </div>
-          <div className="text-white">
-            <strong>Название:</strong> {weapon?.name}
-          </div>
-          <div className="text-white">
-            <strong>Тип:</strong> {weapon?.type}
-          </div>
-          <div className="text-white">
-            <strong>Редкость:</strong> {weapon?.rarity}
-          </div>
-          <div className="text-white">
-            <strong>Изображение:</strong> {weapon?.image}
-          </div>
-          <div className="text-white">
-            <strong>Базовая атака:</strong> {weapon?.baseAttack}
-          </div>
-          <div className="text-white">
-            <strong>Доп. характеристика:</strong> {weapon?.subStatName}
-          </div>
-          <div className="text-white">
-            <strong>Значение доп. характеристики:</strong> {weapon?.subStatValue}
-          </div>
-        </div>
+                 <div className="space-y-2">
+           <div className="text-white">
+             <strong>ID:</strong> {(weapon as any)?.id}
+           </div>
+           <div className="text-white">
+             <strong>Название:</strong> {(weapon as any)?.name}
+           </div>
+           <div className="text-white">
+             <strong>Тип:</strong> {(weapon as any)?.type}
+           </div>
+           <div className="text-white">
+             <strong>Редкость:</strong> {(weapon as any)?.rarity}
+           </div>
+           <div className="text-white">
+             <strong>Изображение:</strong> {(weapon as any)?.image}
+           </div>
+           <div className="text-white">
+             <strong>Базовая атака:</strong> {(weapon as any)?.baseAttack}
+           </div>
+           <div className="text-white">
+             <strong>Доп. характеристика:</strong> {(weapon as any)?.subStatName}
+           </div>
+           <div className="text-white">
+             <strong>Значение доп. характеристики:</strong> {(weapon as any)?.subStatValue}
+           </div>
+         </div>
         
         <div className="mt-6">
           <h3 className="text-lg font-semibold text-white mb-2">Полные данные (JSON):</h3>
