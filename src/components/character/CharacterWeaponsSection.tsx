@@ -53,7 +53,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
         });
         if (response.ok) {
           const data = await response.json();
-          console.log('🔧 CharacterWeaponsSection DEBUG - Recommendations data:', data);
+
           setRecommendation(data);
         } else {
           // Если произошла ошибка, устанавливаем пустой объект
@@ -267,12 +267,6 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                            height={80}
                            className="w-full h-full rounded object-cover"
                            onError={(e) => {
-                             console.error('🔧 Weapon image error in recommendations:', {
-                               weaponId: weapon.id,
-                               weaponName: weapon.name,
-                               weaponImage: weapon.image,
-                               imageUrl: getSafeImageUrl(weapon.image, weapon.name, 'weapon')
-                             });
                              e.currentTarget.src = '/images/weapons/default.png';
                            }}
                          />

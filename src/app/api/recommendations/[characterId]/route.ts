@@ -104,38 +104,26 @@ export async function GET(
     }
 
     // Получаем полные данные оружий
-    console.log('🔧 API Recommendations DEBUG - Original weapons:', recommendation?.weapons);
+
     const weaponsWithFullData = recommendation ? await Promise.all((recommendation.weapons || []).map(async (weapon: unknown) => {
-      // Если оружие уже является объектом с полными данными
-      if (typeof weapon === 'object' && weapon !== null && 'name' in weapon) {
+      let weaponId = '';
+      
+      // Определяем ID оружия
+      if (typeof weapon === 'string') {
+        weaponId = weapon;
+      } else if (typeof weapon === 'object' && weapon !== null && 'id' in weapon) {
         const weaponObj = weapon as WeaponDocument;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { _id, __v, createdAt, updatedAt, ...cleanWeapon } = weaponObj;
-        
-        // Убеждаемся, что все поля являются примитивами
-        return {
-          ...cleanWeapon,
-          id: typeof cleanWeapon.id === 'object' ? cleanWeapon.id?.toString() || '' : (cleanWeapon.id?.toString() || ''),
-          name: cleanWeapon.name?.toString() || '',
-          type: cleanWeapon.type?.toString() || '',
-          rarity: Number(cleanWeapon.rarity) || 1,
-          baseAttack: cleanWeapon.baseAttack?.toString() || '',
-          subStatName: cleanWeapon.subStatName?.toString() || '',
-          subStatValue: cleanWeapon.subStatValue?.toString() || '',
-          passiveName: cleanWeapon.passiveName?.toString() || '',
-          passiveEffect: cleanWeapon.passiveEffect?.toString() || '',
-          image: cleanWeapon.image?.toString() || ''
-        };
+        weaponId = weaponObj.id?.toString() || '';
       }
       
-      // Если оружие является строкой (ID), ищем в базе данных
-      if (typeof weapon === 'string') {
+      // Всегда загружаем актуальные данные из базы данных по ID
+      if (weaponId) {
         try {
           // Проверяем подключение к базе данных
           if (mongoose.connection.db) {
             // Ищем оружие в базе данных по ID
             const weaponCollection = mongoose.connection.db.collection('weapons');
-            const weaponData = await weaponCollection.findOne({ id: weapon });
+            const weaponData = await weaponCollection.findOne({ id: weaponId });
             
             if (weaponData) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -160,7 +148,7 @@ export async function GET(
         }
         
         // Если не удалось найти в БД, возвращаем базовый объект
-        return { id: weapon, name: weapon } as Weapon;
+        return { id: weaponId, name: weaponId } as Weapon;
       }
       
       return { id: 'unknown', name: 'Неизвестное оружие' } as Weapon;
@@ -221,7 +209,7 @@ export async function GET(
       notes: characterStats?.notes || recommendation?.notes
     };
     
-    console.log('🔧 API Recommendations DEBUG - Final weapons data:', weaponsWithFullData);
+
 
     const response = NextResponse.json(recommendationWithFullData);
     
