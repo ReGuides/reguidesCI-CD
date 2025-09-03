@@ -29,6 +29,15 @@ export function ArtifactCombinationModal({ combination, isOpen, onClose }: Artif
 
   const [set1, set2] = combination.sets;
 
+  // Проверяем, что set1 и set2 имеют нужные свойства
+  if (!set1 || !set2 || typeof set1 !== 'object' || typeof set2 !== 'object') {
+    return null;
+  }
+
+  // Type assertion для set1 и set2
+  const artifactSet1 = set1 as { id: string; name: string; image?: string; twoPieceBonus?: string; fourPieceBonus?: string };
+  const artifactSet2 = set2 as { id: string; name: string; image?: string; twoPieceBonus?: string; fourPieceBonus?: string };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-neutral-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -49,51 +58,51 @@ export function ArtifactCombinationModal({ combination, isOpen, onClose }: Artif
             {/* Первый сет */}
             <div className="space-y-4">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 flex-shrink-0">
-                  <OptimizedImage
-                    src={getImageWithFallback(set1.image, set1.name, 'artifact')}
-                    alt={set1.name}
-                    className="w-full h-full rounded object-cover"
-                    type="artifact"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{set1.name}</h3>
-                  <p className="text-gray-400 text-sm">2 предмета</p>
-                </div>
-              </div>
-              
-              {set1.twoPieceBonus && (
-                <div className="bg-neutral-700 rounded-lg p-4">
-                  <h4 className="text-green-400 font-medium mb-2">Бонус за 2 предмета:</h4>
-                  <p className="text-white text-sm leading-relaxed">{set1.twoPieceBonus}</p>
-                </div>
-              )}
+                                 <div className="w-16 h-16 flex-shrink-0">
+                   <OptimizedImage
+                     src={getImageWithFallback(artifactSet1.image, artifactSet1.name, 'artifact')}
+                     alt={artifactSet1.name}
+                     className="w-full h-full rounded object-cover"
+                     type="artifact"
+                   />
+                 </div>
+                 <div>
+                   <h3 className="text-xl font-semibold text-white">{artifactSet1.name}</h3>
+                   <p className="text-gray-400 text-sm">2 предмета</p>
+                 </div>
+               </div>
+               
+               {artifactSet1.twoPieceBonus && (
+                 <div className="bg-neutral-700 rounded-lg p-4">
+                   <h4 className="text-green-400 font-medium mb-2">Бонус за 2 предмета:</h4>
+                   <p className="text-white text-sm leading-relaxed">{artifactSet1.twoPieceBonus}</p>
+                 </div>
+               )}
             </div>
 
             {/* Второй сет */}
             <div className="space-y-4">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 flex-shrink-0">
-                  <OptimizedImage
-                    src={getImageWithFallback(set2.image, set2.name, 'artifact')}
-                    alt={set2.name}
-                    className="w-full h-full rounded object-cover"
-                    type="artifact"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{set2.name}</h3>
-                  <p className="text-gray-400 text-sm">2 предмета</p>
-                </div>
-              </div>
-              
-              {set2.twoPieceBonus && (
-                <div className="bg-neutral-700 rounded-lg p-4">
-                  <h4 className="text-green-400 font-medium mb-2">Бонус за 2 предмета:</h4>
-                  <p className="text-white text-sm leading-relaxed">{set2.twoPieceBonus}</p>
-                </div>
-              )}
+                                 <div className="w-16 h-16 flex-shrink-0">
+                   <OptimizedImage
+                     src={getImageWithFallback(artifactSet2.image, artifactSet2.name, 'artifact')}
+                     alt={artifactSet2.name}
+                     className="w-full h-full rounded object-cover"
+                     type="artifact"
+                   />
+                 </div>
+                 <div>
+                   <h3 className="text-xl font-semibold text-white">{artifactSet2.name}</h3>
+                   <p className="text-gray-400 text-sm">2 предмета</p>
+                 </div>
+               </div>
+               
+               {artifactSet2.twoPieceBonus && (
+                 <div className="bg-neutral-700 rounded-lg p-4">
+                   <h4 className="text-green-400 font-medium mb-2">Бонус за 2 предмета:</h4>
+                   <p className="text-white text-sm leading-relaxed">{artifactSet2.twoPieceBonus}</p>
+                 </div>
+               )}
             </div>
           </div>
 
