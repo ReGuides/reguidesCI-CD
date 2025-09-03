@@ -13,19 +13,15 @@ export function getCharacterImage(name: string): string {
 }
 
 export function getWeaponImage(name: string): string {
-  // Нормализуем имя оружия для поиска файла
-  const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  
-  // Попробуем найти изображение по нормализованному имени
-  return `/images/weapons/${normalizedName}.webp`;
+  // Используем имя оружия как есть, без нормализации
+  // так как файлы могут иметь разные имена
+  return `/images/weapons/${name}`;
 }
 
 export function getArtifactImage(name: string): string {
-  // Нормализуем имя артефакта для поиска файла
-  const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  
-  // Попробуем найти изображение по нормализованному имени
-  return `/images/artifacts/${normalizedName}.webp`;
+  // Используем имя артефакта как есть, без нормализации
+  // так как файлы могут иметь разные имена
+  return `/images/artifacts/${name}`;
 }
 
 export function getAvatarImage(name: string): string {
@@ -118,12 +114,7 @@ export function getImageWithFallback(
     imageUrl = getFallbackImage(type);
   }
   
-  // Добавляем timestamp для предотвращения кэширования (только для локальных изображений)
-  if (imageUrl.startsWith('/') && !imageUrl.startsWith('//')) {
-    const timestamp = Date.now();
-    const separator = imageUrl.includes('?') ? '&' : '?';
-    imageUrl = `${imageUrl}${separator}v=${timestamp}`;
-  }
+  // Убираем добавление timestamp, так как это может вызывать проблемы с загрузкой
   
   return imageUrl;
 }
