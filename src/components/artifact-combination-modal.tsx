@@ -4,28 +4,26 @@ import React from 'react';
 import { X } from 'lucide-react';
 import OptimizedImage from '@/components/ui/optimized-image';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
-
-interface ArtifactSet {
-  id: string;
-  name: string;
-  image?: string;
-  twoPieceBonus?: string;
-  fourPieceBonus?: string;
-}
-
-interface ArtifactCombination {
-  sets: ArtifactSet[];
-  setType: 'combination';
-}
+import { ArtifactOrCombination } from '@/types';
 
 interface ArtifactCombinationModalProps {
-  combination: ArtifactCombination | null;
+  combination: ArtifactOrCombination | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
 export function ArtifactCombinationModal({ combination, isOpen, onClose }: ArtifactCombinationModalProps) {
-  if (!isOpen || !combination || !combination.sets || combination.sets.length < 2) {
+  // Type guard для проверки, что это ArtifactCombination с sets
+  const isArtifactCombination = (item: ArtifactOrCombination | null): item is ArtifactOrCombination & { sets: any[] } => {
+    return item !== null && 
+           'setType' in item && 
+           item.setType === 'combination' && 
+           'sets' in item && 
+           Array.isArray(item.sets) && 
+           item.sets.length >= 2;
+  };
+
+  if (!isOpen || !isArtifactCombination(combination)) {
     return null;
   }
 

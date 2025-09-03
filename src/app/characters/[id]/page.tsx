@@ -18,7 +18,7 @@ import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
 import { ArtifactCombinationModal } from '@/components/artifact-combination-modal';
-import { Weapon, Artifact, Talent } from '@/types';
+import { Weapon, Artifact, Talent, ArtifactOrCombination } from '@/types';
 
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations'; // weapons теперь используется для рекомендаций
@@ -40,7 +40,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [selectedTalent, setSelectedTalent] = useState<Talent | null>(null);
-  const [selectedCombination, setSelectedCombination] = useState<any>(null);
+  const [selectedCombination, setSelectedCombination] = useState<ArtifactOrCombination | null>(null);
   const [isWeaponModalOpen, setIsWeaponModalOpen] = useState(false);
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
@@ -178,7 +178,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
     setSelectedTalent(null);
   };
 
-  const handleCombinationClick = (combination: any) => {
+  const handleCombinationClick = (combination: ArtifactOrCombination) => {
     setSelectedCombination(combination);
     setIsCombinationModalOpen(true);
   };

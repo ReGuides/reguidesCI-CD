@@ -9,7 +9,7 @@ import { Zap, Shield, Heart, Target } from 'lucide-react';
 interface CharacterWeaponsSectionProps {
   characterId: string;
   onItemClick?: (type: string, id: string) => void;
-  onCombinationClick?: (combination: any) => void;
+  onCombinationClick?: (combination: ArtifactOrCombination) => void;
 }
 
 interface MainStat {
