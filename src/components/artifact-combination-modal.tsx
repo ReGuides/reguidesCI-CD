@@ -35,8 +35,8 @@ export function ArtifactCombinationModal({ combination, isOpen, onClose }: Artif
   }
 
   // Type assertion для set1 и set2
-  const artifactSet1 = set1 as { id: string; name: string; image?: string; twoPieceBonus?: string; fourPieceBonus?: string };
-  const artifactSet2 = set2 as { id: string; name: string; image?: string; twoPieceBonus?: string; fourPieceBonus?: string };
+  const artifactSet1 = set1 as { id: string; name: string; image?: string; bonus2?: string; bonus4?: string };
+  const artifactSet2 = set2 as { id: string; name: string; image?: string; bonus2?: string; bonus4?: string };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -72,10 +72,10 @@ export function ArtifactCombinationModal({ combination, isOpen, onClose }: Artif
                  </div>
                </div>
                
-               {artifactSet1.twoPieceBonus && (
+               {artifactSet1.bonus2 && (
                  <div className="bg-neutral-700 rounded-lg p-4">
                    <h4 className="text-green-400 font-medium mb-2">Бонус за 2 предмета:</h4>
-                   <p className="text-white text-sm leading-relaxed">{artifactSet1.twoPieceBonus}</p>
+                   <p className="text-white text-sm leading-relaxed">{artifactSet1.bonus2}</p>
                  </div>
                )}
             </div>
@@ -97,10 +97,10 @@ export function ArtifactCombinationModal({ combination, isOpen, onClose }: Artif
                  </div>
                </div>
                
-               {artifactSet2.twoPieceBonus && (
+               {artifactSet2.bonus2 && (
                  <div className="bg-neutral-700 rounded-lg p-4">
                    <h4 className="text-green-400 font-medium mb-2">Бонус за 2 предмета:</h4>
-                   <p className="text-white text-sm leading-relaxed">{artifactSet2.twoPieceBonus}</p>
+                   <p className="text-white text-sm leading-relaxed">{artifactSet2.bonus2}</p>
                  </div>
                )}
             </div>
