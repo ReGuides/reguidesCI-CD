@@ -61,6 +61,7 @@ export default function EditWeaponPage({ params }: EditWeaponPageProps) {
         const response = await fetch(`/api/weapons/${id}`);
         if (response.ok) {
           const weapon = await response.json();
+          console.log('Загруженное оружие из БД:', weapon);
           
           // Убеждаемся, что все поля присутствуют
           const processedData = {
@@ -68,14 +69,15 @@ export default function EditWeaponPage({ params }: EditWeaponPageProps) {
             id: weapon.id || '',
             type: weapon.type || 'Sword',
             rarity: weapon.rarity || 4,
-            baseAttack: weapon.baseAttack ? weapon.baseAttack.toString() : '',
+            baseAttack: weapon.baseAttack !== undefined && weapon.baseAttack !== null ? weapon.baseAttack.toString() : '',
             subStatName: weapon.subStatName || '',
-            subStatValue: weapon.subStatValue ? weapon.subStatValue.toString() : '',
+            subStatValue: weapon.subStatValue !== undefined && weapon.subStatValue !== null ? weapon.subStatValue.toString() : '',
             passiveName: weapon.passiveName || '',
             passiveEffect: weapon.passiveEffect || '',
             image: weapon.image || ''
           };
           
+          console.log('Обработанные данные для формы:', processedData);
           setFormData(processedData);
           if (weapon.image) {
             setPreviewImage(weapon.image);
@@ -118,11 +120,12 @@ export default function EditWeaponPage({ params }: EditWeaponPageProps) {
       // Подготавливаем данные для отправки
       const submitData = {
         ...formData,
-        baseAttack: formData.baseAttack ? Number(formData.baseAttack) : 0,
-        subStatValue: formData.subStatValue ? Number(formData.subStatValue) : 0,
+        baseAttack: formData.baseAttack || '',
+        subStatValue: formData.subStatValue || '',
         rarity: Number(formData.rarity)
       };
       
+      console.log('Исходные данные формы:', formData);
       console.log('Отправляем данные оружия для обновления:', submitData);
       
       const response = await fetch(`/api/weapons/${weaponId}`, {

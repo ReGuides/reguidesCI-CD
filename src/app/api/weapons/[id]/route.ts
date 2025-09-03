@@ -71,9 +71,11 @@ export async function PUT(
     }
 
     const weaponData = await request.json();
+    console.log('Получены данные для обновления оружия:', weaponData);
     
     // Валидация обязательных полей
     if (!weaponData.name || !weaponData.type || !weaponData.rarity) {
+      console.log('Ошибка валидации: отсутствуют обязательные поля');
       return NextResponse.json(
         { error: 'Missing required fields: name, type, rarity' },
         { status: 400 }
@@ -87,12 +89,16 @@ export async function PUT(
       ...weaponData,
       updatedAt: new Date()
     };
+    
+    console.log('Данные для обновления в БД:', updateData);
 
     const result = await weaponsCollection.findOneAndUpdate(
       { id: id },
       { $set: updateData },
       { returnDocument: 'after' }
     );
+    
+    console.log('Результат обновления в БД:', result);
 
     if (!result) {
       return NextResponse.json(
