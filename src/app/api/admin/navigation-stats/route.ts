@@ -8,6 +8,7 @@ import { WeaponModel } from '@/models/Weapon';
 import { ArtifactModel } from '@/models/Artifact';
 import News from '@/models/News';
 import { AdvertisementModel } from '@/models/Advertisement';
+import { FriendModel } from '@/models/Friend';
 
 export async function GET() {
   try {
@@ -20,7 +21,8 @@ export async function GET() {
       artifacts: 0,
       news: 0,
       users: 0,
-      advertisements: 0
+      advertisements: 0,
+      friends: 0
     };
 
     try {
@@ -56,6 +58,13 @@ export async function GET() {
       navigationStats.advertisements = await AdvertisementModel.countDocuments({ isActive: true });
     } catch (error) {
       addServerLog('warn', 'navigation-stats', 'Failed to count advertisements', { error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+
+    try {
+      // Статистика друзей
+      navigationStats.friends = await FriendModel.countDocuments();
+    } catch (error) {
+      addServerLog('warn', 'navigation-stats', 'Failed to count friends', { error: error instanceof Error ? error.message : 'Unknown error' });
     }
 
     // Пока что users = 0, так как система пользователей еще не реализована

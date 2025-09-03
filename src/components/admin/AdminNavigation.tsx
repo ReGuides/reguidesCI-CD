@@ -12,7 +12,8 @@ import {
   Megaphone, 
   BarChart3,
   LogsIcon,
-  FolderOpen
+  FolderOpen,
+  Heart
 } from 'lucide-react';
 
 interface NavigationStats {
@@ -22,6 +23,7 @@ interface NavigationStats {
   news: number;
   users: number;
   advertisements: number;
+  friends: number;
 }
 
 interface AdminNavigationProps {
@@ -36,7 +38,8 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
     artifacts: 0,
     news: 0,
     users: 0,
-    advertisements: 0
+    advertisements: 0,
+    friends: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -121,6 +124,11 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
       href: '/admin/files',
       label: 'Файлы',
       icon: FolderOpen
+    },
+    {
+      href: '/admin/friends',
+      label: 'Друзья',
+      icon: Heart
     }
   ];
 
@@ -190,6 +198,10 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
             <div className="flex justify-between text-xs">
               <span className="text-neutral-400">Рекламы:</span>
               <span className="text-white font-semibold">{loading ? 'Загрузка...' : navigationStats.advertisements}</span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-neutral-400">Друзей:</span>
+              <span className="text-white font-semibold">{loading ? 'Загрузка...' : navigationStats.friends}</span>
             </div>
           </div>
         </div>
