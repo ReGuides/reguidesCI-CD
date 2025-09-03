@@ -249,13 +249,15 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     weaponKey = `weapon-${weapon.id?.toString() || idx}`;
                   }
                   return (
-                    <div key={weaponKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
-                      <OptimizedImage
-                        src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
-                        alt={weapon.name?.toString() || 'Оружие'}
-                        className="w-16 h-16 rounded mb-3"
-                        type="weapon"
-                      />
+                    <div key={weaponKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px]">
+                      <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                        <OptimizedImage
+                          src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
+                          alt={weapon.name?.toString() || 'Оружие'}
+                          className="w-full h-full rounded object-cover"
+                          type="weapon"
+                        />
+                      </div>
                       <div className="text-center w-full">
                         <div className="flex items-center justify-center gap-1 mb-2">
                           <span className="text-yellow-400 text-sm">★{Number(weapon.rarity)}</span>
@@ -289,8 +291,8 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                   if (artifact.setType === 'combination' && 'sets' in artifact && artifact.sets) {
                     // Комбинация сетов (например, 2+2)
                     return (
-                      <div key={`combination-${index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
-                        <div className="grid grid-cols-2 gap-1 mb-3 w-16 h-16">
+                      <div key={`combination-${index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px]">
+                        <div className="grid grid-cols-2 gap-2 mb-3 w-20 h-20">
                           {artifact.sets.map((set: { id: string; name: string; image?: string }, setIndex: number) => {
                             // Убеждаемся, что все поля являются примитивами
                             const cleanSet = {
@@ -308,13 +310,14 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                               setKey = `set-${cleanSet.id}-${setIndex}`;
                             }
                             return (
-                              <OptimizedImage
-                                key={setKey}
-                                src={getImageWithFallback(cleanSet.image, cleanSet.name, 'artifact')}
-                                alt={cleanSet.name}
-                                className="w-full h-full rounded"
-                                type="artifact"
-                              />
+                              <div key={setKey} className="relative w-full h-full">
+                                <OptimizedImage
+                                  src={getImageWithFallback(cleanSet.image, cleanSet.name, 'artifact')}
+                                  alt={cleanSet.name}
+                                  className="w-full h-full rounded object-cover"
+                                  type="artifact"
+                                />
+                              </div>
                             );
                           })}
                         </div>
@@ -338,13 +341,15 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                       artifactKey = `single-${artifact.id?.toString() || artifact.name?.toString() || index}`;
                     }
                     return (
-                      <div key={artifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
-                        <OptimizedImage
-                          src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
-                          alt={artifact.name?.toString() || 'Артефакт'}
-                          className="w-16 h-16 rounded mb-3"
-                          type="artifact"
-                        />
+                      <div key={artifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px]">
+                        <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                          <OptimizedImage
+                            src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
+                            alt={artifact.name?.toString() || 'Артефакт'}
+                            className="w-full h-full rounded object-cover"
+                            type="artifact"
+                          />
+                        </div>
                         <div className="text-center w-full">
                           <p className="text-white text-xs font-medium leading-tight mb-2 min-h-[2.5rem] flex items-center justify-center">
                             {artifact.name?.toString() || 'Не указано'}
@@ -364,13 +369,15 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                       regularArtifactKey = `regular-${artifact.id?.toString() || artifact.name?.toString() || index}`;
                     }
                     return (
-                      <div key={regularArtifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
-                        <OptimizedImage
-                          src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
-                          alt={artifact.name?.toString() || 'Артефакт'}
-                          className="w-16 h-16 rounded mb-3"
-                          type="artifact"
-                        />
+                      <div key={regularArtifactKey} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px]">
+                        <div className="w-20 h-20 mb-3 flex items-center justify-center">
+                          <OptimizedImage
+                            src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
+                            alt={artifact.name?.toString() || 'Артефакт'}
+                            className="w-full h-full rounded object-cover"
+                            type="artifact"
+                          />
+                        </div>
                         <div className="text-center w-full">
                           <p className="text-white text-xs font-medium leading-tight mb-2 min-h-[2.5rem] flex items-center justify-center">
                             {artifact.name?.toString() || 'Не указано'}
@@ -381,7 +388,10 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                   } else {
                     // Неизвестный тип артефакта
                     return (
-                      <div key={`unknown-${index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[140px]">
+                      <div key={`unknown-${index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px]">
+                        <div className="w-20 h-20 mb-3 flex items-center justify-center bg-neutral-700 rounded">
+                          <span className="text-gray-400 text-xs">?</span>
+                        </div>
                         <div className="text-center w-full">
                           <p className="text-white text-xs font-medium leading-tight mb-2 min-h-[2.5rem] flex items-center justify-center">
                             Неизвестный тип артефакта
