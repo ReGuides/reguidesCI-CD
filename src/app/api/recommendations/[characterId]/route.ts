@@ -104,7 +104,8 @@ export async function GET(
     }
 
     // Получаем полные данные оружий
-    const weaponsWithFullData = recommendation ? (recommendation.weapons || []).map((weapon: unknown) => {
+    console.log('🔧 API Recommendations DEBUG - Original weapons:', recommendation?.weapons);
+    const weaponsWithFullData = recommendation ? await Promise.all((recommendation.weapons || []).map(async (weapon: unknown) => {
       // Если оружие уже является объектом с полными данными
       if (typeof weapon === 'object' && weapon !== null && 'name' in weapon) {
         const weaponObj = weapon as WeaponDocument;
@@ -129,12 +130,45 @@ export async function GET(
       
       // Если оружие является строкой (ID), ищем в базе данных
       if (typeof weapon === 'string') {
-        // Здесь можно добавить поиск по базе данных, если нужно
+        console.log('🔧 API Recommendations DEBUG - Weapon is string ID:', weapon);
+        try {
+          // Проверяем подключение к базе данных
+          if (mongoose.connection.db) {
+            // Ищем оружие в базе данных по ID
+            const weaponCollection = mongoose.connection.db.collection('weapons');
+            const weaponData = await weaponCollection.findOne({ id: weapon });
+            
+            if (weaponData) {
+              console.log('🔧 API Recommendations DEBUG - Found weapon in DB:', weaponData);
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { _id, __v, createdAt, updatedAt, ...cleanWeapon } = weaponData;
+              return {
+                ...cleanWeapon,
+                id: typeof cleanWeapon.id === 'object' ? cleanWeapon.id?.toString() || '' : (cleanWeapon.id?.toString() || ''),
+                name: cleanWeapon.name?.toString() || '',
+                type: cleanWeapon.type?.toString() || '',
+                rarity: Number(cleanWeapon.rarity) || 1,
+                baseAttack: cleanWeapon.baseAttack?.toString() || '',
+                subStatName: cleanWeapon.subStatName?.toString() || '',
+                subStatValue: cleanWeapon.subStatValue?.toString() || '',
+                passiveName: cleanWeapon.passiveName?.toString() || '',
+                passiveEffect: cleanWeapon.passiveEffect?.toString() || '',
+                image: cleanWeapon.image?.toString() || ''
+              };
+            } else {
+              console.log('🔧 API Recommendations DEBUG - Weapon not found in DB for ID:', weapon);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching weapon data:', error);
+        }
+        
+        // Если не удалось найти в БД, возвращаем базовый объект
         return { id: weapon, name: weapon } as Weapon;
       }
       
       return { id: 'unknown', name: 'Неизвестное оружие' } as Weapon;
-    }) : [];
+    })) : [];
 
     // Получаем полные данные артефактов
     const artifactsWithFullData = recommendation ? (recommendation.artifacts || []).map((artifact: unknown) => {
@@ -190,6 +224,8 @@ export async function GET(
       talentPriorities: characterStats?.talentPriorities || [],
       notes: characterStats?.notes || recommendation?.notes
     };
+    
+    console.log('🔧 API Recommendations DEBUG - Final weapons data:', weaponsWithFullData);
 
     const response = NextResponse.json(recommendationWithFullData);
     
