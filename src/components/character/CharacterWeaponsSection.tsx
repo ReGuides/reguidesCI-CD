@@ -291,8 +291,8 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                   if (artifact.setType === 'combination' && 'sets' in artifact && artifact.sets) {
                     // Комбинация сетов (например, 2+2)
                     return (
-                      <div key={`combination-${index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px]">
-                        <div className="grid grid-cols-2 gap-2 mb-3 w-20 h-20">
+                      <div key={`combination-${index}`} className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] col-span-2">
+                        <div className="grid grid-cols-2 gap-3 mb-3 w-32 h-20">
                           {artifact.sets.map((set: { id: string; name: string; image?: string }, setIndex: number) => {
                             // Убеждаемся, что все поля являются примитивами
                             const cleanSet = {
