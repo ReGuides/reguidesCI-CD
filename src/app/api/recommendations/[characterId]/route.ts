@@ -104,7 +104,6 @@ export async function GET(
     }
 
     // Получаем полные данные оружий
-    console.log('🔧 API Recommendations DEBUG - Original weapons:', recommendation?.weapons);
     const weaponsWithFullData = recommendation ? await Promise.all((recommendation.weapons || []).map(async (weapon: unknown) => {
       // Если оружие уже является объектом с полными данными
       if (typeof weapon === 'object' && weapon !== null && 'name' in weapon) {
@@ -130,7 +129,6 @@ export async function GET(
       
       // Если оружие является строкой (ID), ищем в базе данных
       if (typeof weapon === 'string') {
-        console.log('🔧 API Recommendations DEBUG - Weapon is string ID:', weapon);
         try {
           // Проверяем подключение к базе данных
           if (mongoose.connection.db) {
@@ -139,7 +137,6 @@ export async function GET(
             const weaponData = await weaponCollection.findOne({ id: weapon });
             
             if (weaponData) {
-              console.log('🔧 API Recommendations DEBUG - Found weapon in DB:', weaponData);
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { _id, __v, createdAt, updatedAt, ...cleanWeapon } = weaponData;
               return {
@@ -155,8 +152,6 @@ export async function GET(
                 passiveEffect: cleanWeapon.passiveEffect?.toString() || '',
                 image: cleanWeapon.image?.toString() || ''
               };
-            } else {
-              console.log('🔧 API Recommendations DEBUG - Weapon not found in DB for ID:', weapon);
             }
           }
         } catch (error) {
@@ -224,8 +219,6 @@ export async function GET(
       talentPriorities: characterStats?.talentPriorities || [],
       notes: characterStats?.notes || recommendation?.notes
     };
-    
-    console.log('🔧 API Recommendations DEBUG - Final weapons data:', weaponsWithFullData);
 
     const response = NextResponse.json(recommendationWithFullData);
     

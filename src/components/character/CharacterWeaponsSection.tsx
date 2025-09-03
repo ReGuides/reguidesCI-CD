@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Weapon, ArtifactOrCombination } from '@/types';
 import OptimizedImage from '@/components/ui/optimized-image';
-import { getImageWithFallback } from '@/lib/utils/imageUtils';
+import { getSafeImageUrl } from '@/lib/utils/imageUtils';
 import { Zap, Shield, Heart, Target } from 'lucide-react';
 
 interface CharacterWeaponsSectionProps {
@@ -260,7 +260,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                      >
                        <div className="w-20 h-20 mb-3 flex items-center justify-center">
                          <OptimizedImage
-                           src={getImageWithFallback(weapon.image, weapon.name, 'weapon')}
+                           src={getSafeImageUrl(weapon.image, weapon.name, 'weapon')}
                            alt={weapon.name?.toString() || 'Оружие'}
                            className="w-full h-full rounded object-cover"
                            type="weapon"
@@ -327,7 +327,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                             return (
                               <div key={setKey} className="relative w-full h-full">
                                 <OptimizedImage
-                                  src={getImageWithFallback(cleanSet.image, cleanSet.name, 'artifact')}
+                                  src={getSafeImageUrl(cleanSet.image, cleanSet.name, 'artifact')}
                                   alt={cleanSet.name}
                                   className="w-full h-full rounded object-cover"
                                   type="artifact"
@@ -363,7 +363,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                        >
                          <div className="w-20 h-20 mb-3 flex items-center justify-center">
                           <OptimizedImage
-                            src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
+                            src={getSafeImageUrl(artifact.image, artifact.name, 'artifact')}
                             alt={artifact.name?.toString() || 'Артефакт'}
                             className="w-full h-full rounded object-cover"
                             type="artifact"
@@ -395,7 +395,7 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                        >
                          <div className="w-20 h-20 mb-3 flex items-center justify-center">
                           <OptimizedImage
-                            src={getImageWithFallback(artifact.image, artifact.name, 'artifact')}
+                            src={getSafeImageUrl(artifact.image, artifact.name, 'artifact')}
                             alt={artifact.name?.toString() || 'Артефакт'}
                             className="w-full h-full rounded object-cover"
                             type="artifact"

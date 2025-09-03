@@ -73,20 +73,16 @@ export function getImageWithFallback(
   name: string,
   type: 'character' | 'weapon' | 'artifact'
 ): string {
-  console.log('🔧 getImageWithFallback DEBUG:', { originalImage, name, type });
-  
   let imageUrl = '';
   
   // Если есть ссылка из базы данных, используем её
   if (originalImage && originalImage.trim() !== '') {
     // Если это полный URL, возвращаем как есть
     if (originalImage.startsWith('http://') || originalImage.startsWith('https://')) {
-      console.log('🌐 Using full URL:', originalImage);
       imageUrl = originalImage;
     }
     // Если это относительный путь, начинающийся с /, возвращаем как есть
     else if (originalImage.startsWith('/')) {
-      console.log('📁 Using absolute path:', originalImage);
       imageUrl = originalImage;
     }
     // Если это просто имя файла (без пути), добавляем правильный префикс
@@ -94,20 +90,16 @@ export function getImageWithFallback(
       // Для персонажей используем правильную папку
       if (type === 'character') {
         imageUrl = `/images/characters/${originalImage}`;
-        console.log('👤 Using character filename with prefix:', imageUrl);
       } else {
         imageUrl = `/images/${type}s/${originalImage}`;
-        console.log('📦 Using filename with prefix:', imageUrl);
       }
     }
     // Если это относительный путь без начального /, добавляем префикс
     else {
       if (type === 'character') {
         imageUrl = `/images/characters/${originalImage}`;
-        console.log('👤 Using character relative path with prefix:', imageUrl);
       } else {
         imageUrl = `/images/${type}s/${originalImage}`;
-        console.log('📦 Using relative path with prefix:', imageUrl);
       }
     }
   }
@@ -115,19 +107,15 @@ export function getImageWithFallback(
   else if (name) {
     if (type === 'character') {
       imageUrl = getCharacterImage(name);
-      console.log('🔄 Using character name fallback:', imageUrl);
     } else if (type === 'weapon') {
       imageUrl = getWeaponImage(name);
-      console.log('🔄 Using weapon name fallback:', imageUrl);
     } else if (type === 'artifact') {
       imageUrl = getArtifactImage(name);
-      console.log('🔄 Using artifact name fallback:', imageUrl);
     }
   }
   // Иначе возвращаем fallback изображение
   else {
     imageUrl = getFallbackImage(type);
-    console.log('🆘 Using default fallback:', imageUrl);
   }
   
   // Добавляем timestamp для предотвращения кэширования (только для локальных изображений)
@@ -135,7 +123,6 @@ export function getImageWithFallback(
     const timestamp = Date.now();
     const separator = imageUrl.includes('?') ? '&' : '?';
     imageUrl = `${imageUrl}${separator}v=${timestamp}`;
-    console.log('🕒 Added cache-busting timestamp:', imageUrl);
   }
   
   return imageUrl;

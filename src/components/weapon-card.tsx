@@ -38,10 +38,6 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
       }
       
       const weaponData = await response.json();
-      console.log('🔧 WeaponCard loadFullWeapon DEBUG:', { 
-        weaponId: weapon.id, 
-        weaponData: weaponData 
-      });
       // Исправляем извлечение данных из ответа API
       const weaponInfo = weaponData.data || weaponData;
       setFullWeapon(weaponInfo);
@@ -123,11 +119,6 @@ export function WeaponCard({ weapon, onSelect, isSelected }: WeaponCardProps) {
   const colors = getRarityColors(Number(weapon.rarity));
 
   const getImageSrc = () => {
-    console.log('🔧 WeaponCard getImageSrc DEBUG:', { 
-      weaponId: weapon.id, 
-      weaponName: weapon.name, 
-      weaponImage: weapon.image 
-    });
     if (!weapon.image) return '/images/weapons/default.png';
     return getSafeImageUrl(weapon.image, weapon.name, 'weapon');
   };
