@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import AdminButton from '@/components/ui/admin-button';
-import BackButton from '@/components/ui/back-button';
+import { AdminButton } from '@/components/ui/admin-button';
+import { BackButton } from '@/components/ui/back-button';
 import PageTitle from '@/components/ui/page-title';
 
 interface Friend {
@@ -93,7 +93,7 @@ function FriendsManagementContent() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center gap-4 mb-8">
-        <BackButton href="/admin" />
+        <BackButton />
         <h1 className="text-3xl font-bold text-white">Управление друзьями сайта</h1>
       </div>
 
