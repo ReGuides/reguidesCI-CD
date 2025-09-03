@@ -41,9 +41,9 @@ export function CharacterCard({ character, className = '' }: CharacterCardProps)
             target.style.opacity = '0.2'; 
           }}
         />
-        <div className={`relative z-30 mt-auto w-full p-3 sm:p-4 ${getElementColor(character.element)} backdrop-blur-sm transition-all duration-500 group-hover:mt-0 group-hover:h-full group-hover:flex group-hover:items-center group-hover:justify-center`}>
+        <div className={`relative z-30 mt-auto w-full p-2 sm:p-3 ${getElementColor(character.element)} backdrop-blur-sm transition-all duration-500 group-hover:mt-0 group-hover:h-full group-hover:flex group-hover:items-center group-hover:justify-center`}>
           <div className="transition-transform duration-500 text-center">
-            <h2 className="text-sm sm:text-base font-bold text-white drop-shadow mb-1 group-hover:text-base sm:group-hover:text-xl group-hover:font-extrabold leading-tight min-h-[2.5rem] flex items-center justify-center">
+            <h2 className="text-sm sm:text-base font-bold text-white drop-shadow mb-1 group-hover:text-base sm:group-hover:text-xl group-hover:font-extrabold leading-tight">
               {character.name}
             </h2>
             <div className="text-xs sm:text-sm text-white drop-shadow mb-1 group-hover:text-sm sm:group-hover:text-base">
