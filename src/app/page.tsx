@@ -196,7 +196,7 @@ function HomePageContent() {
             {Array.isArray(newest6Characters) && newest6Characters.length > 0 && (
               <div className="mt-12 sm:mt-16">
                 <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Новые персонажи</h2>
-                <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
                   {newest6Characters.map(character => {
                     if (!character || typeof character !== 'object') return null;
                     return (
@@ -228,7 +228,7 @@ function HomePageContent() {
             {/* Случайные персонажи */}
             <div className="mt-12 sm:mt-16">
               <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Случайные персонажи</h2>
-              <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+              <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
                 {Array.isArray(randomBlockCharacters) && randomBlockCharacters.map(character => {
                   if (!character || typeof character !== 'object') return null;
                   return (
