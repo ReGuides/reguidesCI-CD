@@ -115,7 +115,7 @@ export default function CharacterCarousel({
           return (
             <div
               key={`carousel-${character.id}`}
-              className={`absolute top-0 left-1/2 transition-all duration-700 ease-in-out cursor-pointer rounded-2xl shadow-2xl border-2 ${isActive ? 'border-purple-500 shadow-purple-500/50' : 'border-transparent'} hover:z-50`}
+              className={`absolute top-0 left-1/2 transition-all duration-700 ease-in-out cursor-pointer rounded-sm shadow-2xl border-2 ${isActive ? 'border-purple-500 shadow-purple-500/50' : 'border-transparent'} hover:z-50`}
               style={{
                 width: 320,
                 height: 400,
@@ -134,27 +134,27 @@ export default function CharacterCarousel({
                 }
               }}
             >
-              <div className="relative w-full h-full rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-110">
+              <div className="relative w-full h-full rounded-sm overflow-hidden transition-transform duration-300 hover:scale-110">
                 {/* Glow effect for active card */}
                 {isActive && (
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/20 to-blue-500/20 blur-xl scale-100" />
+                  <div className="absolute inset-0 rounded-sm bg-gradient-to-r from-purple-500/20 to-blue-500/20 blur-xl scale-100" />
                 )}
                 <Image
                   src={getImageWithFallback(character.image, character.name, 'character')}
                   alt={character.name}
                   width={320}
                   height={400}
-                  className="absolute inset-0 w-full h-full object-cover object-center rounded-2xl"
+                  className="absolute inset-0 w-full h-full object-cover object-center rounded-sm"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = '/images/characters/default.png';
                   }}
                 />
                 {/* Enhanced gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-sm" />
                 {/* Animated border glow */}
                 {isActive && (
-                  <div className="absolute inset-0 rounded-2xl border-2 border-purple-400/50 animate-pulse" />
+                  <div className="absolute inset-0 rounded-sm border-2 border-purple-400/50 animate-pulse" />
                 )}
                 <div className="relative z-10 p-8 flex flex-col gap-4 h-full justify-end">
                   {/* Character name with enhanced styling */}
