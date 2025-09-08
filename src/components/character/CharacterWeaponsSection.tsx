@@ -300,8 +300,6 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
             {recommendation.artifacts.length > 0 ? (
               <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 px-2">
                 {recommendation.artifacts.map((artifact, index) => {
-                  // Отладочная информация
-                  console.log('🔍 Processing artifact:', { index, artifact, setType: artifact.setType, hasId: 'id' in artifact, hasName: 'name' in artifact });
                   // Проверяем тип артефакта
                   if (artifact.setType === 'combination' && 'sets' in artifact && artifact.sets) {
                     // Комбинация сетов (например, 2+2)
@@ -357,7 +355,6 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     );
                   } else if (artifact.setType === 'single') {
                     // Одиночный сет
-                    console.log('🔍 Processing single artifact:', { artifact, id: artifact.id?.toString() });
                     // Убеждаемся, что у нас есть уникальный строковый ключ
                     let artifactKey;
                     if (typeof artifact.id === 'object' && artifact.id !== null) {
@@ -373,11 +370,8 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                          className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] cursor-pointer"
                          onClick={() => {
                            const artifactId = artifact.id?.toString() || artifact.name?.toString() || '';
-                           console.log('🔍 Single artifact clicked:', { id: artifactId, originalId: artifact.id?.toString(), name: artifact.name?.toString() });
                            if (artifactId) {
                              onItemClick?.('artifact', artifactId);
-                           } else {
-                             console.error('🔍 No valid ID or name for artifact:', artifact);
                            }
                          }}
                        >
@@ -402,7 +396,6 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                     );
                   } else if ('id' in artifact && 'name' in artifact && !artifact.setType) {
                     // Обычный артефакт (для обратной совместимости) - без setType
-                    console.log('🔍 Processing regular artifact (no setType):', { artifact, id: artifact.id?.toString() });
                     // Убеждаемся, что у нас есть уникальный строковый ключ
                     let regularArtifactKey;
                     if (typeof artifact.id === 'object' && artifact.id !== null) {
@@ -418,11 +411,8 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                          className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] cursor-pointer"
                          onClick={() => {
                            const artifactId = artifact.id?.toString() || artifact.name?.toString() || '';
-                           console.log('🔍 Regular artifact clicked:', { id: artifactId, originalId: artifact.id?.toString(), name: artifact.name?.toString() });
                            if (artifactId) {
                              onItemClick?.('artifact', artifactId);
-                           } else {
-                             console.error('🔍 No valid ID or name for regular artifact:', artifact);
                            }
                          }}
                        >

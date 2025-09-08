@@ -26,19 +26,11 @@ export async function GET(
 
     const artifactsCollection = mongoose.connection.db.collection('artifacts');
     // Ищем артефакт сначала по ID, затем по имени
-    console.log('🔍 Searching artifact by ID:', id);
     let artifact = await artifactsCollection.findOne({ id: id });
     
     if (!artifact) {
       // Если не найден по ID, ищем по имени
-      console.log('🔍 Artifact not found by ID, searching by name:', id);
       artifact = await artifactsCollection.findOne({ name: id });
-    }
-    
-    if (artifact) {
-      console.log('🔍 Artifact found:', { id: artifact.id, name: artifact.name });
-    } else {
-      console.log('🔍 Artifact not found by ID or name:', id);
     }
 
     if (!artifact) {

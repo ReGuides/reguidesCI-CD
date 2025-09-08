@@ -56,13 +56,13 @@ function HomePageContent() {
     return withPatch;
   }, [characters]);
 
-  // Для блока — 6 самых новых
-  const newest6Characters = useMemo(() => {
+  // Для блока — 5 самых новых
+  const newest5Characters = useMemo(() => {
     if (!Array.isArray(characters) || !characters) return [];
     return [...characters]
       .filter(char => char && char.patchNumber) // Только персонажи с patchNumber
       .sort(sortByPatchNumber)
-      .slice(0, 6);
+      .slice(0, 5);
   }, [characters]);
 
   // 4 самых просматриваемых (исключая новых)
@@ -108,15 +108,15 @@ function HomePageContent() {
   // Рандомные персонажи (без повторов с баннера и новых)
   const randomBlockCharacters = useMemo(() => {
     if (!Array.isArray(characters) || !characters) return [];
-    const excludeIds = new Set([...bannerCharacters, ...newest6Characters].map(c => c && c.id).filter(Boolean));
+    const excludeIds = new Set([...bannerCharacters, ...newest5Characters].map(c => c && c.id).filter(Boolean));
     const pool = characters.filter(c => c && !excludeIds.has(c.id));
     // Перемешать
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [pool[i], pool[j]] = [pool[j], pool[i]];
     }
-    return pool.slice(0, 6);
-  }, [characters, bannerCharacters, newest6Characters]);
+    return pool.slice(0, 5);
+  }, [characters, bannerCharacters, newest5Characters]);
 
 
 
@@ -193,11 +193,11 @@ function HomePageContent() {
       <div className="w-full max-w-7xl mx-auto px-4">
         <div className="flex-1 min-w-0">
             {/* Новые персонажи */}
-            {Array.isArray(newest6Characters) && newest6Characters.length > 0 && (
+            {Array.isArray(newest5Characters) && newest5Characters.length > 0 && (
               <div className="mt-12 sm:mt-16">
                 <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Новые персонажи</h2>
                 <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
-                  {newest6Characters.map(character => {
+                  {newest5Characters.map(character => {
                     if (!character || typeof character !== 'object') return null;
                     return (
                       <div key={`new-${character.id}`} onClick={() => router.push(`/characters/${character.id}`)} className="cursor-pointer">
