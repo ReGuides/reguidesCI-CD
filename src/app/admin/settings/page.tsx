@@ -67,6 +67,11 @@ export default function SettingsPage() {
       vk: '',
       website: '',
       description: ''
+    },
+    sitemap: {
+      includeAllCharacters: true,
+      lastUpdated: undefined,
+      forceUpdate: false
     }
   });
   const [loading, setLoading] = useState(true);
