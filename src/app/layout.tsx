@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     description: 'Подробные гайды по персонажам, оружию и артефактам Genshin Impact. Рекомендации по сборке, таланты, созвездия и многое другое.',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/images/logos/logo.png',
         width: 1200,
         height: 630,
         alt: 'ReGuides - Гайды по Genshin Impact',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ReGuides - Лучшие гайды по Genshin Impact',
     description: 'Подробные гайды по персонажам, оружию и артефактам Genshin Impact.',
-    images: ['/og-image.jpg'],
+    images: ['/images/logos/logo.png'],
   },
   robots: {
     index: true,
