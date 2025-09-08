@@ -71,6 +71,16 @@ export default function SitemapAdminPage() {
     setMessage('')
     
     try {
+      // Сначала устанавливаем флаг принудительного обновления
+      const forceResponse = await fetch('/api/force-sitemap', {
+        method: 'POST',
+      })
+      
+      if (!forceResponse.ok) {
+        throw new Error('Failed to set force update flag')
+      }
+      
+      // Затем обновляем настройки
       const response = await fetch('/api/admin/sitemap', {
         method: 'POST',
         headers: {
@@ -83,7 +93,7 @@ export default function SitemapAdminPage() {
       
       if (data.success) {
         setSettings(data.data)
-        setMessage('Sitemap обновлен! Проверьте /sitemap.xml')
+        setMessage('Sitemap обновлен! Проверьте /sitemap.xml через несколько секунд')
       } else {
         setMessage('Ошибка обновления: ' + data.error)
       }

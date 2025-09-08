@@ -10,12 +10,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://reguides.ru'
   
   try {
+    console.log('🔗 Sitemap: Starting generation...')
     await connectDB()
+    console.log('✅ Sitemap: Database connected')
     
     // Получаем настройки сайта
     const settings = await SiteSettings.getSettings()
+    console.log('⚙️ Sitemap: Settings loaded:', {
+      includeAllCharacters: settings.sitemap.includeAllCharacters,
+      forceUpdate: settings.sitemap.forceUpdate
+    })
     
     // Получаем все данные из базы
+    console.log('📊 Sitemap: Fetching data from database...')
     const [characters, weapons, artifacts, articles] = await Promise.all([
       settings.sitemap.includeAllCharacters 
         ? CharacterModel.find({}).select('id updatedAt') // Все персонажи
@@ -25,8 +32,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ArticleModel.find({ isActive: true }).select('id updatedAt')
     ])
     
+    console.log('📈 Sitemap: Data fetched:', {
+      characters: characters.length,
+      weapons: weapons.length,
+      artifacts: artifacts.length,
+      articles: articles.length
+    })
+    
     // Обновляем время последнего обновления sitemap
     if (settings.sitemap.forceUpdate) {
+      console.log('🔄 Sitemap: Force update requested, updating timestamp...')
       await SiteSettings.findOneAndUpdate(
         {},
         { 
@@ -102,9 +117,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }))
     
-    return [...staticPages, ...characterPages, ...weaponPages, ...artifactPages, ...articlePages]
+    const allPages = [...staticPages, ...characterPages, ...weaponPages, ...artifactPages, ...articlePages]
+    console.log('🎯 Sitemap: Generated successfully!', {
+      totalPages: allPages.length,
+      static: staticPages.length,
+      characters: characterPages.length,
+      weapons: weaponPages.length,
+      artifacts: artifactPages.length,
+      articles: articlePages.length
+    })
+    return allPages
   } catch (error) {
-    console.error('Error generating sitemap:', error)
+    console.error('❌ Sitemap: Error generating sitemap:', error)
+    console.error('❌ Sitemap: Using fallback - only static pages')
     
     // Fallback - только статические страницы
     return [

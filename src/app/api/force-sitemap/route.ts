@@ -1,16 +1,27 @@
 import { NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
+import connectDB from '@/lib/mongodb'
+import SiteSettings from '@/models/SiteSettings'
 
-export async function GET() {
+export async function POST() {
   try {
-    // Принудительно обновляем sitemap
-    revalidatePath('/sitemap.xml')
+    await connectDB()
+    
+    // Устанавливаем флаг принудительного обновления
+    await SiteSettings.findOneAndUpdate(
+      {},
+      { 
+        'sitemap.forceUpdate': true,
+        'sitemap.lastUpdated': new Date()
+      },
+      { upsert: true }
+    )
     
     return NextResponse.json({
       success: true,
-      message: 'Sitemap cache cleared and regenerated'
+      message: 'Sitemap force update flag set. Check /sitemap.xml in a few seconds.'
     })
   } catch (error) {
+    console.error('Error setting force update flag:', error)
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
