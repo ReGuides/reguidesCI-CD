@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     await connectDB()
     const body = await request.json()
     
-    const updateData: any = {}
+    const updateData: Record<string, unknown> = {}
     
     if (body.includeAllCharacters !== undefined) {
       updateData['sitemap.includeAllCharacters'] = body.includeAllCharacters
