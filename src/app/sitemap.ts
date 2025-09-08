@@ -4,6 +4,7 @@ import { CharacterModel } from '@/models/Character'
 import { WeaponModel } from '@/models/Weapon'
 import { ArtifactModel } from '@/models/Artifact'
 import { ArticleModel } from '@/models/Article'
+import SiteSettings from '@/models/SiteSettings'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://reguides.ru'
@@ -11,13 +12,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     await connectDB()
     
+    // Получаем настройки сайта
+    const settings = await SiteSettings.getSettings()
+    
     // Получаем все данные из базы
     const [characters, weapons, artifacts, articles] = await Promise.all([
-      CharacterModel.find({}).select('id updatedAt'), // Все персонажи, не только активные
+      settings.sitemap.includeAllCharacters 
+        ? CharacterModel.find({}).select('id updatedAt') // Все персонажи
+        : CharacterModel.find({ isActive: true }).select('id updatedAt'), // Только активные
       WeaponModel.find({}).select('id'),
       ArtifactModel.find({}).select('id'),
       ArticleModel.find({ isActive: true }).select('id updatedAt')
     ])
+    
+    // Обновляем время последнего обновления sitemap
+    if (settings.sitemap.forceUpdate) {
+      await SiteSettings.findOneAndUpdate(
+        {},
+        { 
+          'sitemap.lastUpdated': new Date(),
+          'sitemap.forceUpdate': false 
+        }
+      )
+    }
     
     // Статические страницы
     const staticPages: MetadataRoute.Sitemap = [

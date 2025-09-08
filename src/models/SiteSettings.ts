@@ -20,6 +20,11 @@ export interface ISiteSettings {
     website?: string;
     description?: string;
   };
+  sitemap: {
+    includeAllCharacters: boolean; // Включать всех персонажей в sitemap или только активных
+    lastUpdated?: Date;
+    forceUpdate?: boolean;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -65,6 +70,13 @@ const siteSettingsSchema = new mongoose.Schema<ISiteSettings>({
     vk: { type: String },
     website: { type: String },
     description: { type: String }
+  },
+  
+  // Настройки sitemap
+  sitemap: {
+    includeAllCharacters: { type: Boolean, default: true },
+    lastUpdated: { type: Date },
+    forceUpdate: { type: Boolean, default: false }
   },
   
   // Метаданные
