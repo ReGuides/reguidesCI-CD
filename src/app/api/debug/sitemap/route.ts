@@ -11,10 +11,10 @@ export async function GET() {
     
     // Получаем все данные из базы
     const [characters, weapons, artifacts, articles] = await Promise.all([
-      CharacterModel.find({ isActive: true }).select('id updatedAt').limit(5),
-      WeaponModel.find({}).select('id updatedAt').limit(5),
-      ArtifactModel.find({}).select('id updatedAt').limit(5),
-      ArticleModel.find({ isActive: true }).select('id updatedAt').limit(5)
+      CharacterModel.find({ isActive: true }).select('id updatedAt'),
+      WeaponModel.find({}).select('id'),
+      ArtifactModel.find({}).select('id'),
+      ArticleModel.find({ isActive: true }).select('id updatedAt')
     ])
     
     return NextResponse.json({
@@ -25,10 +25,10 @@ export async function GET() {
         artifacts: artifacts.length,
         articles: articles.length,
         sample: {
-          characters: characters,
-          weapons: weapons,
-          artifacts: artifacts,
-          articles: articles
+          characters: characters.slice(0, 3), // Показываем только первые 3 для примера
+          weapons: weapons.slice(0, 3),
+          artifacts: artifacts.slice(0, 3),
+          articles: articles.slice(0, 3)
         }
       }
     })
