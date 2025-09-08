@@ -31,7 +31,7 @@ export default function SitemapAdminPage() {
       } else {
         setMessage('Ошибка загрузки настроек: ' + data.error)
       }
-    } catch (error) {
+    } catch {
       setMessage('Ошибка загрузки настроек')
     } finally {
       setLoading(false)
@@ -59,7 +59,7 @@ export default function SitemapAdminPage() {
       } else {
         setMessage('Ошибка сохранения: ' + data.error)
       }
-    } catch (error) {
+    } catch {
       setMessage('Ошибка сохранения настроек')
     } finally {
       setSaving(false)
@@ -87,7 +87,7 @@ export default function SitemapAdminPage() {
       } else {
         setMessage('Ошибка обновления: ' + data.error)
       }
-    } catch (error) {
+    } catch {
       setMessage('Ошибка обновления sitemap')
     } finally {
       setSaving(false)
