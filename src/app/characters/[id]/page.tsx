@@ -126,6 +126,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
   const elementColor = getElementColor(character.element || '');
 
   const handleItemClick = async (type: string, id: string) => {
+    console.log('🔍 handleItemClick called:', { type, id });
     try {
       if (type === 'weapon') {
         const response = await fetch(`/api/weapons/${id}`);
@@ -137,9 +138,11 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
           console.error('Failed to fetch weapon:', response.status, response.statusText);
         }
       } else if (type === 'artifact') {
+        console.log('🔍 Fetching artifact with ID:', id);
         const response = await fetch(`/api/artifacts/${id}`);
         if (response.ok) {
           const artifact = await response.json();
+          console.log('🔍 Artifact fetched successfully:', artifact);
           setSelectedArtifact(artifact);
           setIsArtifactModalOpen(true);
         } else {

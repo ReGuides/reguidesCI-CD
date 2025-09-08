@@ -31,13 +31,6 @@ export default function RecommendationForm({ initial, onCancel, onSave, characte
   const [showArtifactModal, setShowArtifactModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'weapons' | 'artifacts' | 'stats' | 'teams'>('weapons');
 
-  // Отладочная информация
-  console.log('🔍 RecommendationForm Debug:', {
-    characterWeaponType,
-    characterId,
-    weaponsListCount: weaponsList.length,
-    weaponsListTypes: [...new Set(weaponsList.map(w => w.type))]
-  });
 
   // Загружаем список оружия и артефактов
   useEffect(() => {
@@ -304,13 +297,6 @@ export default function RecommendationForm({ initial, onCancel, onSave, characte
         weaponType={characterWeaponType}
       />
       
-      {/* Отладочная информация */}
-      {showWeaponModal && (
-        <div className="fixed top-4 right-4 bg-black/80 text-white p-2 rounded text-xs z-50">
-          <div>Character Weapon Type: {characterWeaponType}</div>
-          <div>Weapons Count: {weaponsList.length}</div>
-        </div>
-      )}
 
       {/* Модальное окно выбора артефактов */}
       <ArtifactSelectModal

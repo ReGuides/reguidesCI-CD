@@ -61,16 +61,6 @@ export const WeaponSelectModal: React.FC<WeaponSelectModalProps> = ({
         return matchesType && matchesSearch;
       });
   
-  // Отладочная информация
-  console.log('🔍 WeaponSelectModal Debug:', {
-    weaponType,
-    normWeaponType,
-    typeVariants,
-    totalWeapons: weapons.length,
-    weaponsTypes: weapons.map(w => w.type).slice(0, 5), // первые 5 типов для примера
-    allWeaponTypes: [...new Set(weapons.map(w => w.type))], // все уникальные типы
-    filteredCount: filteredWeapons.length
-  });
 
   const handleToggle = (id: string) => {
     setSelected(prev =>
