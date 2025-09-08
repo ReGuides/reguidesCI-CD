@@ -5,7 +5,7 @@ Allow: /
 Allow: /characters
 Allow: /weapons
 Allow: /artifacts
-Allow: /news
+Allow: /articles
 
 # Запрещаем индексацию админки
 Disallow: /admin/

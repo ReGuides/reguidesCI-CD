@@ -3,6 +3,9 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Политика конфиденциальности - ReGuides',
   description: 'Политика конфиденциальности и обработки данных сайта ReGuides',
+  alternates: {
+    canonical: '/privacy-policy',
+  },
 };
 
 export default function PrivacyPolicyPage() {
