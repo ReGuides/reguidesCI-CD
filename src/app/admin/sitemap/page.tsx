@@ -16,6 +16,8 @@ export default function SitemapAdminPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [logs, setLogs] = useState<string[]>([])
+  const [logsLoading, setLogsLoading] = useState(false)
 
   useEffect(() => {
     fetchSettings()
@@ -66,6 +68,27 @@ export default function SitemapAdminPage() {
     }
   }
 
+  const fetchLogs = async () => {
+    setLogsLoading(true)
+    try {
+      const response = await fetch('/api/admin/sitemap-logs')
+      const data = await response.json()
+      
+      if (data.success) {
+        setLogs(data.logs)
+        setMessage('Логи обновлены')
+      } else {
+        setLogs(data.logs || ['Ошибка получения логов'])
+        setMessage('Ошибка получения логов: ' + data.error)
+      }
+    } catch {
+      setLogs(['Ошибка получения логов'])
+      setMessage('Ошибка получения логов')
+    } finally {
+      setLogsLoading(false)
+    }
+  }
+
   const forceUpdateSitemap = async () => {
     setSaving(true)
     setMessage('')
@@ -94,6 +117,8 @@ export default function SitemapAdminPage() {
       if (data.success) {
         setSettings(data.data)
         setMessage('Sitemap обновлен! Проверьте /sitemap.xml через несколько секунд')
+        // Обновляем логи после обновления
+        setTimeout(() => fetchLogs(), 1000)
       } else {
         setMessage('Ошибка обновления: ' + data.error)
       }
@@ -181,6 +206,31 @@ export default function SitemapAdminPage() {
         </button>
       </div>
 
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Логи Sitemap</h2>
+          <button
+            onClick={fetchLogs}
+            disabled={logsLoading}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          >
+            {logsLoading ? 'Загрузка...' : 'Обновить логи'}
+          </button>
+        </div>
+        
+        <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm max-h-96 overflow-y-auto">
+          {logs.length === 0 ? (
+            <div className="text-gray-500">Логи не загружены. Нажмите "Обновить логи"</div>
+          ) : (
+            logs.map((log, index) => (
+              <div key={index} className="mb-1">
+                {log}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
       <div className="bg-gray-50 rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Информация</h2>
         <div className="space-y-2 text-sm text-gray-600">
@@ -188,6 +238,7 @@ export default function SitemapAdminPage() {
           <p>• После обновления проверьте sitemap в браузере</p>
           <p>• Для поисковиков sitemap обновляется автоматически</p>
           <p>• Принудительное обновление сбрасывает кеш sitemap</p>
+          <p>• Логи показывают процесс генерации sitemap в реальном времени</p>
         </div>
       </div>
     </div>
