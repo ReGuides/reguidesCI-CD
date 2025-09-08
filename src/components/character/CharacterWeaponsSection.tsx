@@ -372,8 +372,13 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                          key={artifactKey} 
                          className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] cursor-pointer"
                          onClick={() => {
-                           console.log('🔍 Single artifact clicked:', { id: artifact.id?.toString() });
-                           onItemClick?.('artifact', artifact.id?.toString() || '');
+                           const artifactId = artifact.id?.toString() || artifact.name?.toString() || '';
+                           console.log('🔍 Single artifact clicked:', { id: artifactId, originalId: artifact.id?.toString(), name: artifact.name?.toString() });
+                           if (artifactId) {
+                             onItemClick?.('artifact', artifactId);
+                           } else {
+                             console.error('🔍 No valid ID or name for artifact:', artifact);
+                           }
                          }}
                        >
                          <div className="w-20 h-20 mb-3 flex items-center justify-center">
@@ -412,8 +417,13 @@ const CharacterWeaponsSection: React.FC<CharacterWeaponsSectionProps> = ({ chara
                          key={regularArtifactKey} 
                          className="flex flex-col items-center p-4 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors min-h-[160px] cursor-pointer"
                          onClick={() => {
-                           console.log('🔍 Regular artifact clicked:', { id: artifact.id?.toString() });
-                           onItemClick?.('artifact', artifact.id?.toString() || '');
+                           const artifactId = artifact.id?.toString() || artifact.name?.toString() || '';
+                           console.log('🔍 Regular artifact clicked:', { id: artifactId, originalId: artifact.id?.toString(), name: artifact.name?.toString() });
+                           if (artifactId) {
+                             onItemClick?.('artifact', artifactId);
+                           } else {
+                             console.error('🔍 No valid ID or name for regular artifact:', artifact);
+                           }
                          }}
                        >
                          <div className="w-20 h-20 mb-3 flex items-center justify-center">
