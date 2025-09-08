@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { WeaponCard } from '@/components/weapon-card';
 import { WeaponFilters } from '@/components/features/weapon-filters';
@@ -13,7 +13,9 @@ export default function WeaponsPage() {
   return (
     <>
       <PageTitle title="Оружие" />
-      <WeaponsPageContent />
+      <Suspense fallback={<LoadingSpinner size="lg" className="text-accent" />}>
+        <WeaponsPageContent />
+      </Suspense>
     </>
   );
 }

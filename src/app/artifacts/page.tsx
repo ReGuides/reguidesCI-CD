@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ArtifactCard } from '@/components/artifact-card';
 import { ArtifactFilters } from '@/components/features/artifact-filters';
@@ -13,7 +13,9 @@ export default function ArtifactsPage() {
   return (
     <>
       <PageTitle title="Артефакты" />
-      <ArtifactsPageContent />
+      <Suspense fallback={<LoadingSpinner size="lg" className="text-accent" />}>
+        <ArtifactsPageContent />
+      </Suspense>
     </>
   );
 }
