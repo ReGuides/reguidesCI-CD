@@ -1,15 +1,23 @@
 import { MetadataRoute } from 'next'
 import connectDB from '@/lib/mongodb'
 import { CharacterModel } from '@/models/Character'
+import { WeaponModel } from '@/models/Weapon'
+import { ArtifactModel } from '@/models/Artifact'
+import { ArticleModel } from '@/models/Article'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://reguides.ru'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://reguides.ru'
   
   try {
     await connectDB()
     
-    // Получаем всех персонажей
-    const characters = await CharacterModel.find({ isActive: true }).select('id updatedAt')
+    // Получаем все данные из базы
+    const [characters, weapons, artifacts, articles] = await Promise.all([
+      CharacterModel.find({ isActive: true }).select('id updatedAt'),
+      WeaponModel.find({}).select('id updatedAt'),
+      ArtifactModel.find({}).select('id updatedAt'),
+      ArticleModel.find({ isActive: true }).select('id updatedAt')
+    ])
     
     // Статические страницы
     const staticPages: MetadataRoute.Sitemap = [
@@ -28,13 +36,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       {
         url: `${baseUrl}/weapons`,
         lastModified: new Date(),
-        changeFrequency: 'weekly',
+        changeFrequency: 'daily',
         priority: 0.8,
       },
       {
         url: `${baseUrl}/artifacts`,
         lastModified: new Date(),
-        changeFrequency: 'weekly',
+        changeFrequency: 'daily',
         priority: 0.8,
       },
       {
@@ -49,11 +57,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const characterPages: MetadataRoute.Sitemap = characters.map((character) => ({
       url: `${baseUrl}/characters/${character.id}`,
       lastModified: character.updatedAt || new Date(),
-      changeFrequency: 'weekly' as const,
+      changeFrequency: 'daily' as const,
       priority: 0.8,
     }))
     
-    return [...staticPages, ...characterPages]
+    // Страницы оружия
+    const weaponPages: MetadataRoute.Sitemap = weapons.map((weapon) => ({
+      url: `${baseUrl}/weapons/${weapon.id}`,
+      lastModified: weapon.updatedAt || new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.7,
+    }))
+    
+    // Страницы артефактов
+    const artifactPages: MetadataRoute.Sitemap = artifacts.map((artifact) => ({
+      url: `${baseUrl}/artifacts/${artifact.id}`,
+      lastModified: artifact.updatedAt || new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.7,
+    }))
+    
+    // Страницы статей
+    const articlePages: MetadataRoute.Sitemap = articles.map((article) => ({
+      url: `${baseUrl}/articles/${article.id}`,
+      lastModified: article.updatedAt || new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.6,
+    }))
+    
+    return [...staticPages, ...characterPages, ...weaponPages, ...artifactPages, ...articlePages]
   } catch (error) {
     console.error('Error generating sitemap:', error)
     
@@ -74,13 +106,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       {
         url: `${baseUrl}/weapons`,
         lastModified: new Date(),
-        changeFrequency: 'weekly',
+        changeFrequency: 'daily',
         priority: 0.8,
       },
       {
         url: `${baseUrl}/artifacts`,
         lastModified: new Date(),
-        changeFrequency: 'weekly',
+        changeFrequency: 'daily',
         priority: 0.8,
       },
       {
