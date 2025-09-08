@@ -1,0 +1,30 @@
+User-agent: *
+Allow: /
+
+# Основные страницы
+Allow: /characters
+Allow: /weapons
+Allow: /artifacts
+Allow: /news
+
+# Запрещаем индексацию админки
+Disallow: /admin/
+Disallow: /api/
+Disallow: /debug/
+
+# Запрещаем индексацию служебных файлов
+Disallow: /_next/
+Disallow: /static/
+
+# Sitemap
+Sitemap: https://reguides.ru/sitemap.xml
+
+# Дополнительные настройки для Яндекса
+User-agent: Yandex
+Allow: /
+Crawl-delay: 1
+
+# Настройки для Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
