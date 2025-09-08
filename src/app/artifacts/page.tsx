@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ArtifactCard } from '@/components/artifact-card';
 import { ArtifactFilters } from '@/components/features/artifact-filters';
+import { ArtifactModal } from '@/components/artifact-modal';
 import { Artifact } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import PageTitle from '@/components/ui/page-title';
@@ -17,9 +19,12 @@ export default function ArtifactsPage() {
 }
 
 function ArtifactsPageContent() {
+  const searchParams = useSearchParams();
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     type: 'all',
     rarity: 'all',
@@ -60,6 +65,30 @@ function ArtifactsPageContent() {
     fetchArtifacts();
   }, [filters]);
 
+  // Обработка URL параметров для открытия модалки
+  useEffect(() => {
+    const modal = searchParams.get('modal');
+    const artifactId = searchParams.get('id');
+    
+    if (modal === 'artifact' && artifactId && artifacts.length > 0) {
+      const artifact = artifacts.find(a => a.id === artifactId);
+      if (artifact) {
+        setSelectedArtifact(artifact);
+        setIsModalOpen(true);
+      }
+    }
+  }, [searchParams, artifacts]);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedArtifact(null);
+    // Очищаем URL параметры
+    const url = new URL(window.location.href);
+    url.searchParams.delete('modal');
+    url.searchParams.delete('id');
+    window.history.replaceState({}, '', url.toString());
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-6 overflow-hidden">
       <aside className="w-full md:w-64 flex-shrink-0 min-w-0">
@@ -94,6 +123,13 @@ function ArtifactsPageContent() {
           </div>
         )}
       </main>
+      
+      {/* Модалка артефакта */}
+      <ArtifactModal
+        artifact={selectedArtifact}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 } 

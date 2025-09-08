@@ -1,10 +1,90 @@
+import type { Metadata } from 'next';
+import { Character } from '@/types';
+
+// Генерируем мета-данные для SEO
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/characters/${id}`, {
+      cache: 'no-store' // Всегда получаем свежие данные
+    });
+    
+    if (!response.ok) {
+      return {
+        title: 'Персонаж не найден | ReGuides',
+        description: 'Персонаж не найден в базе данных ReGuides.',
+      };
+    }
+    
+    const character: Character = await response.json();
+    
+    const characterName = character.name || 'Неизвестный персонаж';
+    const characterElement = character.element || 'Неизвестный элемент';
+    const characterWeapon = typeof character.weapon === 'string' ? character.weapon : character.weapon?.name || 'Неизвестное оружие';
+    
+    const title = `${characterName} - Гайд по персонажу | ReGuides`;
+    const description = `Подробный гайд по персонажу ${characterName} в Genshin Impact. Рекомендации по оружию, артефактам, талантам и сборкам. Элемент: ${characterElement}, Оружие: ${characterWeapon}.`;
+    
+    return {
+      title,
+      description,
+      keywords: [
+        characterName,
+        'genshin impact',
+        'гайд',
+        'персонаж',
+        characterElement,
+        characterWeapon,
+        'сборка',
+        'рекомендации',
+        'таланты',
+        'созвездия'
+      ],
+      openGraph: {
+        title,
+        description,
+        type: 'article',
+        url: `https://reguides.ru/characters/${id}`,
+        images: [
+          {
+            url: character.image || '/images/logos/logo.png',
+            width: 1200,
+            height: 630,
+            alt: `${character.name} - Genshin Impact`,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [character.image || '/images/logos/logo.png'],
+      },
+      alternates: {
+        canonical: `/characters/${id}`,
+      },
+      other: {
+        'article:author': 'ReGuides',
+        'article:section': 'Genshin Impact',
+        'article:tag': [characterElement, characterWeapon].join(', '),
+      },
+    };
+  } catch (error) {
+    console.error('Error generating metadata for character:', error);
+    return {
+      title: 'Ошибка загрузки | ReGuides',
+      description: 'Произошла ошибка при загрузке информации о персонаже.',
+    };
+  }
+}
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Character } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import CharacterWeaponsSection from '@/components/character/CharacterWeaponsSection';
@@ -18,6 +98,7 @@ import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
 import { ArtifactCombinationModal } from '@/components/artifact-combination-modal';
+import StructuredData from '@/components/seo/StructuredData';
 import { Weapon, Artifact, Talent, ArtifactOrCombination } from '@/types';
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations';
@@ -40,12 +121,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
   
 
 
-  // Устанавливаем заголовок страницы
-  useEffect(() => {
-    if (character) {
-      document.title = `${character.name} - ReGuides`;
-    }
-  }, [character]);
+  // Мета-данные теперь генерируются на сервере через generateMetadata
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -180,7 +256,11 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row w-full h-full overflow-hidden">
+    <>
+      {/* Структурированные данные для SEO */}
+      {character && <StructuredData character={character} />}
+      
+      <div className="min-h-screen flex flex-col md:flex-row w-full h-full overflow-hidden">
       {/* Левая колонка: информация о персонаже */}
       <div 
         className="relative md:w-80 min-h-full flex flex-col w-full overflow-y-auto overflow-x-hidden" 
@@ -484,7 +564,7 @@ export default function CharacterDetailPage({ params }: { params: Promise<{ id: 
          onClose={closeCombinationModal}
        />
        
-
      </div>
+    </>
   );
 } 

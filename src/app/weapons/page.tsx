@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { WeaponCard } from '@/components/weapon-card';
 import { WeaponFilters } from '@/components/features/weapon-filters';
+import { WeaponModal } from '@/components/weapon-modal';
 import { Weapon } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import PageTitle from '@/components/ui/page-title';
@@ -17,9 +19,12 @@ export default function WeaponsPage() {
 }
 
 function WeaponsPageContent() {
+  const searchParams = useSearchParams();
   const [weapons, setWeapons] = useState<Weapon[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     search: '',
     type: 'all',
@@ -57,6 +62,30 @@ function WeaponsPageContent() {
 
     fetchWeapons();
   }, []);
+
+  // Обработка URL параметров для открытия модалки
+  useEffect(() => {
+    const modal = searchParams.get('modal');
+    const weaponId = searchParams.get('id');
+    
+    if (modal === 'weapon' && weaponId && weapons.length > 0) {
+      const weapon = weapons.find(w => w.id === weaponId);
+      if (weapon) {
+        setSelectedWeapon(weapon);
+        setIsModalOpen(true);
+      }
+    }
+  }, [searchParams, weapons]);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedWeapon(null);
+    // Очищаем URL параметры
+    const url = new URL(window.location.href);
+    url.searchParams.delete('modal');
+    url.searchParams.delete('id');
+    window.history.replaceState({}, '', url.toString());
+  };
 
   // Фильтрация и сортировка оружия
   const filteredAndSortedWeapons = useMemo(() => {
@@ -125,6 +154,13 @@ function WeaponsPageContent() {
           </div>
         )}
       </main>
+      
+      {/* Модалка оружия */}
+      <WeaponModal
+        weapon={selectedWeapon}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 } 
