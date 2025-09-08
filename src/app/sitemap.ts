@@ -9,15 +9,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://reguides.ru'
   
   try {
+    console.log('Connecting to database...')
     await connectDB()
+    console.log('Database connected successfully')
     
     // Получаем все данные из базы
+    console.log('Fetching data from database...')
     const [characters, weapons, artifacts, articles] = await Promise.all([
       CharacterModel.find({ isActive: true }).select('id updatedAt'),
       WeaponModel.find({}).select('id updatedAt'),
       ArtifactModel.find({}).select('id updatedAt'),
       ArticleModel.find({ isActive: true }).select('id updatedAt')
     ])
+    
+    console.log('Data fetched:', {
+      characters: characters.length,
+      weapons: weapons.length,
+      artifacts: artifacts.length,
+      articles: articles.length
+    })
     
     // Статические страницы
     const staticPages: MetadataRoute.Sitemap = [
@@ -85,7 +95,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }))
     
-    return [...staticPages, ...characterPages, ...weaponPages, ...artifactPages, ...articlePages]
+    const allPages = [...staticPages, ...characterPages, ...weaponPages, ...artifactPages, ...articlePages]
+    console.log('Total pages in sitemap:', allPages.length)
+    return allPages
   } catch (error) {
     console.error('Error generating sitemap:', error)
     
