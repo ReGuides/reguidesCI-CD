@@ -33,24 +33,44 @@ export const WeaponSelectModal: React.FC<WeaponSelectModalProps> = ({
   const normalize = (s: string) => (s || '').toLowerCase().replace(/ё/g, 'е').trim();
   
   const weaponTypeRusVariants: Record<string, string[]> = {
-    'лук': ['лук', 'стрелковое'],
-    'меч': ['одноручный меч', 'меч'],
-    'двуручный меч': ['двуручный меч'],
-    'копье': ['копье', 'копьё', 'древковое'],
-    'катализатор': ['катализатор'],
+    'лук': ['лук', 'стрелковое', 'Лук'],
+    'меч': ['одноручный меч', 'меч', 'Одноручный меч'],
+    'одноручный меч': ['одноручный меч', 'меч', 'Одноручный меч'],
+    'двуручный меч': ['двуручный меч', 'Двуручный меч'],
+    'копье': ['копье', 'копьё', 'древковое', 'Копьё', 'Древковое оружие'],
+    'катализатор': ['катализатор', 'Катализатор'],
   };
 
 
 
   const normWeaponType = normalize(weaponType || '');
   const typeVariants = weaponTypeRusVariants[normWeaponType] || [];
-  const filteredWeapons =
-    !normWeaponType || typeVariants.length === 0
-      ? []
-      : weapons.filter(w =>
-          typeVariants.includes(normalize(w.type)) &&
-          w.name.toLowerCase().includes(search.toLowerCase())
-        );
+  
+  // Если нет типа оружия или вариантов, показываем все оружия
+  const filteredWeapons = !normWeaponType || typeVariants.length === 0
+    ? weapons.filter(w => w.name.toLowerCase().includes(search.toLowerCase()))
+    : weapons.filter(w => {
+        const weaponTypeNormalized = normalize(w.type);
+        const weaponTypeOriginal = w.type;
+        
+        // Проверяем как нормализованный тип, так и оригинальный
+        const matchesType = typeVariants.includes(weaponTypeNormalized) || 
+                           typeVariants.includes(weaponTypeOriginal);
+        const matchesSearch = w.name.toLowerCase().includes(search.toLowerCase());
+        
+        return matchesType && matchesSearch;
+      });
+  
+  // Отладочная информация
+  console.log('🔍 WeaponSelectModal Debug:', {
+    weaponType,
+    normWeaponType,
+    typeVariants,
+    totalWeapons: weapons.length,
+    weaponsTypes: weapons.map(w => w.type).slice(0, 5), // первые 5 типов для примера
+    allWeaponTypes: [...new Set(weapons.map(w => w.type))], // все уникальные типы
+    filteredCount: filteredWeapons.length
+  });
 
   const handleToggle = (id: string) => {
     setSelected(prev =>
