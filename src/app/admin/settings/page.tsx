@@ -466,6 +466,44 @@ export default function SettingsPage() {
     }
   };
 
+  // Сохранение основных настроек (включая sitemap)
+  const saveSettings = async () => {
+    try {
+      setSaving(true);
+      
+      const response = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteName: settings.siteName,
+          logo: settings.logo,
+          favicon: settings.favicon,
+          contacts: settings.contacts,
+          sitemap: settings.sitemap
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setMessage({ type: 'success', text: 'Настройки успешно сохранены' });
+          setTimeout(() => setMessage(null), 3000);
+        }
+      } else {
+        const errorData = await response.json();
+        console.error('Settings save error:', errorData);
+        setMessage({ type: 'error', text: `Ошибка при сохранении настроек: ${errorData.error || 'Неизвестная ошибка'}` });
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setMessage({ type: 'error', text: 'Ошибка при сохранении настроек' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Получаем данные пользователя по ID
   const getUserById = (userId: string) => {
     return users.find(user => user._id?.toString() === userId);
@@ -1014,6 +1052,63 @@ export default function SettingsPage() {
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Секция управления Sitemap */}
+        <Card className="bg-neutral-900 border-neutral-700">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Globe className="w-5 h-5" />
+              Управление Sitemap
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-4">
+              <div>
+                <label className="flex items-center gap-2 text-white">
+                  <input
+                    type="checkbox"
+                    checked={settings.sitemap.includeAllCharacters}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      sitemap: {
+                        ...prev.sitemap,
+                        includeAllCharacters: e.target.checked
+                      }
+                    }))}
+                    className="rounded"
+                  />
+                  <span>Включать всех персонажей в sitemap</span>
+                </label>
+                <p className="text-sm text-neutral-400 mt-1">
+                  Если включено, в sitemap будут все персонажи. Если выключено - только активные.
+                </p>
+              </div>
+
+              <div className="p-4 bg-neutral-800 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Информация о sitemap</h4>
+                <div className="space-y-1 text-sm text-neutral-300">
+                  <p>• Последнее обновление: {settings.sitemap.lastUpdated 
+                    ? new Date(settings.sitemap.lastUpdated).toLocaleString('ru-RU')
+                    : 'Никогда'
+                  }</p>
+                  <p>• Sitemap доступен по адресу: <code className="bg-neutral-700 px-1 rounded">/sitemap.xml</code></p>
+                  <p>• Для принудительного обновления используйте: <Link href="/admin/sitemap" className="text-blue-400 hover:underline">/admin/sitemap</Link></p>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <Button
+                  onClick={saveSettings}
+                  disabled={saving}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  {saving ? 'Сохранение...' : 'Сохранить настройки'}
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
