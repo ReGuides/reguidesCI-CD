@@ -116,7 +116,18 @@ export default function SitemapAdminPage() {
       
       if (data.success) {
         setSettings(data.data)
-        setMessage('Sitemap обновлен! Проверьте /sitemap.xml через несколько секунд')
+        
+        // Принудительно обновляем кеш sitemap
+        const refreshResponse = await fetch('/api/admin/refresh-sitemap', {
+          method: 'POST',
+        })
+        
+        if (refreshResponse.ok) {
+          setMessage('Sitemap обновлен и кеш очищен! Проверьте /sitemap.xml')
+        } else {
+          setMessage('Sitemap обновлен, но кеш не очищен. Попробуйте обновить страницу /sitemap.xml')
+        }
+        
         // Обновляем логи после обновления
         setTimeout(() => fetchLogs(), 1000)
       } else {
@@ -138,21 +149,21 @@ export default function SitemapAdminPage() {
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Управление Sitemap</h1>
+    <div className="p-8 max-w-4xl mx-auto bg-gray-900 min-h-screen">
+      <h1 className="text-3xl font-bold mb-8 text-white">Управление Sitemap</h1>
       
       {message && (
         <div className={`p-4 rounded mb-6 ${
           message.includes('Ошибка') 
-            ? 'bg-red-100 text-red-700 border border-red-300' 
-            : 'bg-green-100 text-green-700 border border-green-300'
+            ? 'bg-red-900/20 text-red-400 border border-red-700' 
+            : 'bg-green-900/20 text-green-400 border border-green-700'
         }`}>
           {message}
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Настройки персонажей</h2>
+      <div className="bg-gray-800 rounded-lg shadow p-6 mb-6 border border-gray-700">
+        <h2 className="text-xl font-semibold mb-4 text-white">Настройки персонажей</h2>
         
         <div className="mb-4">
           <label className="flex items-center">
@@ -165,9 +176,9 @@ export default function SitemapAdminPage() {
               }))}
               className="mr-3"
             />
-            <span>Включать всех персонажей в sitemap (не только активных)</span>
+            <span className="text-gray-300">Включать всех персонажей в sitemap (не только активных)</span>
           </label>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-400 mt-1">
             Если включено, в sitemap будут все персонажи. Если выключено - только активные.
           </p>
         </div>
@@ -181,34 +192,58 @@ export default function SitemapAdminPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Принудительное обновление</h2>
+      <div className="bg-gray-800 rounded-lg shadow p-6 mb-6 border border-gray-700">
+        <h2 className="text-xl font-semibold mb-4 text-white">Принудительное обновление</h2>
         
         <div className="mb-4">
-          <p className="text-gray-600 mb-2">
+          <p className="text-gray-300 mb-2">
             Последнее обновление: {settings.lastUpdated 
               ? new Date(settings.lastUpdated).toLocaleString('ru-RU')
               : 'Никогда'
             }
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             Нажмите кнопку ниже, чтобы принудительно обновить sitemap.
             Это полезно после добавления нового контента.
           </p>
         </div>
         
-        <button
-          onClick={forceUpdateSitemap}
-          disabled={saving}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-        >
-          {saving ? 'Обновление...' : 'Обновить Sitemap'}
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={forceUpdateSitemap}
+            disabled={saving}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+          >
+            {saving ? 'Обновление...' : 'Обновить Sitemap'}
+          </button>
+          
+          <button
+            onClick={async () => {
+              setSaving(true)
+              try {
+                const response = await fetch('/api/admin/refresh-sitemap', { method: 'POST' })
+                if (response.ok) {
+                  setMessage('Кеш sitemap очищен! Обновите страницу /sitemap.xml')
+                } else {
+                  setMessage('Ошибка очистки кеша')
+                }
+              } catch {
+                setMessage('Ошибка очистки кеша')
+              } finally {
+                setSaving(false)
+              }
+            }}
+            disabled={saving}
+            className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 disabled:opacity-50"
+          >
+            {saving ? 'Очистка...' : 'Очистить кеш'}
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
+      <div className="bg-gray-800 rounded-lg shadow p-6 mb-6 border border-gray-700">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Логи Sitemap</h2>
+          <h2 className="text-xl font-semibold text-white">Логи Sitemap</h2>
           <button
             onClick={fetchLogs}
             disabled={logsLoading}
@@ -231,10 +266,10 @@ export default function SitemapAdminPage() {
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Информация</h2>
-        <div className="space-y-2 text-sm text-gray-600">
-          <p>• Sitemap доступен по адресу: <code className="bg-gray-200 px-1 rounded">/sitemap.xml</code></p>
+      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <h2 className="text-xl font-semibold mb-4 text-white">Информация</h2>
+        <div className="space-y-2 text-sm text-gray-300">
+          <p>• Sitemap доступен по адресу: <code className="bg-gray-700 text-gray-200 px-1 rounded">/sitemap.xml</code></p>
           <p>• После обновления проверьте sitemap в браузере</p>
           <p>• Для поисковиков sitemap обновляется автоматически</p>
           <p>• Принудительное обновление сбрасывает кеш sitemap</p>

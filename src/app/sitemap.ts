@@ -6,6 +6,10 @@ import { ArtifactModel } from '@/models/Artifact'
 import { ArticleModel } from '@/models/Article'
 import SiteSettings from '@/models/SiteSettings'
 
+// Отключаем кеширование sitemap
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://reguides.ru'
   
