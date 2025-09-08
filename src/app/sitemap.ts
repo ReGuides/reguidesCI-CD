@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     
     // Получаем все данные из базы
     const [characters, weapons, artifacts, articles] = await Promise.all([
-      CharacterModel.find({ isActive: true }).select('id updatedAt'),
+      CharacterModel.find({}).select('id updatedAt'), // Все персонажи, не только активные
       WeaponModel.find({}).select('id'),
       ArtifactModel.find({}).select('id'),
       ArticleModel.find({ isActive: true }).select('id updatedAt')

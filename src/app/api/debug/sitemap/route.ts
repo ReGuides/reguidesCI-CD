@@ -10,7 +10,8 @@ export async function GET() {
     await connectDB()
     
     // Получаем все данные из базы
-    const [characters, weapons, artifacts, articles] = await Promise.all([
+    const [allCharacters, activeCharacters, weapons, artifacts, articles] = await Promise.all([
+      CharacterModel.find({}).select('id isActive updatedAt'),
       CharacterModel.find({ isActive: true }).select('id updatedAt'),
       WeaponModel.find({}).select('id'),
       ArtifactModel.find({}).select('id'),
@@ -20,12 +21,15 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
-        characters: characters.length,
+        allCharacters: allCharacters.length,
+        activeCharacters: activeCharacters.length,
         weapons: weapons.length,
         artifacts: artifacts.length,
         articles: articles.length,
+        inactiveCharacters: allCharacters.filter(c => !c.isActive).length,
         sample: {
-          characters: characters.slice(0, 3), // Показываем только первые 3 для примера
+          allCharacters: allCharacters.slice(0, 3),
+          activeCharacters: activeCharacters.slice(0, 3),
           weapons: weapons.slice(0, 3),
           artifacts: artifacts.slice(0, 3),
           articles: articles.slice(0, 3)
