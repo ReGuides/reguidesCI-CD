@@ -220,7 +220,7 @@ export default function SitemapAdminPage() {
         
         <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm max-h-96 overflow-y-auto">
           {logs.length === 0 ? (
-            <div className="text-gray-500">Логи не загружены. Нажмите "Обновить логи"</div>
+            <div className="text-gray-500">Логи не загружены. Нажмите &quot;Обновить логи&quot;</div>
           ) : (
             logs.map((log, index) => (
               <div key={index} className="mb-1">
