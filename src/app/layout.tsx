@@ -10,10 +10,61 @@ import AdvertisementPopup from '@/components/advertisement-popup';
 import { CopyrightConsole } from '@/components/copyright-console';
 
 export const metadata: Metadata = {
-  title: 'ReGuides',
-  description: 'Лучшие гайды по Genshin Impact',
+  title: {
+    default: 'ReGuides - Лучшие гайды по Genshin Impact',
+    template: '%s | ReGuides'
+  },
+  description: 'Подробные гайды по персонажам, оружию и артефактам Genshin Impact. Рекомендации по сборке, таланты, созвездия и многое другое.',
+  keywords: ['genshin impact', 'гайды', 'персонажи', 'оружие', 'артефакты', 'сборка', 'рекомендации'],
+  authors: [{ name: 'ReGuides' }],
+  creator: 'ReGuides',
+  publisher: 'ReGuides',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://reguides.ru'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'ru_RU',
+    url: 'https://reguides.ru',
+    siteName: 'ReGuides',
+    title: 'ReGuides - Лучшие гайды по Genshin Impact',
+    description: 'Подробные гайды по персонажам, оружию и артефактам Genshin Impact. Рекомендации по сборке, таланты, созвездия и многое другое.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'ReGuides - Гайды по Genshin Impact',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ReGuides - Лучшие гайды по Genshin Impact',
+    description: 'Подробные гайды по персонажам, оружию и артефактам Genshin Impact.',
+    images: ['/og-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
   },
   verification: {
     yandex: 'a3e9f8cfe55d210d',
@@ -21,7 +72,6 @@ export const metadata: Metadata = {
   other: {
     'copyright': '© 2025 ReGuides. Все права защищены.',
     'author': 'ReGuides',
-    'robots': 'index, follow',
   },
 };
 

@@ -1,3 +1,76 @@
+import { Metadata } from 'next';
+import connectDB from '@/lib/mongodb';
+import { CharacterModel } from '@/models/Character';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  
+  try {
+    await connectDB();
+    const character = await CharacterModel.findOne({ id });
+    
+    if (!character) {
+      return {
+        title: 'Персонаж не найден',
+        description: 'Запрашиваемый персонаж не найден на сайте ReGuides.',
+      };
+    }
+
+    const title = `${character.name} - Гайд по персонажу | ReGuides`;
+    const description = `Подробный гайд по персонажу ${character.name} в Genshin Impact. Рекомендации по оружию, артефактам, талантам и сборке. Элемент: ${character.element || 'Не указан'}.`;
+
+    return {
+      title,
+      description,
+      keywords: [
+        character.name,
+        'genshin impact',
+        'гайд',
+        'персонаж',
+        character.element || '',
+        character.weaponType || '',
+        'сборка',
+        'рекомендации'
+      ].filter(Boolean),
+      openGraph: {
+        title,
+        description,
+        type: 'article',
+        images: [
+          {
+            url: character.image || '/og-image.jpg',
+            width: 1200,
+            height: 630,
+            alt: `${character.name} - Гайд по персонажу`,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [character.image || '/og-image.jpg'],
+      },
+      alternates: {
+        canonical: `/characters/${id}`,
+      },
+    };
+  } catch (error) {
+    console.error('Error generating metadata for character:', error);
+    return {
+      title: 'Персонаж | ReGuides',
+      description: 'Гайд по персонажу Genshin Impact на ReGuides.',
+    };
+  }
+}
+
+
+type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations'; // weapons теперь используется для рекомендаций
+
+export default function CharacterDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  return <CharacterDetailPageContent params={params} />;
+}
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -19,17 +92,6 @@ import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
 import { ArtifactCombinationModal } from '@/components/artifact-combination-modal';
 import { Weapon, Artifact, Talent, ArtifactOrCombination } from '@/types';
-
-
-type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations'; // weapons теперь используется для рекомендаций
-
-export default function CharacterDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  return (
-    <>
-      <CharacterDetailPageContent params={params} />
-    </>
-  );
-}
 
 function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
