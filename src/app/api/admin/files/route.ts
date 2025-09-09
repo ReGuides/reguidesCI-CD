@@ -46,8 +46,10 @@ export async function GET(request: NextRequest) {
     const filterCategory = searchParams.get('category');
     const pageParam = searchParams.get('page');
     const limitParam = searchParams.get('limit');
+    const allParam = searchParams.get('all');
     const page = pageParam ? Math.max(parseInt(pageParam, 10) || 1, 1) : 1;
     const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 24, 1), 200) : 24;
+    const getAll = allParam === 'true';
     const filesByCategory: FilesByCategory = {
       characters: [],
       weapons: [],
@@ -215,6 +217,22 @@ export async function GET(request: NextRequest) {
     // Если указан фильтр категории - возвращаем постранично только её
     if (filterCategory && filterCategory in filesByCategory) {
       const allItems: FileInfo[] = filesByCategory[filterCategory as keyof FilesByCategory];
+      
+      // Если запрошены все файлы - возвращаем без пагинации
+      if (getAll) {
+        return NextResponse.json({
+          success: true,
+          data: allItems,
+          pagination: {
+            page: 1,
+            limit: allItems.length,
+            total: allItems.length,
+            pages: 1,
+            hasNext: false
+          }
+        });
+      }
+      
       const start = (page - 1) * limit;
       const paged = allItems.slice(start, start + limit);
       const pages = Math.max(Math.ceil(allItems.length / limit), 1);
