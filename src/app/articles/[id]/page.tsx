@@ -161,11 +161,93 @@ export default function ArticlePage() {
       )}
 
       {/* Содержание */}
-      <div className="prose prose-invert prose-lg max-w-none">
+      <div className="max-w-none">
         <div 
-          className="text-gray-300 leading-relaxed"
+          className="text-gray-300 leading-relaxed news-content"
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
+        
+        {/* Стили для HTML контента */}
+        <style jsx global>{`
+          .news-content h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            line-height: 1.2;
+          }
+          .news-content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.75rem;
+            margin-top: 1.5rem;
+            line-height: 1.3;
+          }
+          .news-content h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: white;
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+            line-height: 1.4;
+          }
+          .news-content p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+            color: #d1d5db;
+          }
+          .news-content ul {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+          }
+          .news-content li {
+            margin-bottom: 0.5rem;
+            color: #d1d5db;
+            line-height: 1.6;
+          }
+          .news-content strong {
+            font-weight: 600;
+            color: white;
+          }
+          .news-content em {
+            font-style: italic;
+            color: #d1d5db;
+          }
+          .news-content a {
+            color: #3b82f6;
+            text-decoration: underline;
+          }
+          .news-content a:hover {
+            color: #60a5fa;
+          }
+          .news-content blockquote {
+            border-left: 4px solid #6b7280;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #9ca3af;
+          }
+          .news-content code {
+            background-color: #374151;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            color: #f3f4f6;
+          }
+          .news-content pre {
+            background-color: #1f2937;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+          }
+          .news-content pre code {
+            background-color: transparent;
+            padding: 0;
+          }
+        `}</style>
         
         {/* Стили для интерактивных элементов */}
         <style jsx>{`
