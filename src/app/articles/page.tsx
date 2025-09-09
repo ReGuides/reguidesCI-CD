@@ -173,7 +173,8 @@ function ArticlesPageContent() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Заголовок страницы */}
              <div className="mb-8">
-         <h1 className="text-4xl font-bold text-white mb-4">Новости и статьи</h1>
+         <h1 className="text-4xl font-bold text-white mb-4">Полезные гайды и советы для персонажей</h1>
+         <p className="text-lg text-neutral-400">Актуальные новости, статьи, обновления игры, события и дни рождения персонажей</p>
                               
        </div>
       
