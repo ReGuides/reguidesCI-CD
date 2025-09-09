@@ -101,8 +101,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         'article:author': article.author || 'ReGuides',
         'article:section': 'Genshin Impact',
         'article:tag': (article.tags || []).join(','),
-        'article:published_time': article.publishedAt ? new Date(article.publishedAt).toISOString() : undefined,
-        'article:modified_time': article.updatedAt ? new Date(article.updatedAt).toISOString() : undefined,
+        ...(article.publishedAt && { 'article:published_time': new Date(article.publishedAt).toISOString() }),
+        ...(article.updatedAt && { 'article:modified_time': new Date(article.updatedAt).toISOString() }),
       },
     };
   } catch (error) {
