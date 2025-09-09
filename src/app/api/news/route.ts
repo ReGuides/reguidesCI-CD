@@ -173,13 +173,30 @@ export async function POST(request: NextRequest) {
     console.log('Parsing request body...');
     const body: CreateNewsRequest = await request.json();
     console.log('Request body:', body);
+    console.log('Request body type:', typeof body);
+    console.log('Request body keys:', Object.keys(body));
     
     const { title, content, type, category, excerpt, image, isPublished, characterId, tags, author } = body;
+
+    console.log('Extracted fields:');
+    console.log('  title:', title, typeof title);
+    console.log('  content:', content, typeof content);
+    console.log('  type:', type, typeof type);
+    console.log('  category:', category, typeof category);
+    console.log('  excerpt:', excerpt, typeof excerpt);
+    console.log('  image:', image, typeof image);
+    console.log('  isPublished:', isPublished, typeof isPublished);
+    console.log('  characterId:', characterId, typeof characterId);
+    console.log('  tags:', tags, typeof tags);
+    console.log('  author:', author, typeof author);
 
     // Валидация
     console.log('Validating input...');
     if (!title || !content || !type) {
       console.log('Validation failed: missing required fields');
+      console.log('  title exists:', !!title);
+      console.log('  content exists:', !!content);
+      console.log('  type exists:', !!type);
       return NextResponse.json(
         { success: false, error: 'Title, content and type are required' },
         { status: 400 }
@@ -187,11 +204,19 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Creating news object...');
+    
+    // Валидация category
+    const validCategories = ['news', 'guide', 'review', 'tutorial', 'event'];
+    const validCategory = validCategories.includes(category) ? category : 'news';
+    
+    console.log('Using category:', validCategory);
+    console.log('Using excerpt:', excerpt || '');
+    
     const news = new News({
       title,
       content,
       type,
-      category: category || 'news',
+      category: validCategory,
       excerpt: excerpt || '',
       image,
       isPublished: isPublished || false,

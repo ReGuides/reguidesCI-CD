@@ -67,37 +67,50 @@ export default function AddNewsPage() {
     try {
       setLoading(true);
       
+      const requestData = {
+        title: form.title,
+        content: form.content,
+        type: form.type,
+        category: form.type === 'article' ? (form.category || 'news') : 'news',
+        excerpt: form.type === 'article' ? (form.excerpt || '') : '',
+        image: form.image || undefined,
+        isPublished: form.isPublished,
+        characterId: form.characterId || undefined,
+        tags: form.tags,
+        author: form.author
+      };
+      
+      console.log('🚀 POST /api/news - Request data:', requestData);
+      console.log('🚀 Form state:', form);
+      
       const response = await fetch('/api/news', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-                 body: JSON.stringify({
-           title: form.title,
-           content: form.content,
-           type: form.type,
-           category: form.type === 'article' ? form.category : undefined,
-           excerpt: form.type === 'article' ? form.excerpt : undefined,
-           image: form.image || undefined,
-           isPublished: form.isPublished,
-           characterId: form.characterId || undefined,
-           tags: form.tags,
-           author: form.author
-         }),
+        body: JSON.stringify(requestData),
       });
+      
+      console.log('🚀 Response status:', response.status);
+      console.log('🚀 Response ok:', response.ok);
 
       if (response.ok) {
         const data = await response.json();
+        console.log('🚀 Success response data:', data);
         if (data.success) {
           alert('Новость успешно создана!');
           router.push('/admin/news');
         }
       } else {
         const error = await response.json();
+        console.error('🚀 Error response:', error);
+        console.error('🚀 Error details:', error.details);
         alert(`Ошибка: ${error.error}`);
       }
     } catch (error) {
-      console.error('Error creating news:', error);
+      console.error('🚀 Catch error:', error);
+      console.error('🚀 Error message:', error.message);
+      console.error('🚀 Error stack:', error.stack);
       alert('Ошибка при создании новости');
     } finally {
       setLoading(false);
@@ -249,7 +262,15 @@ export default function AddNewsPage() {
                 <select
                   id="type"
                   value={form.type}
-                  onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value as 'manual' | 'birthday' | 'update' | 'event' | 'article' }))}
+                  onChange={(e) => {
+                    const newType = e.target.value as 'manual' | 'birthday' | 'update' | 'event' | 'article';
+                    setForm(prev => ({ 
+                      ...prev, 
+                      type: newType,
+                      // Сбрасываем category для не-статей
+                      category: newType === 'article' ? prev.category : 'news'
+                    }));
+                  }}
                   className="w-full h-10 rounded-md border border-neutral-600 bg-neutral-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   required
                 >

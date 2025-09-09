@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test News API</title>
+</head>
+<body>
+    <h1>Test News API</h1>
+    <button onclick="testGetNews()">Test GET /api/news</button>
+    <button onclick="testPostNews()">Test POST /api/news</button>
+    <div id="result"></div>
+
+    <script>
+        async function testGetNews() {
+            try {
+                const response = await fetch('/api/news');
+                const data = await response.json();
+                document.getElementById('result').innerHTML = '<h3>GET Response:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<h3>GET Error:</h3><pre>' + error.message + '</pre>';
+            }
+        }
+
+        async function testPostNews() {
+            try {
+                const testNews = {
+                    title: 'Test News',
+                    content: 'This is a test news content',
+                    type: 'manual',
+                    category: 'news',
+                    excerpt: 'Test excerpt',
+                    isPublished: true,
+                    author: 'Test Author'
+                };
+
+                const response = await fetch('/api/news', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testNews)
+                });
+
+                const data = await response.json();
+                document.getElementById('result').innerHTML = '<h3>POST Response:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<h3>POST Error:</h3><pre>' + error.message + '</pre>';
+            }
+        }
+    </script>
+</body>
+</html>
