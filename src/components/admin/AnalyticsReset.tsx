@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Trash2, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { Trash2, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface ResetPreview {
   totalRecords: number;
@@ -146,7 +146,7 @@ export default function AnalyticsReset() {
 
         <div>
           <label className="block text-sm font-medium text-neutral-300 mb-2">
-            Подтверждение (введите "RESET")
+            Подтверждение (введите &quot;RESET&quot;)
           </label>
           <input
             type="text"
