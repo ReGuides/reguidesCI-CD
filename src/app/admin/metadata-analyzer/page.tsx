@@ -37,7 +37,12 @@ interface MetadataResult {
     generator: string;
     refresh: string;
     rating: string;
-    geo: any;
+    geo: {
+      latitude?: string | null;
+      longitude?: string | null;
+      region?: string | null;
+      placename?: string | null;
+    } | null;
     structuredData: Record<string, unknown>[];
     additionalMeta: Array<{ name: string | null; property: string | null; content: string | null }>;
     contentAnalysis: {
