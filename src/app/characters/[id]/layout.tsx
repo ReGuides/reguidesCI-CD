@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   ].filter(Boolean);
 
   // Формируем правильный URL изображения
-  const getCharacterImageUrl = (character: any) => {
+  const getCharacterImageUrl = (character: { image?: string }) => {
     if (character.image) {
       // Если изображение уже содержит полный путь
       if (character.image.startsWith('http')) {
