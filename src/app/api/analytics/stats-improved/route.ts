@@ -46,14 +46,13 @@ export async function GET(request: NextRequest) {
     if (pageType) matchConditions.pageType = pageType;
     if (pageId) matchConditions.pageId = pageId;
     
-    // 1. Общая статистика с правильным подсчетом уникальных пользователей
+    // 1. Общая статистика (только просмотры страниц)
     const totalStats = await Analytics.aggregate([
       { $match: matchConditions },
       {
         $group: {
           _id: null,
           totalPageViews: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$anonymousSessionId' },
           averageTimeOnPage: { $avg: '$timeOnPage' },
           averageLoadTime: { $avg: '$loadTime' },
           bounceRate: { $avg: { $cond: ['$isBounce', 1, 0] } }
@@ -63,7 +62,6 @@ export async function GET(request: NextRequest) {
         $project: {
           _id: 0,
           totalPageViews: 1,
-          uniqueVisitors: { $size: '$uniqueVisitors' },
           averageTimeOnPage: { $round: ['$averageTimeOnPage', 2] },
           averageLoadTime: { $round: ['$averageLoadTime', 2] },
           bounceRate: { $round: [{ $multiply: ['$bounceRate', 100] }, 2] }
@@ -98,14 +96,14 @@ export async function GET(request: NextRequest) {
       }
     ]);
     
-    // 3. Топ страниц с уникальными посетителями
+    // 3. Топ страниц (только просмотры, уникальные посетители считаем по-другому)
     const topPages = await Analytics.aggregate([
       { $match: matchConditions },
       {
         $group: {
           _id: { page: '$page', pageType: '$pageType', pageId: '$pageId' },
           views: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$anonymousSessionId' }
+          sessions: { $addToSet: '$anonymousSessionId' }
         }
       },
       {
@@ -115,21 +113,21 @@ export async function GET(request: NextRequest) {
           pageType: '$_id.pageType',
           pageId: '$_id.pageId',
           views: 1,
-          uniqueVisitors: { $size: '$uniqueVisitors' }
+          uniqueVisitors: { $size: '$sessions' }
         }
       },
       { $sort: { views: -1 } },
       { $limit: 20 }
     ]);
     
-    // 4. Топ регионов с уникальными посетителями
+    // 4. Топ регионов (только просмотры, сессии считаем отдельно)
     const topRegions = await Analytics.aggregate([
       { $match: matchConditions },
       {
         $group: {
           _id: '$region',
           views: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$anonymousSessionId' }
+          sessions: { $addToSet: '$anonymousSessionId' }
         }
       },
       {
@@ -137,21 +135,21 @@ export async function GET(request: NextRequest) {
           _id: 0,
           region: '$_id',
           views: 1,
-          uniqueVisitors: { $size: '$uniqueVisitors' }
+          uniqueVisitors: { $size: '$sessions' }
         }
       },
       { $sort: { views: -1 } },
       { $limit: 20 }
     ]);
     
-    // 5. Топ устройств с уникальными посетителями
+    // 5. Топ устройств (только просмотры, сессии считаем отдельно)
     const topDevices = await Analytics.aggregate([
       { $match: matchConditions },
       {
         $group: {
           _id: '$deviceCategory',
           views: { $sum: 1 },
-          uniqueVisitors: { $addToSet: '$anonymousSessionId' }
+          sessions: { $addToSet: '$anonymousSessionId' }
         }
       },
       {
@@ -159,7 +157,7 @@ export async function GET(request: NextRequest) {
           _id: 0,
           deviceCategory: '$_id',
           views: 1,
-          uniqueVisitors: { $size: '$uniqueVisitors' }
+          uniqueVisitors: { $size: '$sessions' }
         }
       },
       { $sort: { views: -1 } }
@@ -244,12 +242,15 @@ export async function GET(request: NextRequest) {
     const stats = {
       period,
       startDate: startDate.toISOString(),
-      total: totalStats[0] || {
-        totalPageViews: 0,
-        uniqueVisitors: 0,
-        averageTimeOnPage: 0,
-        averageLoadTime: 0,
-        bounceRate: 0
+      total: {
+        ...(totalStats[0] || {
+          totalPageViews: 0,
+          averageTimeOnPage: 0,
+          averageLoadTime: 0,
+          bounceRate: 0
+        }),
+        // Уникальные посетители берем из сессий (правильно!)
+        uniqueVisitors: sessionStats[0]?.totalSessions || 0
       },
       sessions: sessionStats[0] || {
         totalSessions: 0,
