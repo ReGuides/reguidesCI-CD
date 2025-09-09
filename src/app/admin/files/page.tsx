@@ -657,42 +657,37 @@ export default function FilesManagementPage() {
 
       {/* Модальное окно просмотра изображения */}
       {showImageModal && selectedImage && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 p-4 flex items-center justify-center" onKeyDown={(e) => {
+        <div className="fixed inset-0 bg-black/70 z-50 p-4 flex items-center justify-center" onKeyDown={(e) => {
           if (e.key === 'ArrowLeft') setCurrentIndex((i) => (i - 1 + currentList.length) % currentList.length);
           if (e.key === 'ArrowRight') setCurrentIndex((i) => (i + 1) % currentList.length);
           if (e.key === 'Escape') setShowImageModal(false);
         }} tabIndex={0}>
-          <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-xl shadow-2xl w-full max-w-7xl max-h-[95vh] overflow-hidden border border-neutral-700">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-700 bg-gradient-to-r from-neutral-800 to-neutral-700">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <div className="text-lg font-semibold text-white truncate pr-4">{selectedImage.name}</div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="bg-neutral-600/50 px-3 py-1 rounded-full text-sm text-gray-300">
-                  {currentIndex + 1} / {currentList.length}
-                </div>
+          <div className="relative bg-neutral-900 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-700 bg-neutral-800">
+              <div className="text-sm text-gray-300 truncate pr-4">{selectedImage.name}</div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 mr-2">{currentIndex + 1} / {currentList.length}</span>
                 {selectedImage.url && (
-                  <button onClick={() => copyToClipboard(selectedImage.url)} className="bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 hover:border-blue-500/50 text-blue-300 hover:text-blue-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
-                    <Copy className="w-4 h-4 inline mr-2" /> Копировать URL
+                  <button onClick={() => copyToClipboard(selectedImage.url)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded text-sm">
+                    <Copy className="w-3 h-3 inline mr-1" /> URL
                   </button>
                 )}
-                <button onClick={() => startRename(selectedImage.path, selectedImage.name)} className="bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/30 hover:border-amber-500/50 text-amber-300 hover:text-amber-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
+                <button onClick={() => startRename(selectedImage.path, selectedImage.name)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded text-sm">
                   ✏️ Переименовать
                 </button>
-                <button onClick={() => handleDelete(selectedImage)} className="bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 hover:border-red-500/50 text-red-300 hover:text-red-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
-                  <Trash2 className="w-4 h-4 inline mr-2" /> Удалить
+                <button onClick={() => handleDelete(selectedImage)} className="border border-red-600 hover:bg-red-900/20 text-red-400 hover:text-red-300 px-3 py-1 rounded text-sm">
+                  <Trash2 className="w-3 h-3 inline mr-1" /> Удалить
                 </button>
-                <button onClick={() => setShowImageModal(false)} className="bg-neutral-600/20 hover:bg-neutral-600/30 border border-neutral-500/30 hover:border-neutral-500/50 text-neutral-300 hover:text-neutral-200 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
-                  <X className="w-4 h-4 inline mr-2" /> Закрыть
+                <button onClick={() => setShowImageModal(false)} className="border border-neutral-600 hover:bg-neutral-700 text-white px-3 py-1 rounded text-sm">
+                  <X className="w-3 h-3 inline mr-1" /> Закрыть
                 </button>
               </div>
             </div>
-            <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800" style={{ height: '70vh' }}>
-              <button onClick={() => setCurrentIndex((i) => (i - 1 + currentList.length) % currentList.length)} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm border border-white/20 hover:border-white/30 rounded-full p-3 text-white z-10 transition-all duration-200 hover:scale-110">
+            <div className="relative bg-neutral-900" style={{ height: '70vh' }}>
+              <button onClick={() => setCurrentIndex((i) => (i - 1 + currentList.length) % currentList.length)} className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10">
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              <button onClick={() => setCurrentIndex((i) => (i + 1) % currentList.length)} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm border border-white/20 hover:border-white/30 rounded-full p-3 text-white z-10 transition-all duration-200 hover:scale-110">
+              <button onClick={() => setCurrentIndex((i) => (i + 1) % currentList.length)} className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10">
                 <ChevronRight className="w-6 h-6" />
               </button>
               <div className="absolute inset-0">
@@ -704,33 +699,14 @@ export default function FilesManagementPage() {
                 </div>
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-neutral-700 bg-gradient-to-r from-neutral-800 to-neutral-700 text-sm text-gray-300">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                    <span className="text-gray-400 font-medium">Путь:</span>
-                    <span className="text-white font-mono text-xs bg-neutral-600/50 px-2 py-1 rounded">{selectedImage.path}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span className="text-gray-400 font-medium">Категория:</span>
-                    <span className="text-white capitalize">{selectedImage.category}</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    <span className="text-gray-400 font-medium">Размер:</span>
-                    <span className="text-white">{Math.round(selectedImage.size / 1024)} KB</span>
-                    {imageDims && <span className="text-gray-400">• {imageDims.width}×{imageDims.height}px</span>}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
-                    <span className="text-gray-400 font-medium">Изменен:</span>
-                    <span className="text-white">{new Date(selectedImage.modified).toLocaleString('ru-RU')}</span>
-                  </div>
-                </div>
+            <div className="px-4 py-3 border-t border-neutral-700 bg-neutral-800 text-sm text-gray-300 grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div>
+                <div><span className="text-gray-400">Путь:</span> {selectedImage.path}</div>
+                <div><span className="text-gray-400">Категория:</span> {selectedImage.category}</div>
+              </div>
+              <div>
+                <div><span className="text-gray-400">Размер:</span> {Math.round(selectedImage.size / 1024)} KB{imageDims ? ` • ${imageDims.width}×${imageDims.height}px` : ''}</div>
+                <div><span className="text-gray-400">Изменен:</span> {new Date(selectedImage.modified).toLocaleString('ru-RU')}</div>
               </div>
             </div>
           </div>
