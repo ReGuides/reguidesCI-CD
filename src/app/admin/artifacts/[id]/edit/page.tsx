@@ -172,18 +172,22 @@ export default function EditArtifactPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('type', 'artifacts');
+      formData.append('category', 'artifacts');
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/admin/files/upload', {
         method: 'POST',
         body: formData,
       });
 
       if (response.ok) {
         const result = await response.json();
-        setFormData(prev => ({ ...prev, image: result.fileUrl }));
-        setPreviewImage(result.fileUrl);
-        alert('Изображение успешно загружено!');
+        if (result.success) {
+          setFormData(prev => ({ ...prev, image: result.data.url }));
+          setPreviewImage(result.data.url);
+          alert('Изображение успешно загружено!');
+        } else {
+          alert(`Ошибка загрузки: ${result.error || 'Неизвестная ошибка'}`);
+        }
       } else {
         const errorData = await response.json();
         alert(`Ошибка загрузки: ${errorData.error || 'Неизвестная ошибка'}`);
@@ -392,6 +396,26 @@ export default function EditArtifactPage() {
             <label className="block text-sm font-medium text-text mb-2">
               Изображение артефакта
             </label>
+            
+            {/* Поле для ввода ссылки на изображение */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-text mb-2">
+                Ссылка на изображение
+              </label>
+              <Input
+                type="url"
+                value={formData.image}
+                onChange={(e) => {
+                  handleInputChange('image', e.target.value);
+                  setPreviewImage(e.target.value);
+                }}
+                placeholder="https://example.com/image.jpg"
+                className="bg-neutral-700 border-neutral-600 text-white"
+              />
+              <p className="text-xs text-neutral-400 mt-1">
+                Введите прямую ссылку на изображение или загрузите файл ниже
+              </p>
+            </div>
             
             {previewImage ? (
               <div className="relative inline-block">

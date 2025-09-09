@@ -84,6 +84,8 @@ export default function FilesManagementPage() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [imageDims, setImageDims] = useState<{ width: number; height: number } | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [renamingFile, setRenamingFile] = useState<string | null>(null);
+  const [newFileName, setNewFileName] = useState('');
 
   useEffect(() => {
     fetchFiles();
@@ -263,6 +265,46 @@ export default function FilesManagementPage() {
     }
   };
 
+  const startRename = (filePath: string, currentName: string) => {
+    setRenamingFile(filePath);
+    setNewFileName(currentName);
+  };
+
+  const cancelRename = () => {
+    setRenamingFile(null);
+    setNewFileName('');
+  };
+
+  const confirmRename = async () => {
+    if (!renamingFile || !newFileName.trim()) return;
+
+    try {
+      const response = await fetch('/api/admin/files/rename', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          filePath: renamingFile,
+          newName: newFileName.trim()
+        })
+      });
+
+      if (response.ok) {
+        alert('Файл успешно переименован!');
+        setRenamingFile(null);
+        setNewFileName('');
+        await fetchFiles();
+      } else {
+        const errorData = await response.json();
+        alert(`Ошибка переименования: ${errorData.error || 'Неизвестная ошибка'}`);
+      }
+    } catch (error) {
+      console.error('Rename failed:', error);
+      alert('Ошибка при переименовании файла');
+    }
+  };
+
   const getCategoryLabel = (category: string): string => {
     const labels: Record<string, string> = {
       characters: 'Персонажи',
@@ -405,7 +447,7 @@ export default function FilesManagementPage() {
               ) : (
                 <div className="space-y-3">
                   {categoryFiles.slice(0, 5).map((file: FileInfo) => (
-                    <div key={file.path} className="flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
+                    <div key={file.path} className="group flex items-center justify-between p-3 bg-neutral-700/50 rounded-lg">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <input
                           type="checkbox"
@@ -425,7 +467,46 @@ export default function FilesManagementPage() {
                           </div>
                         )}
                         <div className="min-w-0 flex-1">
-                          <p className="text-white text-sm font-medium truncate">{file.name}</p>
+                          {renamingFile === file.path ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={newFileName}
+                                onChange={(e) => setNewFileName(e.target.value)}
+                                className="bg-neutral-600 border border-neutral-500 text-white text-sm px-2 py-1 rounded flex-1"
+                                autoFocus
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') confirmRename();
+                                  if (e.key === 'Escape') cancelRename();
+                                }}
+                              />
+                              <button
+                                onClick={confirmRename}
+                                className="text-green-400 hover:text-green-300 px-1"
+                                title="Подтвердить"
+                              >
+                                ✓
+                              </button>
+                              <button
+                                onClick={cancelRename}
+                                className="text-red-400 hover:text-red-300 px-1"
+                                title="Отмена"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <p className="text-white text-sm font-medium truncate flex-1">{file.name}</p>
+                              <button
+                                onClick={() => startRename(file.path, file.name)}
+                                className="text-blue-400 hover:text-blue-300 px-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Переименовать"
+                              >
+                                ✏️
+                              </button>
+                            </div>
+                          )}
                           <p className="text-gray-400 text-xs">
                             {formatFileSize(file.size)} • {formatDate(file.modified)}
                           </p>

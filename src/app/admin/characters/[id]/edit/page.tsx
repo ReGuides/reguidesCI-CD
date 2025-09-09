@@ -40,6 +40,8 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
   const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'stats' | 'media' | 'builds' | 'recommendations' | 'talents' | 'constellations'>('basic');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [builds, setBuilds] = useState<any[]>([]);
@@ -396,6 +398,81 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
     );
   }
 
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    // Проверяем тип файла
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Неподдерживаемый тип файла. Разрешены только JPEG, PNG и WebP.');
+      return;
+    }
+
+    // Проверяем размер файла (максимум 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert('Файл слишком большой. Максимальный размер: 5MB.');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('category', 'characters');
+
+      const response = await fetch('/api/admin/files/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setFormData(prev => ({ ...prev, image: result.data.url }));
+          alert('Изображение успешно загружено!');
+        } else {
+          alert(`Ошибка загрузки: ${result.error || 'Неизвестная ошибка'}`);
+        }
+      } else {
+        const errorData = await response.json();
+        alert(`Ошибка загрузки: ${errorData.error || 'Неизвестная ошибка'}`);
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке файла:', error);
+      alert('Произошла ошибка при загрузке файла');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileUpload(e.target.files[0]);
+    }
+  };
+
   const getAvatarSrc = () => {
     if (!formData.image) return '/default-avatar.png';
     if (formData.image.startsWith('http')) return formData.image;
@@ -647,6 +724,54 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                 className="bg-neutral-700 border-neutral-600 text-white"
                 placeholder="/images/characters/albedo.png"
               />
+              <p className="text-xs text-neutral-500 mt-1">
+                Введите прямую ссылку на изображение или загрузите файл ниже
+              </p>
+            </div>
+
+            {/* Загрузка файла */}
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">Загрузить изображение</label>
+              
+              {/* Скрытый input для файлов */}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                id="character-image-upload"
+              />
+
+              {/* Drag & Drop зона */}
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                  dragActive 
+                    ? 'border-accent bg-accent/10' 
+                    : 'border-neutral-600 hover:border-neutral-500'
+                }`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                <Upload className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
+                <p className="text-neutral-400 mb-2">
+                  Перетащите изображение сюда или нажмите для выбора
+                </p>
+                <label
+                  htmlFor="character-image-upload"
+                  className="inline-flex items-center px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors cursor-pointer"
+                >
+                  Выбрать файл
+                </label>
+                <p className="text-xs text-neutral-500 mt-2">
+                  JPEG, PNG, WebP до 5MB
+                </p>
+              </div>
+              
+              {uploading && (
+                <p className="text-accent text-sm mt-2">Загрузка изображения...</p>
+              )}
             </div>
 
             {formData.image && (
