@@ -397,23 +397,23 @@ export default function EditArtifactPage() {
               Изображение артефакта
             </label>
             
-            {/* Поле для ввода ссылки на изображение */}
+            {/* Поле для ввода пути к изображению */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-text mb-2">
-                Ссылка на изображение
+                Путь к изображению
               </label>
               <Input
-                type="url"
+                type="text"
                 value={formData.image}
                 onChange={(e) => {
                   handleInputChange('image', e.target.value);
                   setPreviewImage(e.target.value);
                 }}
-                placeholder="https://example.com/image.jpg"
+                placeholder="/images/artifacts/artifact-name.png или https://example.com/image.jpg"
                 className="bg-neutral-700 border-neutral-600 text-white"
               />
               <p className="text-xs text-neutral-400 mt-1">
-                Введите прямую ссылку на изображение или загрузите файл ниже
+                Введите относительный путь (/images/artifacts/...) или полную ссылку
               </p>
             </div>
             

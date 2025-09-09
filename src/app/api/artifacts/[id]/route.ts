@@ -68,3 +68,79 @@ export async function GET(
     );
   }
 }
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  try {
+    await connectToDatabase();
+    
+    if (!mongoose.connection.db) {
+      return NextResponse.json(
+        { error: 'Database connection failed' },
+        { status: 500 }
+      );
+    }
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Artifact ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    
+    // Валидация обязательных полей
+    if (!body.name || !body.id || !body.rarity || !body.pieces) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name, id, rarity, pieces' },
+        { status: 400 }
+      );
+    }
+
+    const artifactsCollection = mongoose.connection.db.collection('artifacts');
+    
+    // Подготавливаем данные для обновления
+    const updateData = {
+      id: body.id,
+      name: body.name,
+      rarity: Array.isArray(body.rarity) ? body.rarity : [body.rarity],
+      pieces: Number(body.pieces),
+      bonus1: body.bonus1 || '',
+      bonus2: body.bonus2 || '',
+      bonus4: body.bonus4 || '',
+      image: body.image || '',
+      updatedAt: new Date()
+    };
+
+    // Обновляем артефакт
+    const result = await artifactsCollection.updateOne(
+      { id: id },
+      { $set: updateData },
+      { upsert: false }
+    );
+
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { error: 'Artifact not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Artifact updated successfully',
+      data: updateData
+    });
+
+  } catch (error) {
+    console.error('Error updating artifact:', error);
+    return NextResponse.json(
+      { error: 'Failed to update artifact' },
+      { status: 500 }
+    );
+  }
+}
