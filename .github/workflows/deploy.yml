@@ -35,7 +35,7 @@ jobs:
     
     - name: Create build archive
       run: |
-        tar -czf build.tar.gz .next package.json package-lock.json public src/lib/config.ts ecosystem.config.js cleanup-backups.sh maintenance-mode.sh setup-pm2-autostart.sh
+        tar -czf build.tar.gz .next package.json package-lock.json public src/lib/config.ts ecosystem.config.js cleanup-backups.sh setup-pm2-autostart.sh clear-cache.sh
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -154,13 +154,6 @@ jobs:
         script: |
           cd /var/www/reguides
           
-          # Устанавливаем умную конфигурацию nginx
-          echo "🧠 Настраиваем умную конфигурацию nginx..."
-          chmod +x ultra-smart-nginx-config.sh
-          chmod +x cleanup-backups.sh
-          chmod +x setup-pm2-autostart.sh
-          ./ultra-smart-nginx-config.sh
-          
           # Останавливаем текущий процесс
           pm2 stop reguides-nextjs 2>/dev/null || true
           
@@ -176,9 +169,10 @@ jobs:
           rm -rf .next.backup.* 2>/dev/null || echo "No backups to remove"
           echo "All backups removed"
           
-          # Очищаем старые файлы
+          # Очищаем старые файлы и кэш
           rm -rf .next
           rm -f package-lock.json
+          rm -rf node_modules/.cache
           
           # Распаковываем новый билд
           tar -xzf build.tar.gz
@@ -188,6 +182,11 @@ jobs:
           
           # Запускаем приложение
           pm2 start ecosystem.config.js --env production
+          
+          # Очищаем кэш браузера для статических файлов
+          echo "🧹 Очищаем кэш статических файлов..."
+          chmod +x clear-cache.sh
+          ./clear-cache.sh
           
           # Ждем запуска приложения
           echo "⏳ Ждем запуска приложения..."
