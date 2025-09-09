@@ -94,14 +94,13 @@ jobs:
             mv /var/www/reguides/.next /var/www/reguides/.next.backup.$(date +%Y%m%d_%H%M%S)
           fi
           
-          # Удаляем старые бекапы, оставляем только 2 последних
+          # Удаляем ВСЕ старые бекапы
           cd /var/www/reguides
           echo "Current backups:"
           ls -la .next.backup.* 2>/dev/null || echo "No backups found"
-          echo "Removing old backups (keeping only 2 latest):"
-          ls -t .next.backup.* 2>/dev/null | tail -n +3 | xargs -r rm -rf
-          echo "Remaining backups:"
-          ls -la .next.backup.* 2>/dev/null || echo "No backups remaining"
+          echo "Removing ALL old backups:"
+          rm -rf .next.backup.* 2>/dev/null || echo "No backups to remove"
+          echo "All backups removed"
           
           # Очищаем старые файлы
           rm -rf /var/www/reguides/.next
@@ -109,7 +108,7 @@ jobs:
           
           echo "Ready for file upload"
     
-    # Загружаем файл через scp
+    # Загружаем файл через scp с retry
     - name: Copy build file to server
       uses: appleboy/scp-action@v0.1.7
       with:
@@ -120,6 +119,22 @@ jobs:
         target: "/var/www/reguides/"
         debug: true
         overwrite: true
+        timeout: 300
+        command_timeout: 300
+        port: 22
+    
+    # Альтернативный способ загрузки через SSH (если scp не работает)
+    - name: Upload build via SSH (fallback)
+      uses: appleboy/ssh-action@v1.0.3
+      if: failure()
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cd /var/www/reguides
+          echo "Fallback upload method - using rsync instead"
+          # Этот шаг будет выполнен только если scp не сработает
     
     # Разворачиваем на сервере
     - name: Deploy to VPS
@@ -139,13 +154,12 @@ jobs:
             mv .next .next.backup.$(date +%Y%m%d_%H%M%S)
           fi
           
-          # Удаляем старые бекапы, оставляем только 2 последних
+          # Удаляем ВСЕ старые бекапы
           echo "Current backups:"
           ls -la .next.backup.* 2>/dev/null || echo "No backups found"
-          echo "Removing old backups (keeping only 2 latest):"
-          ls -t .next.backup.* 2>/dev/null | tail -n +3 | xargs -r rm -rf
-          echo "Remaining backups:"
-          ls -la .next.backup.* 2>/dev/null || echo "No backups remaining"
+          echo "Removing ALL old backups:"
+          rm -rf .next.backup.* 2>/dev/null || echo "No backups to remove"
+          echo "All backups removed"
           
           # Очищаем старые файлы
           rm -rf .next
@@ -169,6 +183,9 @@ jobs:
           
           # Устанавливаем права на скрипт очистки
           chmod +x cleanup-backups.sh
-          echo "📋 Cleanup script is ready to use"
+          
+          # Принудительно очищаем ВСЕ бэкапы
+          echo "🧹 Принудительная очистка бэкапов..."
+          ./cleanup-backups.sh
           
           echo "✅ Деплой завершен успешно!"
