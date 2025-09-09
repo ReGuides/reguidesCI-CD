@@ -25,7 +25,7 @@ interface MetadataResult {
     viewport: string;
     charset: string;
     hreflang: Array<{ hreflang: string | null; href: string | null }>;
-    structuredData: any[];
+    structuredData: Record<string, unknown>[];
     additionalMeta: Array<{ name: string | null; property: string | null; content: string | null }>;
     contentAnalysis: {
       h1Count: number;
