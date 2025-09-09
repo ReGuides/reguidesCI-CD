@@ -4,6 +4,7 @@ import { CharacterModel } from '@/models/Character'
 import { WeaponModel } from '@/models/Weapon'
 import { ArtifactModel } from '@/models/Artifact'
 import { ArticleModel } from '@/models/Article'
+import News from '@/models/News'
 import SiteSettings from '@/models/SiteSettings'
 
 // Отключаем кеширование sitemap
@@ -27,20 +28,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     
     // Получаем все данные из базы
     console.log('📊 Sitemap: Fetching data from database...')
-    const [characters, weapons, artifacts, articles] = await Promise.all([
+    const [characters, weapons, artifacts, articles, newsArticles] = await Promise.all([
       settings.sitemap.includeAllCharacters 
         ? CharacterModel.find({}).select('id updatedAt') // Все персонажи
         : CharacterModel.find({ isActive: true }).select('id updatedAt'), // Только активные
       WeaponModel.find({}).select('id'),
       ArtifactModel.find({}).select('id'),
-      ArticleModel.find({ isActive: true }).select('id updatedAt')
+      ArticleModel.find({ isActive: true }).select('id updatedAt'),
+      News.find({ type: 'article', isPublished: true }).select('_id updatedAt') // Новости типа "статья"
     ])
     
     console.log('📈 Sitemap: Data fetched:', {
       characters: characters.length,
       weapons: weapons.length,
       artifacts: artifacts.length,
-      articles: articles.length
+      articles: articles.length,
+      newsArticles: newsArticles.length
     })
     
     // Обновляем время последнего обновления sitemap
@@ -121,14 +124,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }))
     
-    const allPages = [...staticPages, ...characterPages, ...weaponPages, ...artifactPages, ...articlePages]
+    // Страницы новостей-статей
+    const newsArticlePages: MetadataRoute.Sitemap = newsArticles.map((newsArticle) => ({
+      url: `${baseUrl}/articles/${newsArticle._id}`,
+      lastModified: newsArticle.updatedAt || new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.5,
+    }))
+    
+    const allPages = [...staticPages, ...characterPages, ...weaponPages, ...artifactPages, ...articlePages, ...newsArticlePages]
     console.log('🎯 Sitemap: Generated successfully!', {
       totalPages: allPages.length,
       static: staticPages.length,
       characters: characterPages.length,
       weapons: weaponPages.length,
       artifacts: artifactPages.length,
-      articles: articlePages.length
+      articles: articlePages.length,
+      newsArticles: newsArticlePages.length
     })
     return allPages
   } catch (error) {
