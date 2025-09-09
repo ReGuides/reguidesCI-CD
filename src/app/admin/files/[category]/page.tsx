@@ -35,6 +35,8 @@ export default function FilesCategoryPage() {
   const [imageDims, setImageDims] = useState<{ width: number; height: number } | null>(null);
 
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [renamingFile, setRenamingFile] = useState<string | null>(null);
+  const [newFileName, setNewFileName] = useState('');
 
   useEffect(() => {
     const p = parseInt(searchParams.get('page') || '1', 10);
@@ -141,6 +143,46 @@ export default function FilesCategoryPage() {
     }
   };
 
+  const startRename = (filePath: string, currentName: string) => {
+    setRenamingFile(filePath);
+    setNewFileName(currentName);
+  };
+
+  const cancelRename = () => {
+    setRenamingFile(null);
+    setNewFileName('');
+  };
+
+  const confirmRename = async () => {
+    if (!renamingFile || !newFileName.trim()) return;
+
+    try {
+      const response = await fetch('/api/admin/files/rename', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          filePath: renamingFile,
+          newName: newFileName.trim()
+        })
+      });
+
+      if (response.ok) {
+        alert('Файл успешно переименован!');
+        setRenamingFile(null);
+        setNewFileName('');
+        await fetchFiles();
+      } else {
+        const errorData = await response.json();
+        alert(`Ошибка переименования: ${errorData.error || 'Неизвестная ошибка'}`);
+      }
+    } catch (error) {
+      console.error('Rename failed:', error);
+      alert('Ошибка при переименовании файла');
+    }
+  };
+
   if (loading) {
     return <div className="p-6 text-gray-400">Загрузка...</div>;
   }
@@ -211,8 +253,49 @@ export default function FilesCategoryPage() {
                 <div className="w-16 h-16 rounded bg-neutral-700 flex items-center justify-center text-gray-400">{file.type}</div>
               )}
               <div className="min-w-0 flex-1">
-                <div className="text-white text-sm truncate" title={file.name}>{file.name}</div>
-                <div className="text-gray-400 text-xs truncate" title={file.path}>{file.path}</div>
+                {renamingFile === file.path ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={newFileName}
+                      onChange={(e) => setNewFileName(e.target.value)}
+                      className="bg-neutral-600 border border-neutral-500 text-white text-sm px-2 py-1 rounded flex-1"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') confirmRename();
+                        if (e.key === 'Escape') cancelRename();
+                      }}
+                    />
+                    <button
+                      onClick={confirmRename}
+                      className="text-green-400 hover:text-green-300 px-1"
+                      title="Подтвердить"
+                    >
+                      ✓
+                    </button>
+                    <button
+                      onClick={cancelRename}
+                      className="text-red-400 hover:text-red-300 px-1"
+                      title="Отмена"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white text-sm truncate" title={file.name}>{file.name}</div>
+                      <div className="text-gray-400 text-xs truncate" title={file.path}>{file.path}</div>
+                    </div>
+                    <button
+                      onClick={() => startRename(file.path, file.name)}
+                      className="text-blue-400 hover:text-blue-300 px-1"
+                      title="Переименовать"
+                    >
+                      ✏️
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
             <div className="mt-3 flex gap-2 justify-end">

@@ -500,7 +500,7 @@ export default function FilesManagementPage() {
                               <p className="text-white text-sm font-medium truncate flex-1">{file.name}</p>
                               <button
                                 onClick={() => startRename(file.path, file.name)}
-                                className="text-blue-400 hover:text-blue-300 px-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="text-blue-400 hover:text-blue-300 px-1"
                                 title="Переименовать"
                               >
                                 ✏️
@@ -642,7 +642,19 @@ export default function FilesManagementPage() {
 
       {/* Модальное окно просмотра изображения */}
       {showImageModal && selectedImage && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') {
+            const newIndex = currentIndex > 0 ? currentIndex - 1 : currentList.length - 1;
+            setCurrentIndex(newIndex);
+            setSelectedImage(currentList[newIndex]);
+          }
+          if (e.key === 'ArrowRight') {
+            const newIndex = currentIndex < currentList.length - 1 ? currentIndex + 1 : 0;
+            setCurrentIndex(newIndex);
+            setSelectedImage(currentList[newIndex]);
+          }
+          if (e.key === 'Escape') setShowImageModal(false);
+        }} tabIndex={0}>
           <div className="relative max-w-4xl max-h-full w-full h-full flex items-center justify-center">
             {/* Кнопка закрытия */}
             <button
@@ -701,6 +713,9 @@ export default function FilesManagementPage() {
                       {formatFileSize(selectedImage.size)} • {formatDate(selectedImage.modified)}
                       {imageDims && ` • ${imageDims.width} × ${imageDims.height}`}
                     </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {selectedImage.path}
+                    </p>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -709,6 +724,13 @@ export default function FilesManagementPage() {
                     >
                       <Copy className="w-3 h-3" />
                       Копировать URL
+                    </button>
+                    <button
+                      onClick={() => startRename(selectedImage.path, selectedImage.name)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
+                    >
+                      ✏️
+                      Переименовать
                     </button>
                     <button
                       onClick={() => handleDelete(selectedImage)}

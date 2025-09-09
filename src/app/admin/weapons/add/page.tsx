@@ -122,8 +122,8 @@ export default function AddWeaponPage() {
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
-          setFormData(prev => ({ ...prev, image: result.fileUrl }));
-          setPreviewImage(result.fileUrl);
+          setFormData(prev => ({ ...prev, image: result.data.url }));
+          setPreviewImage(result.data.url);
           alert('Изображение успешно загружено!');
         } else {
           alert(`Ошибка загрузки: ${result.error || 'Неизвестная ошибка'}`);
