@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import connectDB from '@/lib/mongodb';
 import News from '@/models/News';
+import { News as NewsType } from '@/types';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -11,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     await connectDB();
     
     const { id } = await params;
-    const article = await News.findOne({ _id: id, type: 'article', isPublished: true }).lean();
+    const article = await News.findOne({ _id: id, type: 'article', isPublished: true }).lean() as NewsType | null;
     
     if (!article) {
       return {
