@@ -109,10 +109,21 @@ elif [ "$MODE" = "off" ]; then
         echo "📁 Найден backup: $LATEST_BACKUP"
         cp "$LATEST_BACKUP" "$NGINX_CONFIG"
         
+        # Проверяем символическую ссылку
+        if [ ! -L /etc/nginx/sites-enabled/reguides ]; then
+            echo "🔗 Создаем символическую ссылку..."
+            sudo ln -sf /etc/nginx/sites-available/reguides /etc/nginx/sites-enabled/reguides
+        fi
+        
+        # Удаляем default конфигурацию если есть
+        sudo rm -f /etc/nginx/sites-enabled/default
+        
         # Тестируем конфигурацию nginx
         if sudo nginx -t; then
-            # Перезагружаем nginx
-            sudo systemctl reload nginx
+            # Принудительно перезапускаем nginx
+            sudo systemctl stop nginx
+            sleep 1
+            sudo systemctl start nginx
             echo "✅ Режим обслуживания выключен"
             echo "🌐 Сайт работает в обычном режиме"
         else
@@ -147,7 +158,9 @@ EOF
         
         # Тестируем восстановленную конфигурацию
         if sudo nginx -t; then
-            sudo systemctl reload nginx
+            sudo systemctl stop nginx
+            sleep 1
+            sudo systemctl start nginx
             echo "✅ Конфигурация восстановлена вручную"
             echo "🌐 Сайт работает в обычном режиме"
         else

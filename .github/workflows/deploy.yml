@@ -200,7 +200,8 @@ jobs:
             # Выключаем режим обслуживания
             echo "▶️  Выключаем режим обслуживания..."
             chmod +x maintenance-mode.sh
-            ./maintenance-mode.sh off
+            chmod +x force-disable-maintenance.sh
+            ./maintenance-mode.sh off || ./force-disable-maintenance.sh
             
             echo "🌐 Сайт доступен в обычном режиме"
           else
@@ -214,7 +215,8 @@ jobs:
               mv "$LATEST_BACKUP" .next
               pm2 start ecosystem.config.js --env production
               chmod +x maintenance-mode.sh
-              ./maintenance-mode.sh off
+              chmod +x force-disable-maintenance.sh
+              ./maintenance-mode.sh off || ./force-disable-maintenance.sh
               echo "✅ Восстановление завершено"
             else
               echo "❌ Не удалось восстановить предыдущую версию"
@@ -236,5 +238,10 @@ jobs:
           # Принудительно очищаем ВСЕ бэкапы
           echo "🧹 Принудительная очистка бэкапов..."
           ./cleanup-backups.sh
+          
+          # Принудительно отключаем режим обслуживания на всякий случай
+          echo "🔧 Принудительное отключение режима обслуживания..."
+          chmod +x force-disable-maintenance.sh
+          ./force-disable-maintenance.sh
           
           echo "✅ Деплой завершен успешно!"
