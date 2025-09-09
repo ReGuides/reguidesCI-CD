@@ -15,6 +15,9 @@ if [ ! -w "$NGINX_CONFIG" ] && [ "$EUID" -ne 0 ]; then
 fi
 
 echo "🔧 Управление режимом обслуживания..."
+echo "📁 Рабочая директория: $(pwd)"
+echo "📋 Конфигурация nginx: $NGINX_CONFIG"
+echo "📄 HTML страница: $MAINTENANCE_HTML"
 
 if [ "$MODE" = "on" ]; then
     echo "🛑 Включаем режим обслуживания..."
@@ -53,6 +56,31 @@ server {
 }
 EOF
 
+    # Проверяем существование конфигурации
+    if [ ! -f "$NGINX_CONFIG" ]; then
+        echo "❌ Файл конфигурации nginx не найден: $NGINX_CONFIG"
+        echo "💡 Создаем базовую конфигурацию..."
+        mkdir -p "$(dirname "$NGINX_CONFIG")"
+        cat > "$NGINX_CONFIG" << 'EOF'
+server {
+    listen 80;
+    server_name reguides.ru www.reguides.ru;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+EOF
+    fi
+    
     # Бэкапим текущую конфигурацию
     cp "$NGINX_CONFIG" "${NGINX_CONFIG}.backup.$(date +%Y%m%d_%H%M%S)"
     
@@ -74,8 +102,11 @@ elif [ "$MODE" = "off" ]; then
     echo "▶️  Выключаем режим обслуживания..."
     
     # Восстанавливаем оригинальную конфигурацию
-    if [ -f "${NGINX_CONFIG}.backup.$(ls -t ${NGINX_CONFIG}.backup.* 2>/dev/null | head -1 | cut -d. -f3-)" ]; then
-        LATEST_BACKUP=$(ls -t ${NGINX_CONFIG}.backup.* 2>/dev/null | head -1)
+    echo "🔍 Ищем backup конфигурации..."
+    LATEST_BACKUP=$(ls -t ${NGINX_CONFIG}.backup.* 2>/dev/null | head -1)
+    
+    if [ -n "$LATEST_BACKUP" ] && [ -f "$LATEST_BACKUP" ]; then
+        echo "📁 Найден backup: $LATEST_BACKUP"
         cp "$LATEST_BACKUP" "$NGINX_CONFIG"
         
         # Тестируем конфигурацию nginx
@@ -89,8 +120,40 @@ elif [ "$MODE" = "off" ]; then
             exit 1
         fi
     else
-        echo "❌ Не найден backup конфигурации nginx"
-        exit 1
+        echo "❌ Backup конфигурации не найден"
+        echo "📋 Доступные backup файлы:"
+        ls -la ${NGINX_CONFIG}.backup.* 2>/dev/null || echo "  Нет backup файлов"
+        
+        # Попробуем восстановить конфигурацию вручную
+        echo "🔧 Пытаемся восстановить конфигурацию вручную..."
+        cat > "$NGINX_CONFIG" << 'EOF'
+server {
+    listen 80;
+    server_name reguides.ru www.reguides.ru;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+EOF
+        
+        # Тестируем восстановленную конфигурацию
+        if sudo nginx -t; then
+            sudo systemctl reload nginx
+            echo "✅ Конфигурация восстановлена вручную"
+            echo "🌐 Сайт работает в обычном режиме"
+        else
+            echo "❌ Не удалось восстановить конфигурацию"
+            exit 1
+        fi
     fi
 
 else
