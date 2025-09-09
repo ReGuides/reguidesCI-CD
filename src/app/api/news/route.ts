@@ -38,8 +38,11 @@ interface CreateNewsRequest {
 // GET - получение всех новостей
 export async function GET(request: NextRequest) {
   try {
+    // Проверяем подключение к БД
+    console.log('Connecting to MongoDB...');
     await connectDB();
-    
+    console.log('MongoDB connected successfully');
+
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const category = searchParams.get('category');
@@ -50,6 +53,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const page = parseInt(searchParams.get('page') || '1');
     const skip = (page - 1) * limit;
+
+    console.log('Query parameters:', { type, category, isPublished, search, tags, sortBy, limit, page });
 
     const query: NewsQuery = {};
     
@@ -93,6 +98,9 @@ export async function GET(request: NextRequest) {
         break;
     }
 
+    console.log('Executing query:', query);
+    console.log('Sort options:', sortOptions);
+
     const [news, total] = await Promise.all([
       News.find(query)
         .sort(sortOptions)
@@ -102,6 +110,8 @@ export async function GET(request: NextRequest) {
         .lean(),
       News.countDocuments(query)
     ]);
+
+    console.log(`Found ${news.length} news items, total: ${total}`);
 
     // Добавляем информацию о персонаже
     const newsWithCharacter = news.map(item => {
@@ -128,8 +138,23 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Error fetching news:', error);
+    
+    // Детальная информация об ошибке для отладки
+    const errorDetails = {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      errorType: error instanceof Error ? error.constructor.name : 'Unknown'
+    };
+    
+    console.error('Error details:', errorDetails);
+    
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch news' },
+      { 
+        success: false, 
+        error: 'Failed to fetch news',
+        details: errorDetails
+      },
       { status: 500 }
     );
   }
@@ -138,21 +163,30 @@ export async function GET(request: NextRequest) {
 // POST - создание новой новости
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
+    console.log('POST /api/news - Starting news creation...');
     
+    // Проверяем подключение к БД
+    console.log('Connecting to MongoDB...');
+    await connectDB();
+    console.log('MongoDB connected successfully');
+    
+    console.log('Parsing request body...');
     const body: CreateNewsRequest = await request.json();
+    console.log('Request body:', body);
+    
     const { title, content, type, category, excerpt, image, isPublished, characterId, tags, author } = body;
 
     // Валидация
+    console.log('Validating input...');
     if (!title || !content || !type) {
+      console.log('Validation failed: missing required fields');
       return NextResponse.json(
         { success: false, error: 'Title, content and type are required' },
         { status: 400 }
       );
     }
 
-    // Валидация типа уже обеспечена TypeScript через интерфейс
-
+    console.log('Creating news object...');
     const news = new News({
       title,
       content,
@@ -166,7 +200,9 @@ export async function POST(request: NextRequest) {
       author: author || 'Администратор'
     });
 
+    console.log('Saving news to database...');
     await news.save();
+    console.log('News saved successfully:', news._id);
 
     return NextResponse.json({
       success: true,
@@ -176,8 +212,23 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error creating news:', error);
+    
+    // Детальная информация об ошибке для отладки
+    const errorDetails = {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      errorType: error instanceof Error ? error.constructor.name : 'Unknown'
+    };
+    
+    console.error('Error details:', errorDetails);
+    
     return NextResponse.json(
-      { success: false, error: 'Failed to create news' },
+      { 
+        success: false, 
+        error: 'Failed to create news',
+        details: errorDetails
+      },
       { status: 500 }
     );
   }

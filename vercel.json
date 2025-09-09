@@ -1,0 +1,18 @@
+{
+  "functions": {
+    "src/app/api/admin/files/upload/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/admin/files/upload",
+      "headers": [
+        {
+          "key": "x-body-size-limit",
+          "value": "50mb"
+        }
+      ]
+    }
+  ]
+}

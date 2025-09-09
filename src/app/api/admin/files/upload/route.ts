@@ -5,6 +5,7 @@ import { addServerLog } from '@/lib/serverLog';
 
 export async function POST(request: NextRequest) {
   try {
+    // Увеличиваем лимит размера для formData
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const category = formData.get('category') as string;
