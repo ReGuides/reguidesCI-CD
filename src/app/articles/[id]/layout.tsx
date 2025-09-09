@@ -11,9 +11,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     await connectDB();
     
     const { id } = await params;
-    const article = await News.findById(id).lean();
+    const article = await News.findOne({ _id: id, type: 'article', isPublished: true }).lean();
     
-    if (!article || article.type !== 'article' || !article.isPublished) {
+    if (!article) {
       return {
         title: 'Статья не найдена | ReGuides',
         description: 'Запрашиваемая статья не найдена или не опубликована.',
