@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectToDatabase from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import Analytics from '@/models/Analytics';
 import { addServerLog } from '@/lib/serverLog';
 
 export async function POST(request: NextRequest) {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     const body = await request.json();
     const { 
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     // Получаем статистику для предварительного просмотра
     const totalRecords = await Analytics.countDocuments({});

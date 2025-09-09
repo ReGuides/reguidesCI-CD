@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectToDatabase from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import Analytics from '@/models/Analytics';
 import UserSession from '@/models/UserSession';
 import { addServerLog } from '@/lib/serverLog';
 
 export async function POST(request: NextRequest) {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     const body = await request.json();
     const {

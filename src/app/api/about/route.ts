@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db/mongodb';
+import connectDB from '@/lib/mongodb';
 import { About, IAbout } from '@/lib/db/models/About';
 import { User } from '@/lib/db/models/User';
 import SiteSettings from '@/models/SiteSettings';
@@ -9,7 +9,7 @@ import mongoose from 'mongoose';
 
 export async function GET() {
   try {
-    await connectToDatabase();
+    await connectDB();
     const about = await About.findOne({ isActive: true }).sort({ updatedAt: -1 }).lean() as IAbout | null;
     
     if (!about) {

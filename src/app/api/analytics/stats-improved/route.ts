@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectToDatabase from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import Analytics from '@/models/Analytics';
 import UserSession from '@/models/UserSession';
 import { addServerLog } from '@/lib/serverLog';
 
 export async function GET(request: NextRequest) {
   try {
-    await connectToDatabase();
+    await connectDB();
     
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || '7d'; // 1d, 7d, 30d, 90d, all
