@@ -65,6 +65,12 @@
 - ✅ Всегда запускать `read_lints` после изменений
 - ✅ Исправлять TypeScript ошибки сразу
 
+## **13. TypeScript ошибки**
+- ❌ `error.message` без проверки типа
+- ❌ `category.includes()` с `undefined`
+- ✅ `error instanceof Error ? error.message : 'Unknown'`
+- ✅ `category && validCategories.includes(category)`
+
 ---
 
 **💡 Просто проверяй этот список перед каждым коммитом!**

@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
     
     // Валидация category
     const validCategories = ['news', 'guide', 'review', 'tutorial', 'event'];
-    const validCategory = validCategories.includes(category) ? category : 'news';
+    const validCategory = (category && validCategories.includes(category)) ? category as string : 'news';
     
     console.log('Using category:', validCategory);
     console.log('Using excerpt:', excerpt || '');
