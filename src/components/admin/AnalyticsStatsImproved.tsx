@@ -20,6 +20,7 @@ interface AnalyticsData {
     engagedSessions: number;
     averageSessionDuration: number;
     averagePageViewsPerSession: number;
+    averageEngagementScore: number;
   };
   topPages: Array<{
     page: string;
