@@ -537,7 +537,7 @@ export default function FilesManagementPage() {
                               setCurrentList(allImages);
                               const idx = allImages.findIndex((f: FileInfo) => f.path === file.path);
                               setCurrentIndex(Math.max(idx, 0));
-                              setSelectedImage(file);
+                              setSelectedImage(allImages[Math.max(idx, 0)]);
                               setShowImageModal(true);
                             }}
                             className="border border-neutral-600 hover:bg-neutral-700 text-white px-2 py-1 rounded text-sm"
@@ -658,8 +658,16 @@ export default function FilesManagementPage() {
       {/* Модальное окно просмотра изображения */}
       {showImageModal && selectedImage && (
         <div className="fixed inset-0 bg-black/70 z-50 p-4 flex items-center justify-center" onKeyDown={(e) => {
-          if (e.key === 'ArrowLeft') setCurrentIndex((i) => (i - 1 + currentList.length) % currentList.length);
-          if (e.key === 'ArrowRight') setCurrentIndex((i) => (i + 1) % currentList.length);
+          if (e.key === 'ArrowLeft') {
+            const newIndex = (currentIndex - 1 + currentList.length) % currentList.length;
+            setCurrentIndex(newIndex);
+            setSelectedImage(currentList[newIndex]);
+          }
+          if (e.key === 'ArrowRight') {
+            const newIndex = (currentIndex + 1) % currentList.length;
+            setCurrentIndex(newIndex);
+            setSelectedImage(currentList[newIndex]);
+          }
           if (e.key === 'Escape') setShowImageModal(false);
         }} tabIndex={0}>
           <div className="relative bg-neutral-900 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
@@ -684,10 +692,18 @@ export default function FilesManagementPage() {
               </div>
             </div>
             <div className="relative bg-neutral-900" style={{ height: '70vh' }}>
-              <button onClick={() => setCurrentIndex((i) => (i - 1 + currentList.length) % currentList.length)} className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10">
+              <button onClick={() => {
+                const newIndex = (currentIndex - 1 + currentList.length) % currentList.length;
+                setCurrentIndex(newIndex);
+                setSelectedImage(currentList[newIndex]);
+              }} className="absolute left-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10">
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              <button onClick={() => setCurrentIndex((i) => (i + 1) % currentList.length)} className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10">
+              <button onClick={() => {
+                const newIndex = (currentIndex + 1) % currentList.length;
+                setCurrentIndex(newIndex);
+                setSelectedImage(currentList[newIndex]);
+              }} className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-800/70 hover:bg-neutral-700/80 border border-neutral-700 rounded-full p-2 text-white z-10">
                 <ChevronRight className="w-6 h-6" />
               </button>
               <div className="absolute inset-0">
