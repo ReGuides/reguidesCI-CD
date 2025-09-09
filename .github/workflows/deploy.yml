@@ -154,12 +154,12 @@ jobs:
         script: |
           cd /var/www/reguides
           
-          # Включаем режим обслуживания
-          echo "🛑 Включаем режим обслуживания..."
-          chmod +x maintenance-mode.sh
+          # Устанавливаем умную конфигурацию nginx
+          echo "🧠 Настраиваем умную конфигурацию nginx..."
+          chmod +x ultra-smart-nginx-config.sh
           chmod +x cleanup-backups.sh
           chmod +x setup-pm2-autostart.sh
-          ./maintenance-mode.sh on
+          ./ultra-smart-nginx-config.sh
           
           # Останавливаем текущий процесс
           pm2 stop reguides-nextjs 2>/dev/null || true
@@ -196,14 +196,7 @@ jobs:
           # Проверяем, что приложение запустилось
           if pm2 list | grep -q "reguides-nextjs.*online"; then
             echo "✅ Приложение успешно запущено"
-            
-            # Выключаем режим обслуживания
-            echo "▶️  Выключаем режим обслуживания..."
-            chmod +x maintenance-mode.sh
-            chmod +x force-disable-maintenance.sh
-            ./maintenance-mode.sh off || ./force-disable-maintenance.sh
-            
-            echo "🌐 Сайт доступен в обычном режиме"
+            echo "🌐 Сайт автоматически переключился в обычный режим"
           else
             echo "❌ Ошибка запуска приложения"
             echo "🔄 Восстанавливаем предыдущую версию..."
@@ -214,9 +207,6 @@ jobs:
               rm -rf .next
               mv "$LATEST_BACKUP" .next
               pm2 start ecosystem.config.js --env production
-              chmod +x maintenance-mode.sh
-              chmod +x force-disable-maintenance.sh
-              ./maintenance-mode.sh off || ./force-disable-maintenance.sh
               echo "✅ Восстановление завершено"
             else
               echo "❌ Не удалось восстановить предыдущую версию"
@@ -238,10 +228,5 @@ jobs:
           # Принудительно очищаем ВСЕ бэкапы
           echo "🧹 Принудительная очистка бэкапов..."
           ./cleanup-backups.sh
-          
-          # Принудительно отключаем режим обслуживания на всякий случай
-          echo "🔧 Принудительное отключение режима обслуживания..."
-          chmod +x force-disable-maintenance.sh
-          ./force-disable-maintenance.sh
           
           echo "✅ Деплой завершен успешно!"
