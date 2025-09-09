@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getImageDimensions } from '@/lib/image-dimensions';
 
 // Функция для получения данных персонажа на сервере
 async function getCharacter(id: string) {
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 
   const title = `${character.name} - Гайд по персонажу | ReGuides`;
-  const description = `Подробный гайд по персонажу ${character.name} в Genshin Impact. Рекомендации по оружию, артефактам, талантам и сборкам. Элемент: ${character.element || 'Неизвестно'}, Оружие: ${character.weaponType || 'Неизвестно'}.`;
+  const description = `Подробный гайд по персонажу ${character.name} в Genshin Impact. Рекомендации по оружию, артефактам, талантам и сборкам. Элемент: ${character.element || 'Неизвестно'}, Оружие: ${character.weapon || 'Неизвестно'}.`;
   
   const keywords = [
     character.name.toLowerCase(),
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     'сборка',
     'билд',
     character.element?.toLowerCase() || '',
-    character.weaponType?.toLowerCase() || '',
+    character.weapon?.toLowerCase() || '',
     'оружие',
     'артефакты',
     'таланты',
@@ -70,6 +71,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   const characterImageUrl = getCharacterImageUrl(character);
 
+  // Получаем размеры изображения для персонажей (5:7 пропорция)
+  const imageDimensions = getImageDimensions('character');
+
   return {
     title,
     description,
@@ -82,8 +86,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       images: [
         {
           url: characterImageUrl,
-          width: 1200,
-          height: 630,
+          width: imageDimensions.width,
+          height: imageDimensions.height,
           alt: `${character.name} - Гайд по персонажу Genshin Impact`,
         },
       ],

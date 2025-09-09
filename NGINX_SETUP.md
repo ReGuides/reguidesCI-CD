@@ -60,7 +60,7 @@ server {
     }
 
     # Статические файлы Next.js (должно быть ПЕРЕД основным location)
-    location /_next/ {
+    location /_next/static/ {
         alias /var/www/reguides/.next/static/;
         expires 1y;
         add_header Cache-Control "public, immutable";

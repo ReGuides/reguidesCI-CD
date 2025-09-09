@@ -35,7 +35,7 @@ jobs:
     
     - name: Create build archive
       run: |
-        tar -czf build.tar.gz .next package.json package-lock.json public src/lib/config.ts ecosystem.config.js cleanup-backups.sh setup-pm2-autostart.sh clear-cache.sh
+        tar -czf build.tar.gz .next package.json package-lock.json public src/lib/config.ts ecosystem.config.js cleanup-backups.sh setup-pm2-autostart.sh clear-cache.sh fix-nginx-static.sh debug-nginx.sh force-rebuild.sh
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4

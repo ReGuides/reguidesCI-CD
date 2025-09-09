@@ -1,4 +1,7 @@
 import type { Metadata } from 'next';
+import { getImageDimensions } from '@/lib/image-dimensions';
+
+const imageDimensions = getImageDimensions('weapon');
 
 export const metadata: Metadata = {
   title: 'Оружие Genshin Impact - Гайды и рекомендации | ReGuides',
@@ -28,8 +31,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: 'https://reguides.ru/images/logos/logo.png',
-        width: 1200,
-        height: 630,
+        width: imageDimensions.width,
+        height: imageDimensions.height,
         alt: 'ReGuides - Гайды по оружию Genshin Impact',
       },
     ],
