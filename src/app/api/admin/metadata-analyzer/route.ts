@@ -106,6 +106,76 @@ export async function POST(request: NextRequest) {
         }).filter(meta => meta.name || meta.property);
       };
 
+      const getOpenGraphImages = () => {
+        const matches = html.match(/<meta[^>]*property="og:image"[^>]*>/gi);
+        if (!matches) return [];
+        return matches.map(match => {
+          const contentMatch = match.match(/content="([^"]*)"/i);
+          const widthMatch = match.match(/width="([^"]*)"/i);
+          const heightMatch = match.match(/height="([^"]*)"/i);
+          const altMatch = match.match(/alt="([^"]*)"/i);
+          return {
+            url: contentMatch ? contentMatch[1] : null,
+            width: widthMatch ? widthMatch[1] : null,
+            height: heightMatch ? heightMatch[1] : null,
+            alt: altMatch ? altMatch[1] : null
+          };
+        });
+      };
+
+      const getTwitterImages = () => {
+        const matches = html.match(/<meta[^>]*name="twitter:image"[^>]*>/gi);
+        if (!matches) return [];
+        return matches.map(match => {
+          const contentMatch = match.match(/content="([^"]*)"/i);
+          return {
+            url: contentMatch ? contentMatch[1] : null
+          };
+        });
+      };
+
+      const getLanguage = () => {
+        const htmlMatch = html.match(/<html[^>]*lang="([^"]*)"[^>]*>/i);
+        return htmlMatch ? htmlMatch[1] : null;
+      };
+
+      const getThemeColor = () => {
+        return parser.getMetaContent('theme-color') || null;
+      };
+
+      const getAuthor = () => {
+        return parser.getMetaContent('author') || null;
+      };
+
+      const getGenerator = () => {
+        return parser.getMetaContent('generator') || null;
+      };
+
+      const getRefresh = () => {
+        return parser.getMetaContent('refresh') || null;
+      };
+
+      const getRating = () => {
+        return parser.getMetaContent('rating') || null;
+      };
+
+      const getGeo = () => {
+        const latitude = parser.getMetaContent('geo.position') || parser.getMetaContent('ICBM');
+        const longitude = parser.getMetaContent('geo.position') || parser.getMetaContent('ICBM');
+        const region = parser.getMetaContent('geo.region');
+        const placename = parser.getMetaContent('geo.placename');
+        
+        if (latitude || longitude || region || placename) {
+          return {
+            latitude,
+            longitude,
+            region,
+            placename
+          };
+        }
+        return null;
+      };
+
       const getContentAnalysis = () => {
         const h1Count = (html.match(/<h1[^>]*>/gi) || []).length;
         const h2Count = (html.match(/<h2[^>]*>/gi) || []).length;
@@ -136,6 +206,15 @@ export async function POST(request: NextRequest) {
         getHreflang,
         getStructuredData,
         getAdditionalMeta,
+        getOpenGraphImages,
+        getTwitterImages,
+        getLanguage,
+        getThemeColor,
+        getAuthor,
+        getGenerator,
+        getRefresh,
+        getRating,
+        getGeo,
         getContentAnalysis
       };
     };
@@ -155,12 +234,18 @@ export async function POST(request: NextRequest) {
       ogType: parser.getMetaContent('og:type', true) || 'No OG type',
       ogUrl: parser.getMetaContent('og:url', true) || 'No OG URL',
       ogImage: parser.getMetaContent('og:image', true) || 'No OG image',
+      ogImages: parser.getOpenGraphImages(),
+      ogSiteName: parser.getMetaContent('og:site_name', true) || 'No OG site name',
+      ogLocale: parser.getMetaContent('og:locale', true) || 'No OG locale',
       
       // Twitter Cards
       twitterCard: parser.getMetaContent('twitter:card') || 'No Twitter card',
       twitterTitle: parser.getMetaContent('twitter:title') || 'No Twitter title',
       twitterDescription: parser.getMetaContent('twitter:description') || 'No Twitter description',
       twitterImage: parser.getMetaContent('twitter:image') || 'No Twitter image',
+      twitterImages: parser.getTwitterImages(),
+      twitterSite: parser.getMetaContent('twitter:site') || 'No Twitter site',
+      twitterCreator: parser.getMetaContent('twitter:creator') || 'No Twitter creator',
       
       // Canonical URL
       canonical: parser.getCanonical() || 'No canonical URL',
@@ -174,8 +259,29 @@ export async function POST(request: NextRequest) {
       // Charset
       charset: parser.getCharset() || 'No charset',
       
+      // Language
+      language: parser.getLanguage() || 'No language',
+      
       // Hreflang
       hreflang: parser.getHreflang(),
+      
+      // Theme
+      themeColor: parser.getThemeColor() || 'No theme color',
+      
+      // Author
+      author: parser.getAuthor() || 'No author',
+      
+      // Generator
+      generator: parser.getGenerator() || 'No generator',
+      
+      // Refresh
+      refresh: parser.getRefresh() || 'No refresh',
+      
+      // Rating
+      rating: parser.getRating() || 'No rating',
+      
+      // Geo
+      geo: parser.getGeo() || 'No geo data',
       
       // Structured Data (JSON-LD)
       structuredData: parser.getStructuredData(),

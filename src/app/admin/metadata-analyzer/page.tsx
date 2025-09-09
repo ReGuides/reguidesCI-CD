@@ -16,15 +16,28 @@ interface MetadataResult {
     ogType: string;
     ogUrl: string;
     ogImage: string;
+    ogImages: Array<{ url: string | null; width: string | null; height: string | null; alt: string | null }>;
+    ogSiteName: string;
+    ogLocale: string;
     twitterCard: string;
     twitterTitle: string;
     twitterDescription: string;
     twitterImage: string;
+    twitterImages: Array<{ url: string | null }>;
+    twitterSite: string;
+    twitterCreator: string;
     canonical: string;
     robots: string;
     viewport: string;
     charset: string;
+    language: string;
     hreflang: Array<{ hreflang: string | null; href: string | null }>;
+    themeColor: string;
+    author: string;
+    generator: string;
+    refresh: string;
+    rating: string;
+    geo: any;
     structuredData: Record<string, unknown>[];
     additionalMeta: Array<{ name: string | null; property: string | null; content: string | null }>;
     contentAnalysis: {
@@ -303,6 +316,121 @@ export default function MetadataAnalyzerPage() {
                       <pre className="text-xs text-neutral-300 overflow-x-auto">
                         {JSON.stringify(data, null, 2)}
                       </pre>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Дополнительные Open Graph теги */}
+            <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+              <h4 className="text-lg font-semibold text-white mb-4">Дополнительные Open Graph теги</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Site Name</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.ogSiteName}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Locale</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.ogLocale}</p>
+                </div>
+                {result.metadata.ogImages.length > 0 && (
+                  <div className="md:col-span-2">
+                    <span className="text-sm font-medium text-neutral-300">Images (с размерами)</span>
+                    <div className="space-y-2 mt-2">
+                      {result.metadata.ogImages.map((img, index) => (
+                        <div key={index} className="bg-neutral-700 rounded p-3">
+                          <p className="text-xs text-neutral-300 break-all">{img.url}</p>
+                          {(img.width || img.height) && (
+                            <p className="text-xs text-neutral-400 mt-1">
+                              Размер: {img.width || '?'} × {img.height || '?'}
+                              {img.alt && ` | Alt: ${img.alt}`}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Дополнительные Twitter теги */}
+            <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+              <h4 className="text-lg font-semibold text-white mb-4">Дополнительные Twitter теги</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Site</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.twitterSite}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Creator</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.twitterCreator}</p>
+                </div>
+                {result.metadata.twitterImages.length > 0 && (
+                  <div className="md:col-span-2">
+                    <span className="text-sm font-medium text-neutral-300">Images</span>
+                    <div className="space-y-2 mt-2">
+                      {result.metadata.twitterImages.map((img, index) => (
+                        <div key={index} className="bg-neutral-700 rounded p-3">
+                          <p className="text-xs text-neutral-300 break-all">{img.url}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Технические мета-теги */}
+            <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+              <h4 className="text-lg font-semibold text-white mb-4">Технические мета-теги</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Language</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.language}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Charset</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.charset}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Viewport</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.viewport}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Robots</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.robots}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Theme Color</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.themeColor}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Author</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.author}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Generator</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.generator}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-neutral-300">Rating</span>
+                  <p className="text-sm text-neutral-400 mt-1">{result.metadata.rating}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Hreflang */}
+            {result.metadata.hreflang.length > 0 && (
+              <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-white mb-4">Hreflang (языковые версии)</h4>
+                <div className="space-y-2">
+                  {result.metadata.hreflang.map((hreflang, index) => (
+                    <div key={index} className="bg-neutral-700 rounded p-3">
+                      <span className="text-sm text-neutral-300">
+                        {hreflang.hreflang} → {hreflang.href}
+                      </span>
                     </div>
                   ))}
                 </div>
