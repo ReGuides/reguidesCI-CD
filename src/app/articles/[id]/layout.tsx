@@ -3,14 +3,15 @@ import connectDB from '@/lib/mongodb';
 import News from '@/models/News';
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     await connectDB();
     
-    const article = await News.findById(params.id).lean();
+    const { id } = await params;
+    const article = await News.findById(id).lean();
     
     if (!article || article.type !== 'article' || !article.isPublished) {
       return {
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const ogImage = article.image || '/images/logos/logo.png';
     
     // Создаем канонический URL
-    const canonicalUrl = `https://reguides.ru/articles/${params.id}`;
+    const canonicalUrl = `https://reguides.ru/articles/${id}`;
     
     // Создаем ключевые слова на основе тегов и контента
     const keywords = [
