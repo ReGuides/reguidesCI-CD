@@ -26,7 +26,8 @@ export interface IUserSession extends Document {
   
   // Поведенческие метрики
   isReturning: boolean; // Возвращающийся пользователь
-  isEngaged: boolean; // Вовлеченный пользователь (время > 30 сек)
+  isEngaged: boolean; // Вовлеченный пользователь (время > 30 сек ИЛИ > 2 страниц)
+  engagementScore: number; // Оценка вовлеченности (0-100)
   
   // Последняя страница
   lastPage: string;
@@ -104,6 +105,14 @@ const UserSessionSchema = new Schema<IUserSession>({
   isEngaged: { 
     type: Boolean, 
     default: false,
+    index: true 
+  },
+  
+  engagementScore: { 
+    type: Number, 
+    default: 0,
+    min: 0,
+    max: 100,
     index: true 
   },
   

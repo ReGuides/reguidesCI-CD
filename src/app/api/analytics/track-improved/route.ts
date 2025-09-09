@@ -4,6 +4,30 @@ import Analytics from '@/models/Analytics';
 import UserSession from '@/models/UserSession';
 import { addServerLog } from '@/lib/serverLog';
 
+// Функция для расчета engagement score (0-100)
+function calculateEngagementScore(timeOnSite: number, pageViews: number, clicks: number = 0): number {
+  let score = 0;
+  
+  // Время на сайте (максимум 40 баллов)
+  if (timeOnSite >= 60) score += 40; // 1+ минута
+  else if (timeOnSite >= 30) score += 30; // 30+ секунд
+  else if (timeOnSite >= 10) score += 20; // 10+ секунд
+  else if (timeOnSite >= 5) score += 10; // 5+ секунд
+  
+  // Количество страниц (максимум 40 баллов)
+  if (pageViews >= 5) score += 40; // 5+ страниц
+  else if (pageViews >= 3) score += 30; // 3+ страницы
+  else if (pageViews >= 2) score += 20; // 2+ страницы
+  else if (pageViews >= 1) score += 10; // 1+ страница
+  
+  // Клики (максимум 20 баллов)
+  if (clicks >= 5) score += 20; // 5+ кликов
+  else if (clicks >= 3) score += 15; // 3+ клика
+  else if (clicks >= 1) score += 10; // 1+ клик
+  
+  return Math.min(score, 100);
+}
+
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -46,18 +70,24 @@ export async function POST(request: NextRequest) {
     }
 
     // 1. Обновляем или создаем сессию пользователя
+    const initialTimeOnSite = timeOnPage || 0;
+    const initialPageViews = 1;
+    const initialClicks = clicks || 0;
+    const initialEngagementScore = calculateEngagementScore(initialTimeOnSite, initialPageViews, initialClicks);
+    
     const sessionData = {
       sessionId: anonymousSessionId,
       firstVisit: new Date(),
       lastVisit: new Date(),
       visitCount: 1,
-      totalTimeOnSite: timeOnPage || 0,
-      pageViews: 1,
+      totalTimeOnSite: initialTimeOnSite,
+      pageViews: initialPageViews,
       deviceCategory,
       screenSize: screenSize || 'medium',
       region,
       isReturning: false,
-      isEngaged: (timeOnPage || 0) > 30,
+      isEngaged: initialEngagementScore >= 30, // Вовлеченный если score >= 30
+      engagementScore: initialEngagementScore,
       lastPage: page,
       lastPageType: pageType
     };
@@ -65,19 +95,28 @@ export async function POST(request: NextRequest) {
     const existingSession = await UserSession.findOne({ sessionId: anonymousSessionId });
     
     if (existingSession) {
-      // Обновляем существующую сессию
+      // Обновляем существующую сессию (обновление страницы в той же сессии)
       existingSession.lastVisit = new Date();
-      existingSession.visitCount += 1;
+      // НЕ увеличиваем visitCount - это та же сессия!
       existingSession.totalTimeOnSite += (timeOnPage || 0);
       existingSession.pageViews += 1;
-      existingSession.isReturning = true;
-      existingSession.isEngaged = existingSession.isEngaged || (timeOnPage || 0) > 30;
+      // НЕ меняем isReturning - это та же сессия!
+      
+      // Пересчитываем engagement score
+      const newEngagementScore = calculateEngagementScore(
+        existingSession.totalTimeOnSite, 
+        existingSession.pageViews, 
+        existingSession.clicks || 0
+      );
+      existingSession.engagementScore = newEngagementScore;
+      existingSession.isEngaged = newEngagementScore >= 30;
+      
       existingSession.lastPage = page;
       existingSession.lastPageType = pageType;
       
       await existingSession.save();
     } else {
-      // Создаем новую сессию
+      // Создаем новую сессию (новый визит)
       const newSession = new UserSession(sessionData);
       await newSession.save();
     }

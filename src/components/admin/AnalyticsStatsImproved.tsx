@@ -242,6 +242,11 @@ export default function AnalyticsStatsImproved() {
             <div className="text-sm text-neutral-400 mb-2">Страниц за сессию</div>
             <div className="text-xl font-bold text-white">{data.sessions.averagePageViewsPerSession.toFixed(1)}</div>
           </div>
+
+          <div className="bg-neutral-700 rounded-lg p-4">
+            <div className="text-sm text-neutral-400 mb-2">Вовлеченность</div>
+            <div className="text-xl font-bold text-orange-400">{data.sessions.averageEngagementScore?.toFixed(1) || '0.0'}/100</div>
+          </div>
         </div>
       </div>
 

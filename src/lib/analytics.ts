@@ -37,8 +37,8 @@ class AnalyticsTracker {
   private isFirstVisit: boolean = false;
 
   constructor() {
-    // Генерируем анонимный ID сессии (хешированный)
-    this.anonymousSessionId = this.generateAnonymousSessionId();
+    // Получаем или создаем анонимный ID сессии (сохраняем в sessionStorage)
+    this.anonymousSessionId = this.getOrCreateAnonymousSessionId();
     this.pageStart = new Date();
     this.currentPage = window.location.pathname;
     
@@ -57,6 +57,21 @@ class AnalyticsTracker {
     this.initTracking();
   }
 
+  private getOrCreateAnonymousSessionId(): string {
+    // Проверяем, есть ли уже ID в sessionStorage
+    if (typeof window !== 'undefined') {
+      let sessionId = sessionStorage.getItem('analytics_session_id');
+      if (!sessionId) {
+        // Создаем новый ID только если его нет
+        sessionId = this.generateAnonymousSessionId();
+        sessionStorage.setItem('analytics_session_id', sessionId);
+      }
+      return sessionId;
+    }
+    // Fallback для серверной стороны
+    return this.generateAnonymousSessionId();
+  }
+
   private generateAnonymousSessionId(): string {
     // Создаем анонимный ID на основе времени и случайных данных
     const data = Date.now().toString() + Math.random().toString(36).substr(2, 9);
@@ -65,11 +80,18 @@ class AnalyticsTracker {
   }
 
   private detectDeviceCategory(): 'desktop' | 'mobile' | 'tablet' {
+    // Используем более точное определение устройства
+    const userAgent = navigator.userAgent.toLowerCase();
     const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
     
-    if (screenWidth <= 768) {
+    // Проверяем мобильные устройства по user agent
+    const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    const isTablet = /ipad|android(?!.*mobile)|tablet/i.test(userAgent);
+    
+    if (isMobile || (screenWidth <= 768 && screenHeight <= 1024)) {
       return 'mobile';
-    } else if (screenWidth <= 1024) {
+    } else if (isTablet || (screenWidth <= 1024 && screenWidth > 768)) {
       return 'tablet';
     } else {
       return 'desktop';
@@ -81,33 +103,45 @@ class AnalyticsTracker {
     const screenHeight = window.screen.height;
     const area = screenWidth * screenHeight;
     
-    if (area <= 480000) { // 800x600
+    // Более точные пороги для современных устройств
+    if (area <= 480000) { // 800x600 и меньше
       return 'small';
-    } else if (area <= 1920000) { // 1600x1200
+    } else if (area <= 2073600) { // 1920x1080 и меньше
       return 'medium';
     } else {
-      return 'large';
+      return 'large'; // 4K и выше
     }
   }
 
   private async getRegion(): Promise<'europe' | 'asia' | 'americas' | 'africa' | 'oceania' | 'unknown'> {
     try {
       // Используем только публичный API для определения континента (без IP)
-      const response = await fetch('https://ipapi.co/json/');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 секунд таймаут
+      
+      const response = await fetch('https://ipapi.co/json/', {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
       const data = await response.json();
       
       // Определяем континент по коду страны (без сохранения страны)
       const countryCode = data.country_code;
       
-      if (['RU', 'DE', 'FR', 'GB', 'IT', 'ES', 'PL', 'UA', 'BY', 'KZ'].includes(countryCode)) {
+      if (['RU', 'DE', 'FR', 'GB', 'IT', 'ES', 'PL', 'UA', 'BY', 'KZ', 'NL', 'BE', 'CH', 'AT', 'SE', 'NO', 'DK', 'FI'].includes(countryCode)) {
         return 'europe';
-      } else if (['CN', 'JP', 'KR', 'IN', 'TH', 'VN', 'ID', 'MY'].includes(countryCode)) {
+      } else if (['CN', 'JP', 'KR', 'IN', 'TH', 'VN', 'ID', 'MY', 'SG', 'HK', 'TW', 'PH'].includes(countryCode)) {
         return 'asia';
-      } else if (['US', 'CA', 'BR', 'MX', 'AR', 'CL'].includes(countryCode)) {
+      } else if (['US', 'CA', 'BR', 'MX', 'AR', 'CL', 'CO', 'PE', 'VE'].includes(countryCode)) {
         return 'americas';
-      } else if (['ZA', 'NG', 'EG', 'KE', 'MA'].includes(countryCode)) {
+      } else if (['ZA', 'NG', 'EG', 'KE', 'MA', 'GH', 'TZ', 'UG'].includes(countryCode)) {
         return 'africa';
-      } else if (['AU', 'NZ', 'FJ', 'PG'].includes(countryCode)) {
+      } else if (['AU', 'NZ', 'FJ', 'PG', 'NC', 'VU'].includes(countryCode)) {
         return 'oceania';
       } else {
         return 'unknown';
@@ -220,11 +254,11 @@ class AnalyticsTracker {
         scrollDepth: this.maxScrollDepth,
         clicks: this.clickCount,
         loadTime: roundedLoadTime,
-        isBounce: timeOnPage < 30 // Отказ если меньше 30 секунд
+        isBounce: false // Bounce определяется на сервере по количеству страниц в сессии
       };
 
-      // Отправляем данные на сервер
-      await fetch('/api/analytics/track', {
+      // Отправляем данные на сервер (используем улучшенный API)
+      await fetch('/api/analytics/track-improved', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

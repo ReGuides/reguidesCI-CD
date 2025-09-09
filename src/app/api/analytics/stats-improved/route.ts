@@ -54,8 +54,7 @@ export async function GET(request: NextRequest) {
           _id: null,
           totalPageViews: { $sum: 1 },
           averageTimeOnPage: { $avg: '$timeOnPage' },
-          averageLoadTime: { $avg: '$loadTime' },
-          bounceRate: { $avg: { $cond: ['$isBounce', 1, 0] } }
+          averageLoadTime: { $avg: '$loadTime' }
         }
       },
       {
@@ -63,8 +62,7 @@ export async function GET(request: NextRequest) {
           _id: 0,
           totalPageViews: 1,
           averageTimeOnPage: { $round: ['$averageTimeOnPage', 2] },
-          averageLoadTime: { $round: ['$averageLoadTime', 2] },
-          bounceRate: { $round: [{ $multiply: ['$bounceRate', 100] }, 2] }
+          averageLoadTime: { $round: ['$averageLoadTime', 2] }
         }
       }
     ]);
@@ -79,8 +77,10 @@ export async function GET(request: NextRequest) {
           newSessions: { $sum: { $cond: ['$isReturning', 0, 1] } },
           returningSessions: { $sum: { $cond: ['$isReturning', 1, 0] } },
           engagedSessions: { $sum: { $cond: ['$isEngaged', 1, 0] } },
+          bounceSessions: { $sum: { $cond: [{ $eq: ['$pageViews', 1] }, 1, 0] } },
           averageSessionDuration: { $avg: '$totalTimeOnSite' },
-          averagePageViewsPerSession: { $avg: '$pageViews' }
+          averagePageViewsPerSession: { $avg: '$pageViews' },
+          averageEngagementScore: { $avg: '$engagementScore' }
         }
       },
       {
@@ -90,8 +90,20 @@ export async function GET(request: NextRequest) {
           newSessions: 1,
           returningSessions: 1,
           engagedSessions: 1,
+          bounceRate: { 
+            $round: [
+              { 
+                $multiply: [
+                  { $divide: ['$bounceSessions', '$totalSessions'] }, 
+                  100
+                ] 
+              }, 
+              2
+            ] 
+          },
           averageSessionDuration: { $round: ['$averageSessionDuration', 2] },
-          averagePageViewsPerSession: { $round: ['$averagePageViewsPerSession', 2] }
+          averagePageViewsPerSession: { $round: ['$averagePageViewsPerSession', 2] },
+          averageEngagementScore: { $round: ['$averageEngagementScore', 1] }
         }
       }
     ]);
@@ -246,19 +258,21 @@ export async function GET(request: NextRequest) {
         ...(totalStats[0] || {
           totalPageViews: 0,
           averageTimeOnPage: 0,
-          averageLoadTime: 0,
-          bounceRate: 0
+          averageLoadTime: 0
         }),
-        // Уникальные посетители берем из сессий (правильно!)
-        uniqueVisitors: sessionStats[0]?.totalSessions || 0
+        // Уникальные посетители и bounce rate берем из сессий (правильно!)
+        uniqueVisitors: sessionStats[0]?.totalSessions || 0,
+        bounceRate: sessionStats[0]?.bounceRate || 0
       },
       sessions: sessionStats[0] || {
         totalSessions: 0,
         newSessions: 0,
         returningSessions: 0,
         engagedSessions: 0,
+        bounceRate: 0,
         averageSessionDuration: 0,
-        averagePageViewsPerSession: 0
+        averagePageViewsPerSession: 0,
+        averageEngagementScore: 0
       },
       topPages,
       topRegions,
