@@ -7,6 +7,13 @@ MODE=${1:-"on"}
 NGINX_CONFIG="/etc/nginx/sites-available/reguides"
 MAINTENANCE_HTML="/var/www/reguides/public/maintenance.html"
 
+# Проверяем права доступа
+if [ ! -w "$NGINX_CONFIG" ] && [ "$EUID" -ne 0 ]; then
+    echo "❌ Недостаточно прав для изменения конфигурации nginx"
+    echo "💡 Попробуйте: sudo ./maintenance-mode.sh $MODE"
+    exit 1
+fi
+
 echo "🔧 Управление режимом обслуживания..."
 
 if [ "$MODE" = "on" ]; then
@@ -53,9 +60,9 @@ EOF
     cp /tmp/reguides_maintenance.conf "$NGINX_CONFIG"
     
     # Тестируем конфигурацию nginx
-    if nginx -t; then
+    if sudo nginx -t; then
         # Перезагружаем nginx
-        systemctl reload nginx
+        sudo systemctl reload nginx
         echo "✅ Режим обслуживания включен"
         echo "🌐 Сайт показывает страницу 'Обновление сайта'"
     else
@@ -72,9 +79,9 @@ elif [ "$MODE" = "off" ]; then
         cp "$LATEST_BACKUP" "$NGINX_CONFIG"
         
         # Тестируем конфигурацию nginx
-        if nginx -t; then
+        if sudo nginx -t; then
             # Перезагружаем nginx
-            systemctl reload nginx
+            sudo systemctl reload nginx
             echo "✅ Режим обслуживания выключен"
             echo "🌐 Сайт работает в обычном режиме"
         else
@@ -95,7 +102,7 @@ else
 fi
 
 echo "📋 Статус nginx:"
-systemctl status nginx --no-pager -l
+sudo systemctl status nginx --no-pager -l
 
 echo "🔍 Проверка конфигурации:"
-nginx -t
+sudo nginx -t

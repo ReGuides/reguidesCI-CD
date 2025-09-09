@@ -157,6 +157,8 @@ jobs:
           # Включаем режим обслуживания
           echo "🛑 Включаем режим обслуживания..."
           chmod +x maintenance-mode.sh
+          chmod +x cleanup-backups.sh
+          chmod +x setup-pm2-autostart.sh
           ./maintenance-mode.sh on
           
           # Останавливаем текущий процесс
@@ -197,6 +199,7 @@ jobs:
             
             # Выключаем режим обслуживания
             echo "▶️  Выключаем режим обслуживания..."
+            chmod +x maintenance-mode.sh
             ./maintenance-mode.sh off
             
             echo "🌐 Сайт доступен в обычном режиме"
@@ -210,6 +213,7 @@ jobs:
               rm -rf .next
               mv "$LATEST_BACKUP" .next
               pm2 start ecosystem.config.js --env production
+              chmod +x maintenance-mode.sh
               ./maintenance-mode.sh off
               echo "✅ Восстановление завершено"
             else
