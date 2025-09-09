@@ -190,7 +190,8 @@ export default function AnalyticsStatsImproved() {
               <Users className="w-4 h-4 text-green-400" />
               <span className="text-sm text-neutral-400">Уникальные посетители</span>
             </div>
-            <div className="text-2xl font-bold text-white">{formatNumber(data.total.uniqueVisitors)}</div>
+            <div className="text-2xl font-bold text-white">{formatNumber(data.sessions.totalSessions)}</div>
+            <div className="text-xs text-neutral-500 mt-1">По сессиям</div>
           </div>
 
           <div className="bg-neutral-700 rounded-lg p-4">
@@ -256,7 +257,7 @@ export default function AnalyticsStatsImproved() {
               </div>
               <div className="text-right">
                 <div className="text-white font-semibold">{formatNumber(page.views)}</div>
-                <div className="text-sm text-neutral-400">{formatNumber(page.uniqueVisitors)} уникальных</div>
+                <div className="text-sm text-neutral-400">{formatNumber(page.uniqueVisitors)} сессий</div>
               </div>
             </div>
           ))}
@@ -275,7 +276,7 @@ export default function AnalyticsStatsImproved() {
               </div>
               <div className="text-right">
                 <div className="text-white font-semibold">{formatNumber(region.views)}</div>
-                <div className="text-sm text-neutral-400">{formatNumber(region.uniqueVisitors)} уникальных</div>
+                <div className="text-sm text-neutral-400">{formatNumber(region.uniqueVisitors)} сессий</div>
               </div>
             </div>
           ))}
@@ -296,7 +297,7 @@ export default function AnalyticsStatsImproved() {
               </div>
               <div className="text-right">
                 <div className="text-white font-semibold">{formatNumber(device.views)}</div>
-                <div className="text-sm text-neutral-400">{formatNumber(device.uniqueVisitors)} уникальных</div>
+                <div className="text-sm text-neutral-400">{formatNumber(device.uniqueVisitors)} сессий</div>
               </div>
             </div>
           ))}
