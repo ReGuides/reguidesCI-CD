@@ -13,7 +13,8 @@ import {
   BarChart3,
   LogsIcon,
   FolderOpen,
-  Heart
+  Heart,
+  Search
 } from 'lucide-react';
 
 interface NavigationStats {
@@ -129,6 +130,11 @@ export default function AdminNavigation({ className = '' }: AdminNavigationProps
       href: '/admin/friends',
       label: 'Друзья',
       icon: Heart
+    },
+    {
+      href: '/admin/metadata-analyzer',
+      label: 'Анализатор мета-данных',
+      icon: Search
     }
   ];
 
