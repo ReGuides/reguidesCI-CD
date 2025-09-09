@@ -157,6 +157,14 @@ export default function AnalyticsPage() {
             Обновить
           </Button>
           <Button 
+            onClick={() => window.location.href = '/admin/analytics/improved'}
+            variant="outline" 
+            className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white"
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Улучшенная аналитика
+          </Button>
+          <Button 
             onClick={() => window.location.href = '/admin/analytics/advertising'}
             variant="outline" 
             className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white"
