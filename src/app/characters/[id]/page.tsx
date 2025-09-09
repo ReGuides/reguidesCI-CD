@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
@@ -120,8 +122,6 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     },
   };
 }
-
-'use client';
 
 function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
