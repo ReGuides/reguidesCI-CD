@@ -2,21 +2,27 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Оружие Genshin Impact - Гайды и рекомендации | ReGuides',
-  description: 'Полные гайды по всему оружию Genshin Impact. Рекомендации по выбору оружия, статам и улучшениям. Лучшее оружие для каждого персонажа.',
+  description: 'Полный каталог оружия Genshin Impact с рекомендациями по персонажам. Статистика, пассивные способности, материалы для улучшения и лучшие сборки.',
   keywords: [
     'genshin impact',
     'оружие',
     'гайды',
     'рекомендации',
-    'статы',
-    'улучшения',
-    'персонажи',
+    'статистика',
+    'пассивные способности',
+    'материалы',
+    'улучшение',
     'сборки',
-    'билды'
+    'каталог',
+    'меч',
+    'копье',
+    'лук',
+    'катализатор',
+    'двуручный меч'
   ],
   openGraph: {
     title: 'Оружие Genshin Impact - Гайды и рекомендации | ReGuides',
-    description: 'Полные гайды по всему оружию Genshin Impact. Рекомендации по выбору оружия, статам и улучшениям.',
+    description: 'Полный каталог оружия Genshin Impact с рекомендациями по персонажам. Статистика, пассивные способности, материалы для улучшения.',
     type: 'website',
     url: 'https://reguides.ru/weapons',
     images: [
@@ -31,7 +37,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Оружие Genshin Impact - Гайды и рекомендации | ReGuides',
-    description: 'Полные гайды по всему оружию Genshin Impact. Рекомендации по выбору оружия, статам и улучшениям.',
+    description: 'Полный каталог оружия Genshin Impact с рекомендациями по персонажам. Статистика, пассивные способности, материалы для улучшения.',
     images: ['https://reguides.ru/images/logos/logo.png'],
   },
   alternates: {

@@ -2,21 +2,26 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Артефакты Genshin Impact - Гайды и рекомендации | ReGuides',
-  description: 'Полные гайды по всем артефактам Genshin Impact. Рекомендации по сборкам, бонусам и комбинациям. Лучшие артефакты для каждого персонажа.',
+  description: 'Полный каталог артефактов Genshin Impact с рекомендациями по персонажам. Статистика, бонусы, места получения и лучшие сборки.',
   keywords: [
     'genshin impact',
     'артефакты',
     'гайды',
-    'сборки',
-    'бонусы',
-    'комбинации',
     'рекомендации',
-    'персонажи',
-    'статы'
+    'статистика',
+    'бонусы',
+    'места получения',
+    'сборки',
+    'каталог',
+    'цветок жизни',
+    'перо смерти',
+    'песочные часы',
+    'кубок пространства',
+    'корона разума'
   ],
   openGraph: {
     title: 'Артефакты Genshin Impact - Гайды и рекомендации | ReGuides',
-    description: 'Полные гайды по всем артефактам Genshin Impact. Рекомендации по сборкам, бонусам и комбинациям.',
+    description: 'Полный каталог артефактов Genshin Impact с рекомендациями по персонажам. Статистика, бонусы, места получения.',
     type: 'website',
     url: 'https://reguides.ru/artifacts',
     images: [
@@ -31,7 +36,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Артефакты Genshin Impact - Гайды и рекомендации | ReGuides',
-    description: 'Полные гайды по всем артефактам Genshin Impact. Рекомендации по сборкам, бонусам и комбинациям.',
+    description: 'Полный каталог артефактов Genshin Impact с рекомендациями по персонажам. Статистика, бонусы, места получения.',
     images: ['https://reguides.ru/images/logos/logo.png'],
   },
   alternates: {
