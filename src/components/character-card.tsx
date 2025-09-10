@@ -35,7 +35,7 @@ export function CharacterCard({ character, className = '' }: CharacterCardProps)
           alt={character.name}
           width={350}
           height={490}
-          className="absolute inset-0 w-full h-full object-cover z-10"
+          className="absolute inset-0 w-full h-full object-contain z-10"
           onError={e => { 
             const target = e.target as HTMLImageElement;
             target.style.opacity = '0.2'; 
