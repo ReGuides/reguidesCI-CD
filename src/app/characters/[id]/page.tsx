@@ -190,10 +190,10 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
       {/* Структурированные данные для SEO */}
       <StructuredData character={character} />
       
-      <div className="min-h-screen flex flex-col md:flex-row w-full h-full">
+      <div className="min-h-screen flex flex-col md:flex-row w-full">
       {/* Левая колонка: информация о персонаже */}
       <div 
-        className="relative md:w-80 flex flex-col w-full md:overflow-y-auto overflow-x-hidden" 
+        className="relative md:w-80 flex flex-col w-full flex-shrink-0" 
         style={{ background: elementColor + '33' }}
       >
         {/* Декоративная полоска */}
@@ -325,7 +325,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
       </div>
 
       {/* Правая колонка: контент */}
-      <div className="flex-1 flex flex-col min-h-full min-w-0 w-full md:w-auto">
+      <div className="flex-1 flex flex-col min-w-0 w-full md:w-auto">
         <div className="flex gap-2 mb-6 mt-2 md:mt-4 flex-wrap px-4 overflow-x-auto pb-2">
           <button
             className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
