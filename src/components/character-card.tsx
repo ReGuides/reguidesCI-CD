@@ -29,7 +29,7 @@ export function CharacterCard({ character, className = '' }: CharacterCardProps)
 
   return (
     <Link href={`/characters/${character.id}`}>
-      <div className={`relative bg-card rounded-lg shadow-lg overflow-hidden flex flex-col w-full aspect-[5/7] min-h-[280px] group ${className}`}>
+      <div className={`relative bg-card rounded-lg shadow-lg overflow-hidden flex flex-col w-full h-[350px] group ${className}`}>
         <Image
           src={getImageWithFallback(imageUrl, character.name, 'character')}
           alt={character.name}

@@ -179,7 +179,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
       {/* Структурированные данные для SEO */}
       {character && <StructuredData character={character} />}
       
-      <div className="min-h-screen flex flex-col md:flex-row w-full h-full overflow-hidden">
+      <div className="min-h-screen flex flex-col md:flex-row w-full h-full">
       {/* Левая колонка: информация о персонаже - на мобильных показываем после правой колонки */}
       <div 
         className="relative md:w-80 flex flex-col w-full md:overflow-y-auto overflow-x-hidden order-2 md:order-1" 
