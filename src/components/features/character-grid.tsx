@@ -82,7 +82,7 @@ export function CharacterGrid() {
                 <OptimizedImage
                   src={getImageWithFallback(character.image, character.name, 'character')}
                   alt={character.name}
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-contain"
                 />
                 {character.rarity && (
                   <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/60 text-yellow-300 px-2 py-1 rounded shadow">

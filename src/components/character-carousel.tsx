@@ -144,7 +144,7 @@ export default function CharacterCarousel({
                   alt={character.name}
                   width={320}
                   height={400}
-                  className="absolute inset-0 w-full h-full object-cover object-center rounded-sm"
+                  className="absolute inset-0 w-full h-full object-contain rounded-sm"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = '/images/characters/default.png';
