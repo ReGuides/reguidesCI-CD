@@ -90,26 +90,8 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
 
 
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <LoadingSpinner size="lg" className="text-accent" />
-      </div>
-    );
-  }
 
-  if (error || !character) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center text-red-400">
-          <h2 className="text-2xl font-bold mb-4">Ошибка загрузки</h2>
-          <p>{error || 'Персонаж не найден'}</p>
-        </div>
-      </div>
-    );
-  }
-
-  const elementColor = getElementColor(character.element || '');
+  const elementColor = getElementColor(character?.element || '');
 
   const handleItemClick = async (type: string, id: string) => {
     try {
@@ -174,10 +156,39 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
     setSelectedCombination(null);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" className="text-accent" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-red-400">
+          <h2 className="text-2xl font-bold mb-4">Ошибка загрузки</h2>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!character) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-gray-400">
+          <h2 className="text-2xl font-bold mb-4">Персонаж не найден</h2>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Структурированные данные для SEO */}
-      {character && <StructuredData character={character} />}
+      <StructuredData character={character} />
       
       <div className="min-h-screen flex flex-col md:flex-row w-full h-full">
       {/* Левая колонка: информация о персонаже */}
