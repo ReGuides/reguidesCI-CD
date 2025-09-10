@@ -35,13 +35,13 @@ export function CharacterCard({ character, className = '' }: CharacterCardProps)
           alt={character.name}
           width={350}
           height={490}
-          className="absolute inset-0 w-full h-full object-contain z-10"
+          className="absolute inset-0 w-full h-full object-cover z-10"
           onError={e => { 
             const target = e.target as HTMLImageElement;
             target.style.opacity = '0.2'; 
           }}
         />
-        <div className={`relative z-30 mt-auto w-full p-3 sm:p-4 ${getElementColor(character.element)} backdrop-blur-sm transition-all duration-300 group-hover:mt-0 group-hover:h-full group-hover:flex group-hover:items-center group-hover:justify-center`}>
+        <div className={`relative z-30 mt-auto w-full p-3 sm:p-4 ${getElementColor(character.element)} transition-all duration-300 group-hover:mt-0 group-hover:h-full group-hover:flex group-hover:items-center group-hover:justify-center`}>
           <div className="transition-transform duration-300 text-center">
             <h2 className="text-base sm:text-lg font-bold text-white drop-shadow mb-1 group-hover:text-lg sm:group-hover:text-xl group-hover:font-extrabold leading-tight">
               {character.name}

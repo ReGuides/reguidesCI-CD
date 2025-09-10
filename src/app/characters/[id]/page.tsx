@@ -182,7 +182,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
       <div className="min-h-screen flex flex-col md:flex-row w-full h-full overflow-hidden">
       {/* Левая колонка: информация о персонаже */}
       <div 
-        className="relative md:w-80 min-h-full flex flex-col w-full overflow-y-auto overflow-x-hidden" 
+        className="relative md:w-80 flex flex-col w-full md:overflow-y-auto overflow-x-hidden" 
         style={{ background: elementColor + '33' }}
       >
         {/* Декоративная полоска */}
@@ -314,10 +314,10 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
       </div>
 
       {/* Правая колонка: контент */}
-      <div className="flex-1 flex flex-col min-h-full min-w-0">
-        <div className="flex gap-2 mb-6 mt-2 md:mt-4 flex-wrap px-4">
+      <div className="flex-1 flex flex-col min-h-full min-w-0 w-full md:w-auto">
+        <div className="flex gap-2 mb-6 mt-2 md:mt-4 flex-wrap px-4 overflow-x-auto pb-2">
           <button
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
               activeTab === 'weapons'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
@@ -325,10 +325,11 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             onClick={() => handleTabChange('weapons')}
           >
             <Zap className="w-4 h-4" />
-            Рекомендации
+            <span className="hidden sm:inline">Рекомендации</span>
+            <span className="sm:hidden">Оружие</span>
           </button>
           <button
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
               activeTab === 'teams'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
@@ -336,10 +337,11 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             onClick={() => handleTabChange('teams')}
           >
             <Users className="w-4 h-4" />
-            Команды
+            <span className="hidden sm:inline">Команды</span>
+            <span className="sm:hidden">Команды</span>
           </button>
           <button
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
               activeTab === 'builds'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
@@ -347,10 +349,11 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             onClick={() => handleTabChange('builds')}
           >
             <BookOpen className="w-4 h-4" />
-            Сборки
+            <span className="hidden sm:inline">Сборки</span>
+            <span className="sm:hidden">Сборки</span>
           </button>
           <button
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
               activeTab === 'talents'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
@@ -358,10 +361,11 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             onClick={() => handleTabChange('talents')}
           >
             <Sword className="w-4 h-4" />
-            Таланты
+            <span className="hidden sm:inline">Таланты</span>
+            <span className="sm:hidden">Таланты</span>
           </button>
           <button
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
               activeTab === 'constellations'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
@@ -369,11 +373,12 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             onClick={() => handleTabChange('constellations')}
             >
             <Star className="w-4 h-4" />
-            Созвездия
+            <span className="hidden sm:inline">Созвездия</span>
+            <span className="sm:hidden">Звезды</span>
           </button>
         </div>
 
-        <div className="flex-1 px-4 animate-in fade-in duration-300 min-w-0">
+        <div className="flex-1 px-4 animate-in fade-in duration-300 min-w-0 overflow-y-auto">
           {activeTab === 'weapons' && (
             <div>
               <div className="mb-6">
