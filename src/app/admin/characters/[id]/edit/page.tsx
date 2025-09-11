@@ -13,6 +13,7 @@ import BuildForm from '@/components/builds/BuildForm';
 import RecommendationForm from '@/components/builds/RecommendationForm';
 import TextFormattingToolbar from '@/components/admin/TextFormattingToolbar';
 import SuggestionHelper from '@/components/admin/SuggestionHelper';
+import ArticleEditor from '@/components/ui/article-editor';
 import TalentManager from '@/components/admin/TalentManager';
 import ConstellationManager from '@/components/admin/ConstellationManager';
 import { Weapon } from '@/types';
@@ -56,6 +57,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
   const [editingRecommendation, setEditingRecommendation] = useState<any>(null);
   const [isEditingGameplayDescription, setIsEditingGameplayDescription] = useState(false);
   const [gameplayDescriptionDraft, setGameplayDescriptionDraft] = useState('');
+  const [gameplayDescriptionHtml, setGameplayDescriptionHtml] = useState('');
 
   const fetchWeapons = async () => {
     try {
@@ -104,6 +106,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
           setCharacter(characterData);
           setFormData(processedData);
           setGameplayDescriptionDraft(characterData.gameplayDescription || '');
+          setGameplayDescriptionHtml(characterData.gameplayDescriptionHtml || '');
           
           // Загружаем билды и рекомендации
           await fetchBuilds(id);
@@ -291,6 +294,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
   // Функции для работы с описанием геймплея
   const handleEditGameplayDescription = () => {
     setGameplayDescriptionDraft(formData.gameplayDescription || '');
+    setGameplayDescriptionHtml(formData.gameplayDescriptionHtml || '');
     setIsEditingGameplayDescription(true);
   };
 
@@ -300,11 +304,19 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
       const response = await fetch(`/api/characters/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, gameplayDescription: gameplayDescriptionDraft })
+        body: JSON.stringify({ 
+          ...formData, 
+          gameplayDescription: gameplayDescriptionDraft,
+          gameplayDescriptionHtml: gameplayDescriptionHtml
+        })
       });
       
       if (response.ok) {
-        setFormData(prev => ({ ...prev, gameplayDescription: gameplayDescriptionDraft }));
+        setFormData(prev => ({ 
+          ...prev, 
+          gameplayDescription: gameplayDescriptionDraft,
+          gameplayDescriptionHtml: gameplayDescriptionHtml
+        }));
         setIsEditingGameplayDescription(false);
       }
     } catch (error) {
@@ -315,6 +327,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
   const handleCancelGameplayDescription = () => {
     setIsEditingGameplayDescription(false);
     setGameplayDescriptionDraft('');
+    setGameplayDescriptionHtml('');
   };
 
   const handleInsertSuggestion = (text: string) => {
@@ -841,13 +854,27 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
               </div>
               
               {isEditingGameplayDescription ? (
-                <>
-                  <textarea
-                    value={gameplayDescriptionDraft}
-                    onChange={(e) => setGameplayDescriptionDraft(e.target.value)}
-                    className="w-full min-h-[120px] bg-neutral-700 text-white rounded p-3 border border-neutral-600 resize-none"
-                    placeholder="Введите описание геймплея персонажа..."
-                  />
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-gray-400 mb-2 block">Markdown (для совместимости)</label>
+                      <textarea
+                        value={gameplayDescriptionDraft}
+                        onChange={(e) => setGameplayDescriptionDraft(e.target.value)}
+                        className="w-full min-h-[200px] bg-neutral-700 text-white rounded p-3 border border-neutral-600 resize-none"
+                        placeholder="Введите описание геймплея персонажа в Markdown..."
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-400 mb-2 block">HTML (основной редактор)</label>
+                      <ArticleEditor
+                        value={gameplayDescriptionHtml}
+                        onChange={setGameplayDescriptionHtml}
+                        placeholder="Введите описание геймплея персонажа в HTML..."
+                        className="min-h-[200px]"
+                      />
+                    </div>
+                  </div>
                   <TextFormattingToolbar onInsert={handleInsertSuggestion} />
                   <SuggestionHelper
                     onInsert={handleInsertSuggestion}
@@ -865,12 +892,19 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                     </ul>
                     <div className="mt-1 text-gray-500">Для модалок доступны: <b>weapon:ID</b>, <b>artifact:ID</b>, <b>character:ID</b>, <b>talent:тип</b>, <b>constellation:уровень</b></div>
                   </div>
-                  
-
-                </>
+                </div>
               ) : (
-                <div className="text-neutral-300 whitespace-pre-line">
-                  {formData.gameplayDescription || <span className="text-neutral-500">Нет описания</span>}
+                <div className="text-neutral-300">
+                  {formData.gameplayDescriptionHtml ? (
+                    <div 
+                      className="prose prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: formData.gameplayDescriptionHtml }}
+                    />
+                  ) : formData.gameplayDescription ? (
+                    <div className="whitespace-pre-line">{formData.gameplayDescription}</div>
+                  ) : (
+                    <span className="text-neutral-500">Нет описания</span>
+                  )}
                 </div>
               )}
             </div>
@@ -914,8 +948,17 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                         </Button>
                       </div>
                     </div>
-                    {build.description && (
-                      <p className="text-gray-400 text-sm mb-2">{build.description}</p>
+                    {(build.description || build.descriptionHtml) && (
+                      <div className="text-gray-400 text-sm mb-2">
+                        {build.descriptionHtml ? (
+                          <div 
+                            className="prose prose-invert prose-sm max-w-none"
+                            dangerouslySetInnerHTML={{ __html: build.descriptionHtml }}
+                          />
+                        ) : (
+                          <p>{build.description}</p>
+                        )}
+                      </div>
                     )}
                     {build.role && (
                       <Badge variant="secondary" className="mb-2">

@@ -14,6 +14,7 @@ export interface ICharacter extends mongoose.Document {
   birthday?: string;
   patchNumber?: string;
   gameplayDescription?: string;
+  gameplayDescriptionHtml?: string;
   views?: number;
   isActive?: boolean;
   isFeatured?: boolean;
@@ -36,6 +37,10 @@ const characterSchema = new mongoose.Schema<ICharacter>({
   birthday: { type: String },
   patchNumber: { type: String },
   gameplayDescription: {
+    type: String,
+    default: ''
+  },
+  gameplayDescriptionHtml: {
     type: String,
     default: ''
   },

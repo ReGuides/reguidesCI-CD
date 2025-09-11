@@ -7,6 +7,7 @@ import { WeaponSelectModal } from './WeaponSelectModal';
 import { ArtifactSelectModal } from './ArtifactSelectModal';
 import TextFormattingToolbar from '@/components/admin/TextFormattingToolbar';
 import SuggestionHelper from '@/components/admin/SuggestionHelper';
+import ArticleEditor from '@/components/ui/article-editor';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 
 // Константы для статов и талантов
@@ -45,6 +46,7 @@ interface BuildFormProps {
     title?: string;
     role?: string;
     description?: string;
+    descriptionHtml?: string;
     weapons?: string[];
     artifacts?: ArtifactOrCombination[];
     mainStats?: string[];
@@ -57,6 +59,7 @@ interface BuildFormProps {
     title: string;
     role: string;
     description: string;
+    descriptionHtml: string;
     weapons: string[];
     artifacts: ArtifactOrCombination[];
     mainStats: string[];
@@ -72,6 +75,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
   const [title, setTitle] = useState(initial?.title || "");
   const [role, setRole] = useState(initial?.role || "");
   const [description, setDescription] = useState(initial?.description || "");
+  const [descriptionHtml, setDescriptionHtml] = useState(initial?.descriptionHtml || "");
   const [weapons, setWeapons] = useState<string[]>(initial?.weapons || []);
   const [artifacts, setArtifacts] = useState<ArtifactOrCombination[]>(initial?.artifacts || []);
   const [mainStats, setMainStats] = useState<string[]>(initial?.mainStats || []);
@@ -113,6 +117,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
       title,
       role,
       description,
+      descriptionHtml,
       weapons,
       artifacts,
       mainStats,
@@ -197,12 +202,26 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
         />
         <div>
           <label className="block text-sm font-medium mb-2 text-white">Описание билда</label>
-          <textarea
-            className="bg-neutral-800 rounded px-3 py-2 text-white min-h-[80px] resize-none w-full"
-            placeholder="Описание билда"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">Markdown (для совместимости)</label>
+              <textarea
+                className="bg-neutral-800 rounded px-3 py-2 text-white min-h-[120px] resize-none w-full"
+                placeholder="Описание билда в Markdown"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">HTML (основной редактор)</label>
+              <ArticleEditor
+                value={descriptionHtml}
+                onChange={setDescriptionHtml}
+                placeholder="Описание билда в HTML"
+                className="min-h-[120px]"
+              />
+            </div>
+          </div>
           <TextFormattingToolbar onInsert={handleInsertSuggestion} />
           <SuggestionHelper
             onInsert={handleInsertSuggestion}

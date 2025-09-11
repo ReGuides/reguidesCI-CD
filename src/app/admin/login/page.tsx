@@ -175,16 +175,6 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Дополнительная информация */}
-          <div className="mt-6 pt-6 border-t border-neutral-700/50">
-            <div className="text-center">
-              <p className="text-xs text-gray-500 mb-2">Тестовые учетные данные:</p>
-              <div className="space-y-1 text-xs text-gray-400">
-                <p><span className="text-gray-300">Логин:</span> admin</p>
-                <p><span className="text-gray-300">Пароль:</span> admin123</p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Футер */}

@@ -38,6 +38,7 @@ export async function GET(
       birthday: character.birthday,
       patchNumber: character.patchNumber,
       gameplayDescription: character.gameplayDescription,
+      gameplayDescriptionHtml: character.gameplayDescriptionHtml,
       isActive: character.isActive,
       isFeatured: character.isFeatured,
       role: character.role,

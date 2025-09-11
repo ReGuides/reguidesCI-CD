@@ -26,8 +26,8 @@ export interface AdminUser {
 
 interface AdminAuthContextType {
   user: AdminUser | null;
-  login: (token: string) => void;
-  logout: () => void;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
@@ -44,66 +44,50 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   // Инициализация user из токена
   useEffect(() => {
-    let token = '';
-    if (typeof document !== 'undefined') {
-      const match = document.cookie.match(/adminToken=([^;]+)/);
-      if (match) token = match[1];
-      if (!token) token = localStorage.getItem('adminToken') || '';
-    }
-    if (!token) {
-      setUser(null);
-      return;
-    }
-    try {
-      const decoded = jwtDecode<AdminJwtPayload>(token);
-      if (!decoded || !decoded.id) {
-        setUser(null);
-        return;
-      }
-      setUser({
-        id: decoded.id,
-        name: decoded.name,
-        email: decoded.email,
-        role: decoded.role,
-        avatar: decoded.avatar,
-        username: decoded.username,
-        login: decoded.login,
-      });
-    } catch {
-      setUser(null);
-    }
+    checkAuthStatus();
   }, []);
 
-  // Логин: сохраняем токен, обновляем user
-  const login = (token: string) => {
-    if (typeof document !== 'undefined') {
-      document.cookie = `adminToken=${token}; path=/;`;
-      localStorage.setItem('adminToken', token);
-    }
+  const checkAuthStatus = async () => {
     try {
-      const decoded = jwtDecode<AdminJwtPayload>(token);
-      setUser({
-        id: decoded.id,
-        name: decoded.name,
-        email: decoded.email,
-        role: decoded.role,
-        avatar: decoded.avatar,
-        username: decoded.username,
-        login: decoded.login,
+      const response = await fetch('/api/admin/auth/verify', {
+        method: 'POST',
+        credentials: 'include'
       });
-    } catch {
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.user) {
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
       setUser(null);
     }
   };
 
-  // Логаут: удаляем токен, сбрасываем user
-  const logout = () => {
-    if (typeof document !== 'undefined') {
-      document.cookie = 'adminToken=; Max-Age=0; path=/;';
-      localStorage.removeItem('adminToken');
+  // Логин: обновляем user
+  const login = async () => {
+    await checkAuthStatus();
+  };
+
+  // Логаут: удаляем токены, сбрасываем user
+  const logout = async () => {
+    try {
+      await fetch('/api/admin/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      router.replace('/admin/login');
     }
-    setUser(null);
-    router.replace('/admin/login');
   };
 
   return (

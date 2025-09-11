@@ -14,6 +14,7 @@ export interface Character {
   birthday?: string;
   patchNumber?: string;
   gameplayDescription?: string;
+  gameplayDescriptionHtml?: string;
   views?: number;
   isFeatured?: boolean; // добавлено для админки
   role?: string; // добавлено для админки
@@ -312,6 +313,7 @@ export interface Build {
   _id: string;
   title: string;
   description?: string;
+  descriptionHtml?: string;
   characterId: string;
   role: 'main_dps' | 'sub_dps' | 'support' | 'healer' | 'waifu' | 'pocket_dps';
   weapons: string[];

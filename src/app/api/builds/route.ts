@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
         title: cleanBuild.title?.toString() || '',
         characterId: cleanBuild.characterId?.toString() || '',
         description: cleanBuild.description?.toString() || '',
+        descriptionHtml: cleanBuild.descriptionHtml?.toString() || '',
         artifacts: Array.isArray(cleanBuild.artifacts) ? cleanBuild.artifacts.map(artifact => ({
           ...artifact,
           id: artifact.id?.toString() || '',
