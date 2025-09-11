@@ -1,43 +1,52 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { AuthManager } from '@/lib/auth';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Защищаем только админские маршруты
+  
+  // Проверяем, является ли это админским роутом
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    const token = request.cookies.get('adminToken')?.value || 
-                  request.headers.get('authorization')?.replace('Bearer ', '');
-
-    if (!token) {
+    // Получаем access токен из cookies
+    const accessToken = request.cookies.get('accessToken')?.value;
+    
+    if (!accessToken) {
+      // Нет токена - редирект на логин
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
-
-    try {
-      // Проверяем JWT токен
-      const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
-      
-      // Проверяем роль пользователя
-      if (payload.role !== 'admin') {
-        return NextResponse.redirect(new URL('/admin/login', request.url));
-      }
-
-      // Токен валиден, продолжаем
-      return NextResponse.next();
-    } catch (error) {
-      // Токен невалиден, перенаправляем на логин
+    
+    // Проверяем валидность токена
+    const decoded = AuthManager.verifyAccessToken(accessToken);
+    
+    if (!decoded) {
+      // Токен невалидный - редирект на логин
       return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+    
+    // Токен валидный - продолжаем
+    return NextResponse.next();
+  }
+  
+  // Если это страница логина и пользователь уже авторизован - редирект в админку
+  if (pathname === '/admin/login') {
+    const accessToken = request.cookies.get('accessToken')?.value;
+    
+    if (accessToken) {
+      const decoded = AuthManager.verifyAccessToken(accessToken);
+      
+      if (decoded) {
+        // Пользователь уже авторизован - редирект в админку
+        return NextResponse.redirect(new URL('/admin', request.url));
+      }
     }
   }
-
+  
   return NextResponse.next();
 }
 
+// Конфигурация middleware
 export const config = {
   matcher: [
-    '/admin/:path*',
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
-}; 
+    '/admin/:path*'
+  ]
+};

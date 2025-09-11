@@ -1,47 +1,155 @@
-import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
 
-export interface User {
-  id: string;
-  name: string;
-  login: string;
-  isAdmin: boolean;
+// Секретные ключи для подписи токенов
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'your-access-secret-key-change-in-production';
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'your-refresh-secret-key-change-in-production';
+
+// Время жизни токенов
+const ACCESS_TOKEN_EXPIRES_IN = '15m'; // 15 минут
+const REFRESH_TOKEN_EXPIRES_IN = '7d'; // 7 дней
+
+export interface TokenPayload {
+  userId: string;
+  username: string;
+  role: string;
+  iat?: number;
+  exp?: number;
 }
 
-export interface Session {
-  user: User;
+export interface RefreshTokenPayload {
+  userId: string;
+  type: 'refresh';
+  iat?: number;
+  exp?: number;
 }
 
-// Простая проверка аутентификации для админ-панели
-export async function auth(): Promise<Session | null> {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('admin_token');
-    
-    if (!token) {
+export class AuthManager {
+  /**
+   * Создает access токен для авторизованного пользователя
+   */
+  static generateAccessToken(userId: string, username: string, role: string = 'admin'): string {
+    const payload: TokenPayload = {
+      userId,
+      username,
+      role
+    };
+
+    return jwt.sign(payload, ACCESS_TOKEN_SECRET, {
+      expiresIn: ACCESS_TOKEN_EXPIRES_IN
+    });
+  }
+
+  /**
+   * Создает refresh токен для обновления access токена
+   */
+  static generateRefreshToken(userId: string): string {
+    const payload: RefreshTokenPayload = {
+      userId,
+      type: 'refresh'
+    };
+
+    return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
+      expiresIn: REFRESH_TOKEN_EXPIRES_IN
+    });
+  }
+
+  /**
+   * Проверяет и декодирует access токен
+   */
+  static verifyAccessToken(token: string): TokenPayload | null {
+    try {
+      const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as TokenPayload;
+      return decoded;
+    } catch (error) {
+      console.error('Access token verification failed:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Проверяет и декодирует refresh токен
+   */
+  static verifyRefreshToken(token: string): RefreshTokenPayload | null {
+    try {
+      const decoded = jwt.verify(token, REFRESH_TOKEN_SECRET) as RefreshTokenPayload;
+      if (decoded.type !== 'refresh') {
+        return null;
+      }
+      return decoded;
+    } catch (error) {
+      console.error('Refresh token verification failed:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Обновляет access токен используя refresh токен
+   */
+  static refreshAccessToken(refreshToken: string): { accessToken: string; refreshToken: string } | null {
+    const decoded = this.verifyRefreshToken(refreshToken);
+    if (!decoded) {
       return null;
     }
 
-    // В реальном приложении здесь должна быть проверка JWT токена
-    // Для демонстрации используем простую проверку
-    if (token.value === 'admin_secret_token') {
+    // Создаем новый access токен
+    const newAccessToken = this.generateAccessToken(decoded.userId, 'admin', 'admin');
+    
+    // Создаем новый refresh токен (ротация токенов для безопасности)
+    const newRefreshToken = this.generateRefreshToken(decoded.userId);
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken
+    };
+  }
+
+  /**
+   * Проверяет credentials пользователя
+   * В реальном приложении здесь должна быть проверка с базой данных
+   */
+  static async validateCredentials(username: string, password: string): Promise<{ userId: string; username: string } | null> {
+    // Временная проверка - в продакшене заменить на проверку с БД
+    const validCredentials = {
+      'admin': 'admin123', // username: password
+      'reguides': 'reguides2024'
+    };
+
+    if (validCredentials[username as keyof typeof validCredentials] === password) {
       return {
-        user: {
-          id: '1',
-          name: 'Администратор',
-          login: 'admin',
-          isAdmin: true
-        }
+        userId: 'admin-001',
+        username
       };
     }
 
     return null;
-  } catch (error) {
-    console.error('Auth error:', error);
-    return null;
+  }
+
+  /**
+   * Создает пару токенов для пользователя
+   */
+  static async createTokenPair(userId: string, username: string): Promise<{ accessToken: string; refreshToken: string }> {
+    const accessToken = this.generateAccessToken(userId, username);
+    const refreshToken = this.generateRefreshToken(userId);
+
+    return {
+      accessToken,
+      refreshToken
+    };
   }
 }
 
-// Проверка, является ли пользователь администратором
-export function isAdmin(session: Session | null): boolean {
-  return session?.user?.isAdmin === true;
+/**
+ * Проверяет, является ли токен валидным access токеном
+ */
+export function isValidAccessToken(token: string): boolean {
+  const decoded = AuthManager.verifyAccessToken(token);
+  return decoded !== null;
+}
+
+/**
+ * Проверяет, является ли токен валидным refresh токеном
+ */
+export function isValidRefreshToken(token: string): boolean {
+  const decoded = AuthManager.verifyRefreshToken(token);
+  return decoded !== null;
 }

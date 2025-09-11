@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/admin/stat-card';
+import ProtectedRoute from '@/components/admin/ProtectedRoute';
 import { 
   Users, 
   Eye, 
@@ -164,6 +165,7 @@ export default function AdminDashboard() {
   }
 
   return (
+    <ProtectedRoute>
     <div className="p-6 space-y-6">
       {/* Заголовок */}
       <div className="flex justify-between items-center">
@@ -354,8 +356,8 @@ export default function AdminDashboard() {
               </Button>
             </Link>
           </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
       {/* Популярный контент и активность */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -424,5 +426,6 @@ export default function AdminDashboard() {
         </Card>
       </div>
     </div>
+    </ProtectedRoute>
   );
 } 
