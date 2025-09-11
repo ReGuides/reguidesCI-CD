@@ -29,7 +29,8 @@ export async function POST(request: NextRequest) {
     // Создаем токены
     const { accessToken, refreshToken } = await AuthManager.createTokenPair(
       user.userId,
-      user.username
+      user.username,
+      user.role
     );
 
     // Создаем response с токенами
@@ -38,7 +39,8 @@ export async function POST(request: NextRequest) {
       message: 'Login successful',
       user: {
         id: user.userId,
-        username: user.username
+        username: user.username,
+        role: user.role
       }
     });
 

@@ -104,31 +104,54 @@ export class AuthManager {
   }
 
   /**
-   * Проверяет credentials пользователя
-   * В реальном приложении здесь должна быть проверка с базой данных
+   * Проверяет credentials пользователя с базой данных
    */
-  static async validateCredentials(username: string, password: string): Promise<{ userId: string; username: string } | null> {
-    // Временная проверка - в продакшене заменить на проверку с БД
-    const validCredentials = {
-      'admin': 'admin123', // username: password
-      'reguides': 'reguides2024'
-    };
+  static async validateCredentials(username: string, password: string): Promise<{ userId: string; username: string; role: string } | null> {
+    try {
+      // Импортируем необходимые модули
+      const { User } = await import('@/lib/db/models/User');
+      const { connectToDatabase } = await import('@/lib/db/mongodb');
+      const bcrypt = await import('bcryptjs');
+      
+      await connectToDatabase();
 
-    if (validCredentials[username as keyof typeof validCredentials] === password) {
+      // Ищем пользователя по email, username, login, name
+      const user = await User.findOne({
+        $or: [
+          { email: username },
+          { username: username },
+          { login: username },
+          { name: username }
+        ],
+        isActive: true
+      });
+
+      if (!user) {
+        return null;
+      }
+
+      // Проверяем пароль
+      const isMatch = await bcrypt.default.compare(password, user.password);
+      if (!isMatch) {
+        return null;
+      }
+
       return {
-        userId: 'admin-001',
-        username
+        userId: user._id.toString(),
+        username: user.username || user.login || user.name || 'Unknown',
+        role: user.role || 'admin'
       };
+    } catch (error) {
+      console.error('Error validating credentials:', error);
+      return null;
     }
-
-    return null;
   }
 
   /**
    * Создает пару токенов для пользователя
    */
-  static async createTokenPair(userId: string, username: string): Promise<{ accessToken: string; refreshToken: string }> {
-    const accessToken = this.generateAccessToken(userId, username);
+  static async createTokenPair(userId: string, username: string, role: string = 'admin'): Promise<{ accessToken: string; refreshToken: string }> {
+    const accessToken = this.generateAccessToken(userId, username, role);
     const refreshToken = this.generateRefreshToken(userId);
 
     return {
