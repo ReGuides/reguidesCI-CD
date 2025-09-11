@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const decoded = AuthManager.verifyAccessToken(accessToken);
     
     if (!decoded) {
-      addServerLog('warning', 'admin-auth', 'Invalid access token');
+      addServerLog('warn', 'admin-auth', 'Invalid access token');
       return NextResponse.json(
         { success: false, valid: false, error: 'Invalid token' },
         { status: 401 }
