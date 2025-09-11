@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const refreshToken = request.cookies.get('refreshToken')?.value;
 
     if (!refreshToken) {
-      addServerLog('warning', 'admin-auth', 'Refresh attempt without token');
+      addServerLog('warn', 'admin-auth', 'Refresh attempt without token');
       return NextResponse.json(
         { success: false, error: 'No refresh token provided' },
         { status: 401 }
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const newTokens = AuthManager.refreshAccessToken(refreshToken);
     
     if (!newTokens) {
-      addServerLog('warning', 'admin-auth', 'Invalid refresh token');
+      addServerLog('warn', 'admin-auth', 'Invalid refresh token');
       return NextResponse.json(
         { success: false, error: 'Invalid refresh token' },
         { status: 401 }
