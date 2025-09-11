@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     // Проверяем обязательные поля
     if (!username || !password) {
-      addServerLog('warning', 'admin-auth', 'Login attempt with missing credentials');
+      addServerLog('warn', 'admin-auth', 'Login attempt with missing credentials');
       return NextResponse.json(
         { success: false, error: 'Username and password are required' },
         { status: 400 }
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const user = await AuthManager.validateCredentials(username, password);
     
     if (!user) {
-      addServerLog('warning', 'admin-auth', 'Failed login attempt', { username });
+      addServerLog('warn', 'admin-auth', 'Failed login attempt', { username });
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
         { status: 401 }
