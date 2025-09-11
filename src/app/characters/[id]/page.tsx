@@ -326,9 +326,9 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
 
       {/* Правая колонка: контент */}
       <div className="flex-1 flex flex-col min-w-0 w-full md:w-auto">
-        <div className="flex gap-2 mb-6 mt-2 md:mt-4 flex-wrap px-4 overflow-x-auto pb-2">
+        <div className="flex gap-2 mb-6 mt-2 md:mt-4 flex-wrap px-4">
           <button
-            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'weapons'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
@@ -340,7 +340,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             <span className="sm:hidden">Оружие</span>
           </button>
           <button
-            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'teams'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
@@ -352,7 +352,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             <span className="sm:hidden">Команды</span>
           </button>
           <button
-            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'builds'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
@@ -360,11 +360,11 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             onClick={() => handleTabChange('builds')}
           >
             <BookOpen className="w-4 h-4" />
-            <span className="hidden sm:inline">Сборки</span>
+            <span className="hidden sm:inline">Геймплей и детали сборок</span>
             <span className="sm:hidden">Сборки</span>
           </button>
           <button
-            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'talents'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
@@ -376,7 +376,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             <span className="sm:hidden">Таланты</span>
           </button>
           <button
-            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'constellations'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 border border-purple-500'
                 : 'bg-card text-gray-400 hover:bg-neutral-700 hover:text-white border border-transparent'
