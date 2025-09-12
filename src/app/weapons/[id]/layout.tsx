@@ -2,12 +2,6 @@ import { Metadata } from 'next';
 import connectDB from '@/lib/mongodb';
 import { WeaponModel } from '@/models/Weapon';
 
-interface WeaponData {
-  name?: string;
-  type?: string;
-  rarity?: number;
-  image?: string;
-}
 
 async function getWeapon(id: string) {
   try {

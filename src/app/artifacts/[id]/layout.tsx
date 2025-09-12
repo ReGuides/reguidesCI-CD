@@ -2,11 +2,6 @@ import { Metadata } from 'next';
 import connectDB from '@/lib/mongodb';
 import { ArtifactModel } from '@/models/Artifact';
 
-interface ArtifactData {
-  name?: string;
-  rarity?: number;
-  image?: string;
-}
 
 async function getArtifact(id: string) {
   try {
