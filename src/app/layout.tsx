@@ -8,6 +8,7 @@ import SidebarWrapper from '@/components/sidebar-wrapper';
 import AdvertisementBanner from '@/components/advertisement-banner';
 import AdvertisementPopup from '@/components/advertisement-popup';
 import { CopyrightConsole } from '@/components/copyright-console';
+import YandexMetrika from '@/components/analytics/YandexMetrika';
 
 export const metadata: Metadata = {
   title: {
@@ -84,6 +85,7 @@ export default function RootLayout({
     <html lang="ru">
       <body className="bg-neutral-900 text-white min-h-screen flex flex-col">
         <CopyrightConsole />
+        <YandexMetrika />
         <AnalyticsProvider>
           <SiteSettingsProvider />
           <Header />
