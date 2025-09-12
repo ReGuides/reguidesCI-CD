@@ -144,10 +144,25 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
     
     try {
       const { id } = await params;
+      
+      // Фильтруем только валидные поля для обновления
+      const validFields = [
+        'name', 'image', 'element', 'weapon', 'weaponType', 'region', 'rarity', 
+        'gender', 'description', 'birthday', 'patchNumber', 'gameplayDescription', 
+        'views', 'isActive', 'isFeatured', 'role'
+      ];
+      
+      const updateData: Record<string, unknown> = {};
+      for (const field of validFields) {
+        if (formData[field as keyof typeof formData] !== undefined) {
+          updateData[field] = formData[field as keyof typeof formData];
+        }
+      }
+      
       const response = await fetch(`/api/characters/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(updateData)
       });
       
       if (response.ok) {
