@@ -153,11 +153,26 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
       ];
       
       const updateData: Record<string, unknown> = {};
+      const numericFields = ['rarity', 'views'];
+      
       for (const field of validFields) {
-        if (formData[field as keyof typeof formData] !== undefined) {
-          updateData[field] = formData[field as keyof typeof formData];
+        const value = formData[field as keyof typeof formData];
+        if (value !== undefined && value !== null) {
+          // Для числовых полей проверяем, что значение не пустая строка
+          if (numericFields.includes(field)) {
+            if (value !== '' && !isNaN(Number(value))) {
+              updateData[field] = Number(value);
+            }
+          } else {
+            // Для строковых полей проверяем, что значение не пустая строка
+            if (value !== '') {
+              updateData[field] = value;
+            }
+          }
         }
       }
+      
+      console.log('Sending update data:', updateData);
       
       const response = await fetch(`/api/characters/${id}`, {
         method: 'PUT',
@@ -165,10 +180,14 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
         body: JSON.stringify(updateData)
       });
       
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         router.push('/admin/characters');
       } else {
-        console.error('Error updating character');
+        const errorData = await response.json();
+        console.error('Error updating character:', errorData);
+        alert(`Ошибка обновления персонажа: ${errorData.error || 'Неизвестная ошибка'}`);
       }
     } catch (error) {
       console.error('Error saving character:', error);
