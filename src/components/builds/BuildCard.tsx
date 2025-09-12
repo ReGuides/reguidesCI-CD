@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Zap, Shield, Target, Users, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import OptimizedImage from '@/components/ui/optimized-image';
-import MarkdownRenderer from '@/components/ui/markdown-renderer';
 import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
@@ -278,7 +277,10 @@ const BuildCard: React.FC<BuildCardProps> = ({ build, index }) => {
           {/* Описание */}
           {build.description && (
             <div className="mb-4">
-              <MarkdownRenderer content={build.description} onItemClick={handleItemClick} />
+              <div 
+                className="prose prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: build.description || '' }}
+              />
             </div>
           )}
 
