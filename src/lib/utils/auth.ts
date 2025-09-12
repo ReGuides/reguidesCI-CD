@@ -5,16 +5,11 @@ import { AdminJwtPayload } from '@/app/admin/AdminAuthContext';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 export function getTokenFromRequest(request: NextRequest): string | null {
-  const accessToken = request.cookies.get('accessToken')?.value;
-  const authHeader = request.headers.get('authorization')?.replace('Bearer ', '');
-  
-  console.log('Auth debug:', {
-    hasAccessToken: !!accessToken,
-    hasAuthHeader: !!authHeader,
-    allCookies: request.cookies.getAll().map(c => c.name)
-  });
-  
-  return accessToken || authHeader || null;
+  return (
+    request.cookies.get('accessToken')?.value ||
+    request.headers.get('authorization')?.replace('Bearer ', '') ||
+    null
+  );
 }
 
 export function verifyRequestAuth(request: NextRequest, allowedRoles: string[] = ['admin']) {

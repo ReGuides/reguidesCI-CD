@@ -61,12 +61,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   // Проверяем аутентификацию
-  try {
-    verifyRequestAuth(request, ['admin']);
-  } catch (authError) {
-    console.log('Auth check failed, but continuing for debugging');
-    // Временно продолжаем без аутентификации
-  }
+  verifyRequestAuth(request, ['admin']);
   try {
     await connectDB();
     

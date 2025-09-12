@@ -5,7 +5,21 @@ import { AuthManager } from '@/lib/auth';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Проверяем, является ли это админским роутом
+  // Если это страница логина и пользователь уже авторизован - редирект в админку
+  if (pathname === '/admin/login') {
+    const accessToken = request.cookies.get('accessToken')?.value;
+    
+    if (accessToken) {
+      const decoded = AuthManager.verifyAccessToken(accessToken);
+      
+      if (decoded) {
+        // Пользователь уже авторизован - редирект в админку
+        return NextResponse.redirect(new URL('/admin', request.url));
+      }
+    }
+  }
+  
+  // Проверяем, является ли это админским роутом (кроме логина)
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
     // Получаем токены из cookies
     const accessToken = request.cookies.get('accessToken')?.value;
@@ -49,22 +63,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
     
-    // Токен валидный - продолжаем
+    // Токен валидный - продолжаем без редиректа
     return NextResponse.next();
-  }
-  
-  // Если это страница логина и пользователь уже авторизован - редирект в админку
-  if (pathname === '/admin/login') {
-    const accessToken = request.cookies.get('accessToken')?.value;
-    
-    if (accessToken) {
-      const decoded = AuthManager.verifyAccessToken(accessToken);
-      
-      if (decoded) {
-        // Пользователь уже авторизован - редирект в админку
-        return NextResponse.redirect(new URL('/admin', request.url));
-      }
-    }
   }
   
   return NextResponse.next();
