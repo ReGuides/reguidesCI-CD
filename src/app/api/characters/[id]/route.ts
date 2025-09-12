@@ -74,7 +74,7 @@ export async function PUT(
       'views', 'isActive', 'isFeatured', 'role'
     ];
     
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     for (const field of validFields) {
       if (body[field] !== undefined) {
         updateData[field] = body[field];
