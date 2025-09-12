@@ -34,7 +34,14 @@ export async function POST(request: NextRequest) {
     );
 
     // Получаем полные данные пользователя из базы данных
-    let fullUserData = {
+    let fullUserData: {
+      id: string;
+      username: string;
+      name: string;
+      role: string;
+      email?: string;
+      avatar?: string;
+    } = {
       id: user.userId,
       username: user.username,
       name: user.username,
