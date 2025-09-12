@@ -19,13 +19,16 @@ if (!global.mongoose) {
 }
 
 async function connectDB() {
+  console.log('connectDB: Starting connection attempt');
+  console.log('connectDB: MONGODB_URI:', MONGODB_URI);
+  
   if (cached.conn) {
-    console.log('Using cached MongoDB connection');
+    console.log('connectDB: Using cached MongoDB connection');
     return cached.conn;
   }
 
   if (!cached.promise) {
-    console.log('Creating new MongoDB connection to:', MONGODB_URI);
+    console.log('connectDB: Creating new MongoDB connection to:', MONGODB_URI);
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10,

@@ -55,8 +55,10 @@ export default function AdminLoginPage() {
       const data = await response.json();
 
       if (data.success) {
-        // Успешный логин - редирект в админку
-        router.push('/admin');
+        // Успешный логин - небольшая задержка для установки cookies, затем редирект
+        setTimeout(() => {
+          router.push('/admin');
+        }, 100);
       } else {
         setError(data.error || 'Ошибка входа');
       }

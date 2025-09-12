@@ -48,23 +48,30 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuthStatus = async () => {
     try {
+      console.log('AdminAuthContext: Checking auth status...');
       const response = await fetch('/api/admin/auth/verify', {
         method: 'POST',
         credentials: 'include'
       });
 
+      console.log('AdminAuthContext: Auth response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('AdminAuthContext: Auth response data:', data);
         if (data.success && data.user) {
           setUser(data.user);
+          console.log('AdminAuthContext: User set:', data.user);
         } else {
           setUser(null);
+          console.log('AdminAuthContext: No user data, setting user to null');
         }
       } else {
         setUser(null);
+        console.log('AdminAuthContext: Auth failed, setting user to null');
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error('AdminAuthContext: Auth check failed:', error);
       setUser(null);
     }
   };
