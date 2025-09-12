@@ -13,6 +13,44 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const router = useRouter();
 
+  const tryRefreshToken = useCallback(async (): Promise<void> => {
+    if (isRefreshing) return;
+    
+    setIsRefreshing(true);
+    
+    try {
+      const response = await fetch('/api/admin/auth/refresh', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        // Токен обновлен, проверяем авторизацию снова
+        const verifyResponse = await fetch('/api/admin/auth/verify', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        
+        if (verifyResponse.ok) {
+          setIsAuthorized(true);
+        } else {
+          setIsAuthorized(false);
+          router.push('/admin/login');
+        }
+      } else {
+        // Не удалось обновить токен - редирект на логин
+        setIsAuthorized(false);
+        router.push('/admin/login');
+      }
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      setIsAuthorized(false);
+      router.push('/admin/login');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [isRefreshing, router]);
+
   const checkAuth = useCallback(async (): Promise<void> => {
     try {
       const response = await fetch('/api/admin/auth/verify', {
@@ -32,39 +70,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       console.error('Auth check failed:', error);
       setIsAuthorized(false);
     }
-  }, [isRefreshing, tryRefreshToken]);
+  }, [tryRefreshToken]);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
-  const tryRefreshToken = useCallback(async (): Promise<void> => {
-    if (isRefreshing) return;
-    
-    setIsRefreshing(true);
-    
-    try {
-      const response = await fetch('/api/admin/auth/refresh', {
-        method: 'POST',
-        credentials: 'include'
-      });
-
-      if (response.ok) {
-        // Токен обновлен, проверяем авторизацию снова
-        await checkAuth();
-      } else {
-        // Не удалось обновить токен - редирект на логин
-        setIsAuthorized(false);
-        router.push('/admin/login');
-      }
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      setIsAuthorized(false);
-      router.push('/admin/login');
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, [isRefreshing, checkAuth, router]);
 
   // Показываем загрузку пока проверяем авторизацию
   if (isAuthorized === null || isRefreshing) {
