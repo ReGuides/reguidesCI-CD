@@ -45,7 +45,7 @@ interface BuildFormProps {
   initial?: {
     title?: string;
     role?: string;
-    descriptionHtml?: string;
+    description?: string;
     weapons?: string[];
     artifacts?: ArtifactOrCombination[];
     mainStats?: string[];
@@ -57,7 +57,7 @@ interface BuildFormProps {
   onSave: (build: {
     title: string;
     role: string;
-    descriptionHtml: string;
+    description: string;
     weapons: string[];
     artifacts: ArtifactOrCombination[];
     mainStats: string[];
@@ -72,7 +72,7 @@ interface BuildFormProps {
 export default function BuildForm({ initial, onCancel, onSave, characterWeaponType, characterId }: BuildFormProps) {
   const [title, setTitle] = useState(initial?.title || "");
   const [role, setRole] = useState(initial?.role || "");
-  const [descriptionHtml, setDescriptionHtml] = useState(initial?.descriptionHtml || "");
+  const [description, setDescription] = useState(initial?.description || "");
   const [weapons, setWeapons] = useState<string[]>(initial?.weapons || []);
   const [artifacts, setArtifacts] = useState<ArtifactOrCombination[]>(initial?.artifacts || []);
   const [mainStats, setMainStats] = useState<string[]>(initial?.mainStats || []);
@@ -113,7 +113,7 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
     onSave({
       title,
       role,
-      descriptionHtml,
+      description,
       weapons,
       artifacts,
       mainStats,
@@ -165,8 +165,8 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
   };
 
   const handleInsertSuggestion = (text: string) => {
-    // Вставляем текст в HTML редактор
-    setDescriptionHtml(prev => prev + text);
+    // Вставляем текст в textarea
+    setDescription(prev => prev + text);
   };
 
   return (
@@ -184,12 +184,12 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
           onChange={e => setRole(e.target.value)} 
         />
         <div>
-          <label className="block text-sm font-medium mb-2 text-white">Описание билда</label>
-          <ArticleEditor
-            value={descriptionHtml}
-            onChange={setDescriptionHtml}
-            placeholder="Описание билда..."
-            className="min-h-[200px]"
+          <label className="block text-sm font-medium mb-2 text-white">Описание билда (HTML)</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full min-h-[200px] bg-neutral-700 text-white rounded p-3 border border-neutral-600 resize-none"
+            placeholder="Описание билда в HTML..."
           />
           <TextFormattingToolbar onInsert={handleInsertSuggestion} />
           <SuggestionHelper

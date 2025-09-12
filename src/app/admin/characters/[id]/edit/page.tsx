@@ -56,7 +56,6 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [editingRecommendation, setEditingRecommendation] = useState<any>(null);
   const [isEditingGameplayDescription, setIsEditingGameplayDescription] = useState(false);
-  const [gameplayDescriptionHtml, setGameplayDescriptionHtml] = useState('');
 
   const fetchWeapons = async () => {
     try {
@@ -104,7 +103,6 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
           
           setCharacter(characterData);
           setFormData(processedData);
-          setGameplayDescriptionHtml(characterData.gameplayDescriptionHtml || '');
           
           // Загружаем билды и рекомендации
           await fetchBuilds(id);
@@ -291,7 +289,6 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
 
   // Функции для работы с описанием геймплея
   const handleEditGameplayDescription = () => {
-    setGameplayDescriptionHtml(formData.gameplayDescriptionHtml || '');
     setIsEditingGameplayDescription(true);
   };
 
@@ -302,16 +299,11 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          ...formData, 
-          gameplayDescriptionHtml: gameplayDescriptionHtml
+          gameplayDescription: formData.gameplayDescription
         })
       });
       
       if (response.ok) {
-        setFormData(prev => ({ 
-          ...prev, 
-          gameplayDescriptionHtml: gameplayDescriptionHtml
-        }));
         setIsEditingGameplayDescription(false);
       }
     } catch (error) {
@@ -321,12 +313,14 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
 
   const handleCancelGameplayDescription = () => {
     setIsEditingGameplayDescription(false);
-    setGameplayDescriptionHtml('');
   };
 
   const handleInsertSuggestion = (text: string) => {
     // Вставляем текст в HTML редактор
-    setGameplayDescriptionHtml(prev => prev + text);
+    setFormData(prev => ({
+      ...prev,
+      gameplayDescription: (prev.gameplayDescription || '') + text
+    }));
   };
 
 
@@ -837,12 +831,12 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
               {isEditingGameplayDescription ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm text-gray-400 mb-2 block">Описание геймплея</label>
-                    <ArticleEditor
-                      value={gameplayDescriptionHtml}
-                      onChange={setGameplayDescriptionHtml}
-                      placeholder="Введите описание геймплея персонажа..."
-                      className="min-h-[300px]"
+                    <label className="text-sm text-gray-400 mb-2 block">Описание геймплея (HTML)</label>
+                    <textarea
+                      value={formData.gameplayDescription || ''}
+                      onChange={(e) => setFormData(prev => ({ ...prev, gameplayDescription: e.target.value }))}
+                      className="w-full min-h-[300px] bg-neutral-700 text-white rounded p-3 border border-neutral-600 resize-none"
+                      placeholder="Введите описание геймплея персонажа в HTML..."
                     />
                   </div>
                   <TextFormattingToolbar onInsert={handleInsertSuggestion} />
@@ -865,10 +859,10 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                 </div>
               ) : (
                 <div className="text-neutral-300">
-                  {formData.gameplayDescriptionHtml ? (
+                  {formData.gameplayDescription ? (
                     <div 
                       className="prose prose-invert max-w-none"
-                      dangerouslySetInnerHTML={{ __html: formData.gameplayDescriptionHtml }}
+                      dangerouslySetInnerHTML={{ __html: formData.gameplayDescription }}
                     />
                   ) : (
                     <span className="text-neutral-500">Нет описания</span>

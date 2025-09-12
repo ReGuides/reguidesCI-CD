@@ -38,7 +38,6 @@ export async function GET(
       birthday: character.birthday,
       patchNumber: character.patchNumber,
       gameplayDescription: character.gameplayDescription,
-      gameplayDescriptionHtml: character.gameplayDescriptionHtml,
       isActive: character.isActive,
       isFeatured: character.isFeatured,
       role: character.role,
@@ -68,11 +67,26 @@ export async function PUT(
     const body = await request.json();
     const { id: characterId } = await params;
     
+    // Фильтруем только валидные поля для обновления
+    const validFields = [
+      'name', 'image', 'element', 'weapon', 'weaponType', 'region', 'rarity', 
+      'gender', 'description', 'birthday', 'patchNumber', 'gameplayDescription', 
+      'views', 'isActive', 'isFeatured', 'role'
+    ];
+    
+    const updateData: any = {};
+    for (const field of validFields) {
+      if (body[field] !== undefined) {
+        updateData[field] = body[field];
+      }
+    }
+    
     // Если есть weaponType, сохраняем его как weapon
-    const updateData = { ...body };
     if (body.weaponType) {
       updateData.weapon = body.weaponType;
     }
+    
+    console.log('API: Filtered update data:', updateData);
     
     const updatedCharacter = await CharacterModel.findOneAndUpdate(
       { id: characterId },
