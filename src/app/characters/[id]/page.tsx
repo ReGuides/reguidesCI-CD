@@ -12,6 +12,7 @@ import CharacterTalentsSection from '@/components/character/CharacterTalentsSect
 import CharacterConstellationsSection from '@/components/character/CharacterConstellationsSection';
 import BuildsSection from '@/components/builds/BuildsSection';
 import { Zap, Users, Sword, Star, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import HtmlContent from '@/components/ui/html-content';
 import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
@@ -451,10 +452,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
                   </button>
                   {!isGameplayDescriptionCollapsed && (
                     <div className="px-6 pb-6">
-                      <div 
-                        className="prose prose-invert max-w-none"
-                        dangerouslySetInnerHTML={{ __html: character.gameplayDescription || '' }}
-                      />
+                      <HtmlContent content={character.gameplayDescription || ''} />
                     </div>
                   )}
                 </div>

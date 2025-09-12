@@ -8,6 +8,7 @@ import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 import { Weapon, Artifact, Talent } from '@/types';
+import HtmlContent from '@/components/ui/html-content';
 
 interface BuildCardProps {
   build: {
@@ -240,10 +241,7 @@ const BuildCard: React.FC<BuildCardProps> = ({ build, index }) => {
           {/* Описание */}
           {build.description && (
             <div className="mb-4">
-              <div 
-                className="prose prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: build.description || '' }}
-              />
+              <HtmlContent content={build.description || ''} />
             </div>
           )}
 
