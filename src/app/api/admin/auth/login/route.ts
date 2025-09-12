@@ -33,15 +33,42 @@ export async function POST(request: NextRequest) {
       user.role
     );
 
+    // Получаем полные данные пользователя из базы данных
+    let fullUserData = {
+      id: user.userId,
+      username: user.username,
+      name: user.username,
+      role: user.role
+    };
+
+    try {
+      const { User } = await import('@/lib/db/models/User');
+      const { connectToDatabase } = await import('@/lib/db/mongodb');
+      
+      await connectToDatabase();
+      
+      const dbUser = await User.findById(user.userId);
+      
+      if (dbUser) {
+        fullUserData = {
+          id: dbUser._id.toString(),
+          username: dbUser.username || dbUser.login || dbUser.name || 'Unknown',
+          name: dbUser.name || dbUser.username || dbUser.login || 'Unknown',
+          email: dbUser.email,
+          role: dbUser.role || 'admin',
+          avatar: dbUser.avatar
+        };
+      }
+    } catch (dbError) {
+      console.error('Database error during user fetch in login:', dbError);
+      // Используем базовые данные из токена
+    }
+
     // Создаем response с токенами
     const response = NextResponse.json({
       success: true,
       message: 'Login successful',
-      user: {
-        id: user.userId,
-        username: user.username,
-        role: user.role
-      }
+      user: fullUserData
     });
 
     // Устанавливаем токены в httpOnly cookies для безопасности
@@ -49,7 +76,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 15 * 60 // 15 минут
+      maxAge: 30 * 60 // 30 минут
     });
 
     response.cookies.set('refreshToken', refreshToken, {

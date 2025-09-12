@@ -26,16 +26,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Возвращаем данные пользователя
-    return NextResponse.json({
-      success: true,
-      valid: true,
-      user: {
-        id: decoded.userId,
-        username: decoded.username,
-        role: decoded.role
+    // Получаем полные данные пользователя из базы данных
+    try {
+      const { User } = await import('@/lib/db/models/User');
+      const { connectToDatabase } = await import('@/lib/db/mongodb');
+      
+      await connectToDatabase();
+      
+      const user = await User.findById(decoded.userId);
+      
+      if (!user) {
+        addServerLog('warn', 'admin-auth', 'User not found in database', { userId: decoded.userId });
+        return NextResponse.json(
+          { success: false, valid: false, error: 'User not found' },
+          { status: 401 }
+        );
       }
-    });
+
+      // Возвращаем полные данные пользователя
+      return NextResponse.json({
+        success: true,
+        valid: true,
+        user: {
+          id: user._id.toString(),
+          username: user.username || user.login || user.name || 'Unknown',
+          name: user.name || user.username || user.login || 'Unknown',
+          email: user.email,
+          role: user.role || 'admin',
+          avatar: user.avatar
+        }
+      });
+    } catch (dbError) {
+      console.error('Database error during user fetch:', dbError);
+      // Если не удалось получить данные из БД, возвращаем базовую информацию из токена
+      return NextResponse.json({
+        success: true,
+        valid: true,
+        user: {
+          id: decoded.userId,
+          username: decoded.username,
+          name: decoded.username,
+          role: decoded.role
+        }
+      });
+    }
 
   } catch (error) {
     console.error('Token verification error:', error);

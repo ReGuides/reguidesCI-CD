@@ -116,36 +116,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // Если авторизован - показываем контент с информацией о пользователе
-  return (
-    <div className="min-h-screen bg-neutral-900">
-      {/* Информация о пользователе в шапке */}
-      <div className="bg-neutral-800 border-b border-neutral-700 px-4 py-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-bold">
-                {user?.username?.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <div>
-              <p className="text-white text-sm font-medium">{user?.username}</p>
-              <p className="text-gray-400 text-xs">Администратор</p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
-          >
-            Выйти
-          </button>
-        </div>
-      </div>
-      
-      {/* Основной контент */}
-      <div className="flex-1">
-        {children}
-      </div>
-    </div>
-  );
+  // Если авторизован - показываем контент
+  return <>{children}</>;
 }

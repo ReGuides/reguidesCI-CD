@@ -2,24 +2,50 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { AuthManager } from '@/lib/auth';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Проверяем, является ли это админским роутом
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    // Получаем access токен из cookies
+    // Получаем токены из cookies
     const accessToken = request.cookies.get('accessToken')?.value;
+    const refreshToken = request.cookies.get('refreshToken')?.value;
     
     if (!accessToken) {
-      // Нет токена - редирект на логин
+      // Нет access токена - редирект на логин
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
     
-    // Проверяем валидность токена
+    // Проверяем валидность access токена
     const decoded = AuthManager.verifyAccessToken(accessToken);
     
     if (!decoded) {
-      // Токен невалидный - редирект на логин
+      // Access токен невалидный - пытаемся обновить через refresh токен
+      if (refreshToken) {
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+          const refreshResponse = await fetch(`${baseUrl}/api/admin/auth/refresh`, {
+            method: 'POST',
+            headers: {
+              'Cookie': request.headers.get('cookie') || ''
+            }
+          });
+          
+          if (refreshResponse.ok) {
+            // Токен успешно обновлен - получаем новые cookies
+            const response = NextResponse.next();
+            const setCookieHeader = refreshResponse.headers.get('set-cookie');
+            if (setCookieHeader) {
+              response.headers.set('set-cookie', setCookieHeader);
+            }
+            return response;
+          }
+        } catch (error) {
+          console.error('Token refresh failed:', error);
+        }
+      }
+      
+      // Не удалось обновить токен - редирект на логин
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
     
