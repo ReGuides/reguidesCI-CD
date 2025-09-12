@@ -45,7 +45,6 @@ interface BuildFormProps {
   initial?: {
     title?: string;
     role?: string;
-    description?: string;
     descriptionHtml?: string;
     weapons?: string[];
     artifacts?: ArtifactOrCombination[];
@@ -58,7 +57,6 @@ interface BuildFormProps {
   onSave: (build: {
     title: string;
     role: string;
-    description: string;
     descriptionHtml: string;
     weapons: string[];
     artifacts: ArtifactOrCombination[];
@@ -74,7 +72,6 @@ interface BuildFormProps {
 export default function BuildForm({ initial, onCancel, onSave, characterWeaponType, characterId }: BuildFormProps) {
   const [title, setTitle] = useState(initial?.title || "");
   const [role, setRole] = useState(initial?.role || "");
-  const [description, setDescription] = useState(initial?.description || "");
   const [descriptionHtml, setDescriptionHtml] = useState(initial?.descriptionHtml || "");
   const [weapons, setWeapons] = useState<string[]>(initial?.weapons || []);
   const [artifacts, setArtifacts] = useState<ArtifactOrCombination[]>(initial?.artifacts || []);
@@ -116,7 +113,6 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
     onSave({
       title,
       role,
-      description,
       descriptionHtml,
       weapons,
       artifacts,
@@ -169,21 +165,8 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
   };
 
   const handleInsertSuggestion = (text: string) => {
-    // Вставляем текст в textarea
-    const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
-    if (textarea) {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const currentDescription = description;
-      const newText = currentDescription.substring(0, start) + text + currentDescription.substring(end);
-      setDescription(newText);
-      
-      // Устанавливаем курсор после вставленного текста
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start + text.length, start + text.length);
-      }, 0);
-    }
+    // Вставляем текст в HTML редактор
+    setDescriptionHtml(prev => prev + text);
   };
 
   return (
@@ -202,26 +185,12 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
         />
         <div>
           <label className="block text-sm font-medium mb-2 text-white">Описание билда</label>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block">Markdown (для совместимости)</label>
-              <textarea
-                className="bg-neutral-800 rounded px-3 py-2 text-white min-h-[120px] resize-none w-full"
-                placeholder="Описание билда в Markdown"
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block">HTML (основной редактор)</label>
-              <ArticleEditor
-                value={descriptionHtml}
-                onChange={setDescriptionHtml}
-                placeholder="Описание билда в HTML"
-                className="min-h-[120px]"
-              />
-            </div>
-          </div>
+          <ArticleEditor
+            value={descriptionHtml}
+            onChange={setDescriptionHtml}
+            placeholder="Описание билда..."
+            className="min-h-[200px]"
+          />
           <TextFormattingToolbar onInsert={handleInsertSuggestion} />
           <SuggestionHelper
             onInsert={handleInsertSuggestion}

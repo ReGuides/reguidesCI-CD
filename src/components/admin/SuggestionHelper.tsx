@@ -92,10 +92,14 @@ const SuggestionHelper: React.FC<SuggestionHelperProps> = ({ onInsert, character
 
         // Загружаем таланты и созвездия если есть characterId
         if (characterId) {
+          console.log('SuggestionHelper: Loading talents for characterId:', characterId);
           const talentsResponse = await fetch(`/api/characters/${characterId}/talents`);
           if (talentsResponse.ok) {
             const talentsData = await talentsResponse.json();
+            console.log('SuggestionHelper: Loaded talents data:', talentsData);
             setTalents(talentsData.talents || []);
+          } else {
+            console.error('SuggestionHelper: Failed to load talents:', talentsResponse.status);
           }
 
           const constellationsResponse = await fetch(`/api/characters/${characterId}/constellations`);
