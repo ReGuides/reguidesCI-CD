@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { CharacterModel } from '@/models/Character';
 import { verifyRequestAuth } from '@/lib/utils/auth';
-import { addServerLog } from '@/lib/serverLog';
 
 export async function GET(
   request: NextRequest,

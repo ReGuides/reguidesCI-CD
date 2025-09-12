@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { AdminJwtPayload } from '@/app/admin/AdminAuthContext';
-import { addServerLog } from '@/lib/serverLog';
 
 const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET || 'your-access-secret-key-change-in-production';
 
@@ -22,7 +21,7 @@ export function verifyRequestAuth(request: NextRequest, allowedRoles: string[] =
   let user: AdminJwtPayload;
   try {
     user = jwt.verify(token, JWT_SECRET) as AdminJwtPayload;
-  } catch (error) {
+  } catch {
     throw new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401 });
   }
   
