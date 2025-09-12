@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { AdminJwtPayload } from '@/app/admin/AdminAuthContext';
 import { addServerLog } from '@/lib/serverLog';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET || 'your-access-secret-key-change-in-production';
 
 export function getTokenFromRequest(request: NextRequest): string | null {
   const accessToken = request.cookies.get('accessToken')?.value;
