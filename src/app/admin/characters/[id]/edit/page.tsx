@@ -13,7 +13,6 @@ import BuildForm from '@/components/builds/BuildForm';
 import RecommendationForm from '@/components/builds/RecommendationForm';
 import TextFormattingToolbar from '@/components/admin/TextFormattingToolbar';
 import SuggestionHelper from '@/components/admin/SuggestionHelper';
-import ArticleEditor from '@/components/ui/article-editor';
 import TalentManager from '@/components/admin/TalentManager';
 import ConstellationManager from '@/components/admin/ConstellationManager';
 import { Weapon } from '@/types';
