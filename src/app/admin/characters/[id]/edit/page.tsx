@@ -185,9 +185,16 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
       if (response.ok) {
         router.push('/admin/characters');
       } else {
-        const errorData = await response.json();
-        console.error('Error updating character:', errorData);
-        alert(`Ошибка обновления персонажа: ${errorData.error || 'Неизвестная ошибка'}`);
+        let errorMessage = 'Неизвестная ошибка';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+          console.error('Error updating character:', errorData);
+        } catch (jsonError) {
+          console.error('Error parsing JSON response:', jsonError);
+          errorMessage = `Ошибка сервера (${response.status})`;
+        }
+        alert(`Ошибка обновления персонажа: ${errorMessage}`);
       }
     } catch (error) {
       console.error('Error saving character:', error);
