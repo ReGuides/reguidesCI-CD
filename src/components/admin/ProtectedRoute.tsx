@@ -1,14 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-
-interface User {
-  id: string;
-  username: string;
-  role: string;
-}
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -16,15 +10,10 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/auth/verify', {
         method: 'POST',
@@ -32,9 +21,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       });
 
       if (response.ok) {
-        const data = await response.json();
         setIsAuthorized(true);
-        setUser(data.user);
       } else if (response.status === 401) {
         // Попробуем обновить токен
         await tryRefreshToken();
@@ -45,9 +32,13 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       console.error('Auth check failed:', error);
       setIsAuthorized(false);
     }
-  };
+  }, [isRefreshing, tryRefreshToken]);
 
-  const tryRefreshToken = async () => {
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  const tryRefreshToken = useCallback(async () => {
     if (isRefreshing) return;
     
     setIsRefreshing(true);
@@ -73,22 +64,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     } finally {
       setIsRefreshing(false);
     }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/admin/auth/logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      setIsAuthorized(false);
-      setUser(null);
-      router.push('/admin/login');
-    }
-  };
+  }, [isRefreshing, checkAuth, router]);
 
   // Показываем загрузку пока проверяем авторизацию
   if (isAuthorized === null || isRefreshing) {
