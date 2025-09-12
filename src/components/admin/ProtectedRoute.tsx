@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const router = useRouter();
 
-  const checkAuth = useCallback(async () => {
+  const checkAuth = useCallback(async (): Promise<void> => {
     try {
       const response = await fetch('/api/admin/auth/verify', {
         method: 'POST',
@@ -38,7 +38,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     checkAuth();
   }, [checkAuth]);
 
-  const tryRefreshToken = useCallback(async () => {
+  const tryRefreshToken = useCallback(async (): Promise<void> => {
     if (isRefreshing) return;
     
     setIsRefreshing(true);
