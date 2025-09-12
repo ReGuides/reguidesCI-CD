@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -60,6 +61,7 @@ interface AnalyticsStats {
 }
 
 export default function AnalyticsPage() {
+  const router = useRouter();
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('7d');
@@ -157,7 +159,7 @@ export default function AnalyticsPage() {
             Обновить
           </Button>
           <Button 
-            onClick={() => window.location.href = '/admin/analytics/improved'}
+            onClick={() => router.push('/admin/analytics/improved')}
             variant="outline" 
             className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white"
           >
@@ -165,7 +167,7 @@ export default function AnalyticsPage() {
             Улучшенная аналитика
           </Button>
           <Button 
-            onClick={() => window.location.href = '/admin/analytics/advertising'}
+            onClick={() => router.push('/admin/analytics/advertising')}
             variant="outline" 
             className="border-green-600 text-green-400 hover:bg-green-600 hover:text-white"
           >
