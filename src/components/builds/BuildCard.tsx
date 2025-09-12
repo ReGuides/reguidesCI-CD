@@ -66,43 +66,6 @@ const BuildCard: React.FC<BuildCardProps> = ({ build, index }) => {
     fetchWeapons();
   }, [build.weapons]);
 
-  const handleItemClick = async (type: string, id: string) => {
-    try {
-      if (type === 'weapon') {
-        const response = await fetch(`/api/weapons/${id}`);
-        if (response.ok) {
-          const weapon = await response.json();
-          setSelectedWeapon(weapon);
-          setIsWeaponModalOpen(true);
-        } else {
-          console.error('BuildCard failed to fetch weapon:', response.status, response.statusText);
-        }
-      } else if (type === 'artifact') {
-        const response = await fetch(`/api/artifacts/${id}`);
-        if (response.ok) {
-          const artifact = await response.json();
-          setSelectedArtifact(artifact);
-          setIsArtifactModalOpen(true);
-        } else {
-          console.error('BuildCard failed to fetch artifact:', response.status, response.statusText);
-        }
-      } else if (type === 'talent') {
-        const response = await fetch(`/api/talents/${id}`);
-        if (response.ok) {
-          const talent = await response.json();
-          setSelectedTalent(talent);
-          setIsTalentModalOpen(true);
-        } else {
-          console.error('BuildCard failed to fetch talent:', response.status, response.statusText);
-        }
-      } else if (type === 'character') {
-        // Для персонажей перенаправляем на страницу персонажа
-        window.location.href = `/characters/${id}`;
-      }
-    } catch (error) {
-      console.error('BuildCard error fetching item data:', error);
-    }
-  };
 
   const closeWeaponModal = () => {
     setIsWeaponModalOpen(false);
