@@ -59,20 +59,9 @@ export class AuthManager {
   static verifyAccessToken(token: string): TokenPayload | null {
     try {
       const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as TokenPayload;
-      console.log('Access token verified successfully:', {
-        userId: decoded.userId,
-        username: decoded.username,
-        role: decoded.role,
-        exp: decoded.exp,
-        iat: decoded.iat
-      });
       return decoded;
     } catch (error) {
-      console.error('Access token verification failed:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        tokenLength: token.length,
-        secretLength: ACCESS_TOKEN_SECRET.length
-      });
+      console.error('Access token verification failed:', error);
       return null;
     }
   }

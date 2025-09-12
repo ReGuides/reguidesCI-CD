@@ -8,17 +8,7 @@ export async function POST(request: NextRequest) {
     const accessToken = request.cookies.get('accessToken')?.value || 
                       request.headers.get('authorization')?.replace('Bearer ', '');
 
-    addServerLog('debug', 'Auth verify request', 'admin-auth', {
-      hasAccessToken: !!accessToken,
-      tokenLength: accessToken?.length || 0,
-      allCookies: request.cookies.getAll().map(c => c.name),
-      url: request.url
-    });
-
     if (!accessToken) {
-      addServerLog('warn', 'No access token provided', 'admin-auth', {
-        allCookies: request.cookies.getAll().map(c => c.name)
-      });
       return NextResponse.json(
         { success: false, valid: false, error: 'No token provided' },
         { status: 401 }
@@ -29,10 +19,7 @@ export async function POST(request: NextRequest) {
     const decoded = AuthManager.verifyAccessToken(accessToken);
     
     if (!decoded) {
-      addServerLog('warn', 'Invalid access token', 'admin-auth', {
-        hasToken: !!accessToken,
-        tokenLength: accessToken?.length || 0
-      });
+      addServerLog('warn', 'Invalid access token', 'admin-auth');
       return NextResponse.json(
         { success: false, valid: false, error: 'Invalid token' },
         { status: 401 }

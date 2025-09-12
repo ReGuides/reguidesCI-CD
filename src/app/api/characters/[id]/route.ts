@@ -68,15 +68,7 @@ export async function PUT(
     const { id: characterId } = await params;
     
     // Проверяем аутентификацию
-    try {
-      verifyRequestAuth(request, ['admin']);
-    } catch (authError) {
-      addServerLog('warn', 'Auth check failed in character update', 'character-api', {
-        characterId,
-        error: authError instanceof Error ? authError.message : 'Unknown auth error'
-      });
-      // Временно продолжаем без аутентификации для отладки
-    }
+    verifyRequestAuth(request, ['admin']);
     
     // Фильтруем только валидные поля для обновления
     const validFields = [
