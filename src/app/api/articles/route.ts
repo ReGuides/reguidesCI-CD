@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 function getTokenFromRequest(request: NextRequest): string | null {
   // Сначала пробуем cookie (SSR/middleware), потом заголовок
   return (
-    request.cookies.get('adminToken')?.value ||
+    request.cookies.get('accessToken')?.value ||
     request.headers.get('authorization')?.replace('Bearer ', '') ||
     null
   );

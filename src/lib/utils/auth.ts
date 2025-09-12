@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 
 export function getTokenFromRequest(request: NextRequest): string | null {
   return (
-    request.cookies.get('adminToken')?.value ||
+    request.cookies.get('accessToken')?.value ||
     request.headers.get('authorization')?.replace('Bearer ', '') ||
     null
   );

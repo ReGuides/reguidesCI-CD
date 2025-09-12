@@ -11,10 +11,10 @@ export function useAdminAuthGuard() {
     // Сначала пробуем из cookie (SSR), потом из localStorage (SPA)
     if (typeof document !== 'undefined') {
       // Извлекаем из cookie
-      const match = document.cookie.match(/adminToken=([^;]+)/);
+      const match = document.cookie.match(/accessToken=([^;]+)/);
       if (match) token = match[1];
       // Если нет — пробуем из localStorage (fallback)
-      if (!token) token = localStorage.getItem('adminToken') || '';
+      if (!token) token = localStorage.getItem('accessToken') || '';
     }
     if (!token) {
       router.replace('/admin/login');

@@ -16,9 +16,9 @@ export function useAdminUser(): AdminUser | null {
   return useMemo(() => {
     let token = '';
     if (typeof document !== 'undefined') {
-      const match = document.cookie.match(/adminToken=([^;]+)/);
+      const match = document.cookie.match(/accessToken=([^;]+)/);
       if (match) token = match[1];
-      if (!token) token = localStorage.getItem('adminToken') || '';
+      if (!token) token = localStorage.getItem('accessToken') || '';
     }
     if (!token) return null;
     try {
