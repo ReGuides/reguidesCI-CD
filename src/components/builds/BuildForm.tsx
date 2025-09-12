@@ -7,7 +7,6 @@ import { WeaponSelectModal } from './WeaponSelectModal';
 import { ArtifactSelectModal } from './ArtifactSelectModal';
 import TextFormattingToolbar from '@/components/admin/TextFormattingToolbar';
 import SuggestionHelper from '@/components/admin/SuggestionHelper';
-import ArticleEditor from '@/components/ui/article-editor';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 
 // Константы для статов и талантов
