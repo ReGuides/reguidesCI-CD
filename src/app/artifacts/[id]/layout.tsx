@@ -2,6 +2,12 @@ import { Metadata } from 'next';
 import connectDB from '@/lib/mongodb';
 import { ArtifactModel } from '@/models/Artifact';
 
+interface ArtifactData {
+  name?: string;
+  rarity?: number;
+  image?: string;
+}
+
 async function getArtifact(id: string) {
   try {
     await connectDB();
@@ -58,6 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   ].filter(Boolean);
 
   // Формируем правильный URL изображения
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getArtifactImageUrl = (artifact: any) => {
     if (!artifact?.image) return '/images/logos/logo.png';
     if (artifact.image.startsWith('http')) return artifact.image;

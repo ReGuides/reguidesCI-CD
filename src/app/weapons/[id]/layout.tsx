@@ -2,6 +2,13 @@ import { Metadata } from 'next';
 import connectDB from '@/lib/mongodb';
 import { WeaponModel } from '@/models/Weapon';
 
+interface WeaponData {
+  name?: string;
+  type?: string;
+  rarity?: number;
+  image?: string;
+}
+
 async function getWeapon(id: string) {
   try {
     await connectDB();
@@ -52,6 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   ].filter(Boolean);
 
   // Формируем правильный URL изображения
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getWeaponImageUrl = (weapon: any) => {
     if (!weapon?.image) return '/images/logos/logo.png';
     if (weapon.image.startsWith('http')) return weapon.image;
