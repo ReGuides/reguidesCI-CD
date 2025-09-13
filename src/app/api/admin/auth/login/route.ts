@@ -83,14 +83,14 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 30 * 60 // 30 минут
+      maxAge: 24 * 60 * 60 // 24 часа
     });
 
     response.cookies.set('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 // 7 дней
+      maxAge: 30 * 24 * 60 * 60 // 30 дней
     });
 
     addServerLog('info', 'admin-auth', 'Successful login', { 

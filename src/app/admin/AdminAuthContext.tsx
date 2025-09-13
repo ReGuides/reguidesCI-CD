@@ -48,6 +48,18 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuthStatus = async () => {
     try {
+      // Сначала проверяем sessionStorage как fallback
+      const storedUser = typeof window !== 'undefined' ? sessionStorage.getItem('adminUser') : null;
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          console.log('AdminAuthContext: Using stored user from sessionStorage');
+        } catch (parseError) {
+          console.error('AdminAuthContext: Error parsing stored user:', parseError);
+        }
+      }
+
       console.log('AdminAuthContext: Checking auth status...');
       const response = await fetch('/api/admin/auth/verify', {
         method: 'POST',
@@ -61,18 +73,31 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         console.log('AdminAuthContext: Auth response data:', data);
         if (data.success && data.user) {
           setUser(data.user);
+          // Сохраняем в sessionStorage как fallback
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('adminUser', JSON.stringify(data.user));
+          }
           console.log('AdminAuthContext: User set:', data.user);
         } else {
           setUser(null);
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('adminUser');
+          }
           console.log('AdminAuthContext: No user data, setting user to null');
         }
       } else {
         setUser(null);
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('adminUser');
+        }
         console.log('AdminAuthContext: Auth failed, setting user to null');
       }
     } catch (error) {
       console.error('AdminAuthContext: Auth check failed:', error);
       setUser(null);
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('adminUser');
+      }
     }
   };
 
@@ -92,6 +117,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       console.error('Logout error:', error);
     } finally {
       setUser(null);
+      // Очищаем sessionStorage
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('adminUser');
+      }
       router.replace('/admin/login');
     }
   };

@@ -5,8 +5,8 @@ const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'your-access-secr
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'your-refresh-secret-key-change-in-production';
 
 // Время жизни токенов
-const ACCESS_TOKEN_EXPIRES_IN = '15m'; // 15 минут
-const REFRESH_TOKEN_EXPIRES_IN = '7d'; // 7 дней
+const ACCESS_TOKEN_EXPIRES_IN = '24h'; // 24 часа
+const REFRESH_TOKEN_EXPIRES_IN = '30d'; // 30 дней
 
 export interface TokenPayload {
   userId: string;

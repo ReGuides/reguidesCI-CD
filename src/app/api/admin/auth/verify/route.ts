@@ -8,7 +8,14 @@ export async function POST(request: NextRequest) {
     const accessToken = request.cookies.get('accessToken')?.value || 
                       request.headers.get('authorization')?.replace('Bearer ', '');
 
+    addServerLog('debug', 'admin-auth', 'Auth verify request', {
+      hasToken: !!accessToken,
+      tokenLength: accessToken?.length || 0,
+      allCookies: request.cookies.getAll().map(c => c.name)
+    });
+
     if (!accessToken) {
+      addServerLog('warn', 'admin-auth', 'No access token provided');
       return NextResponse.json(
         { success: false, valid: false, error: 'No token provided' },
         { status: 401 }
@@ -19,12 +26,20 @@ export async function POST(request: NextRequest) {
     const decoded = AuthManager.verifyAccessToken(accessToken);
     
     if (!decoded) {
-      addServerLog('warn', 'Invalid access token', 'admin-auth');
+      addServerLog('warn', 'admin-auth', 'Invalid access token', {
+        tokenLength: accessToken.length,
+        tokenStart: accessToken.substring(0, 20) + '...'
+      });
       return NextResponse.json(
         { success: false, valid: false, error: 'Invalid token' },
         { status: 401 }
       );
     }
+
+    addServerLog('debug', 'admin-auth', 'Token verified successfully', {
+      userId: decoded.userId,
+      username: decoded.username
+    });
 
     // Получаем полные данные пользователя из базы данных
     try {
