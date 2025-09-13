@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ElementSwitcher from '@/components/traveler/ElementSwitcher';
 import ElementTalents from '@/components/traveler/ElementTalents';
 import ElementConstellations from '@/components/traveler/ElementConstellations';
-import HtmlContent from '@/components/ui/html-content';
 
 type TabType = 'talents' | 'constellations' | 'builds' | 'teams';
 
@@ -217,7 +216,6 @@ export default function TravelerPage() {
   const router = useRouter();
   const [currentElement, setCurrentElement] = useState('anemo');
   const [activeTab, setActiveTab] = useState<TabType>('talents');
-  const [isGameplayDescriptionCollapsed, setIsGameplayDescriptionCollapsed] = useState(false);
 
   const elementColors: { [key: string]: string } = {
     anemo: '#22c55e',
