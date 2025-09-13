@@ -118,7 +118,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
         const response = await fetch(`/api/talents/character/${character?.id}`);
         if (response.ok) {
           const talentsData = await response.json();
-          const talent = talentsData.talents?.find((t: any) => t._id === id || t.type === id);
+          const talent = talentsData.talents?.find((t: Talent) => t._id === id || t.type === id);
           if (talent) {
             setSelectedTalent(talent);
             setIsTalentModalOpen(true);
