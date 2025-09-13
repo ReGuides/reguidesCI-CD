@@ -35,6 +35,7 @@ interface ArticleEditorProps {
 }
 
 const colorOptions = [
+  // Основные цвета
   { name: 'Красный', value: '#ef4444' },
   { name: 'Оранжевый', value: '#f97316' },
   { name: 'Желтый', value: '#eab308' },
@@ -43,6 +44,25 @@ const colorOptions = [
   { name: 'Фиолетовый', value: '#8b5cf6' },
   { name: 'Розовый', value: '#ec4899' },
   { name: 'Белый', value: '#ffffff' },
+  
+  // Элементы Genshin Impact
+  { name: 'Пиро (Красный)', value: '#ff6b6b' },
+  { name: 'Гидро (Синий)', value: '#4fc3f7' },
+  { name: 'Электро (Фиолетовый)', value: '#ba68c8' },
+  { name: 'Крио (Голубой)', value: '#81d4fa' },
+  { name: 'Анемо (Зеленый)', value: '#81c784' },
+  { name: 'Гео (Коричневый)', value: '#a1887f' },
+  { name: 'Дендро (Зеленый)', value: '#66bb6a' },
+  
+  // Дополнительные цвета
+  { name: 'Голубой', value: '#00bcd4' },
+  { name: 'Бирюзовый', value: '#26a69a' },
+  { name: 'Темно-синий', value: '#1976d2' },
+  { name: 'Светло-зеленый', value: '#8bc34a' },
+  { name: 'Золотой', value: '#ffc107' },
+  { name: 'Серебряный', value: '#9e9e9e' },
+  { name: 'Серый', value: '#757575' },
+  { name: 'Черный', value: '#424242' },
 ];
 
 export default function ArticleEditor({ 
@@ -454,8 +474,8 @@ export default function ArticleEditor({
           </Button>
           
           {showColorPicker && (
-            <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-20 shadow-xl min-w-[200px] max-w-[280px]">
-              <div className="grid grid-cols-4 gap-2">
+            <div className="absolute top-full left-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg p-3 z-20 shadow-xl min-w-[300px] max-w-[400px]">
+              <div className="grid grid-cols-6 gap-2">
                 {colorOptions.map((color) => (
                   <button
                     key={color.value}

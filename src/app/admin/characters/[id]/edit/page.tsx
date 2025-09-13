@@ -886,15 +886,15 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                     characterId={characterId}
                   />
                   <div className="mt-2 text-xs text-gray-400 bg-neutral-900 rounded p-2">
-                    <div className="font-semibold mb-1 text-gray-300">Поддерживаемая разметка:</div>
+                    <div className="font-semibold mb-1 text-gray-300">HTML редактор поддерживает:</div>
                     <ul className="list-disc pl-5 space-y-1">
-                      <li><b>Жирный:</b> <code>**текст**</code> или <code>__текст__</code></li>
-                      <li><b>Цвет:</b> <code>[pyro:Пиро]</code>, <code>[hydro:Гидро]</code>, <code>[electro:Электро]</code>, <code>[cryo:Крио]</code>, <code>[anemo:Анемо]</code>, <code>[geo:Гео]</code>, <code>[dendro:Дендро]</code>, <code>[red:Красный]</code>, <code>[blue:Голубой]</code>, <code>[green:Зелёный]</code>, <code>[yellow:Жёлтый]</code>, <code>[orange:Оранжевый]</code>, <code>[purple:Фиолетовый]</code>, <code>[cyan:Голубой]</code>, <code>[pink:Розовый]</code></li>
-                      <li><b>Ссылка:</b> <code>[текст](https://site.ru)</code></li>
-                      <li><b>Модалка оружия:</b> <code>[Меч Фавония](weapon:favonius-sword)</code></li>
-                      <li><b>Комбинированное:</b> <code>[pyro:**Пиро ДПС**]</code></li>
+                      <li><b>Форматирование:</b> жирный, курсив, подчеркивание, заголовки</li>
+                      <li><b>Цвета:</b> палитра с цветами элементов Genshin Impact</li>
+                      <li><b>Ссылки:</b> оружие, артефакты, персонажи, таланты, созвездия</li>
+                      <li><b>Списки:</b> маркированные и нумерованные</li>
+                      <li><b>Дополнительно:</b> цитаты, разделители, таблицы</li>
                     </ul>
-                    <div className="mt-1 text-gray-500">Для модалок доступны: <b>weapon:ID</b>, <b>artifact:ID</b>, <b>character:ID</b>, <b>talent:тип</b>, <b>constellation:уровень</b></div>
+                    <div className="mt-1 text-gray-500">Используйте панель инструментов выше для форматирования и кнопку "Подсказки для ссылок" для вставки игровых элементов</div>
                   </div>
                 </div>
               ) : (

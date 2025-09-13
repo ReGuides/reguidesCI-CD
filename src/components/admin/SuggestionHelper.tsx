@@ -176,12 +176,17 @@ const SuggestionHelper: React.FC<SuggestionHelperProps> = ({ onInsert, character
       
       case 'talent':
         return (Array.isArray(talents) ? talents : []).filter(talent => 
-          !query || talent.name.toLowerCase().includes(query)
+          !query || 
+          talent.name.toLowerCase().includes(query) ||
+          talent.type.toLowerCase().includes(query) ||
+          (talent._id && talent._id.toLowerCase().includes(query))
         );
       
       case 'constellation':
         return (Array.isArray(constellations) ? constellations : []).filter(constellation => 
-          !query || constellation.name.toLowerCase().includes(query)
+          !query || 
+          constellation.name.toLowerCase().includes(query) ||
+          constellation.level.toString().includes(query)
         );
       
       default:
@@ -203,47 +208,84 @@ const SuggestionHelper: React.FC<SuggestionHelperProps> = ({ onInsert, character
   };
 
   const handleItemSelect = (item: Weapon | Artifact | Character | Talent | Constellation) => {
-    let text = '';
+    let html = '';
     
     switch (selectedType) {
       case 'weapon':
         const weapon = item as Weapon;
         if (weapon.name && weapon.id) {
-          text = `[${weapon.name}](${selectedType}:${weapon.id})`;
+          html = `<a href="/weapons/${weapon.id}" class="weapon-info inline-flex items-center gap-2 px-2 py-1 rounded border border-orange-500 bg-orange-500/10 hover:bg-orange-500/20 transition-colors text-orange-400 hover:text-orange-300 no-underline">
+            <span class="weapon-icon">⚔️</span> 
+            <strong>${weapon.name}</strong> 
+            <span class="text-xs text-gray-400">${weapon.type} ${weapon.rarity}⭐</span>
+          </a>`;
         }
         break;
       case 'artifact':
         const artifact = item as Artifact;
         if (artifact.name && artifact.id) {
-          text = `[${artifact.name}](${selectedType}:${artifact.id})`;
+          html = `<a href="/artifacts/${artifact.id}" class="artifact-info inline-flex items-center gap-2 px-2 py-1 rounded border border-purple-500 bg-purple-500/10 hover:bg-purple-500/20 transition-colors text-purple-400 hover:text-purple-300 no-underline">
+            <span class="artifact-icon">💎</span> 
+            <strong>${artifact.name}</strong> 
+            <span class="text-xs text-gray-400">${Array.isArray(artifact.rarity) ? artifact.rarity.join(', ') : 'N/A'}⭐</span>
+          </a>`;
         }
         break;
       case 'character':
         const character = item as Character;
         if (character.name && character.id) {
-          text = `[${character.name}](${selectedType}:${character.id})`;
+          const elementColors: { [key: string]: string } = {
+            'Пиро': '#ff6b6b',
+            'Гидро': '#4fc3f7', 
+            'Электро': '#ba68c8',
+            'Крио': '#81d4fa',
+            'Анемо': '#81c784',
+            'Гео': '#a1887f',
+            'Дендро': '#66bb6a'
+          };
+          const elementColor = elementColors[character.element] || '#ffffff';
+          html = `<a href="/characters/${character.id}" class="character-card inline-flex items-center gap-2 px-2 py-1 rounded border transition-colors no-underline" style="border-color: ${elementColor}; background: ${elementColor}20; color: ${elementColor};">
+            <span class="character-icon">👤</span> 
+            <strong>${character.name}</strong> 
+            <span class="text-xs text-gray-400">${character.element} • ${character.weaponType} • ${character.rarity}⭐</span>
+          </a>`;
         }
         break;
       case 'talent':
         const talent = item as Talent;
         if (talent.name) {
-          if (talent.type === 'passive' && talent._id) {
-            text = `[${talent.name}](${selectedType}:passive_${talent._id})`;
-          } else {
-            text = `[${talent.name}](${selectedType}:${talent.type})`;
-          }
+          const talentIcons: { [key: string]: string } = {
+            'normal': '⚔️',
+            'skill': '✨',
+            'burst': '💥',
+            'passive': '⭐'
+          };
+          const talentIcon = talentIcons[talent.type] || '⭐';
+          const talentId = talent._id || talent.type;
+          html = `<span class="talent-info inline-flex items-center gap-2 px-2 py-1 rounded border border-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 transition-colors text-yellow-400 hover:text-yellow-300 cursor-pointer" data-talent-id="${talentId}" data-talent-type="${talent.type}">
+            <span class="talent-icon">${talentIcon}</span> 
+            <strong>${talent.name}</strong>
+            <span class="text-xs text-gray-400">${talent.type === 'normal' ? 'Обычная атака' :
+              talent.type === 'skill' ? 'Элементальный навык' :
+              talent.type === 'burst' ? 'Взрыв стихии' :
+              talent.type === 'passive' ? 'Пассивный талант' : talent.type}</span>
+          </span>`;
         }
         break;
       case 'constellation':
         const constellation = item as Constellation;
         if (constellation.name && constellation.level) {
-          text = `[${constellation.name}](${selectedType}:${constellation.level})`;
+          html = `<span class="constellation-info inline-flex items-center gap-2 px-2 py-1 rounded border border-cyan-500 bg-cyan-500/10 hover:bg-cyan-500/20 transition-colors text-cyan-400 hover:text-cyan-300 cursor-pointer" data-constellation-level="${constellation.level}">
+            <span class="constellation-icon">🌟</span> 
+            <strong>${constellation.name}</strong>
+            <span class="text-xs text-gray-400">Созвездие ${constellation.level}</span>
+          </span>`;
         }
         break;
     }
     
-    if (text) {
-      onInsert(text);
+    if (html) {
+      onInsert(html);
       handleClose();
     }
   };
@@ -434,19 +476,21 @@ const SuggestionHelper: React.FC<SuggestionHelperProps> = ({ onInsert, character
             </span>
           </div>
           
-          {(selectedType === 'weapon' || selectedType === 'artifact' || selectedType === 'character') && (
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder={`Введите название ${selectedType === 'weapon' ? 'оружия' : selectedType === 'artifact' ? 'артефакта' : 'персонажа'}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-              onMouseDown={(e) => e.stopPropagation()}
-              onMouseUp={(e) => e.stopPropagation()}
-              className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-            />
-          )}
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder={`Введите название ${selectedType === 'weapon' ? 'оружия' : 
+              selectedType === 'artifact' ? 'артефакта' : 
+              selectedType === 'character' ? 'персонажа' :
+              selectedType === 'talent' ? 'таланта' :
+              selectedType === 'constellation' ? 'созвездия' : 'элемента'}...`}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseUp={(e) => e.stopPropagation()}
+            className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+          />
           
           <div className="max-h-64 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {filteredItems.length > 0 ? (
