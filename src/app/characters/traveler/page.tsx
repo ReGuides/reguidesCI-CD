@@ -245,36 +245,32 @@ function TravelerPageContent() {
         <div className="space-y-6">
           {activeTab === 'weapons' && (
             <CharacterWeaponsSection 
-              character={character}
+              characterId={character.id}
               onItemClick={handleItemClick}
             />
           )}
 
           {activeTab === 'teams' && (
             <CharacterTeamsSection 
-              character={character}
-              onItemClick={handleItemClick}
+              characterId={character.id}
             />
           )}
 
           {activeTab === 'builds' && (
             <BuildsSection 
               characterId={character.id}
-              onItemClick={handleItemClick}
             />
           )}
 
           {activeTab === 'talents' && (
             <CharacterTalentsSection 
-              character={character}
-              onItemClick={handleItemClick}
+              characterId={character.id}
             />
           )}
 
           {activeTab === 'constellations' && (
             <CharacterConstellationsSection 
-              character={character}
-              onItemClick={handleItemClick}
+              characterId={character.id}
             />
           )}
         </div>
