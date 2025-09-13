@@ -7,6 +7,7 @@ import { WeaponSelectModal } from './WeaponSelectModal';
 import { ArtifactSelectModal } from './ArtifactSelectModal';
 import TextFormattingToolbar from '@/components/admin/TextFormattingToolbar';
 import SuggestionHelper from '@/components/admin/SuggestionHelper';
+import ArticleEditor from '@/components/ui/article-editor';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 
 // Константы для статов и талантов
@@ -184,10 +185,9 @@ export default function BuildForm({ initial, onCancel, onSave, characterWeaponTy
         />
         <div>
           <label className="block text-sm font-medium mb-2 text-white">Описание билда (HTML)</label>
-          <textarea
+          <ArticleEditor
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full min-h-[200px] bg-neutral-700 text-white rounded p-3 border border-neutral-600 resize-none"
+            onChange={setDescription}
             placeholder="Описание билда в HTML..."
           />
           <TextFormattingToolbar onInsert={handleInsertSuggestion} />

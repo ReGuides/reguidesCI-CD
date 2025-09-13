@@ -15,6 +15,7 @@ import TextFormattingToolbar from '@/components/admin/TextFormattingToolbar';
 import SuggestionHelper from '@/components/admin/SuggestionHelper';
 import TalentManager from '@/components/admin/TalentManager';
 import ConstellationManager from '@/components/admin/ConstellationManager';
+import ArticleEditor from '@/components/ui/article-editor';
 import { Weapon } from '@/types';
 import { getImageWithFallback } from '@/lib/utils/imageUtils';
 
@@ -872,10 +873,9 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm text-gray-400 mb-2 block">Описание геймплея (HTML)</label>
-                    <textarea
+                    <ArticleEditor
                       value={formData.gameplayDescription || ''}
-                      onChange={(e) => setFormData(prev => ({ ...prev, gameplayDescription: e.target.value }))}
-                      className="w-full min-h-[300px] bg-neutral-700 text-white rounded p-3 border border-neutral-600 resize-none"
+                      onChange={(content: string) => setFormData(prev => ({ ...prev, gameplayDescription: content }))}
                       placeholder="Введите описание геймплея персонажа в HTML..."
                     />
                   </div>
