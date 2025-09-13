@@ -115,7 +115,6 @@ function TravelerPageContent() {
     patchNumber: '1.0',
     gameplayDescription: 'Путешественник - это главный персонаж игры, который может овладеть всеми семью элементами. В зависимости от выбранного элемента, персонаж получает уникальные таланты и способности.',
     views: 0,
-    isActive: true,
     isFeatured: true,
     role: 'DPS/Support',
     createdAt: new Date(),
