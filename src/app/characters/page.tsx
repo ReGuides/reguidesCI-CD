@@ -6,6 +6,7 @@ import { CharacterFilters } from '@/components/features/character-filters';
 import { Character } from '@/types';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import PageTitle from '@/components/ui/page-title';
+import TravelerCard from '@/components/traveler/TravelerCard';
 
 export default function CharactersPage() {
   return (
@@ -89,6 +90,8 @@ function CharactersPageContent() {
         {/* Characters Grid */}
         {!loading && !error && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {/* Карточка главного персонажа */}
+            <TravelerCard />
             {characters.map((character) => (
               <CharacterCard key={character.id} character={character} />
             ))}
