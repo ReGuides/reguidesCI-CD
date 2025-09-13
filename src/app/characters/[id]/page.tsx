@@ -114,13 +114,19 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
           console.error('Failed to fetch artifact:', response.status, response.statusText);
         }
       } else if (type === 'talent') {
-        const response = await fetch(`/api/talents/${id}`);
+        // Для талантов ищем по characterId и типу таланта
+        const response = await fetch(`/api/talents/character/${character?.id}`);
         if (response.ok) {
-          const talent = await response.json();
-          setSelectedTalent(talent);
-          setIsTalentModalOpen(true);
+          const talentsData = await response.json();
+          const talent = talentsData.talents?.find((t: any) => t._id === id || t.type === id);
+          if (talent) {
+            setSelectedTalent(talent);
+            setIsTalentModalOpen(true);
+          } else {
+            console.error('Talent not found in character data');
+          }
         } else {
-          console.error('Failed to fetch talent:', response.status, response.statusText);
+          console.error('Failed to fetch talents:', response.status, response.statusText);
         }
       } else if (type === 'character') {
         // Для персонажей перенаправляем на страницу персонажа
@@ -465,6 +471,7 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
             <div>
               <CharacterTalentsSection 
                 characterId={character.id}
+                onItemClick={handleItemClick}
               />
             </div>
           )}

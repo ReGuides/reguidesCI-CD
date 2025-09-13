@@ -70,7 +70,7 @@ const SuggestionHelper: React.FC<SuggestionHelperProps> = ({ onInsert, character
         const weaponsResponse = await fetch('/api/weapons');
         if (weaponsResponse.ok) {
           const weaponsData = await weaponsResponse.json();
-          const weaponsArray = Array.isArray(weaponsData) ? weaponsData : [];
+          const weaponsArray = Array.isArray(weaponsData.data) ? weaponsData.data : Array.isArray(weaponsData) ? weaponsData : [];
           setWeapons(weaponsArray);
         }
 
@@ -78,7 +78,7 @@ const SuggestionHelper: React.FC<SuggestionHelperProps> = ({ onInsert, character
         const artifactsResponse = await fetch('/api/artifacts');
         if (artifactsResponse.ok) {
           const artifactsData = await artifactsResponse.json();
-          const artifactsArray = Array.isArray(artifactsData) ? artifactsData : [];
+          const artifactsArray = Array.isArray(artifactsData.data) ? artifactsData.data : Array.isArray(artifactsData) ? artifactsData : [];
           setArtifacts(artifactsArray);
         }
 

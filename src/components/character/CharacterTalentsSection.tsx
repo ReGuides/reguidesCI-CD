@@ -7,6 +7,7 @@ import { Talent } from '@/types';
 
 interface CharacterTalentsSectionProps {
   characterId: string;
+  onItemClick?: (type: string, id: string) => Promise<void>;
 }
 
 interface CharacterTalents {
@@ -42,7 +43,8 @@ const TALENT_COLORS = {
 };
 
 const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({ 
-  characterId
+  characterId,
+  onItemClick
 }) => {
   const [talentsData, setTalentsData] = useState<CharacterTalents | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,9 +86,16 @@ const CharacterTalentsSection: React.FC<CharacterTalentsSectionProps> = ({
     fetchTalents();
   }, [characterId]);
 
-  const handleTalentClick = (talent: Talent) => {
-    setSelectedTalent(talent);
-    setIsTalentModalOpen(true);
+  const handleTalentClick = async (talent: Talent) => {
+    if (onItemClick) {
+      // Используем переданный обработчик
+      const talentId = talent._id || talent.type;
+      await onItemClick('talent', talentId);
+    } else {
+      // Fallback на локальную модалку
+      setSelectedTalent(talent);
+      setIsTalentModalOpen(true);
+    }
   };
 
   const closeTalentModal = () => {
