@@ -1,17 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { getImageWithFallback } from '@/lib/utils/imageUtils';
-import LoadingSpinner from '@/components/ui/loading-spinner';
+import { useState } from 'react';
 import CharacterWeaponsSection from '@/components/character/CharacterWeaponsSection';
 import CharacterTeamsSection from '@/components/character/CharacterTeamsSection';
 import CharacterTalentsSection from '@/components/character/CharacterTalentsSection';
 import CharacterConstellationsSection from '@/components/character/CharacterConstellationsSection';
 import BuildsSection from '@/components/builds/BuildsSection';
-import { Zap, Users, Sword, Star, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
-import HtmlContent from '@/components/ui/html-content';
+import { Zap, Users, Sword, Star, BookOpen } from 'lucide-react';
 import { WeaponModal } from '@/components/weapon-modal';
 import { ArtifactModal } from '@/components/artifact-modal';
 import { TalentModal } from '@/components/talent-modal';
@@ -22,209 +17,6 @@ import ElementSwitcher from '@/components/traveler/ElementSwitcher';
 
 type TabType = 'weapons' | 'teams' | 'builds' | 'talents' | 'constellations';
 
-// Данные талантов для каждого элемента
-const travelerTalents = {
-  anemo: [
-    {
-      name: 'Обычная атака: Иностранный меч',
-      description: 'Выполняет до 5 быстрых атак.',
-      type: 'Normal Attack' as const
-    },
-    {
-      name: 'Элементальный навык: Вихрь',
-      description: 'Создает вихрь, который втягивает врагов и наносит Анемо урон.',
-      type: 'Elemental Skill' as const
-    },
-    {
-      name: 'Элементальный взрыв: Ураган',
-      description: 'Создает мощный ураган, который наносит Анемо урон по области.',
-      type: 'Elemental Burst' as const
-    }
-  ],
-  geo: [
-    {
-      name: 'Обычная атака: Иностранный меч',
-      description: 'Выполняет до 5 быстрых атак.',
-      type: 'Normal Attack' as const
-    },
-    {
-      name: 'Элементальный навык: Звездная ракета',
-      description: 'Создает гео-конструкцию, которая наносит Гео урон.',
-      type: 'Elemental Skill' as const
-    },
-    {
-      name: 'Элементальный взрыв: Скала',
-      description: 'Создает мощную гео-конструкцию, которая наносит Гео урон по области.',
-      type: 'Elemental Burst' as const
-    }
-  ],
-  electro: [
-    {
-      name: 'Обычная атака: Иностранный меч',
-      description: 'Выполняет до 5 быстрых атак.',
-      type: 'Normal Attack' as const
-    },
-    {
-      name: 'Элементальный навык: Молния',
-      description: 'Наносит Электро урон и создает электро-реакции.',
-      type: 'Elemental Skill' as const
-    },
-    {
-      name: 'Элементальный взрыв: Гром',
-      description: 'Создает мощную молнию, которая наносит Электро урон по области.',
-      type: 'Elemental Burst' as const
-    }
-  ],
-  dendro: [
-    {
-      name: 'Обычная атака: Иностранный меч',
-      description: 'Выполняет до 5 быстрых атак.',
-      type: 'Normal Attack' as const
-    },
-    {
-      name: 'Элементальный навык: Рост',
-      description: 'Создает дендро-конструкцию, которая наносит Дендро урон.',
-      type: 'Elemental Skill' as const
-    },
-    {
-      name: 'Элементальный взрыв: Лес',
-      description: 'Создает мощную дендро-конструкцию, которая наносит Дендро урон по области.',
-      type: 'Elemental Burst' as const
-    }
-  ]
-};
-
-// Данные созвездий для каждого элемента
-const travelerConstellations = {
-  anemo: [
-    {
-      name: 'С1: Вихревой поток',
-      description: 'Увеличивает радиус действия элементального навыка.',
-      level: 1
-    },
-    {
-      name: 'С2: Воздушный поток',
-      description: 'Увеличивает урон элементального взрыва.',
-      level: 2
-    },
-    {
-      name: 'С3: Ветреный клинок',
-      description: 'Увеличивает уровень элементального навыка на 3.',
-      level: 3
-    },
-    {
-      name: 'С4: Ураганный клинок',
-      description: 'Увеличивает уровень элементального взрыва на 3.',
-      level: 4
-    },
-    {
-      name: 'С5: Вихревой клинок',
-      description: 'Увеличивает уровень обычной атаки на 3.',
-      level: 5
-    },
-    {
-      name: 'С6: Ветреный клинок',
-      description: 'Увеличивает урон всех атак на 20%.',
-      level: 6
-    }
-  ],
-  geo: [
-    {
-      name: 'С1: Каменный поток',
-      description: 'Увеличивает радиус действия элементального навыка.',
-      level: 1
-    },
-    {
-      name: 'С2: Земной поток',
-      description: 'Увеличивает урон элементального взрыва.',
-      level: 2
-    },
-    {
-      name: 'С3: Каменный клинок',
-      description: 'Увеличивает уровень элементального навыка на 3.',
-      level: 3
-    },
-    {
-      name: 'С4: Скальный клинок',
-      description: 'Увеличивает уровень элементального взрыва на 3.',
-      level: 4
-    },
-    {
-      name: 'С5: Каменный клинок',
-      description: 'Увеличивает уровень обычной атаки на 3.',
-      level: 5
-    },
-    {
-      name: 'С6: Земной клинок',
-      description: 'Увеличивает урон всех атак на 20%.',
-      level: 6
-    }
-  ],
-  electro: [
-    {
-      name: 'С1: Молниеносный поток',
-      description: 'Увеличивает радиус действия элементального навыка.',
-      level: 1
-    },
-    {
-      name: 'С2: Электрический поток',
-      description: 'Увеличивает урон элементального взрыва.',
-      level: 2
-    },
-    {
-      name: 'С3: Молниеносный клинок',
-      description: 'Увеличивает уровень элементального навыка на 3.',
-      level: 3
-    },
-    {
-      name: 'С4: Громовой клинок',
-      description: 'Увеличивает уровень элементального взрыва на 3.',
-      level: 4
-    },
-    {
-      name: 'С5: Молниеносный клинок',
-      description: 'Увеличивает уровень обычной атаки на 3.',
-      level: 5
-    },
-    {
-      name: 'С6: Электрический клинок',
-      description: 'Увеличивает урон всех атак на 20%.',
-      level: 6
-    }
-  ],
-  dendro: [
-    {
-      name: 'С1: Растительный поток',
-      description: 'Увеличивает радиус действия элементального навыка.',
-      level: 1
-    },
-    {
-      name: 'С2: Лесной поток',
-      description: 'Увеличивает урон элементального взрыва.',
-      level: 2
-    },
-    {
-      name: 'С3: Растительный клинок',
-      description: 'Увеличивает уровень элементального навыка на 3.',
-      level: 3
-    },
-    {
-      name: 'С4: Лесной клинок',
-      description: 'Увеличивает уровень элементального взрыва на 3.',
-      level: 4
-    },
-    {
-      name: 'С5: Растительный клинок',
-      description: 'Увеличивает уровень обычной атаки на 3.',
-      level: 5
-    },
-    {
-      name: 'С6: Лесной клинок',
-      description: 'Увеличивает урон всех атак на 20%.',
-      level: 6
-    }
-  ]
-};
 
 export default function TravelerPage() {
   return <TravelerPageContent />;
@@ -236,12 +28,11 @@ function TravelerPageContent() {
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [selectedTalent, setSelectedTalent] = useState<Talent | null>(null);
-  const [selectedCombination, setSelectedCombination] = useState<ArtifactOrCombination | null>(null);
+  const [selectedCombination] = useState<ArtifactOrCombination | null>(null);
   const [isWeaponModalOpen, setIsWeaponModalOpen] = useState(false);
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [isTalentModalOpen, setIsTalentModalOpen] = useState(false);
   const [isCombinationModalOpen, setIsCombinationModalOpen] = useState(false);
-  const [isGameplayDescriptionCollapsed, setIsGameplayDescriptionCollapsed] = useState(false);
 
   const elementColors: { [key: string]: string } = {
     anemo: '#22c55e',
