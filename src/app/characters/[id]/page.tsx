@@ -458,12 +458,12 @@ function CharacterDetailPageContent({ params }: { params: Promise<{ id: string }
                   </button>
                   {!isGameplayDescriptionCollapsed && (
                     <div className="px-6 pb-6">
-                      <HtmlContent content={character.gameplayDescription || ''} />
+                      <HtmlContent content={character.gameplayDescription || ''} onItemClick={handleItemClick} />
                     </div>
                   )}
                 </div>
               )}
-              <BuildsSection characterId={character.id} />
+              <BuildsSection characterId={character.id} onItemClick={handleItemClick} />
             </div>
           )}
 

@@ -1,16 +1,80 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface HtmlContentProps {
   content: string;
   className?: string;
+  onItemClick?: (type: string, id: string) => Promise<void>;
 }
 
-export default function HtmlContent({ content, className = '' }: HtmlContentProps) {
+export default function HtmlContent({ content, className = '', onItemClick }: HtmlContentProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!onItemClick || !contentRef.current) return;
+
+    const handleClick = async (event: Event) => {
+      const target = event.target as HTMLElement;
+      
+      // Проверяем, что клик по интерактивному элементу
+      if (target.closest('.weapon-info')) {
+        event.preventDefault();
+        const link = target.closest('a');
+        if (link) {
+          const href = link.getAttribute('href');
+          if (href) {
+            const weaponId = href.replace('/weapons/', '');
+            await onItemClick('weapon', weaponId);
+          }
+        }
+      } else if (target.closest('.artifact-info')) {
+        event.preventDefault();
+        const link = target.closest('a');
+        if (link) {
+          const href = link.getAttribute('href');
+          if (href) {
+            const artifactId = href.replace('/artifacts/', '');
+            await onItemClick('artifact', artifactId);
+          }
+        }
+      } else if (target.closest('.character-card')) {
+        event.preventDefault();
+        const link = target.closest('a');
+        if (link) {
+          const href = link.getAttribute('href');
+          if (href) {
+            const characterId = href.replace('/characters/', '');
+            await onItemClick('character', characterId);
+          }
+        }
+      } else if (target.closest('.talent-info')) {
+        event.preventDefault();
+        const talentId = target.getAttribute('data-talent-id');
+        if (talentId) {
+          await onItemClick('talent', talentId);
+        }
+      } else if (target.closest('.constellation-info')) {
+        event.preventDefault();
+        const constellationLevel = target.getAttribute('data-constellation-level');
+        if (constellationLevel) {
+          await onItemClick('constellation', constellationLevel);
+        }
+      }
+    };
+
+    const contentElement = contentRef.current;
+    contentElement.addEventListener('click', handleClick);
+
+    return () => {
+      contentElement.removeEventListener('click', handleClick);
+    };
+  }, [onItemClick]);
+
   return (
     <>
       <div 
+        ref={contentRef}
         className={`text-gray-300 leading-relaxed html-content ${className}`}
         dangerouslySetInnerHTML={{ __html: content }}
       />

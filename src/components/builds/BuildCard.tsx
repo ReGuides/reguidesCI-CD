@@ -30,9 +30,10 @@ interface BuildCardProps {
     isFeatured?: boolean;
   };
   index: number;
+  onItemClick?: (type: string, id: string) => Promise<void>;
 }
 
-const BuildCard: React.FC<BuildCardProps> = ({ build, index }) => {
+const BuildCard: React.FC<BuildCardProps> = ({ build, index, onItemClick }) => {
   const [weaponsData, setWeaponsData] = useState<Weapon[]>([]);
   const [loadingWeapons, setLoadingWeapons] = useState(false);
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
@@ -241,7 +242,7 @@ const BuildCard: React.FC<BuildCardProps> = ({ build, index }) => {
           {/* Описание */}
           {build.description && (
             <div className="mb-4">
-              <HtmlContent content={build.description || ''} />
+              <HtmlContent content={build.description || ''} onItemClick={onItemClick} />
             </div>
           )}
 

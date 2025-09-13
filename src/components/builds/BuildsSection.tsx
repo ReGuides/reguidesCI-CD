@@ -6,6 +6,7 @@ import { BookOpen, Loader2 } from 'lucide-react';
 
 interface BuildsSectionProps {
   characterId: string;
+  onItemClick?: (type: string, id: string) => Promise<void>;
 }
 
 interface Build {
@@ -27,7 +28,7 @@ interface Build {
   isFeatured?: boolean;
 }
 
-const BuildsSection: React.FC<BuildsSectionProps> = ({ characterId }) => {
+const BuildsSection: React.FC<BuildsSectionProps> = ({ characterId, onItemClick }) => {
   const [builds, setBuilds] = useState<Build[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -92,7 +93,7 @@ const BuildsSection: React.FC<BuildsSectionProps> = ({ characterId }) => {
       
       <div className="grid gap-6">
         {builds.map((build, index) => (
-          <BuildCard key={build._id} build={build} index={index} />
+          <BuildCard key={build._id} build={build} index={index} onItemClick={onItemClick} />
         ))}
       </div>
     </div>
